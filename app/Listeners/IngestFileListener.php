@@ -8,6 +8,7 @@ use App\Http\Controllers\CyberBuddyController;
 use App\Models\Chunk;
 use App\Models\Collection;
 use App\Models\File;
+use App\Models\Vector;
 use App\Rules\IsValidCollectionName;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -179,11 +180,24 @@ class IngestFileListener extends AbstractListener
                                 'url' => $fileTmp->downloadUrl(),
                                 'page' => $obj['page'],
                                 'text' => $obj['text'],
+                                'is_embedded' => isset($obj['hypothetical_questions']),
                             ]);
 
                             if (isset($obj['tags'])) {
                                 foreach ($obj['tags'] as $tag) {
                                     $chunk->tags()->create(['tag' => Str::lower($tag)]);
+                                }
+                            }
+                            if ($chunk->is_embedded) {
+                                foreach ($obj['hypothetical_questions'] as $question) {
+                                    /** @var Vector $vector */
+                                    $vector = $chunk->vectors()->create([
+                                        'collection_id' => $chunk->collection_id,
+                                        'file_id' => $fileTmp->id,
+                                        'locale' => $question['language'],
+                                        'hypothetical_question' => $question['question'],
+                                        'embedding' => $question['embedding'],
+                                    ]);
                                 }
                             }
                         }
@@ -196,11 +210,24 @@ class IngestFileListener extends AbstractListener
                                 'url' => $file->downloadUrl(),
                                 'page' => $obj['page'],
                                 'text' => $obj['text'],
+                                'is_embedded' => isset($obj['hypothetical_questions']),
                             ]);
 
                             if (isset($obj['tags'])) {
                                 foreach ($obj['tags'] as $tag) {
                                     $chunk->tags()->create(['tag' => Str::lower($tag)]);
+                                }
+                            }
+                            if ($chunk->is_embedded) {
+                                foreach ($obj['hypothetical_questions'] as $question) {
+                                    /** @var Vector $vector */
+                                    $vector = $chunk->vectors()->create([
+                                        'collection_id' => $chunk->collection_id,
+                                        'file_id' => $file->id,
+                                        'locale' => $question['language'],
+                                        'hypothetical_question' => $question['question'],
+                                        'embedding' => $question['embedding'],
+                                    ]);
                                 }
                             }
                         } else {
@@ -220,11 +247,24 @@ class IngestFileListener extends AbstractListener
                                             'url' => $file->downloadUrl(),
                                             'page' => $obj['page'],
                                             'text' => $currentChunk,
+                                            'is_embedded' => isset($obj['hypothetical_questions']),
                                         ]);
 
                                         if (isset($obj['tags'])) {
                                             foreach ($obj['tags'] as $tag) {
                                                 $chunk->tags()->create(['tag' => Str::lower($tag)]);
+                                            }
+                                        }
+                                        if ($chunk->is_embedded) {
+                                            foreach ($obj['hypothetical_questions'] as $question) {
+                                                /** @var Vector $vector */
+                                                $vector = $chunk->vectors()->create([
+                                                    'collection_id' => $chunk->collection_id,
+                                                    'file_id' => $file->id,
+                                                    'locale' => $question['language'],
+                                                    'hypothetical_question' => $question['question'],
+                                                    'embedding' => $question['embedding'],
+                                                ]);
                                             }
                                         }
                                     }
@@ -239,6 +279,7 @@ class IngestFileListener extends AbstractListener
                                     'url' => $file->downloadUrl(),
                                     'page' => $obj['page'],
                                     'text' => $currentChunk,
+                                    'is_embedded' => isset($obj['hypothetical_questions']),
                                 ]);
 
                                 if (isset($obj['tags'])) {
@@ -246,9 +287,27 @@ class IngestFileListener extends AbstractListener
                                         $chunk->tags()->create(['tag' => Str::lower($tag)]);
                                     }
                                 }
+                                if ($chunk->is_embedded) {
+                                    foreach ($obj['hypothetical_questions'] as $question) {
+                                        /** @var Vector $vector */
+                                        $vector = $chunk->vectors()->create([
+                                            'collection_id' => $chunk->collection_id,
+                                            'file_id' => $file->id,
+                                            'locale' => $question['language'],
+                                            'hypothetical_question' => $question['question'],
+                                            'embedding' => $question['embedding'],
+                                        ]);
+                                    }
+                                }
                             }
                         }
                     }
+                }
+
+                // Mark the whole file as 'embedded'
+                if (!Chunk::where('file_id', $file->id)->where('is_embedded', false)->exists()) {
+                    $file->is_embedded = true;
+                    $file->save();
                 }
 
                 // Cleanup

@@ -2,16 +2,16 @@
 
 namespace App\Jobs;
 
-use App\Helpers\ApiUtilsFacade as ApiUtils;
+use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
 use App\Models\Chunk;
 use App\Models\Collection;
 use App\Models\File;
+use App\Models\Vector;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class EmbedChunks implements ShouldQueue
 {
@@ -36,36 +36,29 @@ class EmbedChunks implements ShouldQueue
                     ->where('is_deleted', false)
                     ->chunk(500, function ($chunks) use ($collection) {
 
-                        $files = [];
-                        $chunkz = [];
-
+                        /** @var Chunk $chunk */
                         foreach ($chunks as $chunk) {
-                            if (!in_array($chunk->file_id, $files)) {
-                                $files[] = $chunk->file_id;
-                            }
-                            $chunkz[] = [
-                                'uid' => (string)$chunk->id,
-                                'text' => $chunk->text,
-                                'tags' => $chunk->tags()->pluck('tag')->toArray(),
-                            ];
-                        }
-                        try {
-                            $response = ApiUtils::import_chunks($chunkz, $collection->name);
-                            if ($response['error']) {
-                                Log::error($response['error_details']);
-                            } else {
 
-                                Chunk::whereIn('id', collect($chunkz)->pluck('uid')->toArray())
-                                    ->update(['is_embedded' => true]);
+                            $lang = $chunk->language();
+                            $questions = HypotheticalQuestionsProvider::provide($lang, $chunk->text);
 
-                                foreach ($files as $fileId) {
-                                    if (!Chunk::where('file_id', $fileId)->where('is_embedded', false)->exists()) {
-                                        File::where('id', $fileId)->update(['is_embedded' => true]);
-                                    }
-                                }
+                            foreach ($questions as $question) {
+                                /** @var Vector $vector */
+                                $vector = $chunk->vectors()->create([
+                                    'collection_id' => $chunk->collection_id,
+                                    'file_id' => $chunk->file_id,
+                                    'locale' => $question['language'],
+                                    'hypothetical_question' => $question['question'],
+                                    'embedding' => $question['embedding'],
+                                ]);
                             }
-                        } catch (\Exception $exception) {
-                            Log::error($exception->getMessage());
+
+                            $chunk->is_embedded = true;
+                            $chunk->save();
+
+                            if (!Chunk::where('file_id', $chunk->file_id)->where('is_embedded', false)->exists()) {
+                                File::where('id', $chunk->file_id)->update(['is_embedded' => true]);
+                            }
                         }
                     });
             });

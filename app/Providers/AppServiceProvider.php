@@ -15,6 +15,7 @@ use App\Models\HiddenAlert;
 use App\Models\Honeypot;
 use App\Models\Prompt;
 use App\Models\Template;
+use App\Models\Vector;
 use App\Models\YnhBackup;
 use App\Models\YnhServer;
 use App\Observers\AssetObserver;
@@ -29,6 +30,7 @@ use App\Observers\HiddenAlertObserver;
 use App\Observers\HoneypotObserver;
 use App\Observers\PromptObserver;
 use App\Observers\TemplateObserver;
+use App\Observers\VectorObserver;
 use App\Observers\YnhBackupObserver;
 use App\Observers\YnhServerObserver;
 use App\Rules\AtLeastOneDigit;
@@ -138,6 +140,7 @@ class AppServiceProvider extends ServiceProvider
         File::observe(FilesObserver::class);
         Prompt::observe(PromptObserver::class);
         Template::observe(TemplateObserver::class);
+        Vector::observe(VectorObserver::class);
 
         // SAML
         Event::subscribe(SamlEventSubscriber::class);

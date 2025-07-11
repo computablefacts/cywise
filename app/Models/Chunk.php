@@ -110,6 +110,11 @@ class Chunk extends Model
         return $this->hasMany(ChunkTag::class, 'chunk_id', 'id');
     }
 
+    public function vectors(): HasMany
+    {
+        return $this->hasMany(Vector::class, 'chunk_id', 'id');
+    }
+
     public function language()
     {
         /** @var Collection $collection */

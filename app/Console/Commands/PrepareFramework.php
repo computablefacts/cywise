@@ -2,8 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
+use App\Models\User;
 use App\Models\YnhFramework;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\Yaml\Yaml;
@@ -31,6 +34,9 @@ class PrepareFramework extends Command
     {
         $in = $this->argument('input');
         $out = $this->argument('output');
+        $user = User::query()->where('email', config('towerify.admin.email'))->first();
+
+        Auth::login($user);
 
         if (is_dir($in)) {
             $this->processDirectory($in, $out);
@@ -124,12 +130,16 @@ class PrepareFramework extends Command
             $framework->file = Str::after($output, '/database/') . $framework->file;
 
             foreach ($framework->blocks() as $block) {
+
+                $block = Str::trim($block);
                 $chunk = [
                     'page' => 1,
                     'tags' => $this->extractTitlesFromMarkdown($block),
                     // 'text' => "**Provider.** {$framework->provider}\n**Title.** {$framework->name}\n**Description.** {$framework->description}\n\n" . trim($block),
-                    'text' => trim($block),
+                    'text' => $block,
+                    'hypothetical_questions' => HypotheticalQuestionsProvider::provide($framework->locale, $block),
                 ];
+
                 file_put_contents($filename, json_encode($chunk) . PHP_EOL, FILE_APPEND);
             }
         }

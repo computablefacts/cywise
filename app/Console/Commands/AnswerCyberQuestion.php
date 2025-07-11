@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\AgentSquad\Actions\CyberBuddy;
 use App\AgentSquad\Orchestrator;
 use App\Enums\RoleEnum;
 use App\Models\User;
@@ -9,33 +10,31 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class FindLegalArguments extends Command
+class AnswerCyberQuestion extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'legal:find {input}';
+    protected $signature = 'cyberbuddy';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Find legal arguments.';
-
+    protected $description = 'Interact with CyberBuddy from the command line.';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $in = $this->argument('input');
-        $input = $this->ask('Quelle est la thématique à développer ?');
+        $input = $this->ask('Quelle est votre question ?');
         $messages = [];
         $orchestrator = new Orchestrator();
-        $orchestrator->registerAgent(new LabourLawyer($in));
+        $orchestrator->registerAgent(new CyberBuddy());
         $user = User::query()->where('email', config('towerify.admin.email'))->first();
 
         Auth::login($user);

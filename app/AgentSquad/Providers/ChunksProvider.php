@@ -8,8 +8,12 @@ use Illuminate\Support\Facades\Log;
 
 class ChunksProvider
 {
+    /** @return Collection<Chunk> */
     public static function provide(Collection $collections, string $language, string $keywords, int $take = 50): Collection
     {
+        if ($collections->isEmpty() || empty($language) || empty($keywords)) {
+            return collect();
+        }
         try {
             $start = microtime(true);
             $chunks = Chunk::search("{$language}:{$keywords}")
@@ -17,10 +21,10 @@ class ChunksProvider
                 ->take($take)
                 ->get();
             $stop = microtime(true);
-            Log::debug("[CHUNKS_PROVIDER] Search for '{$keywords}:{$keywords}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
+            Log::debug("[CHUNKS_PROVIDER] Search for '{$language}:{$keywords}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
             return $chunks;
         } catch (\Exception $e) {
-            Log::debug("[CHUNKS_PROVIDER] Search for '{$keywords}:{$keywords}' failed");
+            Log::debug("[CHUNKS_PROVIDER] Search for '{$language}:{$keywords}' failed");
             Log::error($e->getMessage());
             return collect();
         }

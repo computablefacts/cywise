@@ -1,0 +1,6 @@
+Suggest at most 10 clear questions whose answer could be given by the user provided text.
+Don't use pronouns, be explicit about the subjects and objects of the question.
+The questions should be in {LANGUAGE} language.
+Only output one question per line without any other information (no markdown, no introductory sentences, no bullet points, etc.)
+The text (in {LANGUAGE} language) is:
+{TEXT}
