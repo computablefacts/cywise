@@ -27,11 +27,12 @@ class TheCyberBriefProcedure extends Procedure
         $params = $request->validate([
             'url_or_text' => 'required|string',
             'prompt' => 'required|string',
+            'model' => 'nullable|string',
         ]);
 
-        $text = $request->string('url_or_text', '');
-        $prompt = $request->string('prompt', '');
-        $model = $request->string('model', 'gpt-4o');
+        $text = $params['url_or_text'] ?? '';
+        $prompt = $params['prompt'] ?? '';
+        $model = $params['model'] ?? 'gpt-4o';
         // $temperature = $request->float('temperature', 0.7);
         $content = LlmProvider::download($text);
         $response = (new LlmProvider(LlmProvider::OPEN_AI))->execute(Str::replace('[TEXT]', $content, $prompt), $model);

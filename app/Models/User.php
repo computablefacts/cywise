@@ -151,6 +151,7 @@ class User extends WaveUser
             self::setupPrompts($user, 'default_debugger', 'seeders/prompts/default_debugger.txt');
             self::setupPrompts($user, 'default_orchestrator', 'seeders/prompts/default_orchestrator.txt');
             self::setupPrompts($user, 'default_reformulate_question', 'seeders/prompts/default_reformulate_question.txt');
+            self::setupPrompts($user, 'default_summarize', 'seeders/prompts/default_summarize.txt');
 
             // Get the oldest user of the tenant. We will automatically attach the frameworks to this user
             $oldestTenantUser = User::query()
