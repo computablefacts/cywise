@@ -20,3 +20,5 @@ php artisan framework:prepare $CISO_ASSISTANT/NIS/ $TOWERIFY/nis/
 php artisan framework:prepare $CISO_ASSISTANT/NIS2/ $TOWERIFY/nis2/
 php artisan framework:prepare $CISO_ASSISTANT/nist/ $TOWERIFY/nist/
 php artisan framework:prepare $CISO_ASSISTANT/owasp/ $TOWERIFY/owasp/
+
+find "$TOWERIFY" -name "*.jsonl" -type f -exec gzip {} \;
