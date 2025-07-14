@@ -70,9 +70,9 @@ class Orchestrator
     private function processInput(User $user, string $threadId, array $messages, string $input, array $chainOfThought = [], int $depth = 0): AbstractAnswer
     {
         if ($depth >= 3) {
-            Log::error("Too many iterations: $depth");
-            Log::error("Messages: " . json_encode($messages));
-            Log::error("Chain-of-thought: " . json_encode($chainOfThought));
+            Log::warning("Too many iterations: $depth");
+            Log::warning("Messages: " . json_encode($messages));
+            Log::warning("Chain-of-thought: " . json_encode($chainOfThought));
             /** @var ThoughtActionObservation $cot */
             $cot = array_pop($chainOfThought);
             return new FailedAnswer($cot->observation(), $chainOfThought);
