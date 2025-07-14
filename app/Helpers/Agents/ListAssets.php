@@ -5,6 +5,7 @@ namespace App\Helpers\Agents;
 use App\Models\Asset;
 use App\Models\User;
 
+/** @deprecated */
 class ListAssets extends AbstractAction
 {
     static function schema(): array

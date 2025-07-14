@@ -6,6 +6,7 @@ use App\Http\Controllers\AssetController;
 use App\Models\Asset;
 use App\Models\User;
 
+/** @deprecated */
 class RemoveAsset extends AbstractAction
 {
     static function schema(): array

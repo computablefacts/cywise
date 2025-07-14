@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\Port;
 use App\Models\User;
 
+/** @deprecated */
 class ListOpenPorts extends AbstractAction
 {
     static function schema(): array

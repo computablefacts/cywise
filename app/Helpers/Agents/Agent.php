@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+/** @deprecated */
 class Agent
 {
     private bool $fallbackOnNextCollection;

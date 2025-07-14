@@ -4,6 +4,7 @@ namespace App\Helpers\Agents;
 
 use App\Models\User;
 
+/** @deprecated */
 abstract class AbstractAction
 {
     protected User $user;

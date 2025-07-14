@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Parsedown;
 
+/** @deprecated */
 class QueryKnowledgeBase extends AbstractAction
 {
     private const string MODEL = 'deepseek-ai/DeepSeek-R1-0528-Turbo';

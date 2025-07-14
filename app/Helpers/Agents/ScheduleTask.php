@@ -7,6 +7,7 @@ use App\Models\User;
 use Cron\CronExpression;
 use Illuminate\Support\Carbon;
 
+/** @deprecated */
 class ScheduleTask extends AbstractAction
 {
     static function schema(): array

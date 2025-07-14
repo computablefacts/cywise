@@ -4,6 +4,7 @@ namespace App\Helpers\Agents;
 
 use App\Models\User;
 
+/** @deprecated */
 class Help extends AbstractAction
 {
     static function schema(): array

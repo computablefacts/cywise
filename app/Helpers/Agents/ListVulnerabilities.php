@@ -6,6 +6,7 @@ use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\User;
 
+/** @deprecated */
 class ListVulnerabilities extends AbstractAction
 {
     static function schema(): array

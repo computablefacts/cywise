@@ -7,6 +7,7 @@ use App\Models\File;
 use App\Models\User;
 use Illuminate\Support\Str;
 
+/** @deprecated */
 class ClarifyRequest extends AbstractAction
 {
     private string $message;

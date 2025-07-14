@@ -6,6 +6,7 @@ use App\Http\Controllers\AssetController;
 use App\Models\User;
 use Illuminate\Http\Request;
 
+/** @deprecated */
 class BeginAssetMonitoring extends AbstractAction
 {
     static function schema(): array
