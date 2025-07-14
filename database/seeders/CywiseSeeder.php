@@ -432,7 +432,7 @@ class CywiseSeeder extends Seeder
                 'version' => $json['version'],
                 'provider' => $json['provider'],
                 'locale' => $json['locale'],
-                'file' => $root . '/' . basename($file, '.json') . '.jsonl',
+                'file' => $root . '/' . basename($file, '.json') . '.jsonl.gz',
             ]);
         }
     }

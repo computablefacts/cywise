@@ -258,7 +258,7 @@ class User extends WaveUser
     {
         $collection = self::getOrCreateCollection($framework->collectionName(), $priority);
         if ($collection) {
-            $path = Str::replace('.jsonl', '.2.jsonl', $framework->path());
+            $path = Str::replace('.jsonl.gz', '.2.jsonl.gz', $framework->path());
             $url = \App\Http\Controllers\CyberBuddyController::saveLocalFile($collection, $path);
         }
     }

@@ -80,12 +80,12 @@ class YnhFramework extends Model
     public function tree(): array
     {
         $tree = [];
-        $jsonStream = fopen($this->path(), 'r');
+        $jsonStream = gzopen($this->path(), 'rb');
 
         if ($jsonStream === false) {
             throw new \Exception("Failed to open json file for streaming : {$this->path()}");
         }
-        while (($line = fgets($jsonStream)) !== false) {
+        while (($line = gzgets($jsonStream)) !== false) {
 
             $obj = json_decode(trim($line), true);
 
@@ -106,7 +106,7 @@ class YnhFramework extends Model
                 Log::error("Missing tags : {$this->path()} {$line}");
             }
         }
-        fclose($jsonStream);
+        gzclose($jsonStream);
         return $tree;
     }
 

@@ -113,22 +113,44 @@ class CyberBuddyController extends Controller
 
     public static function saveUploadedFile(\App\Models\Collection $collection, UploadedFile $file, bool $triggerIngest = true): ?string
     {
-        $file_md5 = md5_file($file->getRealPath());
-        $file_sha1 = sha1_file($file->getRealPath());
-        /** @var ?File $file_exists */
-        $file_exists = $collection->files()->where('md5', $file_md5)->where('sha1', $file_sha1)->first();
-
-        if ($file_exists) { // ensure each file is added only once to a given collection
-            return $file_exists->downloadUrl();
-        }
-
         // Extract file metadata
         $file_name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $file_extension = $file->getClientOriginalExtension();
         $file_path = $file->getClientOriginalPath();
         $file_size = $file->getSize();
         $mime_type = $file->getClientMimeType();
+        $file_md5 = md5_file($file->getRealPath());
+        $file_sha1 = sha1_file($file->getRealPath());
 
+        if ($file_extension === 'gz') {
+
+            $in = $file->getRealPath();
+            $handleIn = gzopen($in, 'rb');
+
+            if ($handleIn) {
+
+                $out = "/tmp/{$file_name}";
+                $handleOut = fopen($out, 'wb');
+
+                if (!$handleOut) {
+                    gzclose($handleIn);
+                } else {
+                    while (!gzeof($handleIn)) {
+                        fwrite($handleOut, gzread($handleIn, 4096));
+                    }
+                    gzclose($handleIn);
+                    fclose($handleOut);
+                    return self::saveLocalFile($collection, $out, $triggerIngest);
+                }
+            }
+        }
+
+        /** @var ?File $file_exists */
+        $file_exists = $collection->files()->where('md5', $file_md5)->where('sha1', $file_sha1)->first();
+
+        if ($file_exists) { // ensure each file is added only once to a given collection
+            return $file_exists->downloadUrl();
+        }
         if ($file_extension === 'jsonl' && $mime_type === 'application/octet-stream') {
             $mime_type = 'application/x-ndjason';
         }
@@ -418,7 +440,7 @@ class CyberBuddyController extends Controller
             $collection = \App\Models\Collection::create(['name' => $framework->collectionName()]);
         }
 
-        $path = Str::replace('.jsonl', '.2.jsonl', $framework->path());
+        $path = Str::replace('.jsonl.gz', '.2.jsonl.gz', $framework->path());
         $url = self::saveLocalFile($collection, $path);
 
         if ($url) {

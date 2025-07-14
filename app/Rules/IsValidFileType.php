@@ -29,6 +29,7 @@ class IsValidFileType implements ValidationRule
                 $mimeTypes->getMimeTypes('wav'),
                 $mimeTypes->getMimeTypes('webm'),
                 $mimeTypes->getMimeTypes('json'),
+                $mimeTypes->getMimeTypes('gz'),
             );
             if (Str::contains($value->getMimeType(), $mimeTypesAllowed)) {
                 return;
