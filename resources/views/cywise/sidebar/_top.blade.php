@@ -6,15 +6,7 @@
 <x-app.sidebar-dropdown text="{{ __('Timelines') }}"
                         icon="phosphor-stack"
                         id="timelines_dropdown"
-                        :active="
-                          Request::is('private/vulnerabilities') ||
-                          Request::is('private/leaks') ||
-                          Request::is('private/ioc') ||
-                          Request::is('private/assets') ||
-                          Request::is('private/events') ||
-                          Request::is('private/conversations') ||
-                          Request::is('private/notes-and-memos')
-                        "
+                        :active="false"
                         :open="(
                           Request::is('private/vulnerabilities') ||
                           Request::is('private/leaks') ||
@@ -80,11 +72,7 @@
 <x-app.sidebar-dropdown text="{{ __('Libraries') }}"
                         icon="phosphor-books"
                         id="libraries_dropdown"
-                        :active="
-                          Request::is('private/frameworks') ||
-                          Request::is('private/sca') ||
-                          Request::is('private/rules')
-                        "
+                        :active="false"
                         :open="(
                           Request::is('private/frameworks') ||
                           Request::is('private/sca') ||
@@ -109,13 +97,7 @@
 <x-app.sidebar-dropdown text="{{ __('Data Management') }}"
                         icon="phosphor-database"
                         id="datamanagement_dropdown"
-                        :active="
-                          Request::is('private/prompts') ||
-                          Request::is('private/tables') ||
-                          Request::is('private/collections') ||
-                          Request::is('private/documents') ||
-                          Request::is('private/chunks')
-                        "
+                        :active="false"
                         :open="(
                           Request::is('private/prompts') ||
                           Request::is('private/tables') ||
@@ -152,9 +134,7 @@
 <x-app.sidebar-dropdown text="{{ __('Administration') }}"
                         icon="phosphor-gear"
                         id="admin_dropdown"
-                        :active="
-                          Request::is('private/users')
-                        "
+                        :active="false"
                         :open="(
                           Request::is('private/users')
                         ) ? '1' : '0'">
