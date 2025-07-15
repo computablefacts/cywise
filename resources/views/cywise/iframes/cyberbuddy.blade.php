@@ -380,6 +380,10 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
     font-size: calc(var(--font-size));
   }
 
+  .tw-answer-message-html p {
+    margin-bottom: 0;
+  }
+
   .tw-answer-timestamp {
     color: rgb(107, 114, 128);
     font-size: 12px;
@@ -985,7 +989,7 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
       if (message.role === 'user') {
         addUserDirective(message.timestamp ? new Date(message.timestamp) : new Date(), message.content);
       } else if (message.role === 'assistant') {
-        addBotAnswer(message.timestamp ? new Date(message.timestamp) : new Date(), message.answer);
+        addBotAnswer(message.timestamp ? new Date(message.timestamp) : new Date(), {response: [], html: message.html});
       } else {
         console.log('unknown message type', message);
       }

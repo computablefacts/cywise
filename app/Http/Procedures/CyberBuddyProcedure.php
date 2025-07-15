@@ -2,18 +2,18 @@
 
 namespace App\Http\Procedures;
 
+use App\AgentSquad\Actions\CyberBuddy;
+use App\AgentSquad\Answers\FailedAnswer;
+use App\AgentSquad\Orchestrator;
+use App\AgentSquad\Providers\LlmsProvider;
 use App\Enums\RoleEnum;
-use App\Helpers\Agents\AbstractAction;
-use App\Helpers\Agents\Agent;
-use App\Helpers\LlmProvider;
 use App\Jobs\ProcessIncomingEmails;
 use App\Models\Conversation;
-use App\Models\Prompt;
 use App\Models\User;
-use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -61,154 +61,71 @@ class CyberBuddyProcedure extends Procedure
         if (!$conversation) {
             throw new \Exception("{$threadId} is an invalid thread id.");
         }
-        if (count($conversation->thread()) <= 0) {
-
-            $timestamp = Carbon::now();
-
-            // Load the prompt
-            /** @var Prompt $prompt */
-            $prompt = Prompt::where('created_by', $user->id)->where('name', 'default_assistant')->firstOrfail();
-            $prompt->template = Str::replace('{DATE}', $timestamp->format('Y-m-d'), $prompt->template);
-            $prompt->template = Str::replace('{TIME}', $timestamp->format('H:i'), $prompt->template);
-
-            // Set a conversation-wide prompt
-            $conversation->dom = json_encode(array_merge($conversation->thread(), [[
-                'role' => RoleEnum::DEVELOPER->value,
-                'content' => $prompt->template,
-                'timestamp' => Carbon::now()->toIso8601ZuluString(),
-            ]]));
-        }
+//        if (count($conversation->thread()) <= 0) {
+//
+//            $timestamp = Carbon::now();
+//
+//            // Load the prompt
+//            /** @var Prompt $prompt */
+//            $prompt = Prompt::where('created_by', $user->id)->where('name', 'default_assistant')->firstOrfail();
+//            $prompt->template = Str::replace('{DATE}', $timestamp->format('Y-m-d'), $prompt->template);
+//            $prompt->template = Str::replace('{TIME}', $timestamp->format('H:i'), $prompt->template);
+//
+//            // Set a conversation-wide prompt
+//            $conversation->dom = json_encode(array_merge($conversation->thread(), [[
+//                'role' => RoleEnum::DEVELOPER->value,
+//                'content' => $prompt->template,
+//                'timestamp' => Carbon::now()->toIso8601ZuluString(),
+//            ]]));
+//        }
 
         // Transform URLs provided by the user into notes
         ProcessIncomingEmails::extractAndSummarizeHyperlinks($question);
 
-        // Save the user's question
-        $conversation->dom = json_encode(array_merge($conversation->thread(), [[
+        // Load past messages
+        $messages = $conversation->thread();
+
+        // Dispatch work!
+        try {
+            $orchestrator = new Orchestrator();
+            $orchestrator->registerAgent(new CyberBuddy());
+            $answer = $orchestrator->run($user, $threadId, $messages, $question);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            $answer = new FailedAnswer("Sorry, an error occurred: {$e->getMessage()}");
+        }
+
+        // Update the conversation
+        $messages[] = [
             'role' => RoleEnum::USER->value,
             'content' => $question,
             'timestamp' => Carbon::now()->toIso8601ZuluString(),
-        ]]));
-        $conversation->save();
-
-        // Dispatch LLM call
-        if (Str::startsWith($question, '/')) {
-            $answer = $this->processCommand($user, $threadId, Str::after($question, '/'));
-        } else {
-            $answer = $this->processQuestion($user, $threadId, $conversation, $fallbackOnNextCollection);
-        }
-
-        // Save the LLM's answer
-        $conversation->dom = json_encode(array_merge($conversation->thread(), [[
+        ];
+        $messages[] = [
             'role' => RoleEnum::ASSISTANT->value,
-            'answer' => $answer,
+            'content' => $answer->markdown(),
             'timestamp' => Carbon::now()->toIso8601ZuluString(),
-        ]]));
+            'chain_of_thought' => $answer->chainOfThought(),
+            'html' => $answer->html(),
+        ];
+        $conversation->dom = json_encode($messages);
         $conversation->save();
 
         // Summarize the beginning of the conversation
         if (empty($conversation->description)) {
-            $exchange = collect($conversation->thread())
-                ->filter(fn(array $message) => $message['role'] === RoleEnum::USER->value || $message['role'] === RoleEnum::ASSISTANT->value)
+            $exchange = collect($conversation->lightThread())
                 ->take(4)
                 ->map(function (array $message) {
-                    if ($message['role'] === RoleEnum::USER->value) {
-                        $msg = $message['content'] ?? '';
-                    } else if ($message['role'] === RoleEnum::ASSISTANT->value) {
-                        $msg = $message['answer']['raw_answer'] ?? '';
-                    } else {
-                        $msg = '';
-                    }
-                    return Str::upper($message['role']) . " : {$msg}";
+                    $msg = $message['content'] ?? '';
+                    return Str::upper("> " . $message['role']) . " : {$msg}";
                 })
                 ->join("\n\n");
-            $response = (new LlmProvider(LlmProvider::OPEN_AI))->execute("Summarize the conversation in about 10 words :\n\n{$exchange}");
-            $conversation->description = $response['choices'][0]['message']['content'] ?? null;
+            $conversation->description = LlmsProvider::provide("Summarize the conversation in about 10 words :\n\n{$exchange}");
             $conversation->save();
-        }
-
-        unset($answer['raw_answer']);
-        unset($answer['memoize']);
-
-        return $answer;
-    }
-
-    private function processCommand(User $user, string $threadId, string $command): array
-    {
-        if ($command === 'servers') {
-
-            $rows = YnhServer::forUser($user)
-                ->filter(fn(YnhServer $server) => $server->ip())
-                ->map(function (YnhServer $server) use ($user) {
-                    $name = $server->name;
-                    $ipv4 = $server->ip();
-                    $ipv6 = $server->ipv6() ?: '-';
-                    $domains = $server->isYunoHost() ? $server->domains->count() : '-';
-                    $applications = $server->isYunoHost() ? $server->applications->count() : '-';
-                    $users = $server->isYunoHost() ? $server->users->count() : '-';
-                    $linkServer = $server->isYunoHost() ?
-                        '<a href="' . route('ynh.servers.edit', $server->id) . '" target="_blank">' . $name . '</a>' :
-                        '<a href="' . route('home', ['tab' => 'servers', 'servers_type' => 'instrumented']) . '" target="_blank">' . $name . '</a>';
-                    $linkDomains = $domains === '-' ? $domains : '<a href="' . route('ynh.servers.edit', $server->id) . "?tab=domains\" target=\"_blank\">$domains</a>";
-                    $linkApplications = $applications === '-' ? $applications : '<a href="' . route('ynh.servers.edit', $server->id) . "?tab=applications\" target=\"_blank\">$applications</a>";
-                    $linkUsers = $users === '-' ? $users : '<a href="' . route('ynh.servers.edit', $server->id) . "?tab=users\" target=\"_blank\">$users</a>";
-                    return "
-                      <tr>
-                        <td class='left'>{$linkServer}</td>
-                        <td class='left'>{$ipv4}</td>
-                        <td class='left'>{$ipv6}</td>
-                        <td class='left'>{$linkDomains}</td>
-                        <td class='left'>{$linkApplications}</td>
-                        <td class='left'>{$linkUsers}</td>
-                      </tr>
-                    ";
-                })
-                ->join("");
-
-            $header = "
-                <th class='left'>Name</th>
-                <th class='left'>IP V4</th>
-                <th class='left'>IP V6</th>
-                <th class='left'>Domains</th>
-                <th class='left'>Applications</th>
-                <th class='left'>Users</th>
-            ";
-
-            $table = AbstractAction::htmlTable($header, $rows, 6);
-
-            return [
-                'response' => ['Here are the servers you have instrumented :'],
-                'html' => $table,
-                'raw_answer' => "Here are the servers you have instrumented :\n{$table}",
-                'memoize' => false,
-            ];
-        }
-        return [
-            'response' => ['Sorry, I did not understand your request.'],
-            'html' => '',
-            'raw_answer' => 'Sorry, I did not understand your request.',
-            'memoize' => false,
-        ];
-    }
-
-    private function processQuestion(User $user, string $threadId, Conversation $conversation, bool $fallbackOnNextCollection = false): array
-    {
-        $agent = (new Agent($fallbackOnNextCollection))->run($conversation);
-        $markdown = $agent->markdown();
-        if ($agent->name() === 'query_knowledge_base' || $agent->name() === 'list_assets' ||
-            $agent->name() === 'list_open_ports' || $agent->name() === 'list_vulnerabilities' ||
-            $agent->name() === 'clarify_request') {
-            return [
-                'response' => [],
-                'html' => $agent->html(),
-                'raw_answer' => $markdown,
-                'memoize' => $agent->memoize(),
-            ];
         }
         return [
             'response' => [],
-            'html' => (new Parsedown)->text($markdown),
-            'raw_answer' => $markdown,
-            'memoize' => $agent->memoize(),
+            'html' => $messages[count($messages) - 1]['html'] ?? '',
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\AgentSquad\Answers;
 
 use App\AgentSquad\ThoughtActionObservation;
+use Parsedown;
 
 abstract class AbstractAnswer
 {
@@ -40,7 +41,7 @@ abstract class AbstractAnswer
 
     public function html(): string
     {
-        return $this->answer;
+        return (new Parsedown)->text($this->markdown());
     }
 
     public function markdown(): string
