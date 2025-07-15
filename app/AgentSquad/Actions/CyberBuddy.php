@@ -61,12 +61,14 @@ class CyberBuddy extends AbstractAction
             'content' => $prompt,
         ];
         $answer = LlmsProvider::provide($messages, self::MODEL, 3 * 60);
-        $answer = Str::trim(preg_replace('/```json.*?```/s', '', $answer));
+        $matches = null;
+        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
+        $answer = Str::trim($matches[1][0]);
         array_pop($messages);
         $json = json_decode($answer, true);
 
         if (!$json) {
-            return new FailedAnswer("The answer is not valid JSON: {$answer}");
+            return new FailedAnswer("The answer is not a valid JSON: {$answer}");
         }
         if (($json['lang'] ?? '') !== 'french' && ($json['lang'] ?? '') !== 'english') {
             return new FailedAnswer("The language is unknown: {$answer}");

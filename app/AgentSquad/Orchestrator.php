@@ -87,31 +87,29 @@ class Orchestrator
             'ACTIONS' => $actions,
             'INPUT' => $input,
         ]);
-
-        // Log::debug($prompt);
-
         $messages[] = [
             'role' => RoleEnum::USER->value,
             'content' => $prompt,
         ];
         $answer = LlmsProvider::provide($messages, $this->model);
+        $matches = null;
+        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
+        $answer = Str::trim($matches[1][0]);
         array_pop($messages);
         $json = json_decode(Str::trim($answer), true);
-
-        // Log::debug($answer);
 
         if (!isset($json)) {
 
             $json = [];
             $matches = null;
 
-            if (preg_match('/"thought"\s*:\s*"(.*)"/is', $answer, $matches)) {
+            if (preg_match('/"thought"\s*:\s*"(.*?)"/is', $answer, $matches)) {
                 $json['thought'] = $matches[1];
             }
             if (preg_match('/"action_name"\s*:\s*"([a-z0-9_]+)"/is', $answer, $matches)) {
                 $json['action_name'] = $matches[1];
             }
-            if (preg_match('/"action_input"\s*:\s*"(.*)"/is', $answer, $matches)) {
+            if (preg_match('/"action_input"\s*:\s*"(.*?)"/is', $answer, $matches)) {
                 $json['action_input'] = $matches[1];
             }
         }

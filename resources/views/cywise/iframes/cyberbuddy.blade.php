@@ -741,6 +741,22 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
     </div>
   </div>
 </div>
+<div class="modal fade" tabindex="-1" id="" aria-labelledby="" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          {{ __('Close') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -922,12 +938,14 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
 
     const paragraphs = answer.response.map(line => `<p class="tw-answer-message-paragraph">${line}</p>`).join('');
     const html = answer.html.trim() !== '' ? `<div class="tw-answer-message-html">${answer.html}</div>` : '';
+    const uid = com.computablefacts.helpers.goodFastHash(answer.chain_of_thought);
 
     const elDirective = document.createElement('div');
     elDirective.classList.add('tw-answer-wrapper');
     elDirective.innerHTML = `
       <div class="tw-answer">
-        <div class="tw-answer-avatar-wrapper">
+        <div id="cot-${uid}" style="display:none">${JSON.stringify(answer.chain_of_thought)}</div>
+        <div class="tw-answer-avatar-wrapper" onclick="chainOfThought('cot-${uid}')">
           <div class="tw-answer-avatar">
             <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"
                   stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round" class="tw-avatar-color">
@@ -987,11 +1005,11 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
       elActions.style.display = 'unset';
     }
     messages.forEach(message => {
-      console.log(message);
       if (message.role === 'user') {
         addUserDirective(message.timestamp ? new Date(message.timestamp) : new Date(), message.content);
       } else if (message.role === 'assistant') {
-        addBotAnswer(message.timestamp ? new Date(message.timestamp) : new Date(), {response: [], html: message.html});
+        addBotAnswer(message.timestamp ? new Date(message.timestamp) : new Date(),
+          {response: [], html: message.html, chain_of_thought: message.chain_of_thought});
       } else {
         console.log('unknown message type', message);
       }
@@ -1026,6 +1044,30 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
     });
     elInputField.focus();
   });
+
+  const chainOfThought = (uid) => {
+
+    const elCot = document.getElementById(uid);
+    const content = elCot.innerText;
+
+    if (content !== 'undefined') {
+
+      const cot = JSON.parse(content);
+      const modal = new bootstrap.Modal(document.querySelector('.modal'));
+      const modalTitle = document.querySelector('.modal-title');
+      const modalBody = document.querySelector('.modal-body');
+
+      modalTitle.textContent = "{{ __('Chain of Thought') }}";
+      modalBody.innerHTML = cot.map(c => `
+        <p><b>Thought.</b> ${c.thought}</p>
+        <p><b>Action.</b> ${c.action}</p>
+        <p><b>Observation.</b> ${c.observation}</p>
+      `).join('');
+
+      modal.show();
+    }
+  };
+
 </script>
 @endpush
 

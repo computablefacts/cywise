@@ -125,6 +125,7 @@ class CyberBuddyProcedure extends Procedure
         }
         return [
             'response' => [],
+            'chain_of_thought' => $messages[count($messages) - 1]['chain_of_thought'] ?? '',
             'html' => $messages[count($messages) - 1]['html'] ?? '',
         ];
     }
