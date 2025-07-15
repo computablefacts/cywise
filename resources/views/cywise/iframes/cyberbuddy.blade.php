@@ -748,7 +748,7 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
         <h5 class="modal-title">Modal title</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body"></div>
+      <div class="modal-body" style="max-height:60vh;overflow-y:auto;overflow-x:hidden"></div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
           {{ __('Close') }}
