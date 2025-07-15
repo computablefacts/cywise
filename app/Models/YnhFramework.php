@@ -62,7 +62,7 @@ class YnhFramework extends Model
         $collection = $this->collection();
         return $collection ? File::where('is_deleted', false)
             ->where('collection_id', $collection->id)
-            ->where('name', trim(basename($this->file, '.jsonl')))
+            ->where('name', Str::replace('.jsonl.gz', '.2', basename($this->file)))
             ->where('extension', 'jsonl')
             ->first() : null;
     }
