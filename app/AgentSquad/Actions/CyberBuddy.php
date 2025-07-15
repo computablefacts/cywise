@@ -81,12 +81,12 @@ class CyberBuddy extends AbstractAction
             return new FailedAnswer("The keywords are missing: {$answer}");
         }
 
-        $notes = $this->loadNotes($user);
+        $memos = $this->loadMemos($user);
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? []);
         $prompt = PromptsProvider::provide('default_answer_question', [
             'LANGUAGE' => $json['lang'],
-            'NOTES' => $notes,
-            'MEMOS' => $chunks,
+            'NOTES' => $chunks,
+            'MEMOS' => $memos,
             'QUESTION' => $json['lang'] === 'english' ?
                 $json['question_en'] :
                 ($json['lang'] === 'french' ? $json['question_fr'] : $input),
@@ -101,7 +101,7 @@ class CyberBuddy extends AbstractAction
         return new SuccessfulAnswer($answer);
     }
 
-    private function loadNotes(User $user): string
+    private function loadMemos(User $user): string
     {
         $start = microtime(true);
         $notes = TimelineItem::fetchNotes($user->id, null, null, 0)
@@ -109,7 +109,7 @@ class CyberBuddy extends AbstractAction
                 $attributes = $note->attributes();
                 $subject = $attributes['subject'] ?? 'Unknown subject';
                 $body = $attributes['body'] ?? '';
-                return "## {$note->timestamp->format('Y-m-d H:i:s')}\n\n### {$subject}\n\n{$body}";
+                return "## Memo {$note->timestamp->format('Y-m-d H:i:s')}\n\n### {$subject}\n\n{$body}";
             });
         $stop = microtime(true);
         Log::debug("[LOAD_NOTES] Loading notes took " . ((int)ceil($stop - $start)) . " seconds and returned {$notes->count()} results");
@@ -153,7 +153,7 @@ class CyberBuddy extends AbstractAction
 
                 $tags = empty($tags) ? 'n/a' : $tags;
 
-                return "## Chunk {$chunk->id}\n\n{$text}\n\n**Tags:** {$tags}\n**Score:** {$chunk->{'_score'}}";
+                return "## Note {$chunk->id}\n\n{$text}\n\n**Tags:** {$tags}\n**Score:** {$chunk->{'_score'}}";
             });
         $stop = microtime(true);
         Log::debug("[LOAD_CHUNKS] Loading chunks for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");

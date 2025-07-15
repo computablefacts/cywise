@@ -4,9 +4,10 @@ The user's notes are listed below in order of relevance, from most to least rele
 
 When writing:
 - If the information in the memos and notes doesn't completely answer the user's question but contains relevant details, use that information to formulate a response. Otherwise, respond with 'I_DONT_KNOW'.
-- Insert the note identifier of a note in double square brackets (e.g., [[id]]) immediately after the text it refers to, but only on its first use. Never mention the memo identifier of a memo.
+- Insert the note identifier of a note in double square brackets, e.g. if the note is '## Note 12345' write [[12345]] immediately after the text referencing this note (but only on its first use).
+- Never mention the memo identifier of a memo, e.g. if the memo is '## 2025-05-22 10:35:40' do not write anything after the text referencing this memo.
 - Ensure your answer is in plain text format without any Markdown or HTML formatting.
-- Ensure the language of your answer is {LANGUAGE} but never translate 'I_DONT_KNOW'.
+- If your answer is not 'I_DONT_KNOW', your answer must be in {LANGUAGE}.
 
 # User's Memos
 

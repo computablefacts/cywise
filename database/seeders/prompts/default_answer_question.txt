@@ -4,10 +4,52 @@ The user's notes are listed below in order of relevance, from most to least rele
 
 When writing:
 - If the information in the memos and notes doesn't completely answer the user's question but contains relevant details, use that information to formulate a response. Otherwise, respond with 'I_DONT_KNOW'.
-- Insert the note identifier of a note in double square brackets, e.g. if the note is '## Note 12345' write [[12345]] immediately after the text referencing this note (but only on its first use).
-- Never mention the memo identifier of a memo, e.g. if the memo is '## 2025-05-22 10:35:40' do not write anything after the text referencing this memo.
+- Insert the note identifier of a note in double square brackets, e.g. if the note title is '## Note 12345' write [[12345]] immediately after the text referencing this note (but only on its first use).
+- Never mention the memo identifier of a memo, e.g. if the memo title is '## Memo 2025-05-22 10:35:40' do not write anything after the text referencing this memo.
 - Ensure your answer is in plain text format without any Markdown or HTML formatting.
 - If your answer is not 'I_DONT_KNOW', your answer must be in {LANGUAGE}.
+
+For example, if the input (between [INPUT] and [/INPUT]) looks like this:
+
+[INPUT]
+# User's Memos
+
+## Memo 2025-07-15 16:32:09
+
+### Mon mot de passe
+
+cisco666
+
+# User's Notes
+
+## Note 51273
+
+Passwords must consist of at least 12 characters, including uppercase letters, lowercase letters, numbers, and special
+characters chosen from a list of at least 37 possible special characters.
+
+**Tags:** n/a
+**Score:** 0.87
+
+## Note 51245
+
+Les mots de passe doivent être composés d'au minimum 14 caractères comprenant des majuscules, des minuscules et des
+chiffres, sans caractère spécial obligatoire.
+
+**Tags:** n/a
+**Score:** 0.83
+
+# User's Question
+
+Quel doit être la complexité d'un mot de passe ?
+[/INPUT]
+
+Then, the output (between [OUTPUT] and [/OUTPUT]) should look like this:
+
+[OUTPUT]
+De manière générale, les mots de passe doivent être composés d'au minimum 12 caractères comprenant des majuscules, des
+minuscules, des chiffres et des caractères spéciaux [[51273]]. Cependant, si le mot de passe fait plus de 14 caractères,
+il n'est pas nécessaire que celui-ci contienne des caractères spéciaux [[51245]].
+[/OUTPUT]
 
 # User's Memos
 
