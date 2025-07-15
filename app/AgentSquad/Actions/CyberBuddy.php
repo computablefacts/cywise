@@ -61,10 +61,11 @@ class CyberBuddy extends AbstractAction
             'content' => $prompt,
         ];
         $answer = LlmsProvider::provide($messages, self::MODEL, 3 * 60);
+        array_pop($messages);
+
         $matches = null;
         preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
         $answer = Str::trim($matches[1][0]);
-        array_pop($messages);
         $json = json_decode($answer, true);
 
         if (!$json) {
