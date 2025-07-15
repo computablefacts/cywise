@@ -3,11 +3,12 @@
 @php
 
 $conversationId = request()->query('conversation_id');
+$userId = Auth::user()?->id;
 
 if ($conversationId) {
 $conversation = \App\Models\Conversation::where('id', $conversationId)
 ->where('format', \App\Models\Conversation::FORMAT_V1)
-->where('created_by', Auth::user()?->id)
+->where('created_by', $userId)
 ->first();
 }
 
@@ -15,7 +16,7 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
 'thread_id' => \Illuminate\Support\Str::random(10),
 'dom' => json_encode([]),
 'autosaved' => true,
-'created_by' => Auth::user()?->id,
+'created_by' => $userId,
 'format' => \App\Models\Conversation::FORMAT_V1,
 ]);
 
@@ -986,6 +987,7 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
       elActions.style.display = 'unset';
     }
     messages.forEach(message => {
+      console.log(message);
       if (message.role === 'user') {
         addUserDirective(message.timestamp ? new Date(message.timestamp) : new Date(), message.content);
       } else if (message.role === 'assistant') {
