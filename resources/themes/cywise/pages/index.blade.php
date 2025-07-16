@@ -29,62 +29,65 @@ name('home');
         </div>
       </div>
     </section>
-    <section
-      class="flex flex-col items-center justify-between flex-1 w-full max-w-2xl gap-6 px-8 pt-32 mx-auto text-left md:px-12 xl:px-20 lg:pt-32 lg:pb-16 lg:max-w-7xl lg:flex-row">
-      <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
-        <h2 class="text-base/7 font-semibold text-indigo-600">
-          Un besoin ?
-        </h2>
-        <p class="mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-950 sm:text-5xl">
-          Dites-nous qui vous êtes, on adapte le programme !
-        </p>
-        <p class="mt-3 text-sm/6 text-gray-600">
-          Bienvenue ! Dans l’univers Cywise, Cyberbuddy est votre copilote sur tout ce qui touche à la cybersécurité :
-          audit, conformité, PSSI... Il est là pour vous guider, vous expliquer, et vous simplifier la vie (pas pour
-          vous
-          noyer dans le jargon).
-        </p>
-        <div class="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
-          <div class="relative lg:col-span-3">
-            <div class="absolute inset-0 rounded-lg bg-white max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]"></div>
-            <div
-              class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)] lg:rounded-tl-[calc(2rem+1px)]">
-              <div class="p-10 pt-10">
-                <h3 class="text-sm/4 font-semibold text-indigo-600">
-                  TPE & PME
-                </h3>
-                <p class="mt-2 text-lg font-medium tracking-tight text-gray-950">
-                  <a href="{{ route('tpe-pme') }}">
-                    Je suis une TPE ou une PME <span aria-hidden="true">→</span>
-                  </a>
-                </p>
+    <section>
+      <div class="relative isolate px-3 pt-7 lg:px-4">
+        <div class="mx-auto max-w-4xl py-16 sm:py-24 lg:py-28">
+          <h2 class="text-base/7 font-semibold text-indigo-600">
+            Un besoin ?
+          </h2>
+          <p class="mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-950 sm:text-5xl">
+            Dites-nous qui vous êtes, on adapte le programme !
+          </p>
+          <p class="mt-3 text-sm/6 text-gray-600">
+            Bienvenue ! Dans l’univers Cywise, Cyberbuddy est votre copilote sur tout ce qui touche à la cybersécurité
+            :
+            audit, conformité, PSSI... Il est là pour vous guider, vous expliquer, et vous simplifier la vie (pas pour
+            vous
+            noyer dans le jargon).
+          </p>
+          <div class="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-1">
+            <div class="relative lg:col-span-3">
+              <div class="absolute inset-0 rounded-lg bg-white max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]"></div>
+              <div
+                class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)] lg:rounded-tl-[calc(2rem+1px)]">
+                <div class="p-10 pt-10">
+                  <h3 class="text-sm/4 font-semibold text-indigo-600">
+                    TPE & PME
+                  </h3>
+                  <p class="mt-2 text-lg font-medium tracking-tight text-gray-950">
+                    <a href="{{ route('tpe-pme') }}">
+                      Je suis une TPE ou une PME <span aria-hidden="true">→</span>
+                    </a>
+                  </p>
+                </div>
               </div>
+              <div
+                class="pointer-events-none absolute inset-0 rounded-lg shadow outline outline-black/5"></div>
             </div>
-            <div
-              class="pointer-events-none absolute inset-0 rounded-lg shadow outline outline-black/5"></div>
-          </div>
-          <div class="relative lg:col-span-3">
-            <div class="absolute inset-0 rounded-lg bg-white lg:rounded-tr-[2rem]"></div>
-            <div
-              class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-tr-[calc(2rem+1px)]">
-              <div class="p-10 pt-10">
-                <h3 class="text-sm/4 font-semibold text-indigo-600">
-                  Grand Groupe
-                </h3>
-                <p class="mt-2 text-lg font-medium tracking-tight text-gray-950">
-                  <a href="{{ route('pssi') }}">
-                    Je suis un grand groupe <span aria-hidden="true">→</span>
-                  </a>
-                </p>
+            <div class="relative lg:col-span-3">
+              <div class="absolute inset-0 rounded-lg bg-white lg:rounded-tr-[2rem]"></div>
+              <div
+                class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-tr-[calc(2rem+1px)]">
+                <div class="p-10 pt-10">
+                  <h3 class="text-sm/4 font-semibold text-indigo-600">
+                    Grand Groupe
+                  </h3>
+                  <p class="mt-2 text-lg font-medium tracking-tight text-gray-950">
+                    <a href="{{ route('pssi') }}">
+                      Je suis un grand groupe <span aria-hidden="true">→</span>
+                    </a>
+                  </p>
+                </div>
               </div>
+              <div
+                class="pointer-events-none absolute inset-0 rounded-lg shadow outline outline-black/5"></div>
             </div>
-            <div
-              class="pointer-events-none absolute inset-0 rounded-lg shadow outline outline-black/5"></div>
           </div>
         </div>
       </div>
     </section>
-    <section class="bg-white px-6 py-12 sm:py-16 lg:px-8">
+    <section
+      class="flex flex-col items-center justify-between flex-1 w-full max-w-2xl gap-6 px-8 pt-32 mx-auto text-left md:px-12 xl:px-20 lg:pt-16 lg:pb-16 lg:max-w-7xl lg:flex-row">
       <figure class="mx-auto max-w-2xl">
         <p class="sr-only">5 out of 5 stars</p>
         <div class="flex gap-x-1 text-indigo-600">
@@ -130,8 +133,8 @@ name('home');
       </figure>
     </section>
     <section>
-      <div class="bg-white py-24 sm:py-32">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <div class="relative isolate px-3 pt-7 lg:px-4">
+        <div class="mx-auto max-w-4xl py-16 sm:py-24 lg:py-28">
           <div class="mx-auto max-w-2xl lg:text-center">
             <h2 class="text-base/7 font-semibold text-indigo-600">
               Notre différence
@@ -210,7 +213,8 @@ name('home');
         </div>
       </div>
     </section>
-    <section class="bg-white px-6 py-12 sm:py-16 lg:px-8">
+    <section
+      class="flex flex-col items-center justify-between flex-1 w-full max-w-2xl gap-6 px-8 pt-32 mx-auto text-left md:px-12 xl:px-20 lg:pt-16 lg:pb-16 lg:max-w-7xl lg:flex-row">
       <figure class="mx-auto max-w-2xl">
         <p class="sr-only">5 out of 5 stars</p>
         <div class="flex gap-x-1 text-indigo-600">
