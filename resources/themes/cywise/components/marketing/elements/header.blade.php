@@ -37,9 +37,6 @@
         class="absolute inset-0 w-full h-screen pt-24" x-cloak>
         <div class="w-screen h-full bg-black/50"></div>
     </div>
-    @php
-      $isHomepage = Request::is('tpe-pme') || Request::is('pssi') || Request::is('pentest') || Request::is('pricing') || Request::is('a-propos') || Request::is('blog');
-    @endphp
     <x-container>
         <div class="z-30 flex items-center justify-between h-24 md:space-x-8">
             <div class="z-20 flex items-center justify-between w-full md:w-auto">
@@ -48,7 +45,7 @@
                     <x-logo class="w-auto h-8 md:h-9"></x-logo>
                     </a>
                 </div>
-              @if($isHomepage)
+              @if(!Request::is('/'))
                 <div class="flex justify-end flex-grow md:hidden">
                     <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex items-center justify-center p-2 transition duration-150 ease-in-out rounded-full text-zinc-400 hover:text-zinc-500 hover:bg-zinc-100">
                         <svg x-show="!mobileMenuOpen" class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
@@ -57,7 +54,7 @@
                 </div>
               @endif
             </div>
-            @if($isHomepage)
+            @if(!Request::is('/'))
             <nav :class="{ 'hidden' : !mobileMenuOpen, 'block md:relative absolute top-0 left-0 md:w-auto w-screen md:h-auto h-screen pointer-events-none md:z-10 z-10' : mobileMenuOpen }" class="h-full md:flex">
                 <ul :class="{ 'hidden md:flex' : !mobileMenuOpen, 'flex flex-col absolute md:relative md:w-auto w-screen h-full md:h-full md:overflow-auto overflow-scroll md:pt-0 mt-24 md:pb-0 pb-48 bg-white md:bg-transparent' : mobileMenuOpen }" id="menu" class="flex items-stretch justify-start flex-1 w-full h-full ml-0 border-t border-gray-100 pointer-events-auto md:items-center md:justify-center gap-x-8 md:w-auto md:border-t-0 md:flex-row">
                     <li x-data="{ open: false }" @mouseenter="showOverlay=true" @mouseleave="showOverlay=false" class="z-30 flex flex-col items-start h-auto border-b border-gray-100 md:h-full md:border-b-0 group md:flex-row md:items-center">
