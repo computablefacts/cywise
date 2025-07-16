@@ -126,8 +126,12 @@ name('home');
         </blockquote>
         <figcaption class="mt-10 flex items-center gap-x-6">
           <div class="text-sm/6">
-            <div class="font-semibold text-gray-900">Augustin Burg</div>
-            <div class="mt-0.5 text-gray-600">Co-fondateur d'Ackero</div>
+            <div class="font-semibold text-gray-900">
+              Augustin Burg
+            </div>
+            <div class="mt-0.5 text-gray-600">
+              Co-fondateur d'Ackero
+            </div>
           </div>
         </figcaption>
       </figure>
