@@ -434,24 +434,25 @@ name('tpe-pme');
             <figure class="mt-10 flex flex-auto flex-col justify-between">
               <blockquote class="text-lg/8 text-gray-900">
                 <p>
-                  “Avec Cywise, nous avons vu produire une PSSI claire et complète pour notre client en quelques jours
-                  au lieu de plusieurs semaines. Un vrai game changer aussi bien en terme de temps qu'en terme de
-                  qualité et de suivi.”
+                  “La solution a amélioré notre visibilité des périmètres exposés et internes. Nous avons été notifiés
+                  automatiquement des vulnérabilités à corriger. Rien de critique, heureusement. Depuis, nous sommes
+                  alertés dès qu’un changement important est détecté. En somme l’idéal pour une PME comme la nôtre.”
                 </p>
               </blockquote>
               <figcaption class="mt-10 flex items-center gap-x-6">
                 <div class="text-base">
                   <div class="font-semibold text-gray-900">
-                    Augustin Burg
+                    Sylvain M.
                   </div>
                   <div class="mt-1 text-gray-500">
-                    Co-fondateur d'Ackero
+                    RSSI d'Oppscience
                   </div>
                 </div>
               </figcaption>
             </figure>
           </div>
-          <div class="flex flex-col border-t border-gray-900/10 pt-10 sm:pt-16 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0 xl:pl-20">
+          <div
+            class="flex flex-col border-t border-gray-900/10 pt-10 sm:pt-16 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0 xl:pl-20">
             <div class="flex gap-x-1 text-indigo-600">
               <svg class="size-5 flex-none" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
                 <path fill-rule="evenodd"
