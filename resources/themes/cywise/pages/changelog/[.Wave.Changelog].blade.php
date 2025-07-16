@@ -1,16 +1,16 @@
 <?php
     use function Laravel\Folio\{name};
     name('changelog');
-    
+
     // use a dynamic layout based on whether or not the user is authenticated
     $layout = ((auth()->guest()) ? 'layouts.marketing' : 'layouts.app');
 ?>
 
-<x-dynamic-component 
+<x-dynamic-component
 	:component="$layout"
 	bodyClass="bg-zinc-50"
 >
-    
+
     <x-app.container>
         <x-card class="lg:p-10">
 
@@ -30,8 +30,13 @@
                     :title="$changelog->title"
                     :description="$changelog->description"
                 />
-                
-                <p class="mt-5 text-xs font-medium tracking-wider text-zinc-800">Posted on <time datetime="{{ Carbon\Carbon::parse($changelog->created_at)->toIso8601String() }}" class="ml-1">{{ Carbon\Carbon::parse($changelog->created_at)->toFormattedDateString() }}</time></p>
+
+                <p class="mt-5 text-xs font-medium tracking-wider text-zinc-800">
+                  {!! __('Posted on <time datetime=":datetime" class="ml-1">:date</time>', [
+                  'datetime' => Carbon\Carbon::parse($changelog->created_at)->toIso8601String(),
+                  'date' => Carbon\Carbon::parse($changelog->created_at)->toFormattedDateString(),
+                  ]) !!}
+                </p>
                 <div class="max-w-full mx-auto mt-5 prose prose-base dark:prose-invert text-zinc-600 dark:text-zinc-300">
                     {!! $changelog->body !!}
                 </div>

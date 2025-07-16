@@ -17,7 +17,7 @@
         <x-card class="lg:p-10">
             <x-app.heading
                 title="Changelog"
-                description="This is your application changelog where users can visit to stay in the loop about your latest updates and improvements."
+                description="{{ __('Latest updates and enhancements') }}"
             />
 
         <div class="max-w-full mt-8 prose-sm prose dark:prose-invert">
