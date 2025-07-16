@@ -31,7 +31,6 @@ use App\Http\Controllers\Iframes\RulesController;
 use App\Http\Controllers\Iframes\ScaController;
 use App\Http\Controllers\Iframes\TableController;
 use App\Http\Controllers\Iframes\TablesController;
-use App\Http\Controllers\Iframes\TermsController;
 use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Controllers\Iframes\UsersController;
 use App\Jobs\DownloadDebianSecurityBugTracker;
