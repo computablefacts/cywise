@@ -81,7 +81,7 @@ class DashboardController extends Controller
             ->take(3)
             ->toArray();
 
-        return view('cywise.iframes.dashboard', [
+        return view('theme::iframes.dashboard', [
             'nb_monitored' => $nbMonitored,
             'nb_monitorable' => $nbMonitorable,
             'nb_high' => $nbHigh,

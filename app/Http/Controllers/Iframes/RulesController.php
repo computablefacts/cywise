@@ -19,7 +19,7 @@ class RulesController extends Controller
                 return $rule;
             })
             ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE);
-        return view('cywise.iframes.rules', [
+        return view('theme::iframes.rules', [
             'rules' => $rules,
         ]);
     }

@@ -20,7 +20,7 @@ class UsersController extends Controller
             ->get()
             ->sortBy('fullname', SORT_NATURAL | SORT_FLAG_CASE);
         
-        return view('cywise.iframes.users', [
+        return view('theme::iframes.users', [
             'users' => $users,
         ]);
     }

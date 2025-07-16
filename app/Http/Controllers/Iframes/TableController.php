@@ -14,7 +14,7 @@ class TableController extends Controller
             'step' => ['nullable', 'integer', 'min:1'],
         ]);
         $step = $params['step'] ?? 1;
-        return view('cywise.iframes.table', [
+        return view('theme::iframes.table', [
             'step' => $step,
         ]);
     }

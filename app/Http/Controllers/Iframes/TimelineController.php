@@ -36,7 +36,7 @@ class TimelineController extends Controller
             'timestamp' => $timestamp,
             'date' => $date,
             'time' => $time,
-            'html' => \Illuminate\Support\Facades\View::make('cywise.iframes.timeline._note', [
+            'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._note', [
                 'date' => $date,
                 'time' => $time,
                 'user' => $user,
@@ -66,7 +66,7 @@ class TimelineController extends Controller
             'vulnerabilities' => $this->vulnerabilities($params['level'] ?? null, $params['asset_id'] ?? null),
             default => collect(),
         };
-        return view('cywise.iframes.timeline', [
+        return view('theme::iframes.timeline', [
             'today_separator' => $this->separator(Carbon::now()),
             'items' => $items->sortByDesc('timestamp')
                 ->groupBy(fn(array $event) => $event['date'])
@@ -86,7 +86,7 @@ class TimelineController extends Controller
         $timestamp = $date->utc()->format('Y-m-d H:i:s');
         $date = Str::before($timestamp, ' ');
 
-        return Str::replace("\n", '', \Illuminate\Support\Facades\View::make('cywise.iframes.timeline._separator', [
+        return Str::replace("\n", '', \Illuminate\Support\Facades\View::make('theme::iframes.timeline._separator', [
             'date' => $date,
         ])->render());
     }
@@ -109,7 +109,7 @@ class TimelineController extends Controller
                     'timestamp' => $timestamp,
                     'date' => $date,
                     'time' => $time,
-                    'html' => \Illuminate\Support\Facades\View::make('cywise.iframes.timeline._server', [
+                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._server', [
                         'date' => $date,
                         'time' => $time,
                         'server' => $server,
@@ -157,7 +157,7 @@ class TimelineController extends Controller
                     'timestamp' => $timestamp,
                     'date' => $date,
                     'time' => $time,
-                    'html' => \Illuminate\Support\Facades\View::make('cywise.iframes.timeline._asset', [
+                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._asset', [
                         'date' => $date,
                         'time' => $time,
                         'asset' => $asset,
@@ -188,7 +188,7 @@ class TimelineController extends Controller
                     'timestamp' => $timestamp,
                     'date' => $date,
                     'time' => $time,
-                    'html' => \Illuminate\Support\Facades\View::make('cywise.iframes.timeline._conversation', [
+                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._conversation', [
                         'date' => $date,
                         'time' => $time,
                         'conversation' => $conversation,
@@ -221,7 +221,7 @@ class TimelineController extends Controller
                     'timestamp' => $timestamp,
                     'date' => $date,
                     'time' => $time,
-                    'html' => \Illuminate\Support\Facades\View::make('cywise.iframes.timeline._event', [
+                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._event', [
                         'date' => $date,
                         'time' => $time,
                         'msg' => $msg,
@@ -371,7 +371,7 @@ class TimelineController extends Controller
                 'timestamp' => $timestampFirst,
                 'date' => $dateFirst,
                 'time' => $timeFirst,
-                'html' => \Illuminate\Support\Facades\View::make('cywise.iframes.timeline._ioc', [
+                'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._ioc', [
                     'ioc' => $ioc,
                 ])->render(),
             ];
@@ -454,7 +454,7 @@ class TimelineController extends Controller
                     'timestamp' => $timestamp,
                     'date' => $date,
                     'time' => $time,
-                    'html' => \Illuminate\Support\Facades\View::make('cywise.iframes.timeline._leak', [
+                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._leak', [
                         'date' => $date,
                         'time' => $time,
                         'user' => $user,
@@ -512,7 +512,7 @@ class TimelineController extends Controller
                     'timestamp' => $timestamp,
                     'date' => $date,
                     'time' => $time,
-                    'html' => \Illuminate\Support\Facades\View::make('cywise.iframes.timeline._vulnerability', [
+                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._vulnerability', [
                         'date' => $date,
                         'time' => $time,
                         'txtColor' => $txtColor,

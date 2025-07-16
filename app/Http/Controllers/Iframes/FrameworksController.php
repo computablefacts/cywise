@@ -32,7 +32,7 @@ class FrameworksController extends Controller
                 })
                 ->filter(fn(object $item) => count($item->highlights) > 0);
         }
-        return view('cywise.iframes.frameworks', [
+        return view('theme::iframes.frameworks', [
             'search' => $search,
             'frameworks' => $frameworks,
             'highlights' => $highlights,

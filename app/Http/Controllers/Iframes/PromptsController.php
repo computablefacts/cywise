@@ -12,7 +12,7 @@ class PromptsController extends Controller
     public function __invoke(Request $request): View
     {
         $prompts = (new PromptsProcedure())->list($request);
-        return view('cywise.iframes.prompts', [
+        return view('theme::iframes.prompts', [
             'prompts' => $prompts['prompts'],
             'nbPages' => $prompts['nb_pages'],
             'currentPage' => $prompts['page'],

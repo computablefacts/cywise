@@ -10,6 +10,6 @@ class TablesController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        return view('cywise.iframes.tables', []);
+        return view('theme::iframes.tables', []);
     }
 }

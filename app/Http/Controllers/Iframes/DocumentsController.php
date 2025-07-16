@@ -12,7 +12,7 @@ class DocumentsController extends Controller
     public function __invoke(Request $request): View
     {
         $files = (new FilesProcedure())->list($request);
-        return view('cywise.iframes.documents', [
+        return view('theme::iframes.documents', [
             'files' => $files['files'],
             'collection' => $files['collection'],
             'nbPages' => $files['nb_pages'],

@@ -10,6 +10,6 @@ class CyberScribeController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        return view('cywise.iframes.cyberscribe', []);
+        return view('theme::iframes.cyberscribe', []);
     }
 }

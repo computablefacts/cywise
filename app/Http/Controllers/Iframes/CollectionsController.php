@@ -12,7 +12,7 @@ class CollectionsController extends Controller
     public function __invoke(Request $request): View
     {
         $collections = (new CollectionsProcedure())->list($request);
-        return view('cywise.iframes.collections', [
+        return view('theme::iframes.collections', [
             'collections' => $collections['collections'],
             'nbPages' => $collections['nb_pages'],
             'currentPage' => $collections['page'],

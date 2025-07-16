@@ -25,7 +25,7 @@ class ToolsController extends Controller
 
     public function cyberAdvisor(Request $request)
     {
-        return view('cywise.tools.cyberadvisor', []);
+        return view('theme::tools.cyberadvisor', []);
     }
 
     public function cyberCheck(string $hash, int $step, Request $request)
@@ -171,7 +171,7 @@ class ToolsController extends Controller
             // Logout!
             Auth::logout();
         }
-        return view('cywise.tools.cybercheck', [
+        return view('theme::tools.cybercheck', [
             'hash' => $hash,
             'step' => $step,
             'trial' => $trial,

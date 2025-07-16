@@ -10,6 +10,6 @@ class DocumentationController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        return view('cywise.iframes.documentation');
+        return view('theme::iframes.documentation');
     }
 }

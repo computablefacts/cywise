@@ -8,12 +8,12 @@
 	<x-app.container x-data class="space-y-6" x-cloak>
         <div class="w-full">
             <x-app.heading
-                title="Successfully Purchased 🎉"
-                description="Thanks for upgrading to a subscription plan."
+                title="{{ __('Successfully purchased 🎉') }}"
+                description="{{ __('Thanks for upgrading to a subscription plan.') }}"
             />
             <div class="py-5 space-y-5">
-                <p>This is your customer's successful purchase welcome screen. After a user upgrades their account they will be redirected to this page after a successful transaction.</p>
-                <p>You can modify this view inside your theme folder at <x-code-inline>pages/subscription/welcome</x-code-inline>.</p>
+                <p></p>
+                <p></p>
             </div>
         </div>
     </x-app.container>

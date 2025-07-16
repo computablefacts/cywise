@@ -15,7 +15,7 @@ class TermsController extends Controller
             ? public_path('/cywise/markdown/terms.' . app()->getLocale() . '.md')
             : public_path('/cywise/markdown/terms.md');
 
-        return view('cywise.iframes.markdown', [
+        return view('theme::iframes.markdown', [
             'html' => (new Parsedown)->text(file_get_contents($file))
         ]);
     }
