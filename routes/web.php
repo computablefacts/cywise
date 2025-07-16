@@ -617,7 +617,6 @@ Route::middleware(['auth'])->prefix('iframes')->name('iframes.')->group(function
     Route::get('/sca', [ScaController::class, '__invoke'])->name('sca');
     Route::get('/table', [TableController::class, '__invoke'])->name('table');
     Route::get('/tables', [TablesController::class, '__invoke'])->name('tables');
-    Route::get('/terms', [TermsController::class, '__invoke'])->name('terms');
     Route::get('/users', [UsersController::class, '__invoke'])->name('users');
     Route::get('/vulnerabilities', [TimelineController::class, '__invoke'])->name('vulnerabilities');
 });
