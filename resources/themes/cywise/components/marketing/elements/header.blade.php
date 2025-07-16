@@ -1,5 +1,5 @@
-<header 
-    x-data="{ 
+<header
+    x-data="{
         mobileMenuOpen: false, 
         scrolled: false, 
         showOverlay: false, 
@@ -25,11 +25,11 @@
         window.addEventListener('scroll', function() {
             evaluateScrollPosition(); 
         })
-    " 
-    :class="{ 'border-gray-200/60 bg-white/90 border-b backdrop-blur-lg' : scrolled, 'border-transparent border-b bg-transparent translate-y-0' : !scrolled }" 
-    class="box-content sticky top-0 z-50 w-full h-24" 
+    "
+    :class="{ 'border-gray-200/60 bg-white/90 border-b backdrop-blur-lg' : scrolled, 'border-transparent border-b bg-transparent translate-y-0' : !scrolled }"
+    class="box-content sticky top-0 z-50 w-full h-24"
 >
-    <div 
+    <div
         x-show="showOverlay"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0"
@@ -62,7 +62,7 @@
                             </span>
                             <svg :class="{ 'group-hover:-rotate-180' : !mobileMenuOpen, '-rotate-180' : mobileMenuOpen && open }" class="w-5 h-5 transition-all duration-300 ease-out" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" class=""></path></svg>
                         </a>
-                        <div 
+                        <div
                             :class="{ 'hidden md:block opacity-0 invisible md:absolute' : !open, 'md:invisible md:opacity-0 md:hidden md:absolute' : open }"
                             class="top-0 left-0 w-screen space-y-3 transition-transform duration-300 ease-out bg-white border-t border-b border-gray-100 md:shadow-md md:-translate-y-2 md:mt-24 md:block md:group-hover:block md:group-hover:visible md:group-hover:opacity-100 md:group-hover:translate-y-0" x-cloak>
                             <ul class="flex flex-col justify-between mx-auto max-w-7xl md:flex-row md:px-12">
@@ -78,7 +78,7 @@
                                         </a>
                                     </div>
                                     <div class="w-auto divide-y divide-zinc-100">
-                                        <a href="#_" onclick="event.preventDefault(); new FilamentNotification().title('Modify this button in your theme folder').icon('heroicon-o-pencil-square').iconColor('info').send()" class="block text-sm p-7 hover:bg-neutral-100">
+                                        <a href="{{ route('pssi') }}" class="block text-sm p-7 hover:bg-neutral-100">
                                             <span class="block mb-1 font-medium text-black">
                                               PSSI
                                             </span>
@@ -136,7 +136,7 @@
 
                 </ul>
             </nav>
-            
+
             @guest
                 <div class="relative z-30 items-center justify-center flex-shrink-0 hidden h-full space-x-3 text-sm md:flex">
                     <x-button href="{{ route('login') }}" tag="a" class="text-sm" color="secondary">
