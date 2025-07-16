@@ -145,10 +145,15 @@ role=${CONTAINER_ROLE:-app}
 queue_name=${QUEUE_NAME:-default}
 echo "Optimize Laravel..."
 if [[ "$role" = "app" ]]; then
-    echo "Start apache..."
+    echo "artisan storage:link && artisan vendor:publish ..."
     (cd /var/www/html && php artisan storage:link && php artisan vendor:publish --tag=telescope-assets)
+    echo "artisan optimize ..."
     (cd /var/www/html && php artisan optimize)
+    echo "artisan filament:optimize ..."
     (cd /var/www/html && php artisan filament:optimize)
+    echo "chown -R www-data:www-data /var/www/html ..."
+    (cd /var/www/html && chown -R www-data:www-data /var/www/html)
+    echo "Start apache..."
     exec apache2-foreground
 elif [[ "$role" = "queue" ]]; then
     while [[ true ]]
