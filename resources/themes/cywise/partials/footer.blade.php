@@ -1,6 +1,8 @@
 <!-- Section 1 -->
 <footer class="pt-10">
   <x-container>
+    <!--
+    @if(!Request::is('/'))
     <div class="flex flex-wrap items-start justify-between pb-20">
       <a href="#_"
          class="flex items-center w-auto mt-1 text-lg font-bold transition-all duration-300 ease-out brightness-0 md:w-1/6 hover:brightness-100">
@@ -100,7 +102,8 @@
         </div>
       </div>
     </div>
-
+    @endif
+    -->
     <div class="flex flex-col items-center justify-between py-10 border-t border-solid lg:flex-row border-gray">
       <ul class="flex flex-wrap space-x-5 text-xs">
         <li class="mb-6 text-center flex-full lg:flex-none lg:mb-0">&copy; {{ date('Y') }} {{ setting('site.title') }}
