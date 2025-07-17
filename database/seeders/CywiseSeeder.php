@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AppConfig;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -9,6 +10,7 @@ use Illuminate;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Symfony\Component\Yaml\Yaml;
 use Wave\Plan;
 use Wave\Setting;
@@ -23,6 +25,7 @@ class CywiseSeeder extends Seeder
      */
     public function run()
     {
+        $this->setupConfig(); // Should be call first
         $this->setupTenants();
         $this->setupPermissions();
         $this->setupRoles();
@@ -33,6 +36,42 @@ class CywiseSeeder extends Seeder
         $this->fillMissingOsqueryUids();
         $this->setupFrameworks();
         $this->setupUserPromptsAndFrameworks();
+    }
+
+
+    private function setupConfig()
+    {
+        $app_env = config('app.env');
+        if ($app_env == 'local') {
+            $this->setupConfigInDb([
+                'app.url' => 'http://patrick-test',
+                'encrypted:patrick.truc' => '!3d6LPsauw92w?Yd_WgRyDCO5OxRS7ww2DrjsPGSpjg0E8F7z+meV3Nhxnpo=',
+            ]);
+        } elseif ($app_env == 'ngdev') {
+            $this->setupConfigInDb([]);
+        } elseif ($app_env == 'ngprod') {
+            $this->setupConfigInDb([]);
+        }
+    }
+
+    private function setupConfigInDb(array $configs)
+    {
+        foreach ($configs as $key => $value) {
+            if (Str::startsWith($key, 'encrypted:')) {
+                $key = Str::chopStart($key, 'encrypted:');
+                AppConfig::updateOrCreate(['key' => $key], [
+                    'key' => $key,
+                    'value' => $value,
+                    'is_encrypted' => true,
+                ]);
+            } else {
+                AppConfig::updateOrCreate(['key' => $key], [
+                    'is_encrypted' => false,
+                    'key' => $key,
+                    'value' => $value,
+                ]);
+            }
+        }
     }
 
     private function setupWave()
