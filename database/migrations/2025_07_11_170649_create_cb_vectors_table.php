@@ -24,8 +24,7 @@ return new class extends Migration {
             $table->string('locale');
             $table->string('hypothetical_question', 1000);
             if (Vector::isSupportedByMariaDb()) {
-                $table->vector('embedding')->default('[]');
-                $table->index('embedding');
+                $table->vector('embedding', 1024);
             } else {
                 $table->json('embedding')->default('[]');
             }
