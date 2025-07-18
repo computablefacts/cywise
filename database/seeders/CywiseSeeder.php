@@ -60,23 +60,23 @@ class CywiseSeeder extends Seeder
                 'array:towerify.adversarymeter.ip_addresses' => '62.210.90.152',
                 'towerify.adversarymeter.api' => 'https://dev.sentinel-api-rq.apps.sentinel-api.towerify.io/api/v1',
                 'towerify.adversarymeter.api_username' => 'sentinel-admin',
-                'encrypted:towerify.adversarymeter.api_password' => 'gQ050DztnlKauubt_eNTpzxiX5JArvMKfDcYD5yI3XRZh2evHNTUMYolsUFY=',
+                'encrypted:towerify.adversarymeter.api_password' => 'LgWyyrgnDQ8ezYpA_FUim35NiUc2tWmQiR/5wGNnc+bS4iJkDSu1jGdqvFCo=',
                 'towerify.adversarymeter.drop_scan_events_after_x_minutes' => '1440',
                 'towerify.adversarymeter.drop_discovery_events_after_x_minutes' => '60',
                 'towerify.adversarymeter.days_between_scans' => '5',
 
                 'towerify.cyberbuddy.api' => 'https://dev.generic-rag.dev02.towerify.io',
                 'towerify.cyberbuddy.api_username' => 'wrong',
-                'encrypted:towerify.cyberbuddy.api_password' => 'tcOupG7MS!Kgl1jv_5fi2ijJ0pvMyJ4p1ag2Nbju2SucPM6WD2wfddqwro+g=',
+                'encrypted:towerify.cyberbuddy.api_password' => 'DvrhUgtWdTIvcX&#_gX55zIhk0cW4iG8U0lj5VRpCtXG2lNE/lKeXaphI9DI=',
 
                 'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
-                'encrypted:towerify.deepseek.api_key' => 'HnDB&4bkN?zBlrkj_dYZMU6f93g0iMn3KVy13jfScq22jS1Tyxyom7tk9xRleG1dJAOSkRbnZouaOX0IC',
+                'encrypted:towerify.deepseek.api_key' => 'RSS1ZtHV!uSg4Gvr_T3wUdZm/sso1lWLb4CpCPlVa5b6EXjRE0CWwvl2LkNWJmm6Mx9eXuOb8i53Z04Yd',
 
                 'towerify.deepinfra.api' => 'https://api.deepinfra.com/v1/openai',
-                'encrypted:towerify.deepinfra.api_key' => 'haGOoVkGfz3IMWdQ_NFUvofvVzchVbCnIiAOe+L1PqjZI1qB8JbwMa6nT8davKZTle7d75XsZA9sbvN4M',
+                'encrypted:towerify.deepinfra.api_key' => 'MQlASEMkBnwzN#dB_YcE+Q5YNbIEofU3tJ0utgzVGWnlUfVb3zUvE9MxV6Va/8nrlI97S4Aam0YY6eMm/',
 
                 'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
-                'encrypted:towerify.gemini.api_key' => 'LSy7miR7bbFK2A2d_viDW8xdjvV3F95hkHZh5vhDHaOGiYi5XweambV49CWDq5ZbA/p0aoyf/jRp4oyBV',
+                'encrypted:towerify.gemini.api_key' => 'a#juOq4apsMBq&99_iNHi4IdBsswBlkIhwNBYbYNx23AvT6rLsY3kETOang8cka4qANAeASVv9VQYJPEn',
 
                 'array:towerify.telescope.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
                 'array:towerify.telescope.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
@@ -85,11 +85,11 @@ class CywiseSeeder extends Seeder
                 'array:towerify.performa.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
 
                 'towerify.openai.api' => 'https://api.openai.com/v1',
-                'encrypted:towerify.openai.api_key' => 'W82qVC#rWssrTY!4_Hd/ojKLXvpFurHhMKlAwK6111XttCE2K2Oz1TZMNd33bTgDgz6I8AWpmjoouQon7dK0J9Ayet2txbGGKuD9GxmEs4iz0RcbHEyzwOyFCypIhwnAjE+BuJoW69c2/HquujRDDCjLKh13/N/vRx+G9jL6BL/N5kUMi1cvgZmJfW6d6mEiAvwWgIQ0UgFcX9hUIXmAE+9y8dL53MNND55wbh3OjRKTyO31ds9IPKmGrpwg=',
+                'encrypted:towerify.openai.api_key' => '6dbLxUYdsOQiFRcp_xgdMdae7nL5B8uULLU+G3QpXRga0i0qQwPIurAV7T3t/b7WtVn/9etjY6/tFavJfwt9dl5NW2ZHvSIVgKXukMNqQ6k/ZcH1qh9flUu9s2BCW7/YOQJ3hYNAxEanCVglXqazkirUbFwiO5wcsSvg99N0nCoRYVAJNj3/loI8ADfREkYRKEIENyoGNvv7hpPQSvRaGqhE7FR7K7PPzkt84y3FbcR/YJk4IlCRJ7TC1mzA=',
 
-                'encrypted:towerify.scrapfly.api_key' => 'jPM02#ImmrY9Nai1_6I1y7MNJS2aXcahzECa2GzLYujCYoFXY+5MuntE4dOTNsk5VYWFwAf+cKlh5EDa3',
+                'encrypted:towerify.scrapfly.api_key' => '2xXcLYRIKdjFlDL&_fhu7isCCrP20g0iuchgOj/CJIIdGKVq/fpk7lSkcDJiQxLcPkZHfjz5/pf5S3AqI',
 
-                'encrypted:towerify.scraperapi.api_key' => 'Y5bo0c6nweX4i2wM_He6pRzXb8a8gcp1Loz1DiWck/xq2UiIAh9BiKfm9BqVomTOjBFjv6iHZuxRMTCLr',
+                'encrypted:towerify.scraperapi.api_key' => 'f3xkpO94jZGaAJE3_yMyYN+Ub8Zhp63k2i7qsbuHKQ2FRbQdh6/agBlfI7hodzDLH9kbWkcMRJFobctTZ',
 
                 'towerify.stripe.key' => '',
                 'towerify.stripe.secret' => '',
@@ -103,7 +103,7 @@ class CywiseSeeder extends Seeder
                 'towerify.clickhouse.database' => '',
 
                 'towerify.sendgrid.api' => 'https://api.sendgrid.com/v3/mail/send',
-                'encrypted:towerify.sendgrid.api_key' => 'g3VkH6uKcMalvRJ4_uFtoo8ly3uwXBHn3ah3MX6KWHjF6amG5W4BcnOLFpqerUfkb5isQqiIyi6Tpe6URFOqivzgI24z07535cmjygrDtBIfzb4Lk298gjCVKZJo=',
+                'encrypted:towerify.sendgrid.api_key' => 'vkqBP73Ezm3oFqcQ_h5scMEOSW3HC1DcsRJmHI+V2nWMr5TQ4KYJbYePliV8JsObaNKqVqGXl81XGbj445U3oP2O2lyUbClsabgTL/wy0XiWX6KL11uvW+tsN0QE=',
 
                 'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
                 'towerify.josianne.username' => 'cywise',
@@ -111,7 +111,71 @@ class CywiseSeeder extends Seeder
                 'towerify.josianne.database' => '',
             ]);
         } elseif ($app_env == 'prod') {
-            $this->setupConfigInDb([]);
+            $this->setupConfigInDb([
+                'towerify.website' => 'https://cywise.io',
+
+                'towerify.freshdesk.widget_id' => '44000004635',
+                'towerify.freshdesk.to_email' => 'support@computablefacts.freshdesk.com',
+                'towerify.freshdesk.from_email' => 'support@cywise.io',
+
+                'towerify.reports.url' => 'https://reports.cywise.io',
+                'towerify.reports.api' => 'https://reports.cywise.io/api/v1',
+                'towerify.reports.api_username' => 'admin',
+                'encrypted:towerify.reports.api_password' => 'LTF3#G9jB4skruym_pgXeZrDViPcfevUX+PxiRzn9VgHaypMRLK5nV7H1e98=',
+
+                'array:towerify.adversarymeter.ip_addresses' => '62.210.90.152',
+                'towerify.adversarymeter.api' => 'https://prod.sentinel-api.apps.sentinel-api.towerify.io/api/v1',
+                'towerify.adversarymeter.api_username' => 'sentinel-admin',
+                'encrypted:towerify.adversarymeter.api_password' => '?3GH?I97ayIfEsKN_09a2oY8xo+PkGMmLnezl+xbv5rC4Dlw6mbQCVazhCKY=',
+                'towerify.adversarymeter.drop_scan_events_after_x_minutes' => '1440',
+                'towerify.adversarymeter.drop_discovery_events_after_x_minutes' => '60',
+                'towerify.adversarymeter.days_between_scans' => '5',
+
+                'towerify.cyberbuddy.api' => 'https://prod.generic-rag.dev02.towerify.io',
+                'towerify.cyberbuddy.api_username' => 'wrong',
+                'encrypted:towerify.cyberbuddy.api_password' => 'esfM1S4U3SYsnsSm_sAgO943QigLqfU9K8UGUfJAk0gTUp7ovS8uIbD3U+zM=',
+
+                'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
+                'encrypted:towerify.deepseek.api_key' => 'It&C5lRsI!Dq1IsX_ea+wX+Mz22wW95wY1cjq56mDp76lxfeLNrz40RSfe5n9eqflr8lz/TyDsmcqnygh',
+
+                'towerify.deepinfra.api' => 'https://api.deepinfra.com/v1/openai',
+                'encrypted:towerify.deepinfra.api_key' => '2sb?kbsVy4yE3gFw_xNKSEzcwSsF2E8gHmym8okt84QGYCy9T9Sp0e7u3PvkTO/C9z1qEebGyHaJ8Sj3V',
+
+                'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
+                'encrypted:towerify.gemini.api_key' => 'bYg2zlwYpWlULSJ9_boRGCkKbpzTr5NHeZ9ZBqaCkeaCmK2/lpr8mFLCuPcUNvKPlesCldGWo4L7Mb9rc',
+
+                'array:towerify.telescope.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
+                'array:towerify.telescope.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil',
+
+                'array:towerify.performa.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
+                'array:towerify.performa.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil',
+
+                'towerify.openai.api' => 'https://api.openai.com/v1',
+                'encrypted:towerify.openai.api_key' => 'Tg2yWb33U2tIItmd_IU0txV/5KxNv9+bwBnqkMVYujizOT2ErSz59maW2/r71cKbi5KxikqLZ5D6U+AdreucHfXdxd4LN7ZgX8LGI/V2J1qgagPa/xEValIH34MoGeJEIUN11zaKIyBpp2YYV++iQAkGgI9wdjcYGWtr6EjZZELv9tw8OiSrW1GzEf8O7Z86bHiE7DYqxX//3caIzba7ASNMbdAEclXAnMjZa5JstmPEiyU4U6+B5zCTc4ok=',
+
+                'encrypted:towerify.scrapfly.api_key' => '!jr0dNpdZSWuc5cg_BVlBZwoXazqe4LuXvFWaO6+Vnv/wYQx8751JOkXHyLT+4pPsJhbFHC55pwpdhgMI',
+
+                'encrypted:towerify.scraperapi.api_key' => 'MQK32#KsaMczwIRb_0sY+5xNWzDIUWU9ZS0lGlsToaed8w1Yf2OaTmysiUbVS8vgGLgWcwVkfgL1LIHPx',
+
+                'encrypted:towerify.stripe.key' => 'emqKPsH94Gp4!ziy_fBp0naOHlnV28A5fDfY8hWrQy6w9QGUja3fZeIXG4n6214U4OIP+eFJQRwRO5qJ3sFJvM9wMBuwUhpXnMLkT2gpRUG1kdzHVIaGSQeq/6bhwJTF3xNwDTDcvQf70F73uldge+VVroUKdqFgKZiClNQ==',
+                'encrypted:towerify.stripe.secret' => 'r0ZRSP5WHOFJ?H8z_031Fm8fYryEEHjmkax3GINurDzaYtrE0bpWVIAI0y8zxlwqDxoPRKEJ5y0W6Dq+wJp3JEA5FoL+NuZ42bN5Jd8blDdwJqeSqyKsTPWZKmr3sdpNUinLRxf4XxFRRXMpYOCRDOzqrk0qZeOw4HLRfkg==',
+                'towerify.stripe.plans.essential' => 'price_1Qee99DHRqrzgOLGOfaVSPbt',
+                'towerify.stripe.plans.standard' => 'price_1QeeA0DHRqrzgOLGmijDTdnj',
+                'towerify.stripe.plans.premium' => 'price_1QeeAaDHRqrzgOLGBFZ7ms8R',
+
+                'towerify.clickhouse.host' => '',
+                'towerify.clickhouse.username' => '',
+                'towerify.clickhouse.password' => '',
+                'towerify.clickhouse.database' => '',
+
+                'towerify.sendgrid.api' => 'https://api.sendgrid.com/v3/mail/send',
+                'encrypted:towerify.sendgrid.api_key' => 'ER#lce&UYg1jjqfV_cQGMmDoFVpnNgr9T9BWc5mp2JvXIrVLN9n1Hs9AR+6MwdZTX6a6kO+nq8Z7tPSiq23q4PruzEYvgkdjZYXrGCtkbRkbv2Zh+7JndbEZxjcc=',
+
+                'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
+                'towerify.josianne.username' => 'cywise',
+                'towerify.josianne.password' => 'GDr6#awPcu0NKbuR_G06I3zEp0mVx3PDo0lTH1xxpx+MNVimAVAQDfONbRT0=',
+                'towerify.josianne.database' => '',
+            ]);
         }
     }
 
