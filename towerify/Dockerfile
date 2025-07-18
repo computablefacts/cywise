@@ -151,8 +151,9 @@ if [[ "$role" = "app" ]]; then
     (cd /var/www/html && php artisan optimize)
     echo "artisan filament:optimize ..."
     (cd /var/www/html && php artisan filament:optimize)
-    echo "chown -R www-data:www-data /var/www/html ..."
-    (cd /var/www/html && chown -R www-data:www-data /var/www/html)
+    echo "chown -R www-data:www-data ..."
+    chown -R www-data:www-data /var/www/html/storage/app/public/docs
+    chown -R www-data:www-data /var/www/html/storage/framework/views
     echo "Start apache..."
     exec apache2-foreground
 elif [[ "$role" = "queue" ]]; then
