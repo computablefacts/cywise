@@ -38,6 +38,7 @@ use App\Listeners\EndVulnsScanListener;
 use App\Mail\AuditReport;
 use App\Models\Asset;
 use App\Models\Honeypot;
+use App\Models\Port;
 use App\Models\Scan;
 use App\Models\YnhServer;
 use App\Models\YnhTrial;
