@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 if (!function_exists('format_bytes')) {
     function format_bytes($bytes, $precision = 2)
     {
@@ -102,6 +104,10 @@ if (!function_exists('app_config_override')) {
             foreach ($settings as $keyValuePair) {
                 $key = $keyValuePair['key'];
                 $value = $keyValuePair['value'];
+                if (Str::startsWith($key, 'array:')) {
+                    $key = Str::chopStart($key, 'array:');
+                    $value = explode(',', $value);
+                }
                 if ($keyValuePair['is_encrypted'] === 1) {
                     config([$key => cywise_unhash($value)]);
                 } else {
