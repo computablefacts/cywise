@@ -3,3 +3,5 @@
 /vendor
 /.idea
 /.vscode
+/towerify
+!/towerify/Dockerfile
