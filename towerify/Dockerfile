@@ -152,7 +152,9 @@ if [[ "$role" = "app" ]]; then
     echo "artisan filament:optimize ..."
     (cd /var/www/html && php artisan filament:optimize)
     echo "chown -R www-data:www-data ..."
+    mkdir -p /var/www/html/storage/app/public/docs
     chown -R www-data:www-data /var/www/html/storage/app/public/docs
+    mkdir -p /var/www/html/storage/framework/views
     chown -R www-data:www-data /var/www/html/storage/framework/views
     echo "Start apache..."
     exec apache2-foreground
