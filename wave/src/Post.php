@@ -3,6 +3,7 @@
 namespace Wave;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class Post extends Model
@@ -18,7 +19,7 @@ class Post extends Model
     }
 
     public function image(){
-    	return Storage::url($this->image);
+    	return Storage::disk(config('filament.default_filesystem_disk'))->url($this->image);
     }
 
     public function category(){

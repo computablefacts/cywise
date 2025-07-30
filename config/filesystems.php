@@ -74,6 +74,19 @@ return [
             ],
         ],
 
+        'wave-media' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION', 'eu-west-3'),
+            'bucket' => env('AWS_BUCKET_PUBLIC', 'towerify-public'),
+            'prefix' => env('APP_ENV', 'none') . '/wave-media',
+            'visibility' => 'public',
+            'options' => [
+                'ACL' => ''
+            ],
+        ],
+
         'images-s3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

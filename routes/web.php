@@ -59,7 +59,6 @@ Wave::routes();
 
 // See https://devdojo.com/question/customizing-the-two-factor-authentication
 Route::view('/auth/login', 'vendor/auth/pages/auth/login');
-Route::view('/admin/media', 'vendor/wave/media');
 
 
 // See https://devdojo.com/wave/docs/features/user-profiles

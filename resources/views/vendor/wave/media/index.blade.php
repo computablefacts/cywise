@@ -43,7 +43,7 @@ use Filament\Actions\DeleteAction;
 
         public $fileOrFolderCopied = null;
 
-        public function mount($disk = 'public'){
+        public function mount($disk = 'wave-media'){
             $this->record = App\Models\User::first();
             $this->storageURL = $this->storage($disk)->url('/');
             $this->disk = $disk;
