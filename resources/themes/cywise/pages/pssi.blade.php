@@ -15,7 +15,7 @@ name('pssi');
             Politiques de Sécurité des Systèmes d'Information
           </p>
           <h1 class="mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
-            Qu'est-ce qu'une PSSI ?
+            Comment rédiger et suivre sa PSSI ? Rappel !
           </h1>
           <p class="mt-6 text-xl/8 text-gray-700">
             La PSSI reflète la vision stratégique de la direction de l'entreprise en matière de Sécurité des Systèmes
@@ -58,8 +58,8 @@ name('pssi');
           </div>
           <div class="max-w-xl text-base/7 text-gray-600 lg:col-span-7">
             <p class="mt-2">
-              Une PSSI est une démarche composée d’un ensemble de mesures et de directives visant à assurer la sécurité
-              des systèmes d’information au sein d’une organisation. Elle est spécifique à chaque entreprise et doit :
+              Une PSSI est une démarche composée d'un ensemble de mesures et de directives visant à assurer la sécurité
+              des systèmes d'information au sein d'une organisation. Elle est spécifique à chaque entreprise et doit :
             </p>
             <ul role="list" class="mt-8 max-w-xl space-y-8 text-gray-600">
               <li class="flex gap-x-3">
@@ -99,7 +99,7 @@ name('pssi');
               </li>
             </ul>
             <p class="mt-8">
-              Les objectifs d’une PSSI :
+              Les objectifs d'une PSSI :
             </p>
             <ul role="list" class="mt-8 max-w-xl space-y-8 text-gray-600">
               <li class="flex gap-x-3">
@@ -110,7 +110,7 @@ name('pssi');
                         clip-rule="evenodd"/>
                 </svg>
                 <span>
-                  Protéger les données et les actifs de l’entreprises.
+                  Protéger les données et les actifs de l'entreprises.
                 </span>
               </li>
               <li class="flex gap-x-3">
@@ -160,12 +160,12 @@ name('pssi');
                         clip-rule="evenodd"/>
                 </svg>
                 <span>
-                  S’inscrire dans un processus d’amélioration continu.
+                  S'inscrire dans un processus d'amélioration continu.
                 </span>
               </li>
             </ul>
             <p class="mt-6">
-              C’est un exercice complexe qui repose sur un équilibre entre la vision stratégique de la direction et les
+              C'est un exercice complexe qui repose sur un équilibre entre la vision stratégique de la direction et les
               missions des RSSI, qui est basé sur un référentiel de plusieurs milliers de documents internes et
               externes.
             </p>
@@ -202,30 +202,30 @@ name('pssi');
           Notre proposition !
         </h1>
         <p class="mt-6 text-xl/8">
-          Cywise propose à l’entreprise d’automatiser la personnalisation de sa PSSI en se basant sur des PSSI
-          génériques, et sur un référentiel de documents émanant d’entités comme la CNIL ou l’ANSSI.
+          Cywise propose à l'entreprise une automatisation avancée de la personnalisation de sa Politique de Sécurité
+          des Systèmes d'Information (PSSI), en s'appuyant sur un référentiel documentaire issu d'organismes tels que la
+          CNIL, l'ANSSI, ou encore les normes internationales. Grâce à l'intégration d'outils d'Intelligence
+          Artificielle (IA) et de modèles de langage de grande ampleur (LLM), l'élaboration de la PSSI est conçue afin
+          de satisfaire aux exigences techniques et organisationnelles propres à chaque organisation.
         </p>
         <div class="mt-10 max-w-2xl text-gray-600">
           <p class="mt-2">
-            En utilisant des outils d'Intelligence Artificielle (IA) et de LLM (Large Language Model) l’élaboration de
-            la PSSI sera conçue pour répondre aux exigences techniques et organisationnelles spécifiques de
-            l'entreprise.
+            La PSSI devient ainsi le référentiel central pour l'ensemble des projets informatiques et le pilotage global
+            de l'entreprise. Les collaborateurs peuvent y accéder facilement via le chatbot Cyberbuddy, développé par
+            Cywise, leur permettant d'obtenir des réponses précises à toutes leurs interrogations liées à
+            l'environnement informatique. Ce dispositif favorise également la mise à jour continue du document, en
+            fonction des évolutions détectées au sein des systèmes.
           </p>
           <p class="mt-2">
-            La PSSI devient le référentiel principal pour les projets informatiques et le fonctionnement global de
-            l'entreprise. Cywise permet aux collaborateurs la possibilité de consulter cette PSSI via votre chatbot
-            Cyberbuddy, facilitant ainsi les réponses à toutes les questions relatives à l'environnement informatique,
-            mais aussi de la mettre à jour, en fonction des évolutions du système qui seront détectées.
+            Par ailleurs, cette approche facilite la satisfaction des demandes émanant d'institutions telles que les
+            assureurs lors de la contractualisation, ainsi que celles des prospects, clients et fournisseurs, en
+            valorisant la maturité de l'entreprise en matière de cybersécurité.
           </p>
           <p class="mt-2">
-            De plus, cette PSSI permet de répondre aux demandes des institutions telles que les Assureurs lors de
-            l’établissement des contrats, mais aussi aux requêtes des prospects, clients et fournisseurs, en démontrant
-            la maturité de l’entreprise en matière de cybersécurité.
-          </p>
-          <p class="mt-2">
-            Rédiger une PSSI avec Cywise, c’est l’assurance de ne rien oublier et de détailler les différentes solutions
-            utilisées par l’entreprise. Le temps de rédaction varie de quelques heures à quelques jours en fonctions de
-            la taille de l’entreprise et de la complexité de l’organisation et des systèmes à décrire.
+            Confier la rédaction de la PSSI à Cywise garantit une couverture complète et détaillée des solutions
+            déployées au sein de l'organisation. Le délai de réalisation dépend de la taille, de la complexité et de la
+            structure de l'entreprise, ainsi que de la nature des systèmes à documenter, variant généralement de
+            quelques heures à plusieurs jours.
           </p>
         </div>
       </div>
