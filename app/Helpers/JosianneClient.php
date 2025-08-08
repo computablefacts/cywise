@@ -36,9 +36,9 @@ class JosianneClient
         return self::$executeQueryLastError;
     }
 
-    public static function numberOfRows(string $table): ?string
+    public static function numberOfRows(string $table): string
     {
-        return self::executeQuery("SELECT COUNT(*) FROM {$table}");
+        return self::executeQuery("SELECT COUNT(*) FROM {$table}") ?? '0';
     }
 
     private static function cmd(string $query): string
