@@ -70,6 +70,9 @@ name('home');
             <p class="mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl lg:text-balance">
               Pourquoi choisir Cywise pour votre cybersécurité ?
             </p>
+            <p class="mt-6 text-lg/8 text-gray-700">
+              Parce que nous l'avons pensé-construit pour les TPE PME.
+            </p>
           </div>
           <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
             <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
