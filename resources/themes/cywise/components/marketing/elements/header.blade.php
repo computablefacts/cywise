@@ -118,7 +118,23 @@
                           Blog
                         </a>
                     </li>
-
+                    @guest
+                    <li class="relative z-30 flex flex-col items-center justify-center flex-shrink-0 w-full h-auto pt-3 space-y-3 text-sm md:hidden px-7">
+                      <x-button href="https://app.cywise.io/login" tag="a" class="w-full text-sm" color="secondary">
+                        {{ __('Login') }}
+                      </x-button>
+                      <x-button href="https://app.cywise.io/register" tag="a" class="w-full text-sm">
+                        {{ __('Sign Up') }}
+                      </x-button>
+                    </li>
+                    @else
+                    <li class="flex items-center justify-center w-full pt-3 md:hidden px-7">
+                      <x-button href="https://app.cywise.io/login" tag="a" class="w-full text-sm">
+                        {{ __('View Dashboard') }}
+                      </x-button>
+                    </li>
+                    @endguest
+                    <!--
                     @guest
                         <li class="relative z-30 flex flex-col items-center justify-center flex-shrink-0 w-full h-auto pt-3 space-y-3 text-sm md:hidden px-7">
                             <x-button href="{{ route('login') }}" tag="a" class="w-full text-sm" color="secondary">
@@ -135,10 +151,25 @@
                             </x-button>
                         </li>
                     @endguest
-
+                    -->
                 </ul>
             </nav>
             @endif
+            @guest
+            <div class="relative z-30 items-center justify-center flex-shrink-0 hidden h-full space-x-3 text-sm md:flex">
+              <x-button href="https://app.cywise.io/login" tag="a" class="text-sm" color="secondary">
+                {{ __('Login') }}
+              </x-button>
+              <x-button href="https://app.cywise.io/register" tag="a" class="text-sm">
+                {{ __('Sign Up') }}
+              </x-button>
+            </div>
+            @else
+            <x-button href="https://app.cywise.io/login" tag="a" class="text-sm" class="relative z-20 flex-shrink-0 hidden ml-2 md:block">
+              {{ __('View Dashboard') }}
+            </x-button>
+            @endguest
+            <!--
             @guest
                 <div class="relative z-30 items-center justify-center flex-shrink-0 hidden h-full space-x-3 text-sm md:flex">
                     <x-button href="{{ route('login') }}" tag="a" class="text-sm" color="secondary">
@@ -153,7 +184,7 @@
                   {{ __('View Dashboard') }}
                 </x-button>
             @endguest
-
+            -->
         </div>
     </x-container>
 
