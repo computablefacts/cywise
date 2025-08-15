@@ -62,8 +62,8 @@ class AppConfig extends Model
     protected function value(): Attribute
     {
         return Attribute::make(
-            get: fn(string $value) => $this->is_encrypted ? cywise_unhash($value) : $value,
-            set: fn(string $value) => $this->is_encrypted ? cywise_hash($value) : $value,
+            get: fn(?string $value) => $this->is_encrypted ? cywise_unhash($value) : $value,
+            set: fn(?string $value) => $this->is_encrypted ? cywise_hash($value) : $value,
         );
     }
 }
