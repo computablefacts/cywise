@@ -38,12 +38,102 @@ class CywiseSeeder extends Seeder
         $this->setupUserPromptsAndFrameworks();
     }
 
-
     private function setupConfig()
     {
         $app_env = config('app.env');
         if ($app_env == 'local') {
-            $this->setupConfigInDb([]);
+            $this->setupConfigInDb([
+                'towerify.website' => 'http://127.0.0.1:8000',
+
+                'towerify.freshdesk.widget_id' => '',
+                'towerify.freshdesk.to_email' => 'support@computablefacts.freshdesk.com',
+                'towerify.freshdesk.from_email' => 'support@cywise.io',
+
+                'towerify.reports.url' => 'https://dev-reports.cywise.io',
+                'towerify.reports.api' => 'https://dev-reports.cywise.io/api/v1',
+                'towerify.reports.api_username' => '',
+                'towerify.reports.api_password' => '',
+
+                'array:towerify.adversarymeter.ip_addresses' => '62.210.90.152',
+                'towerify.adversarymeter.api' => 'https://dev.sentinel-api-rq.apps.sentinel-api.towerify.io/api/v1',
+                'towerify.adversarymeter.api_username' => 'sentinel-admin',
+                // 'encrypted:towerify.adversarymeter.api_password' => '',
+                'towerify.adversarymeter.drop_scan_events_after_x_minutes' => '1440',
+                'towerify.adversarymeter.drop_discovery_events_after_x_minutes' => '60',
+                'towerify.adversarymeter.days_between_scans' => '5',
+
+                'towerify.cyberbuddy.api' => 'https://dev.generic-rag.dev02.towerify.io',
+                'towerify.cyberbuddy.api_username' => 'wrong',
+                // 'encrypted:towerify.cyberbuddy.api_password' => '',
+
+                'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
+                // 'encrypted:towerify.deepseek.api_key' => '',
+
+                'towerify.deepinfra.api' => 'https://api.deepinfra.com/v1/openai',
+                // 'encrypted:towerify.deepinfra.api_key' => '',
+
+                'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
+                // 'encrypted:towerify.gemini.api_key' => '',
+
+                'array:towerify.telescope.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
+                'array:towerify.telescope.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+
+                'array:towerify.performa.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
+                'array:towerify.performa.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+
+                'towerify.openai.api' => 'https://api.openai.com/v1',
+                // 'encrypted:towerify.openai.api_key' => '',
+
+                // 'encrypted:towerify.scrapfly.api_key' => '',
+
+                // 'encrypted:towerify.scraperapi.api_key' => '',
+
+                'towerify.stripe.key' => '',
+                'towerify.stripe.secret' => '',
+
+                'towerify.stripe.plans.essential.name' => 'Essentiel',
+                'towerify.stripe.plans.essential.description' => null,
+                'towerify.stripe.plans.essential.features' => '',
+                'towerify.stripe.plans.essential.monthly_price' => null,
+                'towerify.stripe.plans.essential.monthly_price_id' => null,
+                'towerify.stripe.plans.essential.yearly_price' => null,
+                'towerify.stripe.plans.essential.yearly_price_id' => null,
+                'towerify.stripe.plans.essential.onetime_price' => null,
+                'towerify.stripe.plans.essential.onetime_price_id' => null,
+
+                'towerify.stripe.plans.standard.name' => 'Standard',
+                'towerify.stripe.plans.standard.description' => null,
+                'towerify.stripe.plans.standard.features' => '',
+                'towerify.stripe.plans.standard.monthly_price' => null,
+                'towerify.stripe.plans.standard.monthly_price_id' => null,
+                'towerify.stripe.plans.standard.yearly_price' => null,
+                'towerify.stripe.plans.standard.yearly_price_id' => null,
+                'towerify.stripe.plans.standard.onetime_price' => null,
+                'towerify.stripe.plans.standard.onetime_price_id' => null,
+
+                'towerify.stripe.plans.premium.name' => 'Premium',
+                'towerify.stripe.plans.premium.description' => null,
+                'towerify.stripe.plans.premium.features' => '',
+                'towerify.stripe.plans.premium.monthly_price' => null,
+                'towerify.stripe.plans.premium.monthly_price_id' => null,
+                'towerify.stripe.plans.premium.yearly_price' => null,
+                'towerify.stripe.plans.premium.yearly_price_id' => null,
+                'towerify.stripe.plans.premium.onetime_price' => null,
+                'towerify.stripe.plans.premium.onetime_price_id' => null,
+
+                'towerify.clickhouse.host' => '',
+                'towerify.clickhouse.username' => '',
+                'towerify.clickhouse.password' => '',
+                'towerify.clickhouse.database' => '',
+
+                'towerify.sendgrid.api' => 'https://api.sendgrid.com/v3/mail/send',
+                // 'encrypted:towerify.sendgrid.api_key' => '',
+
+                'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
+                'towerify.josianne.username' => 'cywise',
+                // 'encrypted:towerify.josianne.password' => '',
+                'towerify.josianne.database' => '',
+            ]);
         } elseif ($app_env == 'dev') {
             $this->setupConfigInDb([
                 'towerify.website' => 'https://cywise.io',
@@ -93,9 +183,36 @@ class CywiseSeeder extends Seeder
 
                 'towerify.stripe.key' => '',
                 'towerify.stripe.secret' => '',
-                'towerify.stripe.plans.essential' => '',
-                'towerify.stripe.plans.standard' => '',
-                'towerify.stripe.plans.premium' => '',
+
+                'towerify.stripe.plans.essential.name' => 'Essentiel',
+                'towerify.stripe.plans.essential.description' => null,
+                'towerify.stripe.plans.essential.features' => 'Scan de vulnérabilités, Honeypots pré-configurés, Adresses emails internes compromises, Charte informatique, Cyberbuddy, 15 jours gratuits, Assistance par tickets (réponse sour 48h)',
+                'towerify.stripe.plans.essential.monthly_price' => '150',
+                'towerify.stripe.plans.essential.monthly_price_id' => '',
+                'towerify.stripe.plans.essential.yearly_price' => null,
+                'towerify.stripe.plans.essential.yearly_price_id' => null,
+                'towerify.stripe.plans.essential.onetime_price' => null,
+                'towerify.stripe.plans.essential.onetime_price_id' => null,
+
+                'towerify.stripe.plans.standard.name' => 'Standard',
+                'towerify.stripe.plans.standard.description' => null,
+                'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI, 15 jours gratuits, Assistance par tickets (réponse sour 24h)',
+                'towerify.stripe.plans.standard.monthly_price' => '400',
+                'towerify.stripe.plans.standard.monthly_price_id' => '',
+                'towerify.stripe.plans.standard.yearly_price' => null,
+                'towerify.stripe.plans.standard.yearly_price_id' => null,
+                'towerify.stripe.plans.standard.onetime_price' => null,
+                'towerify.stripe.plans.standard.onetime_price_id' => null,
+
+                'towerify.stripe.plans.premium.name' => 'Premium',
+                'towerify.stripe.plans.premium.description' => null,
+                'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Premium, CyberBuddy via Teams, SSO, Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sour 6h)',
+                'towerify.stripe.plans.premium.monthly_price' => '600',
+                'towerify.stripe.plans.premium.monthly_price_id' => '',
+                'towerify.stripe.plans.premium.yearly_price' => null,
+                'towerify.stripe.plans.premium.yearly_price_id' => null,
+                'towerify.stripe.plans.premium.onetime_price' => null,
+                'towerify.stripe.plans.premium.onetime_price_id' => null,
 
                 'towerify.clickhouse.host' => '',
                 'towerify.clickhouse.username' => '',
@@ -107,7 +224,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
                 'towerify.josianne.username' => 'cywise',
-                'towerify.josianne.password' => 'HZVYI7BwHZZ#1knH_lYe+yq4mOMZa5SoqLNagIAKsX7SQBphYQYqvukAXq4o=',
+                'encrypted:towerify.josianne.password' => 'HZVYI7BwHZZ#1knH_lYe+yq4mOMZa5SoqLNagIAKsX7SQBphYQYqvukAXq4o=',
                 'towerify.josianne.database' => '',
             ]);
         } elseif ($app_env == 'prod') {
@@ -159,9 +276,36 @@ class CywiseSeeder extends Seeder
 
                 'encrypted:towerify.stripe.key' => 'emqKPsH94Gp4!ziy_fBp0naOHlnV28A5fDfY8hWrQy6w9QGUja3fZeIXG4n6214U4OIP+eFJQRwRO5qJ3sFJvM9wMBuwUhpXnMLkT2gpRUG1kdzHVIaGSQeq/6bhwJTF3xNwDTDcvQf70F73uldge+VVroUKdqFgKZiClNQ==',
                 'encrypted:towerify.stripe.secret' => 'r0ZRSP5WHOFJ?H8z_031Fm8fYryEEHjmkax3GINurDzaYtrE0bpWVIAI0y8zxlwqDxoPRKEJ5y0W6Dq+wJp3JEA5FoL+NuZ42bN5Jd8blDdwJqeSqyKsTPWZKmr3sdpNUinLRxf4XxFRRXMpYOCRDOzqrk0qZeOw4HLRfkg==',
-                'towerify.stripe.plans.essential' => 'price_1Qee99DHRqrzgOLGOfaVSPbt',
-                'towerify.stripe.plans.standard' => 'price_1QeeA0DHRqrzgOLGmijDTdnj',
-                'towerify.stripe.plans.premium' => 'price_1QeeAaDHRqrzgOLGBFZ7ms8R',
+
+                'towerify.stripe.plans.essential.name' => 'Essentiel',
+                'towerify.stripe.plans.essential.description' => null,
+                'towerify.stripe.plans.essential.features' => 'Scan de vulnérabilités, Honeypots pré-configurés, Adresses emails internes compromises, Charte informatique, Cyberbuddy, 15 jours gratuits, Assistance par tickets (réponse sour 48h)',
+                'towerify.stripe.plans.essential.monthly_price' => '150',
+                'towerify.stripe.plans.essential.monthly_price_id' => 'price_1Qee99DHRqrzgOLGOfaVSPbt',
+                'towerify.stripe.plans.essential.yearly_price' => null,
+                'towerify.stripe.plans.essential.yearly_price_id' => null,
+                'towerify.stripe.plans.essential.onetime_price' => null,
+                'towerify.stripe.plans.essential.onetime_price_id' => null,
+
+                'towerify.stripe.plans.standard.name' => 'Standard',
+                'towerify.stripe.plans.standard.description' => null,
+                'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI, 15 jours gratuits, Assistance par tickets (réponse sour 24h)',
+                'towerify.stripe.plans.standard.monthly_price' => '400',
+                'towerify.stripe.plans.standard.monthly_price_id' => 'price_1QeeA0DHRqrzgOLGmijDTdnj',
+                'towerify.stripe.plans.standard.yearly_price' => null,
+                'towerify.stripe.plans.standard.yearly_price_id' => null,
+                'towerify.stripe.plans.standard.onetime_price' => null,
+                'towerify.stripe.plans.standard.onetime_price_id' => null,
+
+                'towerify.stripe.plans.premium.name' => 'Premium',
+                'towerify.stripe.plans.premium.description' => null,
+                'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Premium, CyberBuddy via Teams, SSO, Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sour 6h)',
+                'towerify.stripe.plans.premium.monthly_price' => '600',
+                'towerify.stripe.plans.premium.monthly_price_id' => 'price_1QeeAaDHRqrzgOLGBFZ7ms8R',
+                'towerify.stripe.plans.premium.yearly_price' => null,
+                'towerify.stripe.plans.premium.yearly_price_id' => null,
+                'towerify.stripe.plans.premium.onetime_price' => null,
+                'towerify.stripe.plans.premium.onetime_price_id' => null,
 
                 'towerify.clickhouse.host' => '',
                 'towerify.clickhouse.username' => '',
@@ -173,7 +317,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
                 'towerify.josianne.username' => 'cywise',
-                'towerify.josianne.password' => 'GDr6#awPcu0NKbuR_G06I3zEp0mVx3PDo0lTH1xxpx+MNVimAVAQDfONbRT0=',
+                'encrypted:towerify.josianne.password' => 'GDr6#awPcu0NKbuR_G06I3zEp0mVx3PDo0lTH1xxpx+MNVimAVAQDfONbRT0=',
                 'towerify.josianne.database' => '',
             ]);
         }
@@ -211,37 +355,50 @@ class CywiseSeeder extends Seeder
             'name' => 'registered',
             'guard_name' => 'web',
         ], [
-            'description' => 'This is the default user role. If a user has this role they have created an account; however, they have are not a subscriber.',
+            'description' => 'This is the default user role. If a user has this role they have created an account; however, they are not a subscriber.',
         ]);
+        Plan::where('name', 'Essential')->update(['active' => false]); // Deal with legacy plan name
         Plan::updateOrCreate([
-            'name' => 'Essential',
+            'name' => config('towerify.stripe.plans.essential.name'),
         ], [
-            'description' => '',
-            'features' => '',
+            'description' => config('towerify.stripe.plans.essential.description'),
+            'features' => config('towerify.stripe.plans.essential.features'),
             'role_id' => Role::where('name', 'administrator')->where('guard_name', 'web')->firstOrFail()->id,
             'default' => 0,
-            'monthly_price' => '150',
-            'monthly_price_id' => config('towerify.stripe.plans.essential'),
+            'monthly_price' => config('towerify.stripe.plans.essential.monthly_price'),
+            'monthly_price_id' => config('towerify.stripe.plans.essential.monthly_price_id'),
+            'yearly_price' => config('towerify.stripe.plans.essential.yearly_price'),
+            'yearly_price_id' => config('towerify.stripe.plans.essential.yearly_price_id'),
+            'onetime_price' => config('towerify.stripe.plans.essential.onetime_price'),
+            'onetime_price_id' => config('towerify.stripe.plans.essential.onetime_price_id'),
         ]);
         Plan::updateOrCreate([
-            'name' => 'Standard',
+            'name' => config('towerify.stripe.plans.standard.name'),
         ], [
-            'description' => '',
-            'features' => '',
+            'description' => config('towerify.stripe.plans.standard.description'),
+            'features' => config('towerify.stripe.plans.standard.features'),
             'role_id' => Role::where('name', 'administrator')->where('guard_name', 'web')->firstOrFail()->id,
             'default' => 1,
-            'monthly_price' => '400',
-            'monthly_price_id' => config('towerify.stripe.plans.standard'),
+            'monthly_price' => config('towerify.stripe.plans.standard.monthly_price'),
+            'monthly_price_id' => config('towerify.stripe.plans.standard.monthly_price_id'),
+            'yearly_price' => config('towerify.stripe.plans.standard.yearly_price'),
+            'yearly_price_id' => config('towerify.stripe.plans.standard.yearly_price_id'),
+            'onetime_price' => config('towerify.stripe.plans.standard.onetime_price'),
+            'onetime_price_id' => config('towerify.stripe.plans.standard.onetime_price_id'),
         ]);
         Plan::updateOrCreate([
-            'name' => 'Premium',
+            'name' => config('towerify.stripe.plans.premium.name'),
         ], [
-            'description' => '',
-            'features' => '',
+            'description' => config('towerify.stripe.plans.premium.description'),
+            'features' => config('towerify.stripe.plans.premium.features'),
             'role_id' => Role::where('name', 'administrator')->where('guard_name', 'web')->firstOrFail()->id,
             'default' => 0,
-            'monthly_price' => '600',
-            'monthly_price_id' => config('towerify.stripe.plans.premium'),
+            'monthly_price' => config('towerify.stripe.plans.premium.monthly_price'),
+            'monthly_price_id' => config('towerify.stripe.plans.premium.monthly_price_id'),
+            'yearly_price' => config('towerify.stripe.plans.premium.yearly_price'),
+            'yearly_price_id' => config('towerify.stripe.plans.premium.yearly_price_id'),
+            'onetime_price' => config('towerify.stripe.plans.premium.onetime_price'),
+            'onetime_price_id' => config('towerify.stripe.plans.premium.onetime_price_id'),
         ]);
         Setting::updateOrCreate([
             'key' => 'site.title',
@@ -305,6 +462,7 @@ class CywiseSeeder extends Seeder
                 'group' => 'Site',
             ]);
         }
+        Theme::where('folder', 'anchor')->update(['active' => 0]);
         Theme::updateOrCreate([
             'folder' => 'cywise',
         ], [
