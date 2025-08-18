@@ -136,7 +136,7 @@ class CywiseSeeder extends Seeder
             ]);
         } elseif ($app_env == 'dev') {
             $this->setupConfigInDb([
-                'towerify.website' => 'https://cywise.io',
+                'towerify.website' => 'https://ngdev.cywise-ui.apps.cywise.io',
 
                 'towerify.freshdesk.widget_id' => '',
                 'towerify.freshdesk.to_email' => 'support@computablefacts.freshdesk.com',
@@ -229,7 +229,7 @@ class CywiseSeeder extends Seeder
             ]);
         } elseif ($app_env == 'prod') {
             $this->setupConfigInDb([
-                'towerify.website' => 'https://cywise.io',
+                'towerify.website' => 'https://www.cywise.io',
 
                 'towerify.freshdesk.widget_id' => '44000004635',
                 'towerify.freshdesk.to_email' => 'support@computablefacts.freshdesk.com',
