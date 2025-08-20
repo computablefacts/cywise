@@ -161,7 +161,7 @@
           const editor = window.BlockNote.ctx.editor;
           const blocksFromMarkdown = editor.tryParseMarkdownToBlocks(markdownContent);
           blocksFromMarkdown.then(blocks => {
-            axios.get('/collections').then(response => {
+            listCollectionsApiCall(response => {
               const collections = response.data.map(collection => collection.name);
               for (let i = 0; i < blocks.length; i++) {
                 const block = blocks[i];
@@ -187,7 +187,7 @@
               };
               window.BlockNote.template = template;
               window.BlockNote.observers.notify('template-change', template);
-            }).catch(error => toaster.toastAxiosError(error));
+            });
           });
         };
         reader.readAsText(file);

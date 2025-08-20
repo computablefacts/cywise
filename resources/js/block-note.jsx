@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import ReactDOM from 'react-dom';
 import "@blocknote/core/fonts/inter.css";
 import {BlockNoteView} from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -7,7 +6,7 @@ import {BlockNoteSchema, defaultBlockSpecs, filterSuggestionItems, insertOrUpdat
 import {
   createReactBlockSpec, getDefaultReactSlashMenuItems, SuggestionMenuController, useCreateBlockNote
 } from "@blocknote/react";
-import { createRoot } from 'react-dom/client';
+import {createRoot} from 'react-dom/client';
 import {HiSparkles} from "react-icons/hi";
 import {Menu} from "@mantine/core";
 
@@ -212,16 +211,14 @@ const getCustomSlashMenuItems = (editor, isSlash) => {
       title: 'CyberBuddy',
       subtext: 'Use AI to generate paragraph',
       onItemClick: () => {
-        axios.get('/collections')
-        .then(response => {
-          const collections = response.data.map(collection => collection.name);
+        listCollectionsApiCall(response => {
+          const collections = response.collections.map(collection => collection.name);
           insertOrUpdateBlock(editor, {
             type: "ai_block", props: {
               assistant_name: 'CyberBuddy', collection: collections[0], collections: collections,
             }
           });
-        })
-        .catch(error => toaster.toastAxiosError(error));
+        });
       },
     });
   }
