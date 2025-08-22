@@ -238,6 +238,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\ChunksProcedure::class,
             \App\Http\Procedures\CollectionsProcedure::class,
             \App\Http\Procedures\CyberBuddyProcedure::class,
+            \App\Http\Procedures\CyberScribeProcedure::class,
             \App\Http\Procedures\EventsProcedure::class,
             \App\Http\Procedures\FilesProcedure::class,
             \App\Http\Procedures\InvitationsProcedure::class,
