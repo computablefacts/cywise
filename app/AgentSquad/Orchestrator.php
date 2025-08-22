@@ -75,7 +75,7 @@ class Orchestrator
             Log::warning("Messages: " . json_encode($messages));
             Log::warning("Chain-of-thought: " . json_encode($chainOfThought));
 
-            /** @var ThoughtActionObservation $cot */
+            /** @var ThoughtActionObservation $tao */
             $tao = array_pop($chainOfThought);
             $observation = Str::trim(Str::replace('I_DONT_KNOW', '', $tao->observation()));
 
