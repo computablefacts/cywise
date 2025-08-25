@@ -156,7 +156,7 @@ class CywiseSeeder extends Seeder
                 'towerify.adversarymeter.days_between_scans' => '5',
 
                 'towerify.cyberbuddy.api' => 'https://dev.generic-rag.dev02.towerify.io',
-                'towerify.cyberbuddy.api_username' => 'wrong',
+                'towerify.cyberbuddy.api_username' => 'gr',
                 'encrypted:towerify.cyberbuddy.api_password' => 'DvrhUgtWdTIvcX&#_gX55zIhk0cW4iG8U0lj5VRpCtXG2lNE/lKeXaphI9DI=',
 
                 'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
@@ -249,7 +249,7 @@ class CywiseSeeder extends Seeder
                 'towerify.adversarymeter.days_between_scans' => '5',
 
                 'towerify.cyberbuddy.api' => 'https://prod.generic-rag.dev02.towerify.io',
-                'towerify.cyberbuddy.api_username' => 'wrong',
+                'towerify.cyberbuddy.api_username' => 'gr',
                 'encrypted:towerify.cyberbuddy.api_password' => 'esfM1S4U3SYsnsSm_sAgO943QigLqfU9K8UGUfJAk0gTUp7ovS8uIbD3U+zM=',
 
                 'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
