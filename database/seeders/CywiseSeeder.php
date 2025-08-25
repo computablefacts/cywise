@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Hashing\TwHasher;
 use App\Models\AppConfig;
 use App\Models\Permission;
 use App\Models\Role;
@@ -330,7 +331,7 @@ class CywiseSeeder extends Seeder
                 $key = Str::chopStart($key, 'encrypted:');
                 AppConfig::updateOrCreate(['key' => $key], [
                     'key' => $key,
-                    'value' => $value,
+                    'value' => TwHasher::unhash($value),
                     'is_encrypted' => true,
                 ]);
             } else {
