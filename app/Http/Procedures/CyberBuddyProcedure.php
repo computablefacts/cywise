@@ -3,6 +3,7 @@
 namespace App\Http\Procedures;
 
 use App\AgentSquad\Actions\CyberBuddy;
+use App\AgentSquad\Actions\ManageAssets;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Orchestrator;
 use App\AgentSquad\Providers\LlmsProvider;
@@ -89,6 +90,7 @@ class CyberBuddyProcedure extends Procedure
         try {
             $orchestrator = new Orchestrator();
             $orchestrator->registerAgent(new CyberBuddy());
+            $orchestrator->registerAgent(new ManageAssets());
             $answer = $orchestrator->run($user, $threadId, $messages, $question);
         } catch (\Exception $e) {
             Log::error($e->getMessage());

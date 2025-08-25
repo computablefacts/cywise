@@ -87,7 +87,7 @@ class Orchestrator
 
         $template = '{"thought":"describe here succinctly your thoughts about the question you have been asked", "action_name":"set here the name of the action to execute", "action_input":"set here the input for the action"}';
         $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
-        $actions = implode("\n", array_map(fn(AbstractAction $action) => "- {$action->name()}: {$action->description()}", $this->agents));
+        $actions = implode("\n", array_map(fn(AbstractAction $action) => "[ACTION][NAME]{$action->name()}[/NAME][DESCRIPTION]{$action->description()}[/DESCRIPTION][/ACTION]", $this->agents));
         $prompt = PromptsProvider::provide('default_orchestrator', [
             'TEMPLATE' => $template,
             'COT' => $cot,
@@ -146,7 +146,7 @@ class Orchestrator
         $answer = $this->agents[$json['action_name']]->execute($user, $threadId, $messages, $json['action_input']);
 
         if ($answer->failure()) {
-            $answer->setChainOfThought($chainOfThought);
+            $answer->setChainOfThought(array_merge($chainOfThought, $answer->chainOfThought()));
             return $answer;
         }
 
