@@ -31,7 +31,7 @@ class TwHasher extends AbstractHasher implements Hasher
         return $randomString;
     }
 
-    // Keep in sync with index.php
+    // Keep in sync with Helpers.php
     private static function cywise_hash(string $value): string
     {
         $key = config('towerify.hasher.nonce');
@@ -39,7 +39,7 @@ class TwHasher extends AbstractHasher implements Hasher
         return $initializationVector . '_' . openssl_encrypt($value, 'AES-256-CBC', $key, 0, $initializationVector);
     }
 
-    // Keep in sync with index.php
+    // Keep in sync with Helpers.php
     private static function cywise_unhash(string $value): string
     {
         $key = config('towerify.hasher.nonce');
