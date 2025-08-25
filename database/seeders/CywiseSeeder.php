@@ -63,7 +63,7 @@ class CywiseSeeder extends Seeder
                 'towerify.adversarymeter.days_between_scans' => '5',
 
                 'towerify.cyberbuddy.api' => 'https://dev.generic-rag.dev02.towerify.io',
-                'towerify.cyberbuddy.api_username' => 'wrong',
+                'towerify.cyberbuddy.api_username' => 'gr',
                 // 'encrypted:towerify.cyberbuddy.api_password' => '',
 
                 'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
