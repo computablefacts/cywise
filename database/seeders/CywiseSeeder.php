@@ -163,7 +163,7 @@ class CywiseSeeder extends Seeder
                 'encrypted:towerify.deepseek.api_key' => 'RSS1ZtHV!uSg4Gvr_T3wUdZm/sso1lWLb4CpCPlVa5b6EXjRE0CWwvl2LkNWJmm6Mx9eXuOb8i53Z04Yd',
 
                 'towerify.deepinfra.api' => 'https://api.deepinfra.com/v1/openai',
-                'encrypted:towerify.deepinfra.api_key' => 'MQlASEMkBnwzN#dB_YcE+Q5YNbIEofU3tJ0utgzVGWnlUfVb3zUvE9MxV6Va/8nrlI97S4Aam0YY6eMm/',
+                'encrypted:towerify.deepinfra.api_key' => 'ooLU?YcpQj6rQXmB_/qXKpsXygqXJDpGWtkCPJxANYwPAQbIxTN49ZE0Ipqr/CpeDUSXuBZh9PtyqH8Ck',
 
                 'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
                 'encrypted:towerify.gemini.api_key' => 'a#juOq4apsMBq&99_iNHi4IdBsswBlkIhwNBYbYNx23AvT6rLsY3kETOang8cka4qANAeASVv9VQYJPEn',
@@ -224,7 +224,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
                 'towerify.josianne.username' => 'cywise',
-                'encrypted:towerify.josianne.password' => 'HZVYI7BwHZZ#1knH_lYe+yq4mOMZa5SoqLNagIAKsX7SQBphYQYqvukAXq4o=',
+                'encrypted:towerify.josianne.password' => 'BZMMOKdbxEtn?mpc_xZS2m+XhLGIkAQC7rhtpVKG3diisqZkgxGmSrCPkx7o=',
                 'towerify.josianne.database' => '',
             ]);
         } elseif ($app_env == 'prod') {
