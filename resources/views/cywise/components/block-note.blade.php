@@ -38,6 +38,14 @@
 <script>
   window.addEventListener('load', () => {
     window.BlockNote.render("block-note", {});
+    let _blockNote = window.BlockNote;
+    Object.defineProperty(window, 'BlockNote', {
+      get: () => _blockNote, set: (newValue) => {
+        console.log('window.BlockNote has been updated!');
+        // debugger;
+        // _blockNote = newValue;
+      }
+    });
     window.BlockNote.observers = new com.computablefacts.observers.Subject();
     window.BlockNote.observers.register('template-change', template => {
       if (template) {
