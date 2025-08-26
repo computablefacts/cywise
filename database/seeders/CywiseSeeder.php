@@ -186,7 +186,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.stripe.plans.essential.name' => 'Essentiel',
                 'towerify.stripe.plans.essential.description' => null,
-                'towerify.stripe.plans.essential.features' => 'Scan de vulnérabilités, Honeypots pré-configurés, Adresses emails internes compromises, Charte informatique, Cyberbuddy, 15 jours gratuits, Assistance par tickets (réponse sour 48h)',
+                'towerify.stripe.plans.essential.features' => 'Scan de vulnérabilités, Honeypots pré-configurés, Adresses emails internes compromises, Charte informatique, Cyberbuddy, 15 jours gratuits, Assistance par tickets (réponse sous 48h)',
                 'towerify.stripe.plans.essential.monthly_price' => '150',
                 'towerify.stripe.plans.essential.monthly_price_id' => '',
                 'towerify.stripe.plans.essential.yearly_price' => null,
@@ -196,7 +196,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.stripe.plans.standard.name' => 'Standard',
                 'towerify.stripe.plans.standard.description' => null,
-                'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI, 15 jours gratuits, Assistance par tickets (réponse sour 24h)',
+                'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI, 15 jours gratuits, Assistance par tickets (réponse sous 24h)',
                 'towerify.stripe.plans.standard.monthly_price' => '400',
                 'towerify.stripe.plans.standard.monthly_price_id' => '',
                 'towerify.stripe.plans.standard.yearly_price' => null,
@@ -206,7 +206,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.stripe.plans.premium.name' => 'Premium',
                 'towerify.stripe.plans.premium.description' => null,
-                'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Premium, CyberBuddy via Teams, SSO, Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sour 6h)',
+                'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Standard, CyberBuddy via Teams, SSO, Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sous 6h)',
                 'towerify.stripe.plans.premium.monthly_price' => '600',
                 'towerify.stripe.plans.premium.monthly_price_id' => '',
                 'towerify.stripe.plans.premium.yearly_price' => null,
@@ -279,7 +279,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.stripe.plans.essential.name' => 'Essentiel',
                 'towerify.stripe.plans.essential.description' => null,
-                'towerify.stripe.plans.essential.features' => 'Scan de vulnérabilités, Honeypots pré-configurés, Adresses emails internes compromises, Charte informatique, Cyberbuddy, 15 jours gratuits, Assistance par tickets (réponse sour 48h)',
+                'towerify.stripe.plans.essential.features' => 'Scan de vulnérabilités, Honeypots pré-configurés, Adresses emails internes compromises, Charte informatique, Cyberbuddy, 15 jours gratuits, Assistance par tickets (réponse sous 48h)',
                 'towerify.stripe.plans.essential.monthly_price' => '150',
                 'towerify.stripe.plans.essential.monthly_price_id' => 'price_1Qee99DHRqrzgOLGOfaVSPbt',
                 'towerify.stripe.plans.essential.yearly_price' => null,
@@ -289,7 +289,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.stripe.plans.standard.name' => 'Standard',
                 'towerify.stripe.plans.standard.description' => null,
-                'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI, 15 jours gratuits, Assistance par tickets (réponse sour 24h)',
+                'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI, 15 jours gratuits, Assistance par tickets (réponse sous 24h)',
                 'towerify.stripe.plans.standard.monthly_price' => '400',
                 'towerify.stripe.plans.standard.monthly_price_id' => 'price_1QeeA0DHRqrzgOLGmijDTdnj',
                 'towerify.stripe.plans.standard.yearly_price' => null,
@@ -299,7 +299,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.stripe.plans.premium.name' => 'Premium',
                 'towerify.stripe.plans.premium.description' => null,
-                'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Premium, CyberBuddy via Teams, SSO, Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sour 6h)',
+                'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Standard, CyberBuddy via Teams, SSO, Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sous 6h)',
                 'towerify.stripe.plans.premium.monthly_price' => '600',
                 'towerify.stripe.plans.premium.monthly_price_id' => 'price_1QeeAaDHRqrzgOLGBFZ7ms8R',
                 'towerify.stripe.plans.premium.yearly_price' => null,
