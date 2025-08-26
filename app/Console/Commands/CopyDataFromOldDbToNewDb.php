@@ -277,7 +277,7 @@ class CopyDataFromOldDbToNewDb extends Command
                     'role_id' => Role::where('name', 'administrator')->where('guard_name', 'web')->firstOrFail()->id,
                     'default' => 0,
                     'monthly_price' => '150',
-                    'monthly_price_id' => config('towerify.stripe.plans.essential'),
+                    'monthly_price_id' => config('towerify.stripe.plans.essential.monthly_price_id'),
                 ]);
                 Plan::updateOrCreate([
                     'name' => 'Standard',
@@ -287,7 +287,7 @@ class CopyDataFromOldDbToNewDb extends Command
                     'role_id' => Role::where('name', 'administrator')->where('guard_name', 'web')->firstOrFail()->id,
                     'default' => 1,
                     'monthly_price' => '400',
-                    'monthly_price_id' => config('towerify.stripe.plans.standard'),
+                    'monthly_price_id' => config('towerify.stripe.plans.standard.monthly_price_id'),
                 ]);
                 Plan::updateOrCreate([
                     'name' => 'Premium',
@@ -297,7 +297,7 @@ class CopyDataFromOldDbToNewDb extends Command
                     'role_id' => Role::where('name', 'administrator')->where('guard_name', 'web')->firstOrFail()->id,
                     'default' => 0,
                     'monthly_price' => '600',
-                    'monthly_price_id' => config('towerify.stripe.plans.premium'),
+                    'monthly_price_id' => config('towerify.stripe.plans.premium.monthly_price_id'),
                 ]);
 
                 Log::info('subscriptions...');
