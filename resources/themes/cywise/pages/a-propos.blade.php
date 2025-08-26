@@ -193,17 +193,6 @@ name('a-propos');
                       clip-rule="evenodd"/>
               </svg>
               <span>
-                <strong class="font-semibold text-gray-900">Chatbot pédagogique</strong> pour répondre à vos questions et vous former en même temps
-              </span>
-            </li>
-            <li class="flex gap-x-3">
-              <svg class="mt-1 size-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor"
-                   aria-hidden="true" data-slot="icon">
-                <path fill-rule="evenodd"
-                      d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z"
-                      clip-rule="evenodd"/>
-              </svg>
-              <span>
                 <strong class="font-semibold text-gray-900">Curiosité & Persévérance.</strong> Notre IA est curieuse par nature. Et nous aussi. On gratte, on teste, on creuse, on ajuste. Jusqu’à ce que ça fonctionne!
               </span>
             </li>
