@@ -101,6 +101,9 @@ class Orchestrator
         $answer = LlmsProvider::provide($messages, $this->model);
         array_pop($messages);
 
+        Log::debug("[ORCHESTRATOR] Prompt: {$prompt}");
+        Log::debug("[ORCHESTRATOR] Answer: {$answer}");
+
         $matches = null;
         preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
         $answer = Str::trim($matches[1][0]);
@@ -134,12 +137,15 @@ class Orchestrator
             return new FailedAnswer("The action input is missing: {$answer}", $chainOfThought);
         }
         if ($json['action_name'] === 'respond_to_user') {
+            $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'Responding to the user.');
             return new SuccessfulAnswer($json['action_input'], $chainOfThought);
         }
         if ($json['action_name'] === 'clarify_request') {
+            $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'Asking for clarification.');
             return new SuccessfulAnswer($json['action_input'], $chainOfThought);
         }
         if (!isset($this->agents[$json['action_name']])) {
+            $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An unknown action was requested. Returning to the user.');
             return new FailedAnswer("The action is unknown: {$answer}", $chainOfThought);
         }
 
