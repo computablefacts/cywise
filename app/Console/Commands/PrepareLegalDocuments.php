@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\AgentSquad\Actions\LegalDocument;
 use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Vectors\AbstractVectorStore;
@@ -38,7 +39,7 @@ class PrepareLegalDocuments extends Command
         $in = $this->argument('input');
         $out = $this->argument('output');
         $prompt = $this->argument('prompt');
-        
+
         $this->vectorStoreObjets = new FileVectorStore($out, 4, 'objets');
         $this->vectorStoreArguments = new FileVectorStore($out, 4, 'arguments');
         $this->model = 'google/gemini-2.5-pro';

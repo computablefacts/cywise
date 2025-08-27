@@ -3,6 +3,7 @@
 namespace App\Http\Procedures;
 
 use App\AgentSquad\Actions\CyberBuddy;
+use App\AgentSquad\Actions\LabourLawyer;
 use App\AgentSquad\Actions\ManageAssets;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Orchestrator;
@@ -91,6 +92,48 @@ class CyberBuddyProcedure extends Procedure
             $orchestrator = new Orchestrator();
             $orchestrator->registerAgent(new CyberBuddy());
             $orchestrator->registerAgent(new ManageAssets());
+
+            // TODO : create one agent for each framework
+
+            if ($user->email === config('towerify.admin.email')) {
+
+                $in = database_path('seeders/vectors');
+                $out = storage_path('app/vectors');
+
+                if (!file_exists($out)) {
+
+                    Log::debug("Creating directory '{$out}'...");
+
+                    if (!mkdir($out, 0755, true)) {
+                        throw new \Exception("Failed to create directory: {$out}");
+                    }
+
+                    Log::debug("Directory '{$out}' created.");
+                }
+
+                $input = "{$in}/labour_lawyer." . config('app.env') . ".zip.enc";
+                $output = "{$out}/labour_lawyer";
+
+                if (file_exists($input) && (!file_exists($output) || !is_dir($output))) {
+
+                    Log::debug("Decrypting file '{$input}'...");
+
+                    $file = cywise_decrypt_file(config('towerify.hasher.nonce'), $input);
+                    copy($file, "{$output}.zip");
+
+                    Log::debug("File '{$input}' decrypted.");
+                    Log::debug("Unpacking file '{$output}.zip'...");
+
+                    $files = cywise_unpack_files($out, "labour_lawyer.zip");
+                    rename($files[0], $output);
+                    unlink("{$output}.zip");
+
+                    Log::debug("File '{$output}.zip' unpacked.");
+                }
+
+                $orchestrator->registerAgent(new LabourLawyer($output));
+            }
+
             $answer = $orchestrator->run($user, $threadId, $messages, $question);
         } catch (\Exception $e) {
             Log::error($e->getMessage());

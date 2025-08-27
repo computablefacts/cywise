@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\AgentSquad\Actions;
 
 use Illuminate\Support\Facades\Log;
 

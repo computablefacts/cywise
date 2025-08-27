@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\AgentSquad\Actions;
 
 use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
@@ -17,6 +17,7 @@ class LabourLawyer extends AbstractAction
 {
     private AbstractVectorStore $vectorStoreObjets;
     private AbstractVectorStore $vectorStoreArguments;
+    private string $dir;
     private string $model;
 
     static function schema(): array
@@ -46,6 +47,7 @@ class LabourLawyer extends AbstractAction
     {
         $this->vectorStoreObjets = new FileVectorStore($in, 5, 'objets');
         $this->vectorStoreArguments = new FileVectorStore($in, 5, 'arguments');
+        $this->dir = $in;
         $this->model = $model;
     }
 
@@ -59,7 +61,7 @@ class LabourLawyer extends AbstractAction
             /** @var Vector $vector */
             $vector = $item['vector'];
             $idx = $vector->metadata('index_objet');
-            $document = new LegalDocument($vector->metadata('file'));
+            $document = new LegalDocument("{$this->dir}/{$vector->metadata('file')}");
 
             return [
                 'objet' => $document->objet($idx),
@@ -70,7 +72,7 @@ class LabourLawyer extends AbstractAction
             /** @var Vector $vector */
             $vector = $item['vector'];
             $idx = $vector->metadata('index_objet');
-            $document = new LegalDocument($vector->metadata('file'));
+            $document = new LegalDocument("{$this->dir}/{$vector->metadata('file')}");
 
             return [
                 'objet' => $document->objet($idx),
