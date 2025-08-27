@@ -66,18 +66,76 @@ if (!function_exists('cywise_random_string')) {
 if (!function_exists('cywise_hash')) {
     function cywise_hash(string $value): string
     {
-        $key = config('towerify.hasher.nonce');
-        $initializationVector = cywise_random_string(16);
-        return $initializationVector . '_' . openssl_encrypt($value, 'AES-256-CBC', $key, 0, $initializationVector);
+        return cywise_hash_ext(config('towerify.hasher.nonce'), $value);
     }
 }
 if (!function_exists('cywise_unhash')) {
     function cywise_unhash(string $value): string
     {
-        $key = config('towerify.hasher.nonce');
+        return cywise_unhash_ext(config('towerify.hasher.nonce'), $value);
+    }
+}
+if (!function_exists('cywise_hash_ext')) {
+    function cywise_hash_ext(string $key, string $value): string
+    {
+        $initializationVector = cywise_random_string(16);
+        return $initializationVector . '_' . openssl_encrypt($value, 'AES-256-CBC', $key, 0, $initializationVector);
+    }
+}
+if (!function_exists('cywise_unhash_ext')) {
+    function cywise_unhash_ext(string $key, string $value): string
+    {
         $initializationVector = strtok($value, '_');
         $value2 = substr($value, strpos($value, '_') + 1);
         return openssl_decrypt($value2, 'AES-256-CBC', $key, 0, $initializationVector);
+    }
+}
+if (!function_exists('cywise_encrypt_file')) {
+    function cywise_encrypt_file(string $key, string $file): string
+    {
+        $content = file_get_contents($file);
+        $contentCompressed = gzcompress($content);
+
+        if ($contentCompressed === false) {
+            throw new \Exception("Failed to compress file '{$file}'");
+        }
+
+        $contentEncrypted = cywise_hash_ext($key, $contentCompressed);
+
+        if ($contentEncrypted === false) {
+            throw new \Exception("Failed to encrypt file '{$file}'");
+        }
+
+        $fileTmp = tempnam(sys_get_temp_dir(), 'legal_');
+        file_put_contents($fileTmp, $contentEncrypted);
+
+        return $fileTmp;
+    }
+}
+if (!function_exists('cywise_decrypt_file')) {
+    function cywise_decrypt_file(string $key, string $file): string
+    {
+        if (!is_file($file)) {
+            throw new \Exception("File '{$file}' does not exist");
+        }
+
+        $content = file_get_contents($file);
+        $contentDecrypted = cywise_unhash_ext($key, $content);
+
+        if ($contentDecrypted === false) {
+            throw new \Exception("Failed to decrypt file '{$file}'");
+        }
+
+        $contentDecompressed = gzuncompress($contentDecrypted);
+
+        if ($contentDecompressed === false) {
+            throw new \Exception("Failed to decompress file '{$file}'");
+        }
+
+        $fileTmp = tempnam(sys_get_temp_dir(), 'legal_');
+        file_put_contents($fileTmp, $contentDecompressed);
+
+        return $fileTmp;
     }
 }
 if (!function_exists('app_config_override')) {

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class Vault extends Command
 {
@@ -18,22 +19,7 @@ class Vault extends Command
      *
      * @var string
      */
-    protected $description = 'Encrypt/Decrypt value using a given key.';
-
-    // Keep in sync with Helpers.php
-    private static function cywise_hash(string $key, string $value): string
-    {
-        $initializationVector = cywise_random_string(16);
-        return $initializationVector . '_' . openssl_encrypt($value, 'AES-256-CBC', $key, 0, $initializationVector);
-    }
-
-    // Keep in sync with Helpers.php
-    private static function cywise_unhash(string $key, string $value): string
-    {
-        $initializationVector = strtok($value, '_');
-        $value2 = substr($value, strpos($value, '_') + 1);
-        return openssl_decrypt($value2, 'AES-256-CBC', $key, 0, $initializationVector);
-    }
+    protected $description = 'Encrypt/Decrypt a given value (string or file) using a given key.';
 
     /**
      * Execute the console command.
@@ -43,11 +29,30 @@ class Vault extends Command
         $action = $this->argument('action');
         $key = $this->argument('key');
         $value = $this->argument('value');
+        $isString = !file_exists($value);
 
         if ($action == 'encrypt') {
-            $this->info(Vault::cywise_hash($key, $value));
+            if ($isString) {
+                $this->info(cywise_hash_ext($key, $value));
+            } else {
+                $file = "$value.enc";
+                $output = cywise_encrypt_file($key, $value);
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+                copy($output, $file);
+            }
         } else if ($action == 'decrypt') {
-            $this->info(Vault::cywise_unhash($key, $value));
+            if ($isString) {
+                $this->info(cywise_unhash_ext($key, $value));
+            } else {
+                $file = Str::replace('.enc', '.dec', $value);
+                $output = cywise_decrypt_file($key, $value);
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+                copy($output, $file);
+            }
         } else {
             throw new \Exception("Unknown action : {$action}");
         }
