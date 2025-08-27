@@ -11,12 +11,14 @@ abstract class AbstractAnswer
     /** @var ThoughtActionObservation[] $chainOfThought */
     private array $chainOfThought;
     private bool $success;
+    private bool $final;
 
-    protected function __construct(string $answer, array $chainOfThought = [], bool $success = true)
+    protected function __construct(string $answer, array $chainOfThought = [], bool $success = true, bool $final = false)
     {
         $this->answer = $answer;
         $this->chainOfThought = $chainOfThought;
         $this->success = $success;
+        $this->final = $final;
     }
 
     public function __toString()
@@ -37,6 +39,11 @@ abstract class AbstractAnswer
     public function failure(): bool
     {
         return !$this->success;
+    }
+
+    public function final(): bool
+    {
+        return $this->final;
     }
 
     public function html(): string

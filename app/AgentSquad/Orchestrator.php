@@ -152,11 +152,17 @@ class Orchestrator
         $answer = $this->agents[$json['action_name']]->execute($user, $threadId, $messages, $json['action_input']);
 
         if ($answer->failure()) {
-            $answer->setChainOfThought(array_merge($chainOfThought, $answer->chainOfThought()));
+            $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An error occurred. Returning to the user.');
+            $answer->setChainOfThought($chainOfThought);
             return $answer;
         }
 
         $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", $answer->markdown());
+
+        if ($answer->final()) {
+            $answer->setChainOfThought($chainOfThought);
+            return $answer;
+        }
         return $this->processInput($user, $threadId, $messages, $input, $chainOfThought, $depth + 1);
     }
 }

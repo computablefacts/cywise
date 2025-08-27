@@ -103,6 +103,6 @@ N'utilise pas de markdown pour formuler ta réponse.
         ];
         $answer = LlmsProvider::provide($messages, $this->model, 30);
         array_pop($messages);
-        return new SuccessfulAnswer($answer);
+        return new SuccessfulAnswer($answer, [], !empty($answer));
     }
 }

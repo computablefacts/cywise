@@ -98,7 +98,7 @@ class CyberBuddy extends AbstractAction
         $answer = LlmsProvider::provide($messages, self::MODEL, 120);
         array_pop($messages);
 
-        return new SuccessfulAnswer($answer);
+        return new SuccessfulAnswer($answer, [], !empty($answer));
     }
 
     private function loadMemos(User $user): string
