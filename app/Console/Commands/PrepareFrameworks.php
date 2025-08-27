@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\Yaml\Yaml;
 
-class PrepareFramework extends Command
+class PrepareFrameworks extends Command
 {
     /**
      * The name and signature of the console command.
