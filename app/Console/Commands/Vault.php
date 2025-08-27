@@ -31,7 +31,7 @@ class Vault extends Command
         $value = $this->argument('value');
         $isString = !file_exists($value);
 
-        if ($action == 'encrypt') {
+        if ($action === 'encrypt') {
             if ($isString) {
                 $this->info(cywise_hash_ext($key, $value));
             } else {
@@ -42,7 +42,7 @@ class Vault extends Command
                 }
                 copy($output, $file);
             }
-        } else if ($action == 'decrypt') {
+        } else if ($action === 'decrypt') {
             if ($isString) {
                 $this->info(cywise_unhash_ext($key, $value));
             } else {

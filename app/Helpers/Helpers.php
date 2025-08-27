@@ -138,6 +138,60 @@ if (!function_exists('cywise_decrypt_file')) {
         return $fileTmp;
     }
 }
+if (!function_exists('cywise_pack_files')) {
+    function cywise_pack_files(string $dir, string $pattern): string
+    {
+        if (!is_dir($dir)) {
+            throw new \Exception("Directory not found: {$dir}");
+        }
+
+        $zip = new \ZipArchive();
+        $filename = "$dir/packed_" . date('Y-m-d_H-i-s') . '.zip';
+
+        if ($zip->open($filename, \ZipArchive::CREATE) !== TRUE) {
+            throw new \Exception("Cannot create zip file: {$filename}");
+        }
+        foreach (glob("$dir/$pattern", GLOB_BRACE) as $file) {
+            if (is_file($file)) {
+                $zip->addFile($file, basename($file));
+            }
+        }
+
+        $zip->close();
+        return $filename;
+    }
+}
+if (!function_exists('cywise_unpack_files')) {
+    function cywise_unpack_files(string $dir, string $pattern): array
+    {
+        if (!is_dir($dir)) {
+            throw new \Exception("Directory not found: {$dir}");
+        }
+
+        $directories = [];
+
+        foreach (glob("$dir/$pattern") as $file) {
+
+            $zip = new \ZipArchive();
+
+            if ($zip->open($file) !== TRUE) {
+                throw new \Exception("Cannot open zip file: {$file}");
+            }
+
+            $path = "$dir/" . basename($file, '.zip');
+
+            if (!mkdir($path, 0755, true)) {
+                throw new \Exception("Failed to create directory: {$path}");
+            }
+
+            $zip->extractTo($path);
+            $zip->close();
+
+            $directories[] = $path;
+        }
+        return $directories;
+    }
+}
 if (!function_exists('app_config_override')) {
     function app_config_override(): array
     {
