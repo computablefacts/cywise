@@ -229,6 +229,10 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/ta-tikoma/phpunit-architecture-test" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/tymon/jwt-auth" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/wamania/php-stemmer" />
+      <excludeFolder url="file://$MODULE_DIR$/.phpunit.cache" />
+      <excludeFolder url="file://$MODULE_DIR$/bootstrap/cache/filament" />
+      <excludeFolder url="file://$MODULE_DIR$/storage/app/vectors" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

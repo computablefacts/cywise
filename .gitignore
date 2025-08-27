@@ -1,4 +1,5 @@
 /.phpunit.cache
+/bootstrap/cache
 /node_modules
 /public/hot
 /public/storage
@@ -11,6 +12,7 @@
 /storage/app/public/docs/docs.public.html
 /storage/app/public/images/*
 /storage/app/public/livewire-tmp/*
+/storage/app/vectors
 /storage/debugbar/*
 /storage/migration-checksum_*.txt
 /storage/scout/*.index
