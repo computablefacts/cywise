@@ -1,3 +1,5 @@
 import BlockNote from './block-note';
 
-window.BlockNote = BlockNote;
+if (!window.BlockNote) {
+  window.BlockNote = BlockNote;
+}
