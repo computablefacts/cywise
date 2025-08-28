@@ -99,13 +99,13 @@ const QaBlock = createReactBlockSpec({
       </div>);
     })}
       <div className={"d-flex justify-content-center"}>
-        <input type={"button"}
-               value={"Générer!"}
-               style={{backgroundColor: "#0d6efd", color: "white", border: "none", padding: "10px"}}
-               disabled={loading}
-               onClick={handleClick}>
-        </input>
-        {loading && <span className="tw-loader-25 align-self-center ml-3"></span>}
+        {!loading && <input type={"button"}
+                            value={"Générer!"}
+                            style={{backgroundColor: "#0d6efd", color: "white", border: "none", padding: "10px"}}
+                            disabled={loading}
+                            onClick={handleClick}>
+        </input>}
+        {loading && <span className="loader-25 align-self-center ml-3" style={{marginTop: "10px"}}></span>}
       </div>
     </div>);
   }
@@ -205,7 +205,7 @@ const AiBlock = createReactBlockSpec({
                autoFocus
                required>
         </input>
-        {loading && <span className="tw-loader-25"></span>}
+        {loading && <span className="loader-25"></span>}
       </div>)
   }
 });
