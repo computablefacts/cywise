@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import "@blocknote/core/fonts/inter.css";
 import {BlockNoteView} from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -130,8 +130,22 @@ const AiBlock = createReactBlockSpec({
     // Show/hide loader
     const [loading, setLoading] = useState(false);
 
+    // Focus the input element
+    const inputRef = useRef(props.contentRef);
+    useEffect(() => {
+      const timer = setTimeout(() => inputRef.current?.focus(), 10);
+      return () => clearTimeout(timer);
+    }, [props.block.props.collection]);
+
+    // When the collection is updated, update the underlying data structure
+    const handleCollectionChange = (col) => {
+      props.editor.updateBlock(props.block, {type: "ai_block", props: {collection: col}});
+      const timer = setTimeout(() => inputRef.current?.focus(), 10);
+      return () => clearTimeout(timer);
+    };
+
     // When the prompt is updated, update the underlying data structure
-    const handleChange = (event) => {
+    const handlePromptChange = (event) => {
       props.editor.updateBlock(props.block, {type: "ai_block", props: {prompt: event.target.value}});
     };
 
@@ -176,17 +190,16 @@ const AiBlock = createReactBlockSpec({
           </Menu.Target>
           <Menu.Dropdown>
             {props.block.props.collections.map(col => {
-              return (<Menu.Item key={col} onClick={() => props.editor.updateBlock(props.block,
-                {type: "ai_block", props: {collection: col}})}>{col}</Menu.Item>);
+              return (<Menu.Item key={col} onClick={() => handleCollectionChange(col)}>{col}</Menu.Item>);
             })}
           </Menu.Dropdown>
         </Menu>}
         <input type={"text"}
                style={{flexGrow: "1", border: "none", padding: "3px", outline: "unset", minHeight: "30px"}}
-               ref={props.contentRef}
+               ref={inputRef}
                disabled={loading}
                onKeyDown={handleKeyDown}
-               onChange={handleChange}
+               onChange={handlePromptChange}
                placeholder={"Saisissez vos instructions ici..."}
                value={props.block.props.prompt}
                autoFocus
