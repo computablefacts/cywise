@@ -61,7 +61,11 @@
       return window.BlockNote.ctx.blocks
       .filter(block => block.type === 'heading')
       .map(block => {
-        return {id: block.id, level: block.props.level, text: block.content[0].text};
+        return {
+          id: block.id,
+          level: block.props.level,
+          text: block.content.length === 0 ? null : block.content[0].text
+        };
       });
     }
     return [];

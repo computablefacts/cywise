@@ -121,7 +121,7 @@ const AiBlock = createReactBlockSpec({
     }, collection: {
       default: "",
     }, prompt: {
-      default: null,
+      default: "",
     },
   }, content: "inline",
 }, {
