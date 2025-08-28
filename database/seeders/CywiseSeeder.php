@@ -75,11 +75,11 @@ class CywiseSeeder extends Seeder
                 'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
                 // 'encrypted:towerify.gemini.api_key' => '',
 
-                'array:towerify.telescope.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
-                'array:towerify.telescope.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.telescope.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.telescope.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
 
-                'array:towerify.performa.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
-                'array:towerify.performa.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.performa.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.performa.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
 
                 'towerify.openai.api' => 'https://api.openai.com/v1',
                 // 'encrypted:towerify.openai.api_key' => '',
@@ -168,11 +168,11 @@ class CywiseSeeder extends Seeder
                 'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
                 'encrypted:towerify.gemini.api_key' => 'a#juOq4apsMBq&99_iNHi4IdBsswBlkIhwNBYbYNx23AvT6rLsY3kETOang8cka4qANAeASVv9VQYJPEn',
 
-                'array:towerify.telescope.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
-                'array:towerify.telescope.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.telescope.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.telescope.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
 
-                'array:towerify.performa.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
-                'array:towerify.performa.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.performa.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.performa.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
 
                 'towerify.openai.api' => 'https://api.openai.com/v1',
                 'encrypted:towerify.openai.api_key' => '6dbLxUYdsOQiFRcp_xgdMdae7nL5B8uULLU+G3QpXRga0i0qQwPIurAV7T3t/b7WtVn/9etjY6/tFavJfwt9dl5NW2ZHvSIVgKXukMNqQ6k/ZcH1qh9flUu9s2BCW7/YOQJ3hYNAxEanCVglXqazkirUbFwiO5wcsSvg99N0nCoRYVAJNj3/loI8ADfREkYRKEIENyoGNvv7hpPQSvRaGqhE7FR7K7PPzkt84y3FbcR/YJk4IlCRJ7TC1mzA=',
@@ -261,11 +261,11 @@ class CywiseSeeder extends Seeder
                 'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
                 'encrypted:towerify.gemini.api_key' => 'bYg2zlwYpWlULSJ9_boRGCkKbpzTr5NHeZ9ZBqaCkeaCmK2/lpr8mFLCuPcUNvKPlesCldGWo4L7Mb9rc',
 
-                'array:towerify.telescope.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
-                'array:towerify.telescope.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil',
+                'array:towerify.telescope.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.telescope.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
 
-                'array:towerify.performa.whitelist.usernames' => 'computablefacts.com,hdwsec.fr,mncc.fr',
-                'array:towerify.performa.whitelist.domains' => 'csavelief,engineering,pbrisacier,pduteil',
+                'array:towerify.performa.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.performa.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
 
                 'towerify.openai.api' => 'https://api.openai.com/v1',
                 'encrypted:towerify.openai.api_key' => 'Tg2yWb33U2tIItmd_IU0txV/5KxNv9+bwBnqkMVYujizOT2ErSz59maW2/r71cKbi5KxikqLZ5D6U+AdreucHfXdxd4LN7ZgX8LGI/V2J1qgagPa/xEValIH34MoGeJEIUN11zaKIyBpp2YYV++iQAkGgI9wdjcYGWtr6EjZZELv9tw8OiSrW1GzEf8O7Z86bHiE7DYqxX//3caIzba7ASNMbdAEclXAnMjZa5JstmPEiyU4U6+B5zCTc4ok=',
