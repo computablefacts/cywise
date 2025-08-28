@@ -21,19 +21,19 @@
 <div class="container-fluid mb-3">
   <div class="row">
     <div class="col text-end">
-      <a href="#" onclick="clearDocument()">
+      <span class="bp4-icon bp4-icon-eraser"></span>&nbsp;<a href="#" onclick="clearDocument()">
         {{ __('clear') }}
       </a>&nbsp;&nbsp;&nbsp;
-      <a href="#" onclick="importDocument()">
+      <span class="bp4-icon bp4-icon-import"></span>&nbsp;<a href="#" onclick="importDocument()">
         {{ __('import') }}
       </a>&nbsp;&nbsp;&nbsp;
-      <a href="#" onclick="exportDocument()">
+      <span class="bp4-icon bp4-icon-export"></span>&nbsp;<a href="#" onclick="exportDocument()">
         {{ __('export') }}
       </a>&nbsp;&nbsp;&nbsp;
-      <a href="#" onclick="deleteDocument()">
+      <span class="bp4-icon bp4-icon-trash"></span>&nbsp;<a href="#" onclick="deleteDocument()">
         {{ __('delete') }}
       </a>&nbsp;&nbsp;&nbsp;
-      <a href="#" onclick="saveDocument()">
+      <span class="bp4-icon bp4-icon-floppy-disk"></span>&nbsp;<a href="#" onclick="saveDocument()">
         {{ __('save') }}
       </a>
     </div>
@@ -101,6 +101,9 @@
     }).catch(error => toaster.toastAxiosError(error));
   });
 
+  const documentCannotBeDeleted = () => !elTemplates.selectedItem || !elTemplates.selectedItem.id
+    || elTemplates.selectedItem.type === 'template';
+
   const saveDocument = () => {
 
     const template = window.BlockNote ? window.BlockNote.template : null;
@@ -162,7 +165,7 @@
           const blocksFromMarkdown = editor.tryParseMarkdownToBlocks(markdownContent);
           blocksFromMarkdown.then(blocks => {
             listCollectionsApiCall(response => {
-              const collections = response.data.map(collection => collection.name);
+              const collections = response.collections.map(collection => collection.name);
               for (let i = 0; i < blocks.length; i++) {
                 const block = blocks[i];
                 if (block.type === 'paragraph') {
@@ -203,16 +206,16 @@
   };
 
   const deleteDocument = () => {
-    if (!elTemplates.selectedItem || !elTemplates.selectedItem.id || elTemplates.selectedItem.type === 'template') {
+    if (documentCannotBeDeleted()) {
       clearDocument();
-      return;
+    } else {
+      axios.delete(`/templates/${elTemplates.selectedItem.id}`).then(response => {
+        elTemplates.items = elTemplates.items.filter(item => item.id !== elTemplates.selectedItem.id);
+        clearDocument();
+        toaster.toastSuccess("{{ __('The document has been deleted!') }}");
+      })
+      .catch(error => toaster.toastAxiosError(error));
     }
-    axios.delete(`/templates/${elTemplates.selectedItem.id}`).then(response => {
-      elTemplates.items = elTemplates.items.filter(item => item.id !== elTemplates.selectedItem.id);
-      clearDocument();
-      toaster.toastSuccess("{{ __('The document has been deleted!') }}");
-    })
-    .catch(error => toaster.toastAxiosError(error));
   };
 
 </script>
