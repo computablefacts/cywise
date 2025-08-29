@@ -241,9 +241,9 @@ class CywiseSeeder extends Seeder
                 'encrypted:towerify.reports.api_password' => 'LTF3#G9jB4skruym_pgXeZrDViPcfevUX+PxiRzn9VgHaypMRLK5nV7H1e98=',
 
                 'array:towerify.adversarymeter.ip_addresses' => '62.210.90.152',
-                'towerify.adversarymeter.api' => 'https://prod.sentinel-api.apps.sentinel-api.towerify.io/api/v1',
+                'towerify.adversarymeter.api' => 'https://prod.sentinel-api-rq.apps.sentinel-api.towerify.io/api/v1',
                 'towerify.adversarymeter.api_username' => 'sentinel-admin',
-                'encrypted:towerify.adversarymeter.api_password' => '?3GH?I97ayIfEsKN_09a2oY8xo+PkGMmLnezl+xbv5rC4Dlw6mbQCVazhCKY=',
+                'encrypted:towerify.adversarymeter.api_password' => '25wNPGRVJD6ZXgmP_AICYQmVP4KbC2Hfz8BhT1VzVvAFadzOaz8xL57M9P9g=',
                 'towerify.adversarymeter.drop_scan_events_after_x_minutes' => '1440',
                 'towerify.adversarymeter.drop_discovery_events_after_x_minutes' => '60',
                 'towerify.adversarymeter.days_between_scans' => '5',
