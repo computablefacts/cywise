@@ -9,7 +9,7 @@
 
         <x-elements.back-button
             class="max-w-4xl mx-auto mt-4 md:mt-8"
-            text="back to the blog"
+            text="{{ __('back to the blog') }}"
             :href="route('blog')"
         />
 
