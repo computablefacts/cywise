@@ -84,7 +84,7 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 # Max execution time (default=30)
 RUN echo "max_execution_time=120" > $PHP_INI_DIR/conf.d/max-execution-time.ini
 # Memory Limit (default=128M)
-RUN echo "memory_limit=8192M" > $PHP_INI_DIR/conf.d/max-limit.ini
+RUN echo "memory_limit=12288M" > $PHP_INI_DIR/conf.d/max-limit.ini
 # POST max size (default=8M)
 RUN echo "post_max_size=50M" >> $PHP_INI_DIR/conf.d/max-limit.ini
 # Upload max file size (default=2M)
