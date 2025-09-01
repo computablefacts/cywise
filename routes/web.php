@@ -469,7 +469,21 @@ Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialI
     return response('Unauthorized', 403)->header('Content-Type', 'text/plain');
 })->middleware('auth');
 
-Route::get('/audit-report', fn() => AuditReport::create()['report'])->middleware('auth');
+/** @deprecated */
+Route::get('/audit-report', function () {
+
+    /** @var AuditReport $report */
+    $report = AuditReport::create()['report'];
+
+    try {
+        Mail::mailer('mailcoach')
+            ->to(Auth::user()->email)
+            ->send(new \App\Mail\MailCoachAuditReport($report->render()));
+    } catch (\Exception $e) {
+        Log::error($e->getMessage());
+    }
+    return $report;
+})->middleware('auth');
 
 /** @deprecated */
 Route::post('am/api/v2/public/ports-scan/{uuid}', function (string $uuid, \Illuminate\Http\Request $request) {

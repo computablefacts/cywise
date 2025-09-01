@@ -78,6 +78,12 @@ return [
                 'log',
             ],
         ],
+
+        'mailcoach' => [
+            'transport' => 'mailcoach',
+            'domain' => env('MAILCOACH_DOMAIN'),
+            'token' => env('MAILCOACH_API_KEY'),
+        ],
     ],
 
     /*

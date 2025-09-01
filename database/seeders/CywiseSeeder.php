@@ -133,6 +133,9 @@ class CywiseSeeder extends Seeder
                 'towerify.josianne.username' => 'cywise',
                 // 'encrypted:towerify.josianne.password' => '',
                 'towerify.josianne.database' => '',
+
+                'mail.mailers.mailcoach.domain' => 'cywiseapp.mailcoach.app',
+                // 'encrypted:mail.mailers.mailcoach.token' => '',
             ]);
         } elseif ($app_env == 'dev') {
             $this->setupConfigInDb([
@@ -226,6 +229,9 @@ class CywiseSeeder extends Seeder
                 'towerify.josianne.username' => 'cywise',
                 'encrypted:towerify.josianne.password' => 'BZMMOKdbxEtn?mpc_xZS2m+XhLGIkAQC7rhtpVKG3diisqZkgxGmSrCPkx7o=',
                 'towerify.josianne.database' => '',
+
+                'mail.mailers.mailcoach.domain' => 'cywiseapp.mailcoach.app',
+                'encrypted:mail.mailers.mailcoach.token' => 'f4agCN2VzjXR47a2_VR/fo3UA7KfHG2ZkyNEO3j/xwozU6t7IdHAT9uaA6anNmHC/u2/vQBdZZ67l5UNWepmHZuXjZk18pDRhMGdjfg==',
             ]);
         } elseif ($app_env == 'prod') {
             $this->setupConfigInDb([
@@ -319,6 +325,9 @@ class CywiseSeeder extends Seeder
                 'towerify.josianne.username' => 'cywise',
                 'encrypted:towerify.josianne.password' => 'GDr6#awPcu0NKbuR_G06I3zEp0mVx3PDo0lTH1xxpx+MNVimAVAQDfONbRT0=',
                 'towerify.josianne.database' => '',
+
+                'mail.mailers.mailcoach.domain' => 'cywiseapp.mailcoach.app',
+                'encrypted:mail.mailers.mailcoach.token' => 'm9YPqLakWErKGBs#_GTJmLbOadKQEvkdeFwfdYmXfX7BMkF2CsSh8stuIBhsQ88b6z//nzI+BiMf3mS6XW86nYxcZjaKF2e6eEbD74g==',
             ]);
         }
     }
