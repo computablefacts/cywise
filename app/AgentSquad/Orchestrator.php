@@ -77,12 +77,12 @@ class Orchestrator
 
             /** @var ThoughtActionObservation $tao */
             $tao = array_pop($chainOfThought);
-            $observation = Str::trim(Str::replace('I_DONT_KNOW', '', $tao->observation()));
+            $markdown = Str::trim(Str::replace('I_DONT_KNOW', '', $tao->observation()));
 
-            if (empty($observation)) {
-                $observation = __("I apologize, but I couldn't find any relevant references in my library.");
+            if (empty($markdown)) {
+                $markdown = __("I apologize, but I couldn't find any relevant references in my library.");
             }
-            return new FailedAnswer($observation, $chainOfThought);
+            return new FailedAnswer($markdown, $chainOfThought);
         }
 
         $template = '{"thought":"describe here succinctly your thoughts about the question you have been asked", "action_name":"set here the name of the action to execute", "action_input":"set here the input for the action"}';
@@ -160,7 +160,13 @@ class Orchestrator
         $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", $answer->markdown());
 
         if ($answer->final()) {
+
             $answer->setChainOfThought($chainOfThought);
+            $markdown = Str::trim(Str::replace('I_DONT_KNOW', '', $answer->markdown()));
+
+            if (empty($markdown)) {
+                return new FailedAnswer(__("I apologize, but I couldn't find any relevant references in my library."), $chainOfThought);
+            }
             return $answer;
         }
         return $this->processInput($user, $threadId, $messages, $input, $chainOfThought, $depth + 1);
