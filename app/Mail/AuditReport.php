@@ -4,10 +4,10 @@ namespace App\Mail;
 
 use App\Models\Alert;
 use App\Models\Asset;
+use App\Models\User;
 use App\Models\YnhOsquery;
 use App\Models\YnhOsqueryPackage;
 use App\Models\YnhServer;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -15,6 +15,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
+/** @deprecated */
 class AuditReport extends Mailable
 {
     use Queueable, SerializesModels;
