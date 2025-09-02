@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Hashing\TwHasher;
+use App\Helpers\MailCoach;
 use App\Helpers\SupersetApiUtilsFacade as SupersetApiUtils;
 use App\Jobs\DeleteEmbeddedChunks;
 use App\Rules\IsValidCollectionName;
@@ -101,13 +102,15 @@ class User extends WaveUser
         });
     }
 
-    public static function getOrCreate(string $email, string $name = '', string $password = '', ?int $tenant_id = null): \App\Models\User
+    public static function getOrCreate(string $email, string $name = '', string $password = '', ?int $tenant_id = null, ?string $username = null): \App\Models\User
     {
         /** @var User $user */
         $user = User::where('email', $email)->first();
         if (!$user) {
 
-            $username = Str::before($email, '@');
+            MailCoach::updateSubscribers($email, $name);
+
+            $username = $username ?? Str::before($email, '@');
             /** @var int $count */
             $count = User::where('username', $username)->count();
 
@@ -291,6 +294,7 @@ class User extends WaveUser
         return null;
     }
 
+    /** @deprecated */
     public function isBarredFromAccessingTheApp(): bool
     {
         return is_cywise() && // only applies to Cywise deployment
@@ -300,21 +304,25 @@ class User extends WaveUser
             !$this->subscribed(); // the customer has been set but the subscription ended
     }
 
+    /** @deprecated */
     public function endsTrialSoon(): bool
     {
         return $this->isInTrial() && \Carbon\Carbon::now()->startOfDay()->gte($this->endOfTrial()->subDays(7));
     }
 
+    /** @deprecated */
     public function endsTrialVerySoon(): bool
     {
         return $this->isInTrial() && \Carbon\Carbon::now()->startOfDay()->gte($this->endOfTrial()->subDays(3));
     }
 
+    /** @deprecated */
     public function isInTrial(): bool
     {
         return $this->customer_id == null && \Carbon\Carbon::now()->startOfDay()->lte($this->endOfTrial());
     }
 
+    /** @deprecated */
     public function endOfTrial(): Carbon
     {
         return $this->created_at->startOfDay()->addDays(15);
