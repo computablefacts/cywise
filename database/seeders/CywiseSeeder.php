@@ -256,7 +256,7 @@ class CywiseSeeder extends Seeder
 
                 'towerify.cyberbuddy.api' => 'https://prod.generic-rag.dev02.towerify.io',
                 'towerify.cyberbuddy.api_username' => 'gr',
-                'encrypted:towerify.cyberbuddy.api_password' => 'esfM1S4U3SYsnsSm_sAgO943QigLqfU9K8UGUfJAk0gTUp7ovS8uIbD3U+zM=',
+                'encrypted:towerify.cyberbuddy.api_password' => 'J8l!aJd8EI7iwkgz_txIvvdR02JEPqOaOxK9N7A==',
 
                 'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
                 'encrypted:towerify.deepseek.api_key' => 'It&C5lRsI!Dq1IsX_ea+wX+Mz22wW95wY1cjq56mDp76lxfeLNrz40RSfe5n9eqflr8lz/TyDsmcqnygh',
