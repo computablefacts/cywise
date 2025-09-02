@@ -265,7 +265,10 @@
 @php
 $apps = \App\Models\YnhServer::forUser(request()->user())
 ->flatMap(fn(\App\Models\YnhServer $server) => $server->applications)
-->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE);
+->sortBy([
+    ['server.name', 'asc'],
+    ['name', 'asc'],
+], SORT_NATURAL | SORT_FLAG_CASE);
 @endphp
 @if($apps->isNotEmpty())
 <div class="row pt-3">
@@ -287,9 +290,7 @@ $apps = \App\Models\YnhServer::forUser(request()->user())
           <tr>
             <td>
           <span class="font-lg mb-3 fw-bold">
-            <a href="{{ route('ynh.servers.edit', $app->server->id) }}">
-              {{ $app->server->name }}
-            </a>
+            {{ $app->server->name }}
           </span>
             </td>
             <td>
