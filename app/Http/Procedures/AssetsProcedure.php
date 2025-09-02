@@ -7,6 +7,7 @@ use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
 use App\Listeners\CreateAssetListener;
 use App\Listeners\DeleteAssetListener;
 use App\Mail\HoneypotRequested;
+use App\Mail\MailCoachSimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\AssetTag;
@@ -74,6 +75,7 @@ class AssetsProcedure extends Procedure
                 $body = [
                     "domain" => $domain,
                 ];
+                MailCoachSimpleEmail::sendEmail("Cywise : No subdomain for {$domain}", "Please, investigate.");
                 Mail::to(config('towerify.freshdesk.to_email'))->send(new HoneypotRequested(config('towerify.freshdesk.from_email'), 'Support', $subject, $body));
             }
         } catch (\Exception $e) {
