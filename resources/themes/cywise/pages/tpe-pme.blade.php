@@ -231,7 +231,6 @@ name('tpe-pme');
             </div>
           </div>
           @php
-          $user = \App\Models\User::where('email', config('towerify.admin.email'))->firstOrFail();
           $nbUsers = format_number(\App\Models\User::count());
           $nbAssets = format_number(\App\Models\Asset::count() + \App\Models\YnhServer::count());
           $nbHoneypots = format_number(\App\Models\Honeypot::count());
