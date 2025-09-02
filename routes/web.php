@@ -471,17 +471,9 @@ Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialI
 
 /** @deprecated */
 Route::get('/audit-report', function () {
-
     /** @var AuditReport $report */
     $report = AuditReport::create()['report'];
-
-    try {
-        Mail::mailer('mailcoach')
-            ->to(Auth::user()->email)
-            ->send(new \App\Mail\MailCoachAuditReport($report->render()));
-    } catch (\Exception $e) {
-        Log::error($e->getMessage());
-    }
+    \App\Mail\MailCoachAuditReport::sendEmail($report);
     return $report;
 })->middleware('auth');
 
