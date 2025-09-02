@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
+/** @deprecated */
 class Invitation extends Mailable
 {
     use Queueable, SerializesModels;
