@@ -247,7 +247,7 @@ name('tpe-pme');
                 <dt class="text-sm/6 text-gray-600">
                   Users
                 </dt>
-                <dd class="order-first text-6xl font-semibold tracking-tight">
+                <dd class="order-first text-5xl font-semibold tracking-tight">
                   <span>{{ $nbUsers[0] }}</span> {{ $nbUsers[1] }}
                 </dd>
               </div>
@@ -255,7 +255,7 @@ name('tpe-pme');
                 <dt class="text-sm/6 text-gray-600">
                   Monitored Servers
                 </dt>
-                <dd class="order-first text-6xl font-semibold tracking-tight">
+                <dd class="order-first text-5xl font-semibold tracking-tight">
                   <span>{{ $nbAssets[0] }}</span> {{ $nbAssets[1] }}
                 </dd>
               </div>
@@ -264,7 +264,7 @@ name('tpe-pme');
                 <dt class="text-sm/6 text-gray-600">
                   Compromised Credentials
                 </dt>
-                <dd class="order-first text-6xl font-semibold tracking-tight">
+                <dd class="order-first text-5xl font-semibold tracking-tight">
                   <span>{{ $nbLeaks[0] }}</span> {{ $nbLeaks[1] }}
                 </dd>
               </div>
@@ -272,7 +272,7 @@ name('tpe-pme');
                 <dt class="text-sm/6 text-gray-600">
                   Honeypots
                 </dt>
-                <dd class="order-first text-6xl font-semibold tracking-tight">
+                <dd class="order-first text-5xl font-semibold tracking-tight">
                   <span>{{ $nbHoneypots[0] }}</span> {{ $nbHoneypots[1] }}
                 </dd>
               </div>
