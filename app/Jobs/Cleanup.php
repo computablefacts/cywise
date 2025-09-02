@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Collection;
+use App\Models\User;
 use App\Models\YnhFramework;
 use App\Models\YnhOsquery;
 use App\Models\YnhOsqueryLatestEvent;
@@ -12,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -63,21 +65,28 @@ class Cleanup implements ShouldQueue
 
         Log::debug('Remove empty framework collections');
 
-        YnhFramework::all()->each(function (YnhFramework $framework) {
+        User::all()->each(function (User $user) {
 
-            $collectionName = $framework->collectionName();
+            Auth::login($user);
 
-            Collection::query()
-                ->where('name', $collectionName)
-                ->where('is_deleted', false)
-                ->where('created_at', '<', now()->subDays(7))
-                ->get()
-                ->filter(fn(Collection $collection) => $collection->files()->exists())
-                ->each(function (Collection $collection) {
-                    Log::debug("Marking collection {$collection->name} as deleted");
-                    $collection->is_deleted = true;
-                    $collection->save();
-                });
+            YnhFramework::all()->each(function (YnhFramework $framework) {
+
+                $collectionName = $framework->collectionName();
+
+                Collection::query()
+                    ->where('name', $collectionName)
+                    ->where('is_deleted', false)
+                    ->where('created_at', '<', now()->subDays(7))
+                    ->get()
+                    ->filter(fn(Collection $collection) => $collection->files()->exists())
+                    ->each(function (Collection $collection) {
+                        Log::debug("Marking collection {$collection->name} as deleted");
+                        $collection->is_deleted = true;
+                        $collection->save();
+                    });
+            });
+            
+            Auth::logout();
         });
     }
 }
