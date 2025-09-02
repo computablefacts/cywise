@@ -12,7 +12,7 @@
         </h6>
         <div class="card-text mb-3">
           @foreach($todo as $item)
-          <div class="d-flex justify-content-start align-items-center text-truncate mb-2">
+          <div class="d-flex justify-content-start align-items-center mb-2">
             @if($item->level === 'High')
             <span class="dot-red"></span>
             @elseif ($item->level === 'Medium')
@@ -22,7 +22,7 @@
             @else
             <span class="dot-blue"></span>
             @endif
-            &nbsp;<a href="{{ route('iframes.vulnerabilities') }}#vid-{{ $item->id }}" class="link">
+            &nbsp;<a href="{{ route('iframes.vulnerabilities') }}#vid-{{ $item->id }}" class="link text-truncate">
               {{ $item->asset()->asset }}
             </a>
           </div>
