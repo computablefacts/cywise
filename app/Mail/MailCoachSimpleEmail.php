@@ -13,15 +13,17 @@ class MailCoachSimpleEmail extends Mailable
 {
     use Queueable, SerializesModels, UsesMailcoachMail;
 
+    private string $emailFrom;
     private string $emailSubject;
-    private string $htmlContent;
+    private string $htmlTitle;
+    private string $htmlBody;
 
-    public static function sendEmail(string $subject, string $body, ?string $to = null): void
+    public static function sendEmail(string $subject, string $htmlTitle, string $htmlBody, ?string $to = null, ?string $from = null): void
     {
         try {
             Mail::mailer('mailcoach')
                 ->to($to ?? config('towerify.freshdesk.to_email'))
-                ->send(new MailCoachSimpleEmail($subject, $body));
+                ->send(new MailCoachSimpleEmail($subject, $htmlTitle, $htmlBody, $from));
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
@@ -32,10 +34,12 @@ class MailCoachSimpleEmail extends Mailable
      *
      * @return void
      */
-    public function __construct(string $subject, string $body)
+    public function __construct(string $subject, string $htmlTitle, string $htmlBody, ?string $from = null)
     {
         $this->emailSubject = $subject;
-        $this->htmlContent = $body;
+        $this->htmlTitle = $htmlTitle;
+        $this->htmlBody = $htmlBody;
+        $this->emailFrom = $from ?? config('towerify.freshdesk.from_email');
     }
 
     /**
@@ -46,10 +50,11 @@ class MailCoachSimpleEmail extends Mailable
     public function build()
     {
         return $this
-            ->from(config('towerify.freshdesk.from_email'), 'Support')
-            ->mailcoachMail('honeypot-requested', [
+            ->from($this->emailFrom, 'support')
+            ->mailcoachMail('default', [
                 'subject' => $this->emailSubject,
-                'content' => $this->htmlContent,
+                'title' => $this->htmlTitle,
+                'content' => $this->htmlBody,
             ])
             ->faking(true);
     }

@@ -6,6 +6,7 @@ use App\Events\EndVulnsScan;
 use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use App\Helpers\JosianneClient;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
+use App\Mail\MailCoachSimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\Port;
@@ -181,6 +182,37 @@ class EndVulnsScanListener extends AbstractListener
 
     public static function sendEmail(string $from, string $to, string $subject, string $title, string $beforeCta, string $ctaLink = "", string $ctaName = "", string $afterCta = ""): ?array
     {
+        $header = empty($title) ? "" : "
+            <tr>
+              <td style=\"font-size: 28px; text-align: center;\">
+                {$title}
+              </td>
+            </tr>        
+        ";
+        $body1 = empty($beforeCta) ? "" : "
+            <tr>
+              <td style=\"font-size: 16px; line-height: 1.6;\">
+                {$beforeCta}
+              </td>
+            </tr>
+        ";
+        $cta = empty($ctaLink) || empty($ctaName) ? "" : "
+            <tr>
+                <td align=\"center\" style=\"background-color: #fbca3e; padding: 10px 20px; border-radius: 5px;\">                    
+                    <a href=\"{$ctaLink}\" target=\"_blank\" style=\"color: white; text-decoration: none; font-weight: bold;\">
+                      {$ctaName}
+                    </a>
+                </td>
+            </tr>
+        ";
+        $body2 = empty($afterCta) ? "" : "
+            <tr>
+              <td style=\"font-size: 16px; line-height: 1.6;\">
+                {$afterCta}
+              </td>    
+            </tr> 
+        ";
+        MailCoachSimpleEmail::sendEmail($subject, $title, "<table cellspacing=\"0\" cellpadding=\"0\" style=\"margin: auto;\">{$header}{$body1}{$cta}{$body2}</table>", $to, $from);
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . config('towerify.sendgrid.api_key'),
             'Accept' => 'application/json',

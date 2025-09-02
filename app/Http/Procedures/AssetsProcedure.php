@@ -75,7 +75,7 @@ class AssetsProcedure extends Procedure
                 $body = [
                     "domain" => $domain,
                 ];
-                MailCoachSimpleEmail::sendEmail("Cywise : No subdomain for {$domain}", "Please, investigate.");
+                MailCoachSimpleEmail::sendEmail("Cywise : No subdomain for {$domain}", "No subdomain for {$domain}", "Please, investigate.");
                 Mail::to(config('towerify.freshdesk.to_email'))->send(new HoneypotRequested(config('towerify.freshdesk.from_email'), 'Support', $subject, $body));
             }
         } catch (\Exception $e) {
