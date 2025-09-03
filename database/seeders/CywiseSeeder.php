@@ -728,7 +728,7 @@ class CywiseSeeder extends Seeder
                     ->chunkById(100, function ($users) {
                         /** @var User $user */
                         foreach ($users as $user) {
-                            User::init($user, false);
+                            User::init($user, true);
                         }
                     });
             }

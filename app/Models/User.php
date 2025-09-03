@@ -168,7 +168,13 @@ class User extends WaveUser
             // TODO : create user's private collection privcol*
 
             // Create shadow collections for some frameworks
-            $frameworks = \App\Models\YnhFramework::all();
+            $frameworks = \App\Models\YnhFramework::whereIn('file', [
+                'seeders/frameworks/anssi/anssi-guide-hygiene.jsonl.gz',
+                'seeders/frameworks/anssi/anssi-genai-security-recommendations-1.0.jsonl.gz',
+                'seeders/frameworks/nis2/annex-implementing-regulation-of-nis2-on-t-m.jsonl.gz',
+                'seeders/frameworks/gdpr/gdpr.jsonl.gz',
+                'seeders/frameworks/dora/dora.jsonl.gz',
+            ])->get();
             $providers = [
                 'ANSSI' => 100,
                 'FR' => 110,
@@ -185,38 +191,20 @@ class User extends WaveUser
                 $collection = $framework->collectionName();
                 $priority = $providers[$framework->provider];
 
-                switch ($framework->file) {
-                    case 'seeders/frameworks/anssi/anssi-guide-hygiene.jsonl':
-                    case 'seeders/frameworks/anssi/anssi-genai-security-recommendations-1.0.jsonl':
-                    case 'seeders/frameworks/gdpr/gdpr.jsonl':
-                    case 'seeders/frameworks/gdpr/gdpr-checklist.jsonl':
-                    case 'seeders/frameworks/nis/nis1-rules-fr.jsonl':
-                    case 'seeders/frameworks/nis2/nis2-directive.jsonl':
-                    case 'seeders/frameworks/nis2/annex-implementing-regulation-of-nis2-on-t-m.jsonl':
-                    case 'seeders/frameworks/dora/dora.jsonl':
-                    case 'seeders/frameworks/nist/nist-800-171-rev3.jsonl':
-                    {
-                        if ($forceUpdate && !in_array($collection, $updated)) {
-                            /** @var \App\Models\Collection $collection */
-                            $col = Collection::where('name', $collection)
-                                ->where('is_deleted', false)
-                                ->first();
-                            if ($col) {
-                                $col->is_deleted = true;
-                                $col->save();
-                                (new DeleteEmbeddedChunks())->handle();
-                            }
-                            $updated[] = $collection;
-                        }
-                        if (!$oldestTenantUser || $user->id === $oldestTenantUser->id) {
-                            self::setupFrameworks($framework, $priority);
-                        }
-                        break;
+                if ($forceUpdate && !in_array($collection, $updated)) {
+                    /** @var \App\Models\Collection $collection */
+                    $col = Collection::where('name', $collection)
+                        ->where('is_deleted', false)
+                        ->first();
+                    if ($col) {
+                        $col->is_deleted = true;
+                        $col->save();
+                        (new DeleteEmbeddedChunks())->handle();
                     }
-                    default:
-                    {
-                        break;
-                    }
+                    $updated[] = $collection;
+                }
+                if (!$oldestTenantUser || $user->id === $oldestTenantUser->id) {
+                    self::setupFrameworks($framework, $priority);
                 }
             }
         } catch (\Exception $e) {
@@ -241,12 +229,7 @@ class User extends WaveUser
             ->first();
 
         if (isset($oldPrompt)) {
-            $promptPrev = Str::lower(Str::trim(File::get(database_path("$root.prev"))));
-            if (Str::lower(Str::trim($oldPrompt->template)) === $promptPrev) {
-                $oldPrompt->update(['template' => $newPrompt]);
-            } else {
-                Log::debug("The user {$user->email} prompt {$oldPrompt->name} has not been updated");
-            }
+            $oldPrompt->update(['template' => $newPrompt]);
         } else {
             /** @var Prompt $oldPrompt */
             $oldPrompt = Prompt::create([
