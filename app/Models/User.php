@@ -147,6 +147,8 @@ class User extends WaveUser
 
         try {
             // Set the user's prompts
+            Log::debug("[{$user->email}] Updating user's prompts...");
+
             self::setupPrompts($user, 'default_answer_question', 'seeders/prompts/default_answer_question.txt');
             self::setupPrompts($user, 'default_assistant', 'seeders/prompts/default_assistant.txt');
             self::setupPrompts($user, 'default_chat', 'seeders/prompts/default_chat.txt');
@@ -157,17 +159,25 @@ class User extends WaveUser
             self::setupPrompts($user, 'default_reformulate_question', 'seeders/prompts/default_reformulate_question.txt');
             self::setupPrompts($user, 'default_summarize', 'seeders/prompts/default_summarize.txt');
 
+            Log::debug("[{$user->email}] User's prompts updated.");
+
             // Get the oldest user of the tenant. We will automatically attach the frameworks to this user
+            Log::debug("[{$user->email}] Searching oldest user in tenant {$user->tenant_id}...");
+
             $oldestTenantUser = User::query()
                 ->when($user->tenant_id, fn($query) => $query->where('tenant_id', '=', $user->tenant_id))
                 ->when($user->customer_id, fn($query) => $query->where('customer_id', '=', $user->customer_id))
                 ->orderBy('created_at')
                 ->first();
 
+            Log::debug("[{$user->email}] Oldest user in tenant {$user->tenant_id} is {$oldestTenantUser?->email}.");
+
             // TODO : create CyberScribe's templates
             // TODO : create user's private collection privcol*
 
             // Create shadow collections for some frameworks
+            Log::debug("[{$user->email}] Loading frameworks...");
+
             $frameworks = \App\Models\YnhFramework::whereIn('file', [
                 'seeders/frameworks/anssi/anssi-guide-hygiene.jsonl.gz',
                 'seeders/frameworks/anssi/anssi-genai-security-recommendations-1.0.jsonl.gz',
@@ -175,6 +185,9 @@ class User extends WaveUser
                 'seeders/frameworks/gdpr/gdpr.jsonl.gz',
                 'seeders/frameworks/dora/dora.jsonl.gz',
             ])->get();
+
+            Log::debug("[{$user->email}] {$frameworks->count()} frameworks loaded.");
+
             $providers = [
                 'ANSSI' => 100,
                 'FR' => 110,
@@ -186,12 +199,16 @@ class User extends WaveUser
             ];
             $updated = [];
 
+            /** @var YnhFramework $framework */
             foreach ($frameworks as $framework) {
 
                 $collection = $framework->collectionName();
                 $priority = $providers[$framework->provider];
 
                 if ($forceUpdate && !in_array($collection, $updated)) {
+
+                    Log::debug("[{$user->email}] Deleting collection {$collection}...");
+
                     /** @var \App\Models\Collection $collection */
                     $col = Collection::where('name', $collection)
                         ->where('is_deleted', false)
@@ -202,9 +219,13 @@ class User extends WaveUser
                         (new DeleteEmbeddedChunks())->handle();
                     }
                     $updated[] = $collection;
+
+                    Log::debug("[{$user->email}] Collection {$collection} deleted.");
                 }
                 if (!$oldestTenantUser || $user->id === $oldestTenantUser->id) {
+                    Log::debug("[{$user->email}] Importing framework {$framework->name}...");
                     self::setupFrameworks($framework, $priority);
+                    Log::debug("[{$user->email}] Framework {$framework->name} imported.");
                 }
             }
         } catch (\Exception $e) {
