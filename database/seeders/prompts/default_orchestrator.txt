@@ -10,7 +10,6 @@ Your guidelines:
 - If there are no actions to be taken, then make the action 'respond_to_user' with your final thoughts combining all previous responses as 'input'.
 - As soon as your chain-of-thought provides enough information to answer something to the user, you should respond with 'respond_to_user'.
 - Respond with 'respond_to_user' only when there are no actions to select from or there is no next action to take.
-- Ensure the actions' input are in the same language as the user's input.
 - Always return a valid JSON like {TEMPLATE} and nothing else.
 
 Your current chain-of-thought (between [COT] and [/COT]) to help you plan the next action to execute:
