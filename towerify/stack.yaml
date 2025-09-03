@@ -9,7 +9,6 @@ services:
     env_file:
       - .env
     environment:
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
@@ -32,7 +31,6 @@ services:
       - .env
     environment:
       - CONTAINER_ROLE=scheduler
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
@@ -48,7 +46,6 @@ services:
       - .env
     environment:
       - CONTAINER_ROLE=queue
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
@@ -65,7 +62,6 @@ services:
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=low
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
@@ -82,7 +78,6 @@ services:
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=medium
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
@@ -99,7 +94,6 @@ services:
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=critical
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
@@ -118,7 +112,6 @@ services:
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=scout
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
