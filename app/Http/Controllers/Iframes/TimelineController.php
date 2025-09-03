@@ -206,7 +206,8 @@ class TimelineController extends Controller
 
         return Messages::get($servers, $cutOffTime, [
             Messages::AUTHENTICATION_AND_SSH_ACTIVITY,
-            // Messages::SERVICES_AND_SCHEDULED_TASKS,
+            Messages::SERVICES_AND_SCHEDULED_TASKS,
+            Messages::PROCESSES_AND_BACKGROUND_TASKS,
             Messages::SHELL_HISTORY_AND_ROOT_COMMANDS,
             Messages::PACKAGES,
             Messages::USERS_AND_GROUPS,
