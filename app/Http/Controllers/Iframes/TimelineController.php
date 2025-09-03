@@ -60,7 +60,7 @@ class TimelineController extends Controller
                 ->concat($this->servers($params['server_id'] ?? null)),
             'conversations' => $this->conversations(),
             'events' => $this->events($params['server_id'] ?? null),
-            'ioc' => $this->ioc(75, $params['server_id'] ?? null),
+            'ioc' => $this->ioc(10, $params['server_id'] ?? null),
             'leaks' => $this->leaks(),
             'notes-and-memos' => $this->notesAndMemos(),
             'vulnerabilities' => $this->vulnerabilities($params['level'] ?? null, $params['asset_id'] ?? null),
