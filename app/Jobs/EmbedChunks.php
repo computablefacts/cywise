@@ -43,14 +43,25 @@ class EmbedChunks implements ShouldQueue
                             $questions = HypotheticalQuestionsProvider::provide($lang, $chunk->text);
 
                             foreach ($questions as $question) {
-                                /** @var Vector $vector */
-                                $vector = $chunk->vectors()->create([
-                                    'collection_id' => $chunk->collection_id,
-                                    'file_id' => $chunk->file_id,
-                                    'locale' => $question['language'],
-                                    'hypothetical_question' => $question['question'],
-                                    'embedding' => $question['embedding'],
-                                ]);
+                                if (Vector::isSupportedByMariaDb()) {
+                                    $isOk = Vector::insertVector(
+                                        $chunk->collection_id,
+                                        $chunk->file_id,
+                                        $chunk->id,
+                                        $question['language'],
+                                        $question['question'],
+                                        $question['embedding']
+                                    );
+                                } else {
+                                    /** @var Vector $vector */
+                                    $vector = $chunk->vectors()->create([
+                                        'collection_id' => $chunk->collection_id,
+                                        'file_id' => $chunk->file_id,
+                                        'locale' => $question['language'],
+                                        'hypothetical_question' => $question['question'],
+                                        'embedding' => $question['embedding'],
+                                    ]);
+                                }
                             }
 
                             $chunk->is_embedded = true;

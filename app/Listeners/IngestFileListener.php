@@ -190,14 +190,25 @@ class IngestFileListener extends AbstractListener
                             }
                             if ($chunk->is_embedded) {
                                 foreach ($obj['hypothetical_questions'] as $question) {
-                                    /** @var Vector $vector */
-                                    $vector = $chunk->vectors()->create([
-                                        'collection_id' => $chunk->collection_id,
-                                        'file_id' => $fileTmp->id,
-                                        'locale' => $question['language'],
-                                        'hypothetical_question' => $question['question'],
-                                        'embedding' => $question['embedding'],
-                                    ]);
+                                    if (Vector::isSupportedByMariaDb()) {
+                                        $isOk = Vector::insertVector(
+                                            $chunk->collection_id,
+                                            $fileTmp->id,
+                                            $chunk->id,
+                                            $question['language'],
+                                            $question['question'],
+                                            $question['embedding']
+                                        );
+                                    } else {
+                                        /** @var Vector $vector */
+                                        $vector = $chunk->vectors()->create([
+                                            'collection_id' => $chunk->collection_id,
+                                            'file_id' => $fileTmp->id,
+                                            'locale' => $question['language'],
+                                            'hypothetical_question' => $question['question'],
+                                            'embedding' => $question['embedding'],
+                                        ]);
+                                    }
                                 }
                             }
                         }
@@ -220,14 +231,25 @@ class IngestFileListener extends AbstractListener
                             }
                             if ($chunk->is_embedded) {
                                 foreach ($obj['hypothetical_questions'] as $question) {
-                                    /** @var Vector $vector */
-                                    $vector = $chunk->vectors()->create([
-                                        'collection_id' => $chunk->collection_id,
-                                        'file_id' => $file->id,
-                                        'locale' => $question['language'],
-                                        'hypothetical_question' => $question['question'],
-                                        'embedding' => $question['embedding'],
-                                    ]);
+                                    if (Vector::isSupportedByMariaDb()) {
+                                        $isOk = Vector::insertVector(
+                                            $chunk->collection_id,
+                                            $file->id,
+                                            $chunk->id,
+                                            $question['language'],
+                                            $question['question'],
+                                            $question['embedding']
+                                        );
+                                    } else {
+                                        /** @var Vector $vector */
+                                        $vector = $chunk->vectors()->create([
+                                            'collection_id' => $chunk->collection_id,
+                                            'file_id' => $file->id,
+                                            'locale' => $question['language'],
+                                            'hypothetical_question' => $question['question'],
+                                            'embedding' => $question['embedding'],
+                                        ]);
+                                    }
                                 }
                             }
                         } else {
@@ -257,14 +279,25 @@ class IngestFileListener extends AbstractListener
                                         }
                                         if ($chunk->is_embedded) {
                                             foreach ($obj['hypothetical_questions'] as $question) {
-                                                /** @var Vector $vector */
-                                                $vector = $chunk->vectors()->create([
-                                                    'collection_id' => $chunk->collection_id,
-                                                    'file_id' => $file->id,
-                                                    'locale' => $question['language'],
-                                                    'hypothetical_question' => $question['question'],
-                                                    'embedding' => $question['embedding'],
-                                                ]);
+                                                if (Vector::isSupportedByMariaDb()) {
+                                                    $isOk = Vector::insertVector(
+                                                        $chunk->collection_id,
+                                                        $file->id,
+                                                        $chunk->id,
+                                                        $question['language'],
+                                                        $question['question'],
+                                                        $question['embedding']
+                                                    );
+                                                } else {
+                                                    /** @var Vector $vector */
+                                                    $vector = $chunk->vectors()->create([
+                                                        'collection_id' => $chunk->collection_id,
+                                                        'file_id' => $file->id,
+                                                        'locale' => $question['language'],
+                                                        'hypothetical_question' => $question['question'],
+                                                        'embedding' => $question['embedding'],
+                                                    ]);
+                                                }
                                             }
                                         }
                                     }
@@ -289,14 +322,25 @@ class IngestFileListener extends AbstractListener
                                 }
                                 if ($chunk->is_embedded) {
                                     foreach ($obj['hypothetical_questions'] as $question) {
-                                        /** @var Vector $vector */
-                                        $vector = $chunk->vectors()->create([
-                                            'collection_id' => $chunk->collection_id,
-                                            'file_id' => $file->id,
-                                            'locale' => $question['language'],
-                                            'hypothetical_question' => $question['question'],
-                                            'embedding' => $question['embedding'],
-                                        ]);
+                                        if (Vector::isSupportedByMariaDb()) {
+                                            $isOk = Vector::insertVector(
+                                                $chunk->collection_id,
+                                                $file->id,
+                                                $chunk->id,
+                                                $question['language'],
+                                                $question['question'],
+                                                $question['embedding']
+                                            );
+                                        } else {
+                                            /** @var Vector $vector */
+                                            $vector = $chunk->vectors()->create([
+                                                'collection_id' => $chunk->collection_id,
+                                                'file_id' => $file->id,
+                                                'locale' => $question['language'],
+                                                'hypothetical_question' => $question['question'],
+                                                'embedding' => $question['embedding'],
+                                            ]);
+                                        }
                                     }
                                 }
                             }

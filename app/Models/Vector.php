@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -70,6 +71,23 @@ class Vector extends Model
                 return false;
             }
         });
+    }
+
+    public static function insertVector(int $collectionId, int $fileId, int $chunkId, string $locale, string $hypotheticalQuestion, array $embedding): bool
+    {
+        if (!empty($embedding)) {
+            $sql = "INSERT INTO cb_vectors (collection_id, file_id, locale, hypothetical_question, embedding, chunk_id, created_by, updated_at, created_at) VALUES (?, ?, ?, ?, VEC_FromText(?), ?, ?, NOW(), NOW())";
+            return DB::statement($sql, [
+                $collectionId,
+                $fileId,
+                $locale,
+                $hypotheticalQuestion,
+                '[' . implode(",", $embedding) . ']',
+                $chunkId,
+                Auth::user()?->id
+            ]);
+        }
+        return false;
     }
 
     public function collection(): HasOne
