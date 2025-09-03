@@ -278,16 +278,15 @@ class CyberBuddy extends AbstractAction
             $tt = $chunk?->text ?? '';
             $answer = Str::replace($ref, "<b style=\"color:{$color}\">[{$id}]</b>", $answer);
             $references[$id] = "
-              <li style=\"padding:0;margin-bottom:0.25rem\">
-                <b style=\"color:{$color}\">[{$id}]</b>&nbsp;
-                <div class=\"cb-tooltip-list\">
-                  {$src}
-                  <span class=\"cb-tooltiptext cb-tooltip-list-top\" style=\"background-color:{$color};color:#444;\">
-                    {$tt}
-                  </span>
-                </div>
-              </li>
-            ";
+<li style=\"padding:0;margin-bottom:0.25rem\">
+  <b style=\"color:{$color}\">[{$id}]</b>&nbsp;
+  <div class=\"cb-tooltip-list\">
+    {$src}
+    <span class=\"cb-tooltiptext cb-tooltip-list-top\" style=\"background-color:{$color};color:#444;\">
+      {$tt}
+    </span>
+  </div>
+</li>";
         }
         ksort($references);
         $answer = "{$answer}<br><br><b>Sources :</b><ul>" . collect($references)->values()->join("") . "</ul>";
