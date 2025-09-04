@@ -42,6 +42,9 @@ use App\Listeners\ImportVirtualTableListener;
 use App\Listeners\IngestFileListener;
 use App\Listeners\IngestHoneypotsEventsListener;
 use App\Listeners\InstallAppListener;
+use App\Listeners\LoginFailedListener;
+use App\Listeners\LoginSucceededListener;
+use App\Listeners\LogoutSucceededListener;
 use App\Listeners\ProcessLogalertPayloadListener;
 use App\Listeners\ProcessLogalertPayloadListenerEx;
 use App\Listeners\ProcessLogparserPayloadListener;
@@ -52,6 +55,9 @@ use App\Listeners\SendAuditReportListener;
 use App\Listeners\StartAssetsDiscoverListener;
 use App\Listeners\UninstallAppListener;
 use App\Listeners\UpdateServerInfosListener;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -142,6 +148,17 @@ class EventServiceProvider extends ServiceProvider
         // Check
         StartAssetsDiscover::class => [
             StartAssetsDiscoverListener::class,
+        ],
+
+        // Laravel
+        Failed::class => [
+            LoginFailedListener::class,
+        ],
+        Login::class => [
+            LoginSucceededListener::class,
+        ],
+        Logout::class => [
+            LogoutSucceededListener::class,
         ],
     ];
 
