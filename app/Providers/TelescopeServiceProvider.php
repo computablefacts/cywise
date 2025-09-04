@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Telescope\EntryType;
 use Laravel\Telescope\IncomingEntry;
@@ -70,8 +71,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
      */
     protected function gate(): void
     {
-        Gate::define('viewTelescope', function (User $user) {
-            return Str::startsWith($user->email, $this->whitelistUsernames()) && Str::endsWith($user->email, $this->whitelistDomains());
+        Gate::define('viewTelescope', function (User $userGate, User $userTelescope) {
+            Log::debug('userTelescope->email:' . $userTelescope->email);
+            return Str::startsWith($userTelescope->email, $this->whitelistUsernames()) && Str::endsWith($userTelescope->email, $this->whitelistDomains());
         });
     }
 

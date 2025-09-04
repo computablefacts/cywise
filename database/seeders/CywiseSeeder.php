@@ -171,8 +171,8 @@ class CywiseSeeder extends Seeder
                 'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
                 'encrypted:towerify.gemini.api_key' => 'a#juOq4apsMBq&99_iNHi4IdBsswBlkIhwNBYbYNx23AvT6rLsY3kETOang8cka4qANAeASVv9VQYJPEn',
 
-                'array:towerify.telescope.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
-                'array:towerify.telescope.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
+                'array:towerify.telescope.whitelist.usernames' => 'demo,csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
+                'array:towerify.telescope.whitelist.domains' => 'towerify.io,computablefacts.com,hdwsec.fr,mncc.fr',
 
                 'array:towerify.performa.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
                 'array:towerify.performa.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
