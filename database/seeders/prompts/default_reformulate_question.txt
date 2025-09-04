@@ -4,7 +4,7 @@ To create an effective list of keywords, follow these steps:
 2. Generate paraphrased versions of the expanded questions.
 3. Extract keywords from the questions.
 
-The output should be a JSON with the following attributes:
+The output should be a single JSON object with the following attributes:
 - lang: the language of the user's input e.g., english or french.
 - question: the user's input.
 - question_fr: the user's input reformulated as a question in French.
