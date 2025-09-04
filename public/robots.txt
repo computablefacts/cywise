@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+Disallow: /cyber-check
+Disallow: /cyber-advisor
+Disallow: /auth/register
+Disallow: /auth/login
+Disallow: /admin
