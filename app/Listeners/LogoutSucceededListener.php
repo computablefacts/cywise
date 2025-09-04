@@ -13,17 +13,19 @@ class LogoutSucceededListener extends AbstractListener
         if (!($event instanceof Logout)) {
             throw new \Exception('Invalid event type!');
         }
+        if ($event->guard === 'web') {
+            
+            /** @var User $user */
+            $user = $event->user;
 
-        /** @var User $user */
-        $user = $event->user;
-
-        /** @var AppTrace $trace */
-        $trace = AppTrace::create([
-            'user_id' => $user?->id,
-            'verb' => 'GET',
-            'endpoint' => "/auth/logout?email={$user->email}",
-            'duration_in_ms' => 10,
-            'failed' => false,
-        ]);
+            /** @var AppTrace $trace */
+            $trace = AppTrace::create([
+                'user_id' => $user?->id,
+                'verb' => 'GET',
+                'endpoint' => "/auth/logout?email={$user->email}",
+                'duration_in_ms' => 10,
+                'failed' => false,
+            ]);
+        }
     }
 }

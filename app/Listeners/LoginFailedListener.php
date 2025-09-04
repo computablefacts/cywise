@@ -13,18 +13,20 @@ class LoginFailedListener extends AbstractListener
         if (!($event instanceof Failed)) {
             throw new \Exception('Invalid event type!');
         }
+        if ($event->guard === 'web') {
+            
+            $email = $event->credentials['email'];
+            $password = $event->credentials['password'];
+            $user = User::where('email', $email)->first();
 
-        $email = $event->credentials['email'];
-        $password = $event->credentials['password'];
-        $user = User::where('email', $email)->first();
-
-        /** @var AppTrace $trace */
-        $trace = AppTrace::create([
-            'user_id' => $user?->id,
-            'verb' => 'GET',
-            'endpoint' => "/auth/login?email={$email}",
-            'duration_in_ms' => 10,
-            'failed' => true,
-        ]);
+            /** @var AppTrace $trace */
+            $trace = AppTrace::create([
+                'user_id' => $user?->id,
+                'verb' => 'GET',
+                'endpoint' => "/auth/login?email={$email}",
+                'duration_in_ms' => 10,
+                'failed' => true,
+            ]);
+        }
     }
 }
