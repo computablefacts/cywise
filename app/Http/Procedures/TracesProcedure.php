@@ -38,6 +38,20 @@ class TracesProcedure extends Procedure
         /** @var User $loggedInUser */
         $loggedInUser = $request->user();
 
+        if ($loggedInUser->email === config('towerify.admin.email')) {
+            return [
+                "traces" => AppTrace::select([
+                    'app_traces.*',
+                    DB::raw('users.name AS user_name'),
+                    DB::raw('users.email AS user_email'),
+                ])
+                    ->leftJoin('users', 'users.id', '=', 'app_traces.user_id')
+                    ->orderByDesc('created_at')
+                    ->limit($limit)
+                    ->get(),
+            ];
+        }
+
         $users = User::query()
             ->when($loggedInUser->tenant_id, fn($query) => $query->where('tenant_id', '=', $loggedInUser->tenant_id))
             ->when($loggedInUser->customer_id, fn($query) => $query->where('customer_id', '=', $loggedInUser->customer_id))

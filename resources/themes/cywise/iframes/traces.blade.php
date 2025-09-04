@@ -34,9 +34,13 @@
           </span>
         </td>
         <td>
+          @if(isset($trace->user_email))
           <a href="mailto:{{ $trace->user_email }}" target="_blank">
             {{ $trace->user_name }}
           </a>
+          @else
+          -
+          @endif
         </td>
         <td>
           {{ $trace->verb }}
