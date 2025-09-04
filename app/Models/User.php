@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Hashing\TwHasher;
 use App\Helpers\MailCoach;
 use App\Helpers\SupersetApiUtilsFacade as SupersetApiUtils;
 use App\Jobs\DeleteEmbeddedChunks;
@@ -49,6 +48,7 @@ class User extends WaveUser
         'username',
         'avatar',
         'password',
+        'ynh_password',
         'role_id',
         'verification_code',
         'verified',
@@ -66,6 +66,7 @@ class User extends WaveUser
      */
     protected $hidden = [
         'password',
+        'ynh_password',
         'remember_token',
     ];
 
@@ -543,7 +544,7 @@ class User extends WaveUser
 
     public function ynhPassword(): string
     {
-        return TwHasher::unhash($this->password); // TODO : migrate legacy column
+        return isset($this->ynh_password) ? cywise_unhash($this->ynh_password) : '';
     }
 
     public function client(): string
