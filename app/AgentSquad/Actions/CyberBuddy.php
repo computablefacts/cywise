@@ -170,7 +170,7 @@ class CyberBuddy extends AbstractAction
     private function fullTextSearch(User $user, string $lang, array $input): Collection
     {
         /** @var array<string> $keywords */
-        $keywords = $this->combine($input);
+        $keywords = $this->combine($input, 5);
         /** @var Collection<Chunk> $chunks */
         $chunks = collect();
         foreach ($keywords as $k) {
@@ -224,7 +224,7 @@ class CyberBuddy extends AbstractAction
             ->get();
     }
 
-    private function combine(array $arrays): array
+    private function combine(array $arrays, bool $sample = false): array
     {
         if (empty($arrays)) {
             return [];
@@ -245,6 +245,10 @@ class CyberBuddy extends AbstractAction
                 }
             }
             $combinations = $new;
+        }
+        if ($sample) {
+            shuffle($combinations);
+            $combinations = array_slice($combinations, 0, 5);
         }
         return array_map(fn(array $combination) => implode(" ", $combination), $combinations);
     }
