@@ -1,52 +1,87 @@
+x-watch-dockerfile: &watch-dockerfile
+  action: rebuild
+  path: towerify/Dockerfile
+x-watch-composer: &watch-composer
+  action: rebuild
+  path: composer.json
+x-watch-package: &watch-package
+  action: rebuild
+  path: package.json
+x-watch-config: &watch-config
+  action: sync+restart
+  path: ./config
+  target: /var/www/html/config
+x-watch-routes: &watch-routes
+  action: sync+restart
+  path: ./routes
+  target: /var/www/html/routes
+x-watch-views: &watch-views
+  action: sync+restart
+  path: ./resources/views
+  target: /var/www/html/resources/views
+x-watch-themes: &watch-themes
+  action: sync+restart
+  path: ./resources/themes
+  target: /var/www/html/resources/themes
+x-watch-wave-views: &watch-wave-views
+  action: sync+restart
+  path: ./wave/resources/views
+  target: /var/www/html/wave/resources/views
+x-watch-app-sync: &watch-app-sync
+  action: sync
+  path: .
+  target: /var/www/html
+  ignore:
+    - config/
+    - node_modules/
+    - resources/themes/
+    - resources/views/
+    - routes/
+    - vendor/
+
+
 x-common: &common
   image: cywise-ui:local-build
   build:
     context: .
     dockerfile: towerify/Dockerfile
-  develop:
-    watch:
-      - action: rebuild
-        path: towerify/Dockerfile
-      - action: sync
-        path: .
-        target: /var/www/html
-        ignore:
-          - config/
-          - node_modules/
-          - routes/
-          - vendor/
-      - action: sync+restart
-        path: ./config
-        target: /var/www/html/config
-      - action: sync+restart
-        path: ./routes
-        target: /var/www/html/routes
   restart: always
   extra_hosts:
     host.docker.internal: host-gateway
   env_file:
     - .env
-  environment:
-    - LOG_CHANNEL=stderr
-    - DB_CONNECTION=mysql
-    - DB_HOST=host.docker.internal
-    - DB_PORT=3306
 
 services:
-  lrvl9-app:
+  app:
     <<: *common
     ports:
       - target: 80
         published: 8080
     volumes:
       - ./data/scout:/var/www/html/storage/scout
+    environment:
+      - LOG_CHANNEL=stderr
+      - DB_CONNECTION=mysql
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile
+        - <<: *watch-composer
+        - <<: *watch-package
+        - <<: *watch-config
+        - <<: *watch-routes
+        - <<: *watch-views
+        - <<: *watch-themes
+        - <<: *watch-wave-views
     deploy:
       update_config:
         parallelism: 1
         delay: 10s
         order: start-first
 
-  lrvl9-scheduler:
+  scheduler:
     <<: *common
     environment:
       - CONTAINER_ROLE=scheduler
@@ -54,6 +89,13 @@ services:
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
       - DB_PORT=3306
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile
+        - <<: *watch-composer
+        - <<: *watch-package
+        - <<: *watch-config
 
 
 
