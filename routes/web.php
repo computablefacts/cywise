@@ -60,6 +60,7 @@ Wave::routes();
 // See https://devdojo.com/question/customizing-the-two-factor-authentication
 Route::view('/auth/login', 'vendor/auth/pages/auth/login');
 
+Route::redirect('/the-cyber-brief', '/blog');
 
 // See https://devdojo.com/wave/docs/features/user-profiles
 Route::redirect('profile/{username}', '/dashboard');
