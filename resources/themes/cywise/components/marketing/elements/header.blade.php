@@ -130,7 +130,7 @@
                         </li>
                     @else
                         <li class="flex items-center justify-center w-full pt-3 md:hidden px-7">
-                            <x-button href="{{ route('login') }}" tag="a" class="w-full text-sm">
+                            <x-button href="{{ route('dashboard') }}" tag="a" class="w-full text-sm">
                               {{ __('View Dashboard') }}
                             </x-button>
                         </li>
@@ -149,7 +149,7 @@
                     </x-button>
                 </div>
             @else
-                <x-button href="{{ route('login') }}" tag="a" class="text-sm" class="relative z-20 flex-shrink-0 hidden ml-2 md:block">
+                <x-button href="{{ route('dashboard') }}" tag="a" class="text-sm" class="relative z-20 flex-shrink-0 hidden ml-2 md:block">
                   {{ __('View Dashboard') }}
                 </x-button>
             @endguest
