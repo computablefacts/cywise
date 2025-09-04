@@ -32,6 +32,7 @@ use App\Http\Controllers\Iframes\ScaController;
 use App\Http\Controllers\Iframes\TableController;
 use App\Http\Controllers\Iframes\TablesController;
 use App\Http\Controllers\Iframes\TimelineController;
+use App\Http\Controllers\Iframes\TracesController;
 use App\Http\Controllers\Iframes\UsersController;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
@@ -626,6 +627,7 @@ Route::middleware(['auth', LogHttpRequests::class])->prefix('iframes')->name('if
     Route::get('/sca', [ScaController::class, '__invoke'])->name('sca');
     Route::get('/table', [TableController::class, '__invoke'])->name('table');
     Route::get('/tables', [TablesController::class, '__invoke'])->name('tables');
+    Route::get('/traces', [TracesController::class, '__invoke'])->name('traces');
     Route::get('/users', [UsersController::class, '__invoke'])->name('users');
     Route::get('/vulnerabilities', [TimelineController::class, '__invoke'])->name('vulnerabilities');
 });

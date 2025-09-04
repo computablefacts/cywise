@@ -183,6 +183,11 @@
                                 :active="Request::is('users')">
               {{ __('Users') }}
             </x-app.sidebar-link>
+            <x-app.sidebar-link href="{{ route('traces') }}"
+                                icon="phosphor-list-dashes"
+                                :active="Request::is('traces')">
+              {{ __('Traces') }}
+            </x-app.sidebar-link>
           </x-app.sidebar-dropdown>
         </div>
       </div>
