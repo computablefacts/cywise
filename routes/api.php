@@ -214,7 +214,10 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             // TODO
         ])
             ->name('rpc.endpoint')
-            ->middleware([GzipCompress::class]);
+            ->middleware([
+                GzipCompress::class,
+                \App\Http\Middleware\LogJsonRpcRequests::class,
+            ]);
     });
 
     /** PRIVATE ENDPOINTS */
@@ -251,6 +254,10 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\VulnerabilitiesProcedure::class,
         ])
             ->name('rpc.endpoint')
-            ->middleware([GzipCompress::class, \App\Http\Middleware\Authenticate::class]);
+            ->middleware([
+                GzipCompress::class,
+                \App\Http\Middleware\LogJsonRpcRequests::class,
+                \App\Http\Middleware\Authenticate::class,
+            ]);
     });
 });
