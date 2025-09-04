@@ -22,7 +22,8 @@ use Illuminate\Support\Str;
 
 class CyberBuddy extends AbstractAction
 {
-    private const string MODEL = 'deepseek-ai/DeepSeek-R1-0528-Turbo';
+    private const string MODEL_REFORMULATE = 'meta-llama/Llama-4-Scout-17B-16E-Instruct';
+    private const string MODEL_ANSWER = 'deepseek-ai/DeepSeek-R1-0528-Turbo';
 
     static function schema(): array
     {
@@ -65,7 +66,7 @@ class CyberBuddy extends AbstractAction
             'role' => RoleEnum::USER->value,
             'content' => $prompt,
         ];
-        $answer = LlmsProvider::provide($messages, self::MODEL, 3 * 60);
+        $answer = LlmsProvider::provide($messages, self::MODEL_REFORMULATE, 3 * 60);
         array_pop($messages);
 
         $matches = null;
@@ -100,7 +101,7 @@ class CyberBuddy extends AbstractAction
             'role' => RoleEnum::USER->value,
             'content' => $prompt,
         ];
-        $answer = LlmsProvider::provide($messages, self::MODEL, 120);
+        $answer = LlmsProvider::provide($messages, self::MODEL_ANSWER, 120);
         array_pop($messages);
 
         return new SuccessfulAnswer($this->enhanceWithSources($answer), [], !empty($answer));
