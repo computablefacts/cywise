@@ -131,7 +131,7 @@ new class extends Component
                 return;
             }
 
-            event(new Login(auth()->guard('web'), $this->userModel->where('email', $this->email)->first(), true));
+            event(new Login('web', $this->userModel->where('email', $this->email)->first(), true));
 
             if(session()->get('url.intended') != route('logout.get')){
                 session()->regenerate();
