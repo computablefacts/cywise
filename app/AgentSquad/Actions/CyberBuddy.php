@@ -224,7 +224,7 @@ class CyberBuddy extends AbstractAction
             ->get();
     }
 
-    private function combine(array $arrays, bool $sample = false): array
+    private function combine(array $arrays, int $sample = -1): array
     {
         if (empty($arrays)) {
             return [];
@@ -246,9 +246,9 @@ class CyberBuddy extends AbstractAction
             }
             $combinations = $new;
         }
-        if ($sample) {
+        if ($sample > 0) {
             shuffle($combinations);
-            $combinations = array_slice($combinations, 0, 5);
+            $combinations = array_slice($combinations, 0, min(count($combinations), $sample));
         }
         return array_map(fn(array $combination) => implode(" ", $combination), $combinations);
     }
