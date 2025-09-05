@@ -1,29 +1,33 @@
-x-watch-dockerfile: &watch-dockerfile
+x-watch-dockerfile: &watch-dockerfile-rebuild
   action: rebuild
   path: towerify/Dockerfile
-x-watch-composer: &watch-composer
+x-watch-composer: &watch-composer-rebuild
   action: rebuild
   path: composer.json
-x-watch-package: &watch-package
+x-watch-package: &watch-package-rebuild
   action: rebuild
   path: package.json
-x-watch-config: &watch-config
+x-watch-config: &watch-config-restart
   action: sync+restart
   path: ./config
   target: /var/www/html/config
-x-watch-routes: &watch-routes
+x-watch-env: &watch-env-restart
+  action: sync+restart
+  path: .env
+  target: /var/www/html/.env.temp
+x-watch-routes: &watch-routes-restart
   action: sync+restart
   path: ./routes
   target: /var/www/html/routes
-x-watch-views: &watch-views
+x-watch-views: &watch-views-restart
   action: sync+restart
   path: ./resources/views
   target: /var/www/html/resources/views
-x-watch-themes: &watch-themes
+x-watch-themes: &watch-themes-restart
   action: sync+restart
   path: ./resources/themes
   target: /var/www/html/resources/themes
-x-watch-wave-views: &watch-wave-views
+x-watch-wave-views: &watch-wave-views-restart
   action: sync+restart
   path: ./wave/resources/views
   target: /var/www/html/wave/resources/views
@@ -67,14 +71,15 @@ services:
     develop:
       watch:
         - <<: *watch-app-sync
-        - <<: *watch-dockerfile
-        - <<: *watch-composer
-        - <<: *watch-package
-        - <<: *watch-config
-        - <<: *watch-routes
-        - <<: *watch-views
-        - <<: *watch-themes
-        - <<: *watch-wave-views
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+        - <<: *watch-routes-restart
+        - <<: *watch-views-restart
+        - <<: *watch-themes-restart
+        - <<: *watch-wave-views-restart
     deploy:
       update_config:
         parallelism: 1
@@ -92,117 +97,102 @@ services:
     develop:
       watch:
         - <<: *watch-app-sync
-        - <<: *watch-dockerfile
-        - <<: *watch-composer
-        - <<: *watch-package
-        - <<: *watch-config
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
 
-
-
-
-
-  lrvl9-scheduler:
-    image: __DOCKER_IMAGE_NAME__:__DOCKER_IMAGE_TAG__
-    extra_hosts:
-      host.docker.internal: host-gateway
-    env_file:
-      - .env
-    environment:
-      - CONTAINER_ROLE=scheduler
-      - APP_URL=https://__DOMAIN____PATH__
-      - LOG_CHANNEL=stderr
-      - DB_CONNECTION=mysql
-      - DB_HOST=host.docker.internal
-      - DB_PORT=3306
-      - DB_DATABASE=__DB_NAME__
-      - DB_USERNAME=__DB_USER__
-      - DB_PASSWORD=__DB_PWD__
-  lrvl9-queue:
-    image: __DOCKER_IMAGE_NAME__:__DOCKER_IMAGE_TAG__
-    extra_hosts:
-      host.docker.internal: host-gateway
-    env_file:
-      - .env
+  queue:
+    <<: *common
     environment:
       - CONTAINER_ROLE=queue
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
       - DB_PORT=3306
-      - DB_DATABASE=__DB_NAME__
-      - DB_USERNAME=__DB_USER__
-      - DB_PASSWORD=__DB_PWD__
-  lrvl9-queue-low:
-    image: __DOCKER_IMAGE_NAME__:__DOCKER_IMAGE_TAG__
-    extra_hosts:
-      host.docker.internal: host-gateway
-    env_file:
-      - .env
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+
+  queue-low:
+    <<: *common
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=low
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
       - DB_PORT=3306
-      - DB_DATABASE=__DB_NAME__
-      - DB_USERNAME=__DB_USER__
-      - DB_PASSWORD=__DB_PWD__
-  lrvl9-queue-medium:
-    image: __DOCKER_IMAGE_NAME__:__DOCKER_IMAGE_TAG__
-    extra_hosts:
-      host.docker.internal: host-gateway
-    env_file:
-      - .env
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+
+  queue-medium:
+    <<: *common
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=medium
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
       - DB_PORT=3306
-      - DB_DATABASE=__DB_NAME__
-      - DB_USERNAME=__DB_USER__
-      - DB_PASSWORD=__DB_PWD__
-  lrvl9-queue-critical:
-    image: __DOCKER_IMAGE_NAME__:__DOCKER_IMAGE_TAG__
-    extra_hosts:
-      host.docker.internal: host-gateway
-    env_file:
-      - .env
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+
+  queue-critical:
+    <<: *common
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=critical
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
       - DB_PORT=3306
-      - DB_DATABASE=__DB_NAME__
-      - DB_USERNAME=__DB_USER__
-      - DB_PASSWORD=__DB_PWD__
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
     deploy:
       replicas: 3
-  lrvl9-queue-scout:
-    image: __DOCKER_IMAGE_NAME__:__DOCKER_IMAGE_TAG__
-    extra_hosts:
-      host.docker.internal: host-gateway
-    env_file:
-      - .env
+
+  queue-scout:
+    <<: *common
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=scout
-      - APP_URL=https://__DOMAIN____PATH__
       - LOG_CHANNEL=stderr
       - DB_CONNECTION=mysql
       - DB_HOST=host.docker.internal
       - DB_PORT=3306
-      - DB_DATABASE=__DB_NAME__
-      - DB_USERNAME=__DB_USER__
-      - DB_PASSWORD=__DB_PWD__
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
     volumes:
       - ./data/scout:/var/www/html/storage/scout
 ===============================
