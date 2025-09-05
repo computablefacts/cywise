@@ -28,7 +28,6 @@ class EventsSeeder
                 'email' => $email,
                 'password' => TwHasher::hash($password),
                 'type' => 'admin',
-                'is_active' => true,
             ]
         );
 
