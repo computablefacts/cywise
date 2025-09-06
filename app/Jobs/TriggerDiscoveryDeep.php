@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Enums\AssetTypesEnum;
 use App\Events\BeginDiscovery;
 use App\Models\Asset;
-use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -29,21 +28,18 @@ class TriggerDiscoveryDeep implements ShouldQueue
 
     public function handle()
     {
-        Tenant::all()
-            ->map(fn(Tenant $tenant) => User::where('tenant_id', $tenant->id)->orderBy('created_at')->first())
-            ->filter(fn(User $user) => isset($user))
-            ->each(function (User $user) {
+        User::all()->each(function (User $user) {
 
-                Auth::login($user); // otherwise the tenant will not be properly set
+            Auth::login($user); // otherwise the tenant will not be properly set
 
-                Asset::whereNull('discovery_id')
-                    ->where('type', AssetTypesEnum::DNS)
-                    ->get()
-                    ->map(fn(Asset $asset) => $asset->tld())
-                    ->unique()
-                    ->each(fn(string $tld) => BeginDiscovery::dispatch($tld));
+            Asset::whereNull('discovery_id')
+                ->where('type', AssetTypesEnum::DNS)
+                ->get()
+                ->map(fn(Asset $asset) => $asset->tld())
+                ->unique()
+                ->each(fn(string $tld) => BeginDiscovery::dispatch($tld));
 
-                Auth::logout();
-            });
+            Auth::logout();
+        });
     }
 }
