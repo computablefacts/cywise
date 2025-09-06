@@ -46,25 +46,32 @@ class Scan extends Model
         'updated_at' => 'datetime',
     ];
 
-    /** @deprecated */
     public static function removeDanglingScans(): void
     {
         $frequency = config('towerify.adversarymeter.days_between_scans');
         $minDate = Carbon::now()->subDays((int)$frequency);
+
+        // Find scans that did not properly end:
+        // - The scan is no more attached to an asset
+        // - The ports scan has not completed after x days
+        // - The vulns scan has not completed after x days
         DB::update("
             DELETE
             FROM am_scans
-            WHERE vulns_scan_ends_at IS NULL
-            AND (
-              (
-                ports_scan_id NOT IN (SELECT next_scan_id FROM am_assets WHERE next_scan_id IS NOT NULL)
-                AND ports_scan_id NOT IN (SELECT cur_scan_id FROM am_assets WHERE cur_scan_id IS NOT NULL)
-                AND ports_scan_id NOT IN (SELECT prev_scan_id FROM am_assets WHERE prev_scan_id IS NOT NULL)
-              ) OR (
-                ports_scan_id IN (SELECT next_scan_id FROM am_assets WHERE next_scan_id IS NOT NULL)
-                AND vulns_scan_begins_at IS NOT NULL
-                AND vulns_scan_begins_at < '{$minDate->format('Y-m-d')}'
-              )
+            WHERE (
+              ports_scan_id NOT IN (SELECT next_scan_id FROM am_assets WHERE next_scan_id IS NOT NULL)
+              AND ports_scan_id NOT IN (SELECT cur_scan_id FROM am_assets WHERE cur_scan_id IS NOT NULL)
+              AND ports_scan_id NOT IN (SELECT prev_scan_id FROM am_assets WHERE prev_scan_id IS NOT NULL)
+            ) OR (
+              ports_scan_id IN (SELECT next_scan_id FROM am_assets WHERE next_scan_id IS NOT NULL)
+              AND ports_scan_ends_at IS NULL
+              AND ports_scan_begins_at IS NOT NULL
+              AND ports_scan_begins_at < '{$minDate->format('Y-m-d')}'
+            ) OR (
+              ports_scan_id IN (SELECT next_scan_id FROM am_assets WHERE next_scan_id IS NOT NULL)
+              AND vulns_scan_ends_at IS NULL  
+              AND vulns_scan_begins_at IS NOT NULL
+              AND vulns_scan_begins_at < '{$minDate->format('Y-m-d')}'
             )
         ");
     }
