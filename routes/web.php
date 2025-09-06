@@ -67,6 +67,7 @@ Route::redirect('profile/{username}', '/dashboard');
 
 // Legacy URL. Redirect for SEO reasons.
 Route::redirect('/the-cyber-brief', '/blog');
+Route::redirect('/home', '/dashboard');
 
 // Public facing tools
 Route::get('/cyber-check', function (\Illuminate\Http\Request $request) {
