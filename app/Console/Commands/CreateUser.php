@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
@@ -42,7 +43,13 @@ class CreateUser extends Command
         }
 
         // Create user
-        $user = User::getOrCreate($email, $name, $password, null, $username);
+        $user = User::create([
+            'name' => $name,
+            'email' => $email,
+            'username' => $username,
+            'password' => Hash::make($password),
+            'verified' => 1
+        ]);
 
         // Get roles and let user select
         $roles = Role::all()->pluck('name')->toArray();

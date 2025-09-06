@@ -3,12 +3,12 @@
 namespace Wave\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Wave\ApiKey;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -31,7 +31,7 @@ class AuthController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-        if (!$token = JWTAuth::attempt($credentials)) {
+        if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -50,15 +50,14 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    public function token()
-    {
+    public function token(){
         $request = app('request');
 
-        if (isset($request->key)) {
+        if(isset($request->key)){
 
             $key = ApiKey::where('key', '=', $request->key)->first();
 
-            if (isset($key->id)) {
+            if(isset($key->id)){
                 $key->update([
                     'last_used_at' => Carbon::now(),
                 ]);
@@ -86,7 +85,7 @@ class AuthController extends Controller
     /**
      * Get the token array structure.
      *
-     * @param string $token
+     * @param  string $token
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -108,10 +107,16 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = User::getOrCreate($request->email, $request->name, $request->password, null, $request->username);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'username' => $request->username,
+            'password' => bcrypt($request->password),
+        ]);
+
         $credentials = ['email' => $request['email'], 'password' => $request['password']];
 
-        if (!$token = JWTAuth::attempt($credentials)) {
+        if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
