@@ -10,7 +10,6 @@ use App\Models\Collection;
 use App\Models\File;
 use App\Models\Vector;
 use App\Rules\IsValidCollectionName;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -28,7 +27,7 @@ class IngestFileListener extends AbstractListener
             return;
         }
 
-        Auth::login($event->user); // otherwise the tenant will not be properly set
+        $event->user->actAs(); // otherwise the tenant will not be properly set
 
         try {
             /** @var Collection $collection */

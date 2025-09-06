@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Events\CreateBackup;
 use App\Models\YnhBackup;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -20,7 +19,7 @@ class CreateBackupListener extends AbstractListener
         $user = $event->user;
         $server = $event->server;
 
-        Auth::login($user); // otherwise the tenant will not be properly set
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         if ($server && $server->isReady()) {
 

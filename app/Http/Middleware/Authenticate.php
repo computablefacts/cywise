@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
-use Illuminate\Support\Facades\Auth;
 
 class Authenticate extends Middleware
 {
@@ -28,7 +27,7 @@ class Authenticate extends Middleware
                 if ($token->expires_at === null || $token->expires_at > Carbon::now()) { // Ensure the token hasn't expired'
                     /** @var User $user */
                     $user = $token->tokenable;
-                    Auth::onceUsingId($user->id);
+                    $user->actAs();
                     return $next($request);
                 }
             }

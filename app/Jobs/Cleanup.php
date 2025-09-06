@@ -13,7 +13,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -67,7 +66,7 @@ class Cleanup implements ShouldQueue
 
         User::all()->each(function (User $user) {
 
-            Auth::login($user);
+            $user->actAs(); // otherwise the tenant will not be properly set
 
             YnhFramework::all()->each(function (YnhFramework $framework) {
 
@@ -85,8 +84,6 @@ class Cleanup implements ShouldQueue
                         $collection->save();
                     });
             });
-            
-            Auth::logout();
         });
     }
 }

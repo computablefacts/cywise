@@ -9,7 +9,6 @@ use App\Helpers\ClickhouseUtils;
 use App\Helpers\TableStorage;
 use App\Models\Table;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -30,7 +29,7 @@ class ImportTableListener extends AbstractListener
         $columns = $event->columns;
         $description = $event->description;
 
-        Auth::login($user); // otherwise the tenant will not be properly set
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         // Misc. parameters
         $clickhouseHost = config('towerify.clickhouse.host');

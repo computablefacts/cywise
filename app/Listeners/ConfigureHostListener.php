@@ -6,10 +6,10 @@ use App\Enums\SshTraceStateEnum;
 use App\Events\ConfigureHost;
 use App\Events\CreateAsset;
 use App\Events\PullServerInfos;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Vanilo\Order\Models\FulfillmentStatus;
 
+/** @deprecated */
 class ConfigureHostListener extends AbstractListener
 {
     protected function handle2($event)
@@ -22,7 +22,7 @@ class ConfigureHostListener extends AbstractListener
         $user = $event->user;
         $server = $event->server;
 
-        Auth::login($user); // otherwise the tenant will not be properly set
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         if ($server && !$server->isReady()) { // If multiple setup requests were sent, only process them till one succeeds
 

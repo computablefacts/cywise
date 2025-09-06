@@ -12,7 +12,6 @@ use App\Models\Honeypot;
 use App\Models\User;
 use App\Models\YnhTrial;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -86,7 +85,7 @@ class ToolsController extends Controller
                 $trial->save();
             }
 
-            Auth::login($user);
+            $user->actAs(); // otherwise the tenant will not be properly set
 
             if (!$trial->honeypots) {
 
@@ -171,9 +170,6 @@ class ToolsController extends Controller
             }
 
             usort($assets, fn($a, $b) => strcmp($a['asset'], $b['asset']));
-
-            // Logout!
-            Auth::logout();
         }
         return view('theme::tools.cybercheck', [
             'hash' => $hash,

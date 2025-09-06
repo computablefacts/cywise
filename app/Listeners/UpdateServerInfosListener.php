@@ -3,7 +3,6 @@
 namespace App\Listeners;
 
 use App\Events\PullServerInfos;
-use Illuminate\Support\Facades\Auth;
 
 class UpdateServerInfosListener extends AbstractListener
 {
@@ -17,7 +16,7 @@ class UpdateServerInfosListener extends AbstractListener
         $user = $event->user;
         $server = $event->server;
 
-        Auth::login($user); // otherwise the tenant will not be properly set
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         if ($server && $server->isReady()) {
             $server->pullServerInfos($uid, $user);

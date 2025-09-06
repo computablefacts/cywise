@@ -44,10 +44,10 @@ class CywiseSeeder extends Seeder
         $app_env = config('app.env');
         $appConfigClass = sprintf('Database\Seeders\DbConfig\%sDbAppConfig', Str::ucfirst($app_env));
 
-        if (! class_exists($appConfigClass)) {
+        if (!class_exists($appConfigClass)) {
             Log::warning('Class ' . $appConfigClass . ' not found for app.env ' . $app_env);
             $appConfigClass = 'Database\Seeders\DbConfig\DefaultDbAppConfig';
-            if (! class_exists($appConfigClass)) {
+            if (!class_exists($appConfigClass)) {
                 throw new \Exception('Default class ' . $appConfigClass . ' not found.');
             }
         }
@@ -444,7 +444,8 @@ class CywiseSeeder extends Seeder
                     ->first();
 
                 if ($oldestInTenant) {
-                    User::init($oldestInTenant, true);
+                    $oldestInTenant->actAs();
+                    $oldestInTenant->init(true);
                 }
 
                 User::query()
@@ -453,7 +454,8 @@ class CywiseSeeder extends Seeder
                     ->chunkById(100, function ($users) {
                         /** @var User $user */
                         foreach ($users as $user) {
-                            User::init($user, false);
+                            $user->actAs();
+                            $user->init();
                         }
                     });
             }

@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Events\PullServerInfos;
 use App\Events\RemoveUserPermission;
-use Illuminate\Support\Facades\Auth;
 
 class RemoveUserPermissionListener extends AbstractListener
 {
@@ -20,7 +19,7 @@ class RemoveUserPermissionListener extends AbstractListener
         $user2 = $event->ynhUser;
         $permission = $event->permission;
 
-        Auth::login($user); // otherwise the tenant will not be properly set
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         if ($server && $server->isReady()) {
 

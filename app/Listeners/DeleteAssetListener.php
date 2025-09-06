@@ -5,11 +5,10 @@ namespace App\Listeners;
 use App\Enums\AssetTypesEnum;
 use App\Events\DeleteAsset;
 use App\Models\Asset;
+use App\Models\User;
 use App\Rules\IsValidAsset;
 use App\Rules\IsValidDomain;
 use App\Rules\IsValidIpAddress;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class DeleteAssetListener extends AbstractListener
@@ -48,7 +47,7 @@ class DeleteAssetListener extends AbstractListener
         if (!($event instanceof DeleteAsset)) {
             throw new \Exception('Invalid event type!');
         }
-        Auth::login($event->user); // otherwise the tenant will not be properly set
+        $event->user->actAs(); // otherwise the tenant will not be properly set
         self::execute($event->user, $event->asset);
     }
 }

@@ -7,7 +7,6 @@ use App\Models\YnhCve;
 use App\Models\YnhOsquery;
 use App\Models\YnhOsqueryPackage;
 use App\Models\YnhServer;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class RebuildPackagesListListener extends AbstractListener
@@ -26,7 +25,7 @@ class RebuildPackagesListListener extends AbstractListener
         $user = $event->user;
         $server = $event->server;
 
-        Auth::login($user); // otherwise the tenant will not be properly set
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         if (!$server) {
             Log::info("Loading servers for user {$event->user->email}...");

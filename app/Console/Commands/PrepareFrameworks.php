@@ -6,7 +6,6 @@ use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
 use App\Models\User;
 use App\Models\YnhFramework;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\Yaml\Yaml;
@@ -36,7 +35,7 @@ class PrepareFrameworks extends Command
         $out = $this->argument('output');
         $user = User::query()->where('email', config('towerify.admin.email'))->first();
 
-        Auth::login($user);
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         if (is_dir($in)) {
             $this->processDirectory($in, $out);

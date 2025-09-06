@@ -6,7 +6,6 @@ use App\Enums\SshTraceStateEnum;
 use App\Events\DeleteAsset;
 use App\Events\PullServerInfos;
 use App\Events\UninstallApp;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class UninstallAppListener extends AbstractListener
@@ -22,7 +21,7 @@ class UninstallAppListener extends AbstractListener
         $application = $event->application;
         $server = $event->application->server;
 
-        Auth::login($user); // otherwise the tenant will not be properly set
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         if ($server && $server->isReady()) {
 

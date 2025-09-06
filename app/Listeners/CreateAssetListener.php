@@ -6,13 +6,12 @@ use App\Enums\AssetTypesEnum;
 use App\Events\CreateAsset;
 use App\Models\Asset;
 use App\Models\AssetTag;
+use App\Models\User;
 use App\Models\YnhTrial;
 use App\Rules\IsValidAsset;
 use App\Rules\IsValidDomain;
 use App\Rules\IsValidIpAddress;
 use App\Rules\IsValidTag;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -77,7 +76,7 @@ class CreateAssetListener extends AbstractListener
         if (!($event instanceof CreateAsset)) {
             throw new \Exception('Invalid event type!');
         }
-        Auth::login($event->user); // otherwise the tenant will not be properly set
+        $event->user->actAs(); // otherwise the tenant will not be properly set
         self::execute($event->user, $event->asset, $event->monitor, $event->tags);
     }
 }

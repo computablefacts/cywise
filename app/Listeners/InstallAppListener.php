@@ -8,7 +8,6 @@ use App\Events\InstallApp;
 use App\Events\PullServerInfos;
 use App\Helpers\AppStore;
 use App\Models\YnhApplication;
-use Illuminate\Support\Facades\Auth;
 
 class InstallAppListener extends AbstractListener
 {
@@ -23,7 +22,7 @@ class InstallAppListener extends AbstractListener
         $server = $event->server;
         $order = $event->order;
 
-        Auth::login($user); // otherwise the tenant will not be properly set
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         if ($server && $server->isReady()) {
 

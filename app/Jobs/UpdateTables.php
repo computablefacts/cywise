@@ -6,13 +6,13 @@ use App\Events\ImportTable;
 use App\Helpers\ClickhouseUtils;
 use App\Helpers\TableStorage;
 use App\Models\Table;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class UpdateTables implements ShouldQueue
 {
@@ -33,11 +33,12 @@ class UpdateTables implements ShouldQueue
             ->get()
             ->each(function (Table $table) {
 
-                Auth::loginUsingId($table->created_by);
-
-                $user = Auth::user();
+                /** @var User $user */
+                $user = User::findOrFail($table->created_by);
+                $user->actAs();
 
                 $disk = TableStorage::inDisk($table->credentials);
+
                 collect($disk->files())->filter(function ($file) use ($table) {
                     return ClickhouseUtils::normalizeTableName($file) === $table->name;
                 })->filter(function ($file) use ($disk, $table) {

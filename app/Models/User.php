@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Helpers\MailCoach;
-use App\Helpers\SupersetApiUtilsFacade as SupersetApiUtils;
 use App\Jobs\DeleteEmbeddedChunks;
 use App\Rules\IsValidCollectionName;
 use Illuminate\Notifications\Notifiable;
@@ -90,16 +89,21 @@ class User extends WaveUser
         });
 
         // Listen for the created event of the model
-        static::created(function ($user) {
+        static::created(function (User $user) {
 
-            // Remove all roles
-            $user->syncRoles([]);
+            if (!$user->tenant_id) {
+                /** @var Tenant $tenant */
+                $tenant = Tenant::create(['name' => Str::random()]);
+                $user->tenant_id = $tenant->id;
+                $user->save();
+            }
 
-            // Assign the default role
-            $user->assignRole(config('wave.default_user_role', 'registered'));
+            // Assign the default roles
+            $user->syncRoles(Role::ADMINISTRATOR, Role::LIMITED_ADMINISTRATOR, Role::BASIC_END_USER, config('wave.default_user_role', 'registered'));
 
             // Set frameworks, templates and roles
-            User::init($user);
+            $user->actAs();
+            $user->init();
         });
     }
 
@@ -130,8 +134,6 @@ class User extends WaveUser
                 'tenant_id' => $tenant_id ?? $tenant->id,
                 'avatar' => 'demo/default.png',
             ]);
-
-            $user->syncRoles(Role::ADMINISTRATOR, Role::LIMITED_ADMINISTRATOR, Role::BASIC_END_USER);
         }
         /* if (!isset($user->superset_id)) { // Automatically create a proper superset account for all users
             $json = SupersetApiUtils::get_or_add_user($user);
@@ -141,43 +143,60 @@ class User extends WaveUser
         return $user;
     }
 
-    public static function init(User $user, bool $forceUpdate = false): void
+    /**
+     * Log a user into the application without sessions or cookies. Does not trigger the Login event.
+     */
+    public function actAs(): void
     {
-        $userOld = Auth::user();
-        Auth::login($user); // otherwise the tenant will not be properly set
+        if (Auth::setUser($this)) {
+            Log::debug('The authenticated user is now : ' . Auth::user()->email);
+        } else {
+            Log::error('User::actAs() failed for user : ' . $this->email);
+        }
+    }
 
+    public function tenant(): ?Tenant
+    {
+        if ($this->tenant_id) {
+            return Tenant::where('id', $this->tenant_id)->first();
+        }
+        return null;
+    }
+
+    public function init(bool $forceUpdate = false): void
+    {
         try {
             // Set the user's prompts
-            Log::debug("[{$user->email}] Updating user's prompts...");
+            Log::debug("[{$this->email}] Updating user's prompts...");
 
-            self::setupPrompts($user, 'default_answer_question', 'seeders/prompts/default_answer_question.txt');
-            self::setupPrompts($user, 'default_assistant', 'seeders/prompts/default_assistant.txt');
-            self::setupPrompts($user, 'default_chat', 'seeders/prompts/default_chat.txt');
-            self::setupPrompts($user, 'default_chat_history', 'seeders/prompts/default_chat_history.txt');
-            self::setupPrompts($user, 'default_debugger', 'seeders/prompts/default_debugger.txt');
-            self::setupPrompts($user, 'default_hypothetical_questions', 'seeders/prompts/default_hypothetical_questions.txt');
-            self::setupPrompts($user, 'default_orchestrator', 'seeders/prompts/default_orchestrator.txt');
-            self::setupPrompts($user, 'default_reformulate_question', 'seeders/prompts/default_reformulate_question.txt');
-            self::setupPrompts($user, 'default_summarize', 'seeders/prompts/default_summarize.txt');
+            $this->setupPrompts('default_answer_question', 'seeders/prompts/default_answer_question.txt');
+            $this->setupPrompts('default_assistant', 'seeders/prompts/default_assistant.txt');
+            $this->setupPrompts('default_chat', 'seeders/prompts/default_chat.txt');
+            $this->setupPrompts('default_chat_history', 'seeders/prompts/default_chat_history.txt');
+            $this->setupPrompts('default_debugger', 'seeders/prompts/default_debugger.txt');
+            $this->setupPrompts('default_hypothetical_questions', 'seeders/prompts/default_hypothetical_questions.txt');
+            $this->setupPrompts('default_orchestrator', 'seeders/prompts/default_orchestrator.txt');
+            $this->setupPrompts('default_reformulate_question', 'seeders/prompts/default_reformulate_question.txt');
+            $this->setupPrompts('default_summarize', 'seeders/prompts/default_summarize.txt');
 
-            Log::debug("[{$user->email}] User's prompts updated.");
+            Log::debug("[{$this->email}] User's prompts updated.");
 
             // Get the oldest user of the tenant. We will automatically attach the frameworks to this user
-            Log::debug("[{$user->email}] Searching oldest user in tenant {$user->tenant_id}...");
+            Log::debug("[{$this->email}] Searching oldest user in tenant {$this->tenant_id}...");
 
             $oldestTenantUser = User::query()
-                ->when($user->tenant_id, fn($query) => $query->where('tenant_id', '=', $user->tenant_id))
-                ->when($user->customer_id, fn($query) => $query->where('customer_id', '=', $user->customer_id))
+                ->when($this->tenant_id, fn($query) => $query->where('tenant_id', '=', $this->tenant_id))
+                ->when($this->customer_id, fn($query) => $query->where('customer_id', '=', $this->customer_id))
                 ->orderBy('created_at')
                 ->first();
 
-            Log::debug("[{$user->email}] Oldest user in tenant {$user->tenant_id} is {$oldestTenantUser?->email}.");
+            Log::debug("[{$this->email}] Oldest user in tenant {$this->tenant_id} is {$oldestTenantUser?->email}.");
 
             // TODO : create CyberScribe's templates
             // TODO : create user's private collection privcol*
 
             // Create shadow collections for some frameworks
-            Log::debug("[{$user->email}] Loading frameworks...");
+            Log::debug("[{$this->email}] Loading frameworks...");
 
             $frameworks = \App\Models\YnhFramework::whereIn('file', [
                 'seeders/frameworks/anssi/anssi-guide-hygiene.jsonl.gz',
@@ -187,7 +206,7 @@ class User extends WaveUser
                 'seeders/frameworks/dora/dora.jsonl.gz',
             ])->get();
 
-            Log::debug("[{$user->email}] {$frameworks->count()} frameworks loaded.");
+            Log::debug("[{$this->email}] {$frameworks->count()} frameworks loaded.");
 
             $providers = [
                 'ANSSI' => 100,
@@ -208,12 +227,13 @@ class User extends WaveUser
 
                 if ($forceUpdate && !in_array($collection, $updated)) {
 
-                    Log::debug("[{$user->email}] Deleting collection {$collection}...");
+                    Log::debug("[{$this->email}] Deleting collection {$collection}...");
 
-                    /** @var \App\Models\Collection $collection */
+                    /** @var \App\Models\Collection $col */
                     $col = Collection::where('name', $collection)
                         ->where('is_deleted', false)
                         ->first();
+
                     if ($col) {
                         $col->is_deleted = true;
                         $col->save();
@@ -221,82 +241,17 @@ class User extends WaveUser
                     }
                     $updated[] = $collection;
 
-                    Log::debug("[{$user->email}] Collection {$collection} deleted.");
+                    Log::debug("[{$this->email}] Collection {$collection} deleted.");
                 }
-                if (!$oldestTenantUser || $user->id === $oldestTenantUser->id) {
-                    Log::debug("[{$user->email}] Importing framework {$framework->name}...");
-                    self::setupFrameworks($framework, $priority);
-                    Log::debug("[{$user->email}] Framework {$framework->name} imported.");
+                if (!$oldestTenantUser || $this->id === $oldestTenantUser->id) {
+                    Log::debug("[{$this->email}] Importing framework {$framework->name}...");
+                    $this->setupFrameworks($framework, $priority);
+                    Log::debug("[{$this->email}] Framework {$framework->name} imported.");
                 }
             }
         } catch (\Exception $e) {
-            Log::error("Error while initializing user {$user->email} : {$e->getMessage()}");
+            Log::error("Error while initializing user {$this->email} : {$e->getMessage()}");
         }
-
-        Auth::logout();
-
-        if ($userOld) {
-            Auth::login($userOld);
-        }
-    }
-
-    private static function setupPrompts(User $user, string $name, string $root)
-    {
-        $newPrompt = File::get(database_path($root));
-
-        /** @var Prompt $oldPrompt */
-        $oldPrompt = Prompt::query()
-            ->where('created_by', $user->id)
-            ->where('name', $name)
-            ->first();
-
-        if (isset($oldPrompt)) {
-            $oldPrompt->update(['template' => $newPrompt]);
-        } else {
-            /** @var Prompt $oldPrompt */
-            $oldPrompt = Prompt::create([
-                'created_by' => $user->id,
-                'name' => $name,
-                'template' => $newPrompt
-            ]);
-        }
-    }
-
-    private static function setupFrameworks(YnhFramework $framework, int $priority): void
-    {
-        $collection = self::getOrCreateCollection($framework->collectionName(), $priority);
-        if ($collection) {
-            $path = Str::replace('.jsonl.gz', '.2.jsonl.gz', $framework->path());
-            $url = \App\Http\Controllers\CyberBuddyController::saveLocalFile($collection, $path);
-        }
-    }
-
-    private static function getOrCreateCollection(string $collectionName, int $priority): ?Collection
-    {
-        /** @var \App\Models\Collection $collection */
-        $collection = Collection::where('name', $collectionName)
-            ->where('is_deleted', false)
-            ->first();
-
-        if (!$collection) {
-            if (!IsValidCollectionName::test($collectionName)) {
-                Log::error("Invalid collection name : {$collectionName}");
-                return null;
-            }
-            $collection = Collection::create([
-                'name' => $collectionName,
-                'priority' => max($priority, 0),
-            ]);
-        }
-        return $collection;
-    }
-
-    public function tenant(): ?Tenant
-    {
-        if ($this->tenant_id) {
-            return Tenant::where('id', $this->tenant_id)->first();
-        }
-        return null;
     }
 
     /** @deprecated */
@@ -556,5 +511,56 @@ class User extends WaveUser
             return "tid{$this->tenant_id}";
         }
         return "tid0-cid0";
+    }
+
+    private function setupPrompts(string $name, string $root)
+    {
+        $newPrompt = File::get(database_path($root));
+
+        /** @var Prompt $oldPrompt */
+        $oldPrompt = Prompt::query()
+            ->where('created_by', $this->id)
+            ->where('name', $name)
+            ->first();
+
+        if (isset($oldPrompt)) {
+            $oldPrompt->update(['template' => $newPrompt]);
+        } else {
+            /** @var Prompt $oldPrompt */
+            $oldPrompt = Prompt::create([
+                'created_by' => $this->id,
+                'name' => $name,
+                'template' => $newPrompt
+            ]);
+        }
+    }
+
+    private function setupFrameworks(YnhFramework $framework, int $priority): void
+    {
+        $collection = $this->getOrCreateCollection($framework->collectionName(), $priority);
+        if ($collection) {
+            $path = Str::replace('.jsonl.gz', '.2.jsonl.gz', $framework->path());
+            $url = \App\Http\Controllers\CyberBuddyController::saveLocalFile($collection, $path);
+        }
+    }
+
+    private function getOrCreateCollection(string $collectionName, int $priority): ?Collection
+    {
+        /** @var \App\Models\Collection $collection */
+        $collection = Collection::where('name', $collectionName)
+            ->where('is_deleted', false)
+            ->first();
+
+        if (!$collection) {
+            if (!IsValidCollectionName::test($collectionName)) {
+                Log::error("Invalid collection name : {$collectionName}");
+                return null;
+            }
+            $collection = Collection::create([
+                'name' => $collectionName,
+                'priority' => max($priority, 0),
+            ]);
+        }
+        return $collection;
     }
 }

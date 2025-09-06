@@ -11,7 +11,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Auth;
 
 class TriggerDiscoveryDeep implements ShouldQueue
 {
@@ -30,7 +29,7 @@ class TriggerDiscoveryDeep implements ShouldQueue
     {
         User::all()->each(function (User $user) {
 
-            Auth::login($user); // otherwise the tenant will not be properly set
+            $user->actAs(); // otherwise the tenant will not be properly set
 
             Asset::whereNull('discovery_id')
                 ->where('type', AssetTypesEnum::DNS)
@@ -38,8 +37,6 @@ class TriggerDiscoveryDeep implements ShouldQueue
                 ->map(fn(Asset $asset) => $asset->tld())
                 ->unique()
                 ->each(fn(string $tld) => BeginDiscovery::dispatch($tld));
-
-            Auth::logout();
         });
     }
 }

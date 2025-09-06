@@ -150,8 +150,7 @@ class ProcessIncomingEmails implements ShouldQueue
 
                     // Create shadow profile
                     $user = User::getOrCreate($address->mail);
-
-                    Auth::login($user); // otherwise the tenant will not be properly set
+                    $user->actAs(); // otherwise the tenant will not be properly set
 
                     // Ensure all prompts are properly loaded
                     /* if (Prompt::count() >= 4) {

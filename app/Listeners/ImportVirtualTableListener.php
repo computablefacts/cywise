@@ -7,7 +7,6 @@ use App\Helpers\ClickhouseClient;
 use App\Helpers\ClickhouseUtils;
 use App\Models\Table;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -24,7 +23,7 @@ class ImportVirtualTableListener extends AbstractListener
         $query = $event->query;
         $description = $event->description;
 
-        Auth::login($user); // otherwise the tenant will not be properly set
+        $user->actAs(); // otherwise the tenant will not be properly set
 
         $tableName = ClickhouseUtils::normalizeTableName($table);
         /** @var Table $tbl */
