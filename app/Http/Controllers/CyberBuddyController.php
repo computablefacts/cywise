@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\AgentSquad\Actions\CyberBuddy;
+use App\AgentSquad\Providers\LlmsProvider;
 use App\Events\IngestFile;
-use App\Helpers\ApiUtilsFacade as ApiUtils;
 use App\Models\Chunk;
 use App\Models\Conversation;
 use App\Models\File;
@@ -282,8 +282,13 @@ class CyberBuddyController extends Controller
 
     public function llm1(Request $request)
     {
-        // TODO : validate request
-        $answer = (new CyberBuddy())->execute($request->user(), Str::random(10), [], "{$request->string('collection')}:{$request->string('prompt')}");
+        $params = $request->validate([
+            'collection' => 'required|string|min:1|max:100',
+            'prompt' => 'required|string|min:1|max:1000',
+        ]);
+        $collection = $params['collection'];
+        $prompt = $params['prompt'];
+        $answer = (new CyberBuddy())->execute($request->user(), Str::random(10), [], "{$collection}:{$prompt}");
         if ($answer->success()) {
             $answer = Str::before($answer->markdown(), '<br><br><b>Sources :</b>');
             return preg_replace("/\[((\d+,?)+)]/", "", $answer);
@@ -293,15 +298,34 @@ class CyberBuddyController extends Controller
 
     public function llm2(Request $request)
     {
-        // TODO : validate request
-        $template = $request->string('template');
-        $prompt = $request->string('prompt');
-        $questionsAndAnswers = $request->input('q_and_a', []);
-        $response = ApiUtils::generate_from_template($template, $prompt, $questionsAndAnswers);
-        if (!isset($response['error']) || $response['error']) {
-            return 'Une erreur s\'est produite. Veuillez réessayer ultérieurement.';
-        }
-        return self::removeSourcesFromAnswer($response['response']);
+        $params = $request->validate([
+            'template' => 'required|string|min:1|max:1000',
+            'prompt' => 'nullable|string|min:0|max:1000',
+            'q_and_a.*' => 'required|array|min:1|max:50',
+            'q_and_a.*.question' => 'required|string|min:1|max:500',
+            'q_and_a.*.answer' => 'required|string|min:1|max:1000',
+        ]);
+        $template = !empty($params['template']) ? $params['template'] : "";
+        $input = collect($params['q_and_a'] ?? [])
+            ->map(fn(array $qa) => "Question: {$qa['question']}\nRéponse: {$qa['answer']}")
+            ->join("\n\n");
+        $prompt = !empty($params['prompt']) ? $params['prompt'] : "
+            Tu es un expert en cybersécurité dont le rôle est d’aider à la rédaction d’une charte informatique.
+            
+            En se basant sur un exemple de rédaction (fourni entre les balises [EXAMPLE] et [/EXAMPLE]) rédige en te basant le plus possible sur l’exemple
+            un texte qui prend en compte les informations fournies dans la partie de questions/réponses fournie ci-après (entre les balises [QA] et [/QA])
+            Par exemple si le texte d’exemple suggère une clause mais que cela est en contradiction avec les données présentes dans la partie questions/réponses
+            alors modifie le texte pour prendre en compte ces données plutôt que ceux de l’exemple. Ne répond qu’avec le texte généré, sans ajouter de préambule explicatif.
+            Si la réponse a une question est vide ou NA ou / alors ne modifie pas le texte d’exemple sur les parties concernant cette question.
+            
+            [EXAMPLE]
+            {$template}
+            [/EXAMPLE]
+            [QA]
+            {$input}
+            [/QA]
+        ";
+        return LlmsProvider::provide($prompt, 'deepseek-ai/DeepSeek-R1-0528-Turbo');
     }
 
     public function streamFile(string $secret, Request $request)
