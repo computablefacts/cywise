@@ -16,6 +16,7 @@ use App\Models\ChunkTag;
 use App\Models\File;
 use App\Models\TimelineItem;
 use App\Models\User;
+use App\Rules\IsValidCollectionName;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -59,6 +60,16 @@ class CyberBuddy extends AbstractAction
 
     public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
+        // Extract collection (if any)
+        $collection = Str::before($input, ':');
+
+        if (IsValidCollectionName::test($collection) && \App\Models\Collection::where('name', $collection)->exists()) {
+            $input = Str::after($input, ':');
+        } else {
+            $collection = null;
+        }
+
+        // Reformulate question in both english and french
         $prompt = PromptsProvider::provide('default_reformulate_question', [
             'QUESTION' => htmlspecialchars($input, ENT_QUOTES, 'UTF-8'),
         ]);
@@ -87,8 +98,9 @@ class CyberBuddy extends AbstractAction
             return new FailedAnswer("The keywords are missing: {$answer}");
         }
 
-        $memos = $this->loadMemos($user);
-        $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? []);
+        // Fill context & answer question
+        $memos = empty($collection) ? $this->loadMemos($user) : '';
+        $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
         $prompt = PromptsProvider::provide('default_answer_question', [
             'LANGUAGE' => $json['lang'],
             'NOTES' => $chunks,
@@ -104,7 +116,7 @@ class CyberBuddy extends AbstractAction
         $answer = LlmsProvider::provide($messages, self::MODEL_ANSWER, 120);
         array_pop($messages);
 
-        return new SuccessfulAnswer($this->enhanceWithSources($answer), [], !empty($answer));
+        return new SuccessfulAnswer($this->enhanceWithSources(strip_tags($answer)), [], !empty($answer));
     }
 
     private function loadMemos(User $user): string
@@ -122,17 +134,17 @@ class CyberBuddy extends AbstractAction
         return $notes->join("\n\n");
     }
 
-    private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr): string
+    private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): string
     {
         $start = microtime(true);
-        $fullTextSearchEn = $this->fullTextSearch($user, 'en', $keywordsEn);
-        $fullTextSearchFr = $this->fullTextSearch($user, 'fr', $keywordsFr);
+        $fullTextSearchEn = $this->fullTextSearch($user, 'en', $keywordsEn, $collection);
+        $fullTextSearchFr = $this->fullTextSearch($user, 'fr', $keywordsFr, $collection);
         $stop = microtime(true);
         $nbResults = $fullTextSearchEn->count() + $fullTextSearchFr->count();
         Log::debug("[LOAD_CHUNKS] Full-text search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
         $start = microtime(true);
-        $vectorSearchEn = $this->vectorSearch($user, 'en', $questionEn);
-        $vectorSearchFr = $this->vectorSearch($user, 'fr', $questionFr);
+        $vectorSearchEn = $this->vectorSearch($user, 'en', $questionEn, $collection);
+        $vectorSearchFr = $this->vectorSearch($user, 'fr', $questionFr, $collection);
         $stop = microtime(true);
         $nbResults = $vectorSearchEn->count() + $vectorSearchFr->count();
         Log::debug("[LOAD_CHUNKS] Vector search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
@@ -167,7 +179,7 @@ class CyberBuddy extends AbstractAction
     }
 
     /** @return Collection<Chunk> */
-    private function fullTextSearch(User $user, string $lang, array $input): Collection
+    private function fullTextSearch(User $user, string $lang, array $input, ?string $collection = null): Collection
     {
         /** @var array<string> $keywords */
         $keywords = $this->combine($input, 5);
@@ -175,9 +187,9 @@ class CyberBuddy extends AbstractAction
         $chunks = collect();
         foreach ($keywords as $k) {
             if ($lang === 'en') {
-                $chunkz = ChunksProvider::provide($this->englishCollections(), 'en', $k, 5);
+                $chunkz = ChunksProvider::provide($this->englishCollections($collection), 'en', $k, 5);
             } else if ($lang === 'fr') {
-                $chunkz = ChunksProvider::provide($this->frenchCollections(), 'fr', $k, 5);
+                $chunkz = ChunksProvider::provide($this->frenchCollections($collection), 'fr', $k, 5);
             } else {
                 $chunkz = collect();
             }
@@ -187,18 +199,18 @@ class CyberBuddy extends AbstractAction
     }
 
     /** @return Collection<Chunk> */
-    private function vectorSearch(User $user, string $lang, string $input): Collection
+    private function vectorSearch(User $user, string $lang, string $input, ?string $collection = null): Collection
     {
         if ($lang === 'en') {
-            return ChunksProvider2::provide($this->englishCollections(), 'en', $input, 4);
+            return ChunksProvider2::provide($this->englishCollections($collection), 'en', $input, 4);
         }
         if ($lang === 'fr') {
-            return ChunksProvider2::provide($this->frenchCollections(), 'fr', $input, 4);
+            return ChunksProvider2::provide($this->frenchCollections($collection), 'fr', $input, 4);
         }
         return collect();
     }
 
-    private function englishCollections(): Collection
+    private function englishCollections(?string $collection = null): Collection
     {
         return \App\Models\Collection::query()
             ->where('cb_collections.is_deleted', false)
@@ -206,12 +218,13 @@ class CyberBuddy extends AbstractAction
                 $query->where('cb_collections.name', 'like', "%lgen") // see YnhFramework::collectionName
                 ->orWhere('cb_collections.name', 'not like', '%lg%');
             })
+            ->when($collection, fn($query) => $query->where('cb_collections.name', '=', $collection))
             ->orderBy('cb_collections.priority')
             ->orderBy('cb_collections.name')
             ->get();
     }
 
-    private function frenchCollections(): Collection
+    private function frenchCollections(?string $collection = null): Collection
     {
         return \App\Models\Collection::query()
             ->where('cb_collections.is_deleted', false)
@@ -219,6 +232,7 @@ class CyberBuddy extends AbstractAction
                 $query->where('cb_collections.name', 'like', "%lgfr") // see YnhFramework::collectionName
                 ->orWhere('cb_collections.name', 'not like', '%lg%');
             })
+            ->when($collection, fn($query) => $query->where('cb_collections.name', '=', $collection))
             ->orderBy('cb_collections.priority')
             ->orderBy('cb_collections.name')
             ->get();

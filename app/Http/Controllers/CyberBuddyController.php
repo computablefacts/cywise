@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AgentSquad\Actions\CyberBuddy;
 use App\Events\IngestFile;
 use App\Helpers\ApiUtilsFacade as ApiUtils;
 use App\Models\Chunk;
@@ -282,13 +283,12 @@ class CyberBuddyController extends Controller
     public function llm1(Request $request)
     {
         // TODO : validate request
-        $collection = $request->string('collection');
-        $prompt = $request->string('prompt');
-        $response = ApiUtils::ask_chunks($prompt, $collection, null, true, true, 'fr', 10, true);
-        if (!isset($response['error']) || $response['error']) {
-            return 'Une erreur s\'est produite. Veuillez réessayer ultérieurement.';
+        $answer = (new CyberBuddy())->execute($request->user(), Str::random(10), [], "{$request->string('collection')}:{$request->string('prompt')}");
+        if ($answer->success()) {
+            $answer = Str::before($answer->markdown(), '<br><br><b>Sources :</b>');
+            return preg_replace("/\[((\d+,?)+)]/", "", $answer);
         }
-        return self::removeSourcesFromAnswer($response['response']);
+        return 'Une erreur s\'est produite. Veuillez réessayer ultérieurement.';
     }
 
     public function llm2(Request $request)
