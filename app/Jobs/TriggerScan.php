@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Events\BeginPortsScan;
+use App\Listeners\BeginPortsScanListener;
 use App\Models\Asset;
 use App\Models\Scan;
 use Carbon\Carbon;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class TriggerScan implements ShouldQueue
 {
@@ -50,6 +52,10 @@ class TriggerScan implements ShouldQueue
                 $scans = $asset->scanCompleted();
                 return $scans->isEmpty() || $scans->sortBy('vulns_scan_ends_at')->last()?->vulns_scan_ends_at <= $minDate;
             })
-            ->each(fn(Asset $asset) => BeginPortsScan::dispatch($asset));
+            ->each(function (Asset $asset) {
+                Log::debug("Starting scan of asset {$asset->asset} ({$asset->id})...");
+                (new BeginPortsScanListener())->handle(new BeginPortsScan($asset));
+                Log::debug("Scan of asset {$asset->asset} ({$asset->id}) started.");
+            });
     }
 }

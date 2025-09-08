@@ -35,6 +35,7 @@ class BeginPortsScanListener extends AbstractListener
             Log::error('Ports scan cannot be started : ' . json_encode($task));
         } else {
 
+            /** @var Scan $scan */
             $scan = Scan::create([
                 'asset_id' => $asset->id,
                 'ports_scan_id' => $taskId,
