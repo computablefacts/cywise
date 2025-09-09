@@ -76,8 +76,8 @@ class PrepareLegalDocuments extends Command
 
     private function processFile(string $file, string $output, string $prompt): void
     {
-        if (!Str::endsWith($file, '.docx') && !Str::endsWith($file, '.doc')) {
-            Log::warning("Skipping file $file : not a .docx file.");
+        if (!Str::endsWith($file, '.docx') && !Str::endsWith($file, '.doc') && !Str::endsWith($file, '.pdf')) {
+            Log::warning("Skipping file $file : not a .docx or .pdf file.");
             return;
         }
 
@@ -86,26 +86,39 @@ class PrepareLegalDocuments extends Command
         $json = "{$output}/{$filename}.json";
 
         if (!file_exists($md)) {
-            shell_exec("pandoc -t markdown_strict --extract-media=\"{$output}/attachments/{$filename}\" \"$file\" -o \"$md\"");
+            $this->info("Converting {$filename} to markdown...");
+            if (Str::endsWith($file, '.pdf')) {
+                shell_exec("pdftotext -layout \"$file\" - | pandoc -f markdown -t markdown_strict --extract-media=\"{$output}/attachments/{$filename}\" -o \"$md\"");
+            } else {
+                shell_exec("pandoc -t markdown_strict --extract-media=\"{$output}/attachments/{$filename}\" \"$file\" -o \"$md\"");
+            }
+            $this->info("File converted to markdown.");
         }
         if (!file_exists($md)) {
-            Log::warning("Skipping file $file : no markdown file.");
+            $this->warn("Skipping file {$filename} : no markdown file.");
             return;
         }
         if (!file_exists($json)) {
 
+            $this->info("Building JSON document from {$filename}...");
+
+            $start = microtime(true);
             $markdown = file_get_contents($md);
             $prompt = \Illuminate\Support\Facades\File::get($prompt);
             $prompt = Str::replace('{DOC}', $markdown, $prompt);
             $answer = LlmsProvider::provide($prompt, $this->model, 30 * 60);
             $array = json_decode($answer, true);
+            $end = microtime(true);
+            $durationInSeconds = $end - $start;
+
+            $this->info("JSON document built in {$durationInSeconds} seconds.");
 
             if ($array) {
                 file_put_contents($json, json_encode($array, JSON_PRETTY_PRINT));
             }
         }
         if (!file_exists($json)) {
-            Log::warning("Skipping file $file : no json file.");
+            $this->warn("Skipping file {$filename} : no json file.");
             return;
         }
     }
