@@ -434,6 +434,12 @@ class CywiseSeeder extends Seeder
 
     private function setupUserPromptsAndFrameworks(): void
     {
+        // Setup the admin
+        $user = User::query()->where('email', config('towerify.admin.email'))->first();
+        $user->actAs();
+        $user->init(true);
+
+        // Setup other users
         \App\Models\Tenant::query()->chunkById(100, function ($tenants) {
             /** @var \App\Models\Tenant $tenant */
             foreach ($tenants as $tenant) {
@@ -460,7 +466,6 @@ class CywiseSeeder extends Seeder
                     });
             }
         });
-
     }
 
     private function setupFrameworks(): void
