@@ -199,7 +199,7 @@ class TimelineController extends Controller
 
     private function events(?int $serverId = null): Collection
     {
-        $cutOffTime = Carbon::now()->startOfDay()->subDay();
+        $cutOffTime = Carbon::now()->startOfDay()->subDays(3);
         $servers = YnhServer::query()
             ->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))
             ->get();
@@ -237,7 +237,7 @@ class TimelineController extends Controller
 
     private function ioc(int $minScore = 1, ?int $serverId = null): Collection
     {
-        $cutOffTime = Carbon::now()->startOfDay()->subDay();
+        $cutOffTime = Carbon::now()->startOfDay()->subDays(3);
         $servers = YnhServer::query()->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))->get();
         $events = YnhOsquery::select([
             DB::raw('ynh_servers.name AS server_name'),
