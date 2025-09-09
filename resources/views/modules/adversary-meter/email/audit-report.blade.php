@@ -131,27 +131,7 @@
     <br><br>
   </div>
 </center>
-@if(Auth::user()->isInTrial())
-@if(Auth::user()->endsTrialVerySoon())
-<pre style="background-color:#D63384FF;color:white;border:unset">
-{{ __('Your account is in the trial period until :date.', ['date' => Auth::user()->endOfTrial()->format('Y-m-d')]) }}&nbsp;{!! __('Click <a href=":plans" style="color:white">here</a> to upgrade to a paid plan.', ['plans' => route('plans')]) !!}
-</pre>
-@elseif(Auth::user()->endsTrialSoon())
-<pre style="background-color:#FFC107FF;color:white;border:unset">
-{{ __('Your account is in the trial period until :date.', ['date' => Auth::user()->endOfTrial()->format('Y-m-d')]) }}&nbsp;{!! __('Click <a href=":plans" style="color:white">here</a> to upgrade to a paid plan.', ['plans' => route('plans')]) !!}
-</pre>
-@else
-<pre>
-{{ __('Your account is in the trial period until :date.', ['date' => Auth::user()->endOfTrial()->format('Y-m-d')]) }}
-</pre>
-@endif
-@elseif(Auth::user()->isBarredFromAccessingTheApp())
-<pre style="background-color:#DC3545FF;color:white;border:unset">
-{{ __('Your trial ended on :date.', ['date' => Auth::user()->endOfTrial()->format('Y-m-d')]) }}&nbsp;{!! __('Click <a href=":plans" style="color:white">here</a> to continue using Cywise.', ['plans' => route('plans')]) !!}
-</pre>
-@else
 <hr/>
-@endif
 <div class='heading grey'>
   Table des matières
 </div>

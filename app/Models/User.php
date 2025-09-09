@@ -254,40 +254,6 @@ class User extends WaveUser
         }
     }
 
-    /** @deprecated */
-    public function isBarredFromAccessingTheApp(): bool
-    {
-        return is_cywise() && // only applies to Cywise deployment
-            !$this->isAdmin() && // the admin is always allowed to login
-            !$this->isInTrial() && // the trial ended
-            $this->customer_id == null && // the customer has not been set yet (automatically set after a successful subscription)
-            !$this->subscribed(); // the customer has been set but the subscription ended
-    }
-
-    /** @deprecated */
-    public function endsTrialSoon(): bool
-    {
-        return $this->isInTrial() && \Carbon\Carbon::now()->startOfDay()->gte($this->endOfTrial()->subDays(7));
-    }
-
-    /** @deprecated */
-    public function endsTrialVerySoon(): bool
-    {
-        return $this->isInTrial() && \Carbon\Carbon::now()->startOfDay()->gte($this->endOfTrial()->subDays(3));
-    }
-
-    /** @deprecated */
-    public function isInTrial(): bool
-    {
-        return $this->customer_id == null && \Carbon\Carbon::now()->startOfDay()->lte($this->endOfTrial());
-    }
-
-    /** @deprecated */
-    public function endOfTrial(): Carbon
-    {
-        return $this->created_at->startOfDay()->addDays(15);
-    }
-
     public function sentinelApiToken(): ?string
     {
         if (!$this->canManageServers()) {
