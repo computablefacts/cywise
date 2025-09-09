@@ -43,7 +43,7 @@ class LabourLawyer extends AbstractAction
         ];
     }
 
-    public function __construct(string $in, string $model = 'Qwen/Qwen3-14B')
+    public function __construct(string $in, string $model = 'deepseek-ai/DeepSeek-R1-0528-Turbo')
     {
         $this->vectorStoreObjets = new FileVectorStore($in, 5, 'objets');
         $this->vectorStoreArguments = new FileVectorStore($in, 5, 'arguments');
