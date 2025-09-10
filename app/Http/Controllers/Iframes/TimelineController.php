@@ -55,9 +55,7 @@ class TimelineController extends Controller
         ]);
         $objects = last(explode('/', trim($request->path(), '/')));
         $items = match ($objects) {
-            'assets' => $this
-                ->assets($params['status'] ?? null, $params['asset_id'] ?? null)
-                ->concat($this->servers($params['server_id'] ?? null)),
+            'assets' => $this->assets($params['status'] ?? null, $params['asset_id'] ?? null),
             'conversations' => $this->conversations(),
             'events' => $this->events($params['server_id'] ?? null),
             'ioc' => $this->iocs(10, $params['server_id'] ?? null, $params['level'] ?? null),
@@ -68,7 +66,13 @@ class TimelineController extends Controller
         };
         return view('theme::iframes.timeline', [
             'today_separator' => $this->separator(Carbon::now()),
-            'items' => (($objects === 'ioc' || $objects === 'vulnerabilities') ? $items['items'] : $items)->sortByDesc('timestamp')
+            'items' => (
+            $objects === 'assets' ?
+                $items['items']->concat($this->servers($params['server_id'] ?? null)) :
+                ($objects === 'ioc' || $objects === 'vulnerabilities' ?
+                    $items['items'] :
+                    $items)
+            )->sortByDesc('timestamp')
                 ->groupBy(fn(array $event) => $event['date'])
                 ->mapWithKeys(function ($events, $timestamp) {
                     return [
@@ -82,6 +86,8 @@ class TimelineController extends Controller
             'nb_medium' => $items['nb_medium'] ?? 0,
             'nb_low' => $items['nb_low'] ?? 0,
             'nb_suspect' => $items['nb_suspect'] ?? 0,
+            'nb_monitored' => $items['nb_monitored'] ?? 0,
+            'nb_monitorable' => $items['nb_monitorable'] ?? 0,
         ]);
     }
 
@@ -123,54 +129,64 @@ class TimelineController extends Controller
             });
     }
 
-    private function assets(?string $status = null, ?int $assetId = null): Collection
+    private function assets(?string $status = null, ?int $assetId = null): array
     {
-        return Asset::query()
-            ->when($status, function ($query, $status) {
-                if ($status === 'monitorable') {
-                    $query->where('is_monitored', false);
-                } else if ($status === 'monitored') {
-                    $query->where('is_monitored', true);
-                }
-            })
-            ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
-            ->get()
-            ->map(function (Asset $asset) {
+        return [
+            'nb_monitored' => Asset::query()
+                ->where('is_monitored', true)
+                ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
+                ->count(),
+            'nb_monitorable' => Asset::query()
+                ->where('is_monitored', false)
+                ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
+                ->count(),
+            'items' => Asset::query()
+                ->when($status, function ($query, $status) {
+                    if ($status === 'monitorable') {
+                        $query->where('is_monitored', false);
+                    } else if ($status === 'monitored') {
+                        $query->where('is_monitored', true);
+                    }
+                })
+                ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
+                ->get()
+                ->map(function (Asset $asset) {
 
-                $timestamp = $asset->created_at->utc()->format('Y-m-d H:i:s');
-                $date = Str::before($timestamp, ' ');
-                $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
+                    $timestamp = $asset->created_at->utc()->format('Y-m-d H:i:s');
+                    $date = Str::before($timestamp, ' ');
+                    $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
 
-                $alerts = $asset->is_monitored ?
-                    $asset->alerts()->get()->filter(fn($alert) => $alert->is_hidden === 0) :
-                    collect();
-                $hasHigh = $alerts->contains(fn($alert) => $alert->level === 'High');
-                $hasMedium = $alerts->contains(fn($alert) => $alert->level === 'Medium');
-                $hasLow = $alerts->contains(fn($alert) => $alert->level === 'Low');
+                    $alerts = $asset->is_monitored ?
+                        $asset->alerts()->get()->filter(fn($alert) => $alert->is_hidden === 0) :
+                        collect();
+                    $hasHigh = $alerts->contains(fn($alert) => $alert->level === 'High');
+                    $hasMedium = $alerts->contains(fn($alert) => $alert->level === 'Medium');
+                    $hasLow = $alerts->contains(fn($alert) => $alert->level === 'Low');
 
-                if ($hasHigh) {
-                    $bgColor = 'var(--c-red)';
-                } elseif ($hasMedium) {
-                    $bgColor = 'var(--c-orange-light)';
-                } elseif ($hasLow) {
-                    $bgColor = 'var(--c-green)';
-                } else {
-                    $bgColor = 'var(--c-blue)';
-                }
-                return [
-                    'timestamp' => $timestamp,
-                    'date' => $date,
-                    'time' => $time,
-                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._asset', [
+                    if ($hasHigh) {
+                        $bgColor = 'var(--c-red)';
+                    } elseif ($hasMedium) {
+                        $bgColor = 'var(--c-orange-light)';
+                    } elseif ($hasLow) {
+                        $bgColor = 'var(--c-green)';
+                    } else {
+                        $bgColor = 'var(--c-blue)';
+                    }
+                    return [
+                        'timestamp' => $timestamp,
                         'date' => $date,
                         'time' => $time,
-                        'asset' => $asset,
-                        'bgColor' => $bgColor,
-                        'alerts' => $alerts,
-                    ])->render(),
-                    '_asset' => $asset,
-                ];
-            });
+                        'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._asset', [
+                            'date' => $date,
+                            'time' => $time,
+                            'asset' => $asset,
+                            'bgColor' => $bgColor,
+                            'alerts' => $alerts,
+                        ])->render(),
+                        '_asset' => $asset,
+                    ];
+                }),
+        ];
     }
 
     private function conversations(): Collection

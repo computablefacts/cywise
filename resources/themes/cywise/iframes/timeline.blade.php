@@ -301,6 +301,9 @@
 @endpush
 
 @section('content')
+@if(request()->routeIs('iframes.assets'))
+@include('theme::iframes.timeline._asset-counters')
+@endif
 @if(request()->routeIs('iframes.ioc'))
 @include('theme::iframes.timeline._ioc-counters')
 @endif
