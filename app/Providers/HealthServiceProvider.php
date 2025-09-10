@@ -43,7 +43,7 @@ class HealthServiceProvider extends ServiceProvider
             CacheCheck::new(),
             DatabaseCheck::new(),
             DatabaseTableSizeCheck::new()
-                ->table('telescope_entries', 1500),
+                ->table('telescope_entries', 6000),
             DebugModeCheck::new()->unless(app()->environment('local')),
             OptimizedAppCheck::new()->unless(app()->environment('local')),
             ScheduleCheck::new()->heartbeatMaxAgeInMinutes(2),
