@@ -60,7 +60,7 @@ class TimelineController extends Controller
                 ->concat($this->servers($params['server_id'] ?? null)),
             'conversations' => $this->conversations(),
             'events' => $this->events($params['server_id'] ?? null),
-            'ioc' => $this->ioc(10, $params['server_id'] ?? null),
+            'ioc' => $this->iocs(10, $params['server_id'] ?? null, $params['level'] ?? null),
             'leaks' => $this->leaks(),
             'notes-and-memos' => $this->notesAndMemos(),
             'vulnerabilities' => $this->vulnerabilities($params['level'] ?? null, $params['asset_id'] ?? null),
@@ -68,7 +68,7 @@ class TimelineController extends Controller
         };
         return view('theme::iframes.timeline', [
             'today_separator' => $this->separator(Carbon::now()),
-            'items' => $items->sortByDesc('timestamp')
+            'items' => (($objects === 'ioc' || $objects === 'vulnerabilities') ? $items['items'] : $items)->sortByDesc('timestamp')
                 ->groupBy(fn(array $event) => $event['date'])
                 ->mapWithKeys(function ($events, $timestamp) {
                     return [
@@ -78,6 +78,10 @@ class TimelineController extends Controller
                     ];
                 })
                 ->toArray(),
+            'nb_high' => $items['nb_high'] ?? 0,
+            'nb_medium' => $items['nb_medium'] ?? 0,
+            'nb_low' => $items['nb_low'] ?? 0,
+            'nb_suspect' => $items['nb_suspect'] ?? 0,
         ]);
     }
 
@@ -235,7 +239,7 @@ class TimelineController extends Controller
             });
     }
 
-    private function ioc(int $minScore = 1, ?int $serverId = null): Collection
+    private function iocs(int $minScore = 1, ?int $serverId = null, ?string $level = null): array
     {
         $cutOffTime = Carbon::now()->startOfDay()->subDays(3);
         $servers = YnhServer::query()->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))->get();
@@ -274,9 +278,33 @@ class TimelineController extends Controller
         $groupName = null;
         /** @var ?string $groupDay */
         $groupDay = null;
+        $nbHigh = 0;
+        $nbMedium = 0;
+        $nbLow = 0;
+        $nbSuspect = 0;
 
         /** @var YnhOsquery $event */
         foreach ($events as $event) {
+            if ($event->score >= 75) {
+                $nbHigh++;
+            } else if ($event->score >= 50) {
+                $nbMedium++;
+            } else if ($event->score >= 25) {
+                $nbLow++;
+            } else {
+                $nbSuspect++;
+            }
+            if (isset($level)) {
+                if ($level === 'high' && $event->score < 75) {
+                    continue;
+                }
+                if ($level === 'medium' && $event->score < 50) {
+                    continue;
+                }
+                if ($level === 'low' && $event->score < 25) {
+                    continue;
+                }
+            }
 
             $serverId = $event->ynh_server_id ?? null;
             $name = $event->name ?? null;
@@ -302,80 +330,86 @@ class TimelineController extends Controller
         if ($group !== null && $group->isNotEmpty()) {
             $groups->push($group);
         }
-        return $groups->map(function (Collection $group) {
+        return [
+            'nb_high' => $nbHigh,
+            'nb_medium' => $nbMedium,
+            'nb_low' => $nbLow,
+            'nb_suspect' => $nbSuspect,
+            'items' => $groups->map(function (Collection $group) {
 
-            /** @var YnhOsquery $first */
-            $first = $group->first();
-            /** @var YnhOsquery $last */
-            $last = $group->last();
+                /** @var YnhOsquery $first */
+                $first = $group->first();
+                /** @var YnhOsquery $last */
+                $last = $group->last();
 
-            $timestampFirst = $first->calendar_time->utc()->format('Y-m-d H:i:s');
-            $dateFirst = Str::before($timestampFirst, ' ');
-            $timeFirst = Str::beforeLast(Str::after($timestampFirst, ' '), ':');
+                $timestampFirst = $first->calendar_time->utc()->format('Y-m-d H:i:s');
+                $dateFirst = Str::before($timestampFirst, ' ');
+                $timeFirst = Str::beforeLast(Str::after($timestampFirst, ' '), ':');
 
-            $timestampLast = $last->calendar_time->utc()->format('Y-m-d H:i:s');
-            $dateLast = Str::before($timestampLast, ' ');
-            $timeLast = Str::beforeLast(Str::after($timestampLast, ' '), ':');
+                $timestampLast = $last->calendar_time->utc()->format('Y-m-d H:i:s');
+                $dateLast = Str::before($timestampLast, ' ');
+                $timeLast = Str::beforeLast(Str::after($timestampLast, ' '), ':');
 
-            $ioc = [
-                'first' => [
+                $ioc = [
+                    'first' => [
+                        'timestamp' => $timestampFirst,
+                        'date' => $dateFirst,
+                        'time' => $timeFirst,
+                        'ioc' => $first,
+                    ],
+                    'last' => [
+                        'timestamp' => $timestampLast,
+                        'date' => $dateLast,
+                        'time' => $timeLast,
+                        'ioc' => $last,
+                    ],
+                    'in_between' => $group->count(),
+                ];
+
+                if ($ioc['first']['ioc']->score >= 75) {
+                    $ioc['first']['txtColor'] = "white";
+                    $ioc['first']['bgColor'] = "#ff4d4d";
+                    $ioc['first']['level'] = "(criticité haute)";
+                } else if ($ioc['first']['ioc']->score >= 50) {
+                    $ioc['first']['txtColor'] = "white";
+                    $ioc['first']['bgColor'] = "#ffaa00";
+                    $ioc['first']['level'] = "(criticité moyenne)";
+                } else if ($ioc['first']['ioc']->score >= 25) {
+                    $ioc['first']['txtColor'] = "white";
+                    $ioc['first']['bgColor'] = "#4bd28f";
+                    $ioc['first']['level'] = "(criticité basse)";
+                } else {
+                    $ioc['first']['txtColor'] = "var(--c-grey-400)";
+                    $ioc['first']['bgColor'] = "var(--c-grey-100)";
+                    $ioc['first']['level'] = "(suspect)";
+                }
+                if ($ioc['last']['ioc']->score >= 75) {
+                    $ioc['last']['txtColor'] = "white";
+                    $ioc['last']['bgColor'] = "#ff4d4d";
+                    $ioc['last']['level'] = "(criticité haute)";
+                } else if ($ioc['last']['ioc']->score >= 50) {
+                    $ioc['last']['txtColor'] = "white";
+                    $ioc['last']['bgColor'] = "#ffaa00";
+                    $ioc['last']['level'] = "(criticité moyenne)";
+                } else if ($ioc['last']['ioc']->score >= 25) {
+                    $ioc['last']['txtColor'] = "white";
+                    $ioc['last']['bgColor'] = "#4bd28f";
+                    $ioc['last']['level'] = "(criticité basse)";
+                } else {
+                    $ioc['last']['txtColor'] = "var(--c-grey-400)";
+                    $ioc['last']['bgColor'] = "var(--c-grey-100)";
+                    $ioc['last']['level'] = "(suspect)";
+                }
+                return [
                     'timestamp' => $timestampFirst,
                     'date' => $dateFirst,
                     'time' => $timeFirst,
-                    'ioc' => $first,
-                ],
-                'last' => [
-                    'timestamp' => $timestampLast,
-                    'date' => $dateLast,
-                    'time' => $timeLast,
-                    'ioc' => $last,
-                ],
-                'in_between' => $group->count(),
-            ];
-
-            if ($ioc['first']['ioc']->score >= 75) {
-                $ioc['first']['txtColor'] = "white";
-                $ioc['first']['bgColor'] = "#ff4d4d";
-                $ioc['first']['level'] = "(criticité haute)";
-            } else if ($ioc['first']['ioc']->score >= 50) {
-                $ioc['first']['txtColor'] = "white";
-                $ioc['first']['bgColor'] = "#ffaa00";
-                $ioc['first']['level'] = "(criticité moyenne)";
-            } else if ($ioc['first']['ioc']->score >= 25) {
-                $ioc['first']['txtColor'] = "white";
-                $ioc['first']['bgColor'] = "#4bd28f";
-                $ioc['first']['level'] = "(criticité basse)";
-            } else {
-                $ioc['first']['txtColor'] = "var(--c-grey-400)";
-                $ioc['first']['bgColor'] = "var(--c-grey-100)";
-                $ioc['first']['level'] = "(suspect)";
-            }
-            if ($ioc['last']['ioc']->score >= 75) {
-                $ioc['last']['txtColor'] = "white";
-                $ioc['last']['bgColor'] = "#ff4d4d";
-                $ioc['last']['level'] = "(criticité haute)";
-            } else if ($ioc['last']['ioc']->score >= 50) {
-                $ioc['last']['txtColor'] = "white";
-                $ioc['last']['bgColor'] = "#ffaa00";
-                $ioc['last']['level'] = "(criticité moyenne)";
-            } else if ($ioc['last']['ioc']->score >= 25) {
-                $ioc['last']['txtColor'] = "white";
-                $ioc['last']['bgColor'] = "#4bd28f";
-                $ioc['last']['level'] = "(criticité basse)";
-            } else {
-                $ioc['last']['txtColor'] = "var(--c-grey-400)";
-                $ioc['last']['bgColor'] = "var(--c-grey-100)";
-                $ioc['last']['level'] = "(suspect)";
-            }
-            return [
-                'timestamp' => $timestampFirst,
-                'date' => $dateFirst,
-                'time' => $timeFirst,
-                'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._ioc', [
-                    'ioc' => $ioc,
-                ])->render(),
-            ];
-        });
+                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._ioc', [
+                        'ioc' => $ioc,
+                    ])->render(),
+                ];
+            }),
+        ];
     }
 
     private function leaks(): Collection
@@ -473,59 +507,86 @@ class TimelineController extends Controller
             ->map(fn(TimelineItem $item) => self::noteAndMemo($user, $item));
     }
 
-    private function vulnerabilities(?string $level = null, ?int $assetId = null): Collection
+    private function vulnerabilities(?string $level = null, ?int $assetId = null): array
     {
-        return $this->alerts($level, $assetId)
-            ->map(function (Alert $alert) {
+        $alerts = $this->alerts(null, $assetId);
+        $nbHigh = 0;
+        $nbMedium = 0;
+        $nbLow = 0;
+        $nbSuspect = 0;
 
-                $timestamp = $alert->updated_at->utc()->format('Y-m-d H:i:s');
-                $date = Str::before($timestamp, ' ');
-                $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
-                $asset = $alert->asset();
-                $port = $alert->port();
+        /** @var Alert $alert */
+        foreach ($alerts as $alert) {
+            if ($alert->level === 'High') {
+                $nbHigh++;
+            } else if ($alert->level === 'Medium') {
+                $nbMedium++;
+            } else if ($alert->level === 'Low') {
+                $nbLow++;
+            } else {
+                $nbSuspect++;
+            }
+        }
 
-                if ($alert->level === 'High') {
-                    $txtColor = "white";
-                    $bgColor = "var(--c-red)";
-                    $level = "(" . __("high") . ")";
-                } else if ($alert->level === 'Medium') {
-                    $txtColor = "white";
-                    $bgColor = "var(--c-orange-light)";
-                    $level = "(" . __("medium") . ")";
-                } else if ($alert->level === 'Low') {
-                    $txtColor = "white";
-                    $bgColor = "var(--c-green)";
-                    $level = "(" . __("low") . ")";
-                } else {
-                    $txtColor = "var(--c-grey-400)";
-                    $bgColor = "var(--c-grey-100)";
-                    $level = "(" . __("inconnue") . ")";
-                }
+        $alerts = null;
 
-                $tags = "<div><span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>" . $port
-                        ->tags()
-                        ->get()
-                        ->map(fn(PortTag $tag) => Str::lower($tag->tag))
-                        ->join("</span>&nbsp;<span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>") . "</span></div>";
+        return [
+            'nb_high' => $nbHigh,
+            'nb_medium' => $nbMedium,
+            'nb_low' => $nbLow,
+            'nb_suspect' => $nbSuspect,
+            'items' => $this->alerts($level, $assetId)
+                ->map(function (Alert $alert) {
 
-                return [
-                    'timestamp' => $timestamp,
-                    'date' => $date,
-                    'time' => $time,
-                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._vulnerability', [
+                    $timestamp = $alert->updated_at->utc()->format('Y-m-d H:i:s');
+                    $date = Str::before($timestamp, ' ');
+                    $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
+                    $asset = $alert->asset();
+                    $port = $alert->port();
+
+                    if ($alert->level === 'High') {
+                        $txtColor = "white";
+                        $bgColor = "var(--c-red)";
+                        $level = "(" . __("high") . ")";
+                    } else if ($alert->level === 'Medium') {
+                        $txtColor = "white";
+                        $bgColor = "var(--c-orange-light)";
+                        $level = "(" . __("medium") . ")";
+                    } else if ($alert->level === 'Low') {
+                        $txtColor = "white";
+                        $bgColor = "var(--c-green)";
+                        $level = "(" . __("low") . ")";
+                    } else {
+                        $txtColor = "var(--c-grey-400)";
+                        $bgColor = "var(--c-grey-100)";
+                        $level = "(" . __("inconnue") . ")";
+                    }
+
+                    $tags = "<div><span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>" . $port
+                            ->tags()
+                            ->get()
+                            ->map(fn(PortTag $tag) => Str::lower($tag->tag))
+                            ->join("</span>&nbsp;<span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>") . "</span></div>";
+
+                    return [
+                        'timestamp' => $timestamp,
                         'date' => $date,
                         'time' => $time,
-                        'txtColor' => $txtColor,
-                        'bgColor' => $bgColor,
-                        'level' => $level,
-                        'tags' => $tags,
-                        'alert' => $alert,
-                        'asset' => $asset,
-                        'port' => $port,
-                    ])->render(),
-                    '_asset' => $asset,
-                ];
-            });
+                        'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._vulnerability', [
+                            'date' => $date,
+                            'time' => $time,
+                            'txtColor' => $txtColor,
+                            'bgColor' => $bgColor,
+                            'level' => $level,
+                            'tags' => $tags,
+                            'alert' => $alert,
+                            'asset' => $asset,
+                            'port' => $port,
+                        ])->render(),
+                        '_asset' => $asset,
+                    ];
+                }),
+        ];
     }
 
     private function alerts(?string $level = null, ?int $assetId = null): Collection

@@ -301,6 +301,12 @@
 @endpush
 
 @section('content')
+@if(request()->routeIs('iframes.ioc'))
+@include('theme::iframes.timeline._ioc-counters')
+@endif
+@if(request()->routeIs('iframes.vulnerabilities'))
+@include('theme::iframes.timeline._vulnerability-counters')
+@endif
 <div class="row mt-3 mb-3">
   <div class="col">
     <div class="card">
