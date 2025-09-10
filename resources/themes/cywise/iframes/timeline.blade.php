@@ -274,7 +274,7 @@
     position: fixed;
     top: calc(56px + 20px);
     right: 20px;
-    background-color: var(--c-blue-500);
+    background-color: var(--c-blue);
     color: white;
     width: 40px;
     height: 40px;
