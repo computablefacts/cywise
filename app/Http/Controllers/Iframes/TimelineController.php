@@ -527,65 +527,75 @@ class TimelineController extends Controller
                 $nbSuspect++;
             }
         }
-
-        $alerts = null;
-
+        if (!empty($level)) {
+            $alerts = $alerts->filter(function (Alert $alert) use ($level) {
+                if ($level === 'high' && $alert->level === 'High') {
+                    return true;
+                }
+                if ($level === 'medium' && $alert->level === 'Medium') {
+                    return true;
+                }
+                if ($level === 'low' && $alert->level === 'Low') {
+                    return true;
+                }
+                return false;
+            });
+        }
         return [
             'nb_high' => $nbHigh,
             'nb_medium' => $nbMedium,
             'nb_low' => $nbLow,
             'nb_suspect' => $nbSuspect,
-            'items' => $this->alerts($level, $assetId)
-                ->map(function (Alert $alert) {
+            'items' => $alerts->map(function (Alert $alert) {
 
-                    $timestamp = $alert->updated_at->utc()->format('Y-m-d H:i:s');
-                    $date = Str::before($timestamp, ' ');
-                    $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
-                    $asset = $alert->asset();
-                    $port = $alert->port();
+                $timestamp = $alert->updated_at->utc()->format('Y-m-d H:i:s');
+                $date = Str::before($timestamp, ' ');
+                $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
+                $asset = $alert->asset();
+                $port = $alert->port();
 
-                    if ($alert->level === 'High') {
-                        $txtColor = "white";
-                        $bgColor = "var(--c-red)";
-                        $level = "(" . __("high") . ")";
-                    } else if ($alert->level === 'Medium') {
-                        $txtColor = "white";
-                        $bgColor = "var(--c-orange-light)";
-                        $level = "(" . __("medium") . ")";
-                    } else if ($alert->level === 'Low') {
-                        $txtColor = "white";
-                        $bgColor = "var(--c-green)";
-                        $level = "(" . __("low") . ")";
-                    } else {
-                        $txtColor = "var(--c-grey-400)";
-                        $bgColor = "var(--c-grey-100)";
-                        $level = "(" . __("inconnue") . ")";
-                    }
+                if ($alert->level === 'High') {
+                    $txtColor = "white";
+                    $bgColor = "var(--c-red)";
+                    $level = "(" . __("high") . ")";
+                } else if ($alert->level === 'Medium') {
+                    $txtColor = "white";
+                    $bgColor = "var(--c-orange-light)";
+                    $level = "(" . __("medium") . ")";
+                } else if ($alert->level === 'Low') {
+                    $txtColor = "white";
+                    $bgColor = "var(--c-green)";
+                    $level = "(" . __("low") . ")";
+                } else {
+                    $txtColor = "var(--c-grey-400)";
+                    $bgColor = "var(--c-grey-100)";
+                    $level = "(" . __("inconnue") . ")";
+                }
 
-                    $tags = "<div><span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>" . $port
-                            ->tags()
-                            ->get()
-                            ->map(fn(PortTag $tag) => Str::lower($tag->tag))
-                            ->join("</span>&nbsp;<span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>") . "</span></div>";
+                $tags = "<div><span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>" . $port
+                        ->tags()
+                        ->get()
+                        ->map(fn(PortTag $tag) => Str::lower($tag->tag))
+                        ->join("</span>&nbsp;<span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>") . "</span></div>";
 
-                    return [
-                        'timestamp' => $timestamp,
+                return [
+                    'timestamp' => $timestamp,
+                    'date' => $date,
+                    'time' => $time,
+                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._vulnerability', [
                         'date' => $date,
                         'time' => $time,
-                        'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._vulnerability', [
-                            'date' => $date,
-                            'time' => $time,
-                            'txtColor' => $txtColor,
-                            'bgColor' => $bgColor,
-                            'level' => $level,
-                            'tags' => $tags,
-                            'alert' => $alert,
-                            'asset' => $asset,
-                            'port' => $port,
-                        ])->render(),
-                        '_asset' => $asset,
-                    ];
-                }),
+                        'txtColor' => $txtColor,
+                        'bgColor' => $bgColor,
+                        'level' => $level,
+                        'tags' => $tags,
+                        'alert' => $alert,
+                        'asset' => $asset,
+                        'port' => $port,
+                    ])->render(),
+                    '_asset' => $asset,
+                ];
+            }),
         ];
     }
 
