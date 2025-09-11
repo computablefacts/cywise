@@ -16,7 +16,7 @@
     <x-app.container>
         <x-card class="lg:p-10">
             <x-app.heading
-                title="Changelog"
+                title="{{ __('Changelog') }}"
                 description="{{ __('Latest updates and enhancements') }}"
             />
 

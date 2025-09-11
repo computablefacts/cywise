@@ -15,7 +15,7 @@
         <x-card class="lg:p-10">
 
             <x-elements.back-button
-                text="View Full Changelog"
+                text="{{ __('View Full Changelog') }}"
                 :href="route('changelogs')"
             />
 
