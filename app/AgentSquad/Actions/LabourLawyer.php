@@ -26,13 +26,16 @@ class LabourLawyer extends AbstractAction
             "type" => "function",
             "function" => [
                 "name" => "labour_lawyer",
-                "description" => "A lawyer whose specialty is labour law.",
+                "description" => "
+                    Answer questions related to the French labour law.
+                    The action's input must always be in French, regardless of the user's language.
+                ",
                 "parameters" => [
                     "type" => "object",
                     "properties" => [
                         "question" => [
                             "type" => ["string"],
-                            "description" => "The question to be asked to the lawyer.",
+                            "description" => "The question to be asked to the labor lawyer.",
                         ],
                     ],
                     "required" => ["question"],
