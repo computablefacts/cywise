@@ -69,7 +69,7 @@ class TimelineController extends Controller
             'items' => (
             $objects === 'assets' ?
                 $items['items']->concat($this->servers($params['server_id'] ?? null)) :
-                ($objects === 'ioc' || $objects === 'vulnerabilities' ?
+                ($objects === 'conversations' || $objects === 'ioc' || $objects === 'vulnerabilities' ?
                     $items['items'] :
                     $items)
             )->sortByDesc('timestamp')
@@ -88,6 +88,7 @@ class TimelineController extends Controller
             'nb_suspect' => $items['nb_suspect'] ?? 0,
             'nb_monitored' => $items['nb_monitored'] ?? 0,
             'nb_monitorable' => $items['nb_monitorable'] ?? 0,
+            'nb_conversations' => $items['nb_conversations'] ?? 0,
         ]);
     }
 
@@ -189,16 +190,18 @@ class TimelineController extends Controller
         ];
     }
 
-    private function conversations(): Collection
+    private function conversations(): array
     {
         /** @var User $user */
         $user = Auth::user();
-
-        return Conversation::query()
+        $items = Conversation::query()
             ->where('created_by', $user->id)
             ->where('dom', '!=', '[]')
-            ->get()
-            ->map(function (Conversation $conversation) use ($user) {
+            ->get();
+
+        return [
+            'nb_conversations' => $items->count(),
+            'items' => $items->map(function (Conversation $conversation) use ($user) {
 
                 $timestamp = $conversation->created_at->utc()->format('Y-m-d H:i:s');
                 $date = Str::before($timestamp, ' ');
@@ -214,7 +217,8 @@ class TimelineController extends Controller
                         'conversation' => $conversation,
                     ])->render(),
                 ];
-            });
+            }),
+        ];
     }
 
     private function events(?int $serverId = null): Collection
