@@ -237,7 +237,7 @@ class TimelineController extends Controller
         ]);
 
         return [
-            'nb_items' => $events->count(),
+            'nb_events' => $events->count(),
             'items' => $events->map(function (array $msg) {
 
                 $timestamp = $msg['timestamp'];
