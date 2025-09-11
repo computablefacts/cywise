@@ -80,6 +80,14 @@
               :active="Request::is('events')">
               {{ __('Events') }}
             </x-app.sidebar-link>
+            @if(isset(Auth::user()->performa_domain))
+            <x-app.sidebar-link
+              href="https://{{ Auth::user()->performa_domain }}"
+              icon="phosphor-chart-line"
+              target="_blank">
+              {{ __('Metrics') }}
+            </x-app.sidebar-link>
+            @endif
             <x-app.sidebar-link
               href="{{ route('assets') }}"
               icon="phosphor-globe"
