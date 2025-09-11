@@ -62,16 +62,14 @@ class TimelineController extends Controller
             'leaks' => $this->leaks(),
             'notes-and-memos' => $this->notesAndMemos(),
             'vulnerabilities' => $this->vulnerabilities($params['level'] ?? null, $params['asset_id'] ?? null),
-            default => collect(),
+            default => [],
         };
         return view('theme::iframes.timeline', [
             'today_separator' => $this->separator(Carbon::now()),
             'items' => (
             $objects === 'assets' ?
                 $items['items']->concat($this->servers($params['server_id'] ?? null)) :
-                ($objects === 'conversations' || $objects === 'events' || $objects === 'ioc' || $objects === 'notes-and-memos' || $objects === 'vulnerabilities' ?
-                    $items['items'] :
-                    $items)
+                $items['items']
             )->sortByDesc('timestamp')
                 ->groupBy(fn(array $event) => $event['date'])
                 ->mapWithKeys(function ($events, $timestamp) {
@@ -91,6 +89,7 @@ class TimelineController extends Controller
             'nb_conversations' => $items['nb_conversations'] ?? 0,
             'nb_notes' => $items['nb_notes'] ?? 0,
             'nb_events' => $items['nb_events'] ?? 0,
+            'nb_leaks' => $items['nb_leaks'] ?? 0,
         ]);
     }
 
@@ -437,7 +436,7 @@ class TimelineController extends Controller
         ];
     }
 
-    private function leaks(): Collection
+    private function leaks(): array
     {
         /** @var User $user */
         $user = Auth::user();
@@ -502,8 +501,12 @@ class TimelineController extends Controller
                 }
             }
         }
-        return TimelineItem::fetchLeaks($user->id, null, null, 0)
-            ->map(function (TimelineItem $item) use ($user) {
+
+        $leaks = TimelineItem::fetchLeaks($user->id, null, null, 0);
+
+        return [
+            'nb_leaks' => $leaks->count(),
+            'items' => $leaks->map(function (TimelineItem $item) use ($user) {
 
                 $timestamp = $item->timestamp->utc()->format('Y-m-d H:i:s');
                 $date = Str::before($timestamp, ' ');
@@ -520,7 +523,8 @@ class TimelineController extends Controller
                         'leak' => $item,
                     ])->render(),
                 ];
-            });
+            }),
+        ];
     }
 
     private function notesAndMemos(): array
