@@ -310,6 +310,9 @@
 @if(request()->routeIs('iframes.ioc'))
 @include('theme::iframes.timeline._ioc-counters')
 @endif
+@if(request()->routeIs('iframes.notes-and-memos'))
+@include('theme::iframes.timeline._note-counters')
+@endif
 @if(request()->routeIs('iframes.vulnerabilities'))
 @include('theme::iframes.timeline._vulnerability-counters')
 @endif

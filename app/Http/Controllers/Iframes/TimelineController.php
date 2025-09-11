@@ -69,7 +69,7 @@ class TimelineController extends Controller
             'items' => (
             $objects === 'assets' ?
                 $items['items']->concat($this->servers($params['server_id'] ?? null)) :
-                ($objects === 'conversations' || $objects === 'ioc' || $objects === 'vulnerabilities' ?
+                ($objects === 'conversations' || $objects === 'ioc' || $objects === 'notes-and-memos' || $objects === 'vulnerabilities' ?
                     $items['items'] :
                     $items)
             )->sortByDesc('timestamp')
@@ -89,6 +89,7 @@ class TimelineController extends Controller
             'nb_monitored' => $items['nb_monitored'] ?? 0,
             'nb_monitorable' => $items['nb_monitorable'] ?? 0,
             'nb_conversations' => $items['nb_conversations'] ?? 0,
+            'nb_notes' => $items['nb_notes'] ?? 0,
         ]);
     }
 
@@ -194,14 +195,14 @@ class TimelineController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        $items = Conversation::query()
+        $conversations = Conversation::query()
             ->where('created_by', $user->id)
             ->where('dom', '!=', '[]')
             ->get();
 
         return [
-            'nb_conversations' => $items->count(),
-            'items' => $items->map(function (Conversation $conversation) use ($user) {
+            'nb_conversations' => $conversations->count(),
+            'items' => $conversations->map(function (Conversation $conversation) use ($user) {
 
                 $timestamp = $conversation->created_at->utc()->format('Y-m-d H:i:s');
                 $date = Str::before($timestamp, ' ');
@@ -518,13 +519,16 @@ class TimelineController extends Controller
             });
     }
 
-    private function notesAndMemos(): Collection
+    private function notesAndMemos(): array
     {
         /** @var User $user */
         $user = Auth::user();
+        $notes = TimelineItem::fetchNotes($user->id, null, null, 0);
 
-        return TimelineItem::fetchNotes($user->id, null, null, 0)
-            ->map(fn(TimelineItem $item) => self::noteAndMemo($user, $item));
+        return [
+            'nb_notes' => $notes->count(),
+            'items' => $notes->map(fn(TimelineItem $item) => self::noteAndMemo($user, $item)),
+        ];
     }
 
     private function vulnerabilities(?string $level = null, ?int $assetId = null): array
