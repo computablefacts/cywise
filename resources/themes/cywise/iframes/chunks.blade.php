@@ -51,6 +51,7 @@
         <th>{{ __('Filename') }}</th>
         <th class="text-end">{{ __('Page') }}</th>
         <th class="text-end">{{ __('Length') }}</th>
+        <th class="text-end">{{ __('Number of Vectors') }}</th>
         <th>{{ __('Created At') }}</th>
         <th></th>
       </tr>
@@ -77,6 +78,9 @@
         <td class="text-end">
           {{ Illuminate\Support\Number::format(\Illuminate\Support\Str::length($chunk->text), locale:'sv') }}
         </td>
+        <td class="text-end">
+          {{ Illuminate\Support\Number::format($chunk->vectors()->count(), locale:'sv') }}
+        </td>
         <td>{{ $chunk->created_at->format('Y-m-d H:i') }}</td>
         <td class="text-end">
           <a href="#" onclick="deleteChunk({{ $chunk->id }})" class="text-decoration-none" style="color:red">
@@ -101,14 +105,14 @@
         </td>
       </tr>
       <tr>
-        <td colspan="7">
+        <td colspan="8">
           @foreach($chunk->tags()->orderBy('id')->get() as $tag)
           <span class="lozenge information">{{ $tag->tag }}</span>&nbsp;
           @endforeach
         </td>
       </tr>
       <tr class="collapse" id="chunk{{ $chunk->id }}">
-        <td colspan="7" style="background-color:#fff3cd;">
+        <td colspan="8" style="background-color:#fff3cd;">
           <div style="display:grid;">
             <div class="overflow-auto">
               <pre class="mb-0 w-100 pre-light" onclick="editChunk(this, {{ $chunk->id }})">{{ $chunk->text }}</pre>
