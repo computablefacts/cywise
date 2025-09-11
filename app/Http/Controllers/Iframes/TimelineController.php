@@ -69,7 +69,7 @@ class TimelineController extends Controller
             'items' => (
             $objects === 'assets' ?
                 $items['items']->concat($this->servers($params['server_id'] ?? null)) :
-                ($objects === 'conversations' || $objects === 'ioc' || $objects === 'notes-and-memos' || $objects === 'vulnerabilities' ?
+                ($objects === 'conversations' || $objects === 'events' || $objects === 'ioc' || $objects === 'notes-and-memos' || $objects === 'vulnerabilities' ?
                     $items['items'] :
                     $items)
             )->sortByDesc('timestamp')
@@ -90,6 +90,7 @@ class TimelineController extends Controller
             'nb_monitorable' => $items['nb_monitorable'] ?? 0,
             'nb_conversations' => $items['nb_conversations'] ?? 0,
             'nb_notes' => $items['nb_notes'] ?? 0,
+            'nb_events' => $items['nb_events'] ?? 0,
         ]);
     }
 
@@ -222,21 +223,23 @@ class TimelineController extends Controller
         ];
     }
 
-    private function events(?int $serverId = null): Collection
+    private function events(?int $serverId = null): array
     {
         $cutOffTime = Carbon::now()->startOfDay()->subDays(3);
         $servers = YnhServer::query()
             ->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))
             ->get();
-
-        return Messages::get($servers, $cutOffTime, [
+        $events = Messages::get($servers, $cutOffTime, [
             Messages::AUTHENTICATION_AND_SSH_ACTIVITY,
             // Messages::SERVICES_AND_SCHEDULED_TASKS,
             Messages::SHELL_HISTORY_AND_ROOT_COMMANDS,
             Messages::PACKAGES,
             Messages::USERS_AND_GROUPS,
-        ])
-            ->map(function (array $msg) {
+        ]);
+
+        return [
+            'nb_items' => $events->count(),
+            'items' => $events->map(function (array $msg) {
 
                 $timestamp = $msg['timestamp'];
                 $date = Str::before($timestamp, ' ');
@@ -257,7 +260,8 @@ class TimelineController extends Controller
                             ->first();
                     }),
                 ];
-            });
+            }),
+        ];
     }
 
     private function iocs(int $minScore = 1, ?int $serverId = null, ?string $level = null): array

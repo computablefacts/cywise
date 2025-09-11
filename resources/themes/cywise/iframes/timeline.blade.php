@@ -307,6 +307,9 @@
 @if(request()->routeIs('iframes.conversations'))
 @include('theme::iframes.timeline._conversation-counters')
 @endif
+@if(request()->routeIs('iframes.events'))
+@include('theme::iframes.timeline._event-counters')
+@endif
 @if(request()->routeIs('iframes.ioc'))
 @include('theme::iframes.timeline._ioc-counters')
 @endif
