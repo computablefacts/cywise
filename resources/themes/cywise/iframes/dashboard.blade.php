@@ -266,8 +266,8 @@
 $apps = \App\Models\YnhServer::forUser(request()->user())
 ->flatMap(fn(\App\Models\YnhServer $server) => $server->applications)
 ->sortBy([
-    ['server.name', 'asc'],
-    ['name', 'asc'],
+['server.name', 'asc'],
+['name', 'asc'],
 ], SORT_NATURAL | SORT_FLAG_CASE);
 @endphp
 @if($apps->isNotEmpty())
@@ -389,7 +389,7 @@ Invoke-WebRequest -Uri "{{ app_url() }}/setup/script?api_token={{ Auth::user()->
         @else
         <div class="card-text mb-3">
           <table
-            class="charts-css column hide-data show-labels show-primary-axis show-3-secondary-axes data-spacing-3 multiple stacked">
+            class="charts-css column hide-data show-primary-axis show-3-secondary-axes data-spacing-1 multiple stacked">
             <thead>
             <tr>
               <th scope="col">{{ __('Date') }}</th>
@@ -403,11 +403,15 @@ Invoke-WebRequest -Uri "{{ app_url() }}/setup/script?api_token={{ Auth::user()->
               <th scope="row">{{ \Illuminate\Support\Str::after($count['date'], '-') }}</th>
               <td style="--size: calc({{ $count['human_or_targeted'] }} / {{ $honeypot['max'] }});">
                 <span class="data">{{ $count['human_or_targeted'] }}</span>
-                <span class="tooltip">{{ __('Human or Targeted') }}: {{ $count['human_or_targeted'] }}</span>
+                <span class="tooltip">
+                  {{ __('Human or Targeted') }}: {{ $count['human_or_targeted'] }}<br>{{ \Illuminate\Support\Str::after($count['date'], '-') }}
+                </span>
               </td>
               <td style="--size: calc({{ $count['not_human_or_targeted'] }} / {{ $honeypot['max'] }});">
                 <span class="data">{{ $count['not_human_or_targeted'] }}</span>
-                <span class="tooltip">{{ __('Bots') }}: {{ $count['not_human_or_targeted'] }}</span>
+                <span class="tooltip">
+                  {{ __('Bots') }}: {{ $count['not_human_or_targeted'] }}<br>{{ \Illuminate\Support\Str::after($count['date'], '-') }}
+                </span>
               </td>
             </tr>
             @endforeach
