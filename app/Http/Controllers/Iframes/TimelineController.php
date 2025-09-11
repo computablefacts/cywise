@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Iframes;
 use App\Helpers\JosianneClient;
 use App\Helpers\Messages;
 use App\Http\Controllers\Controller;
+use App\Http\Procedures\EventsProcedure;
+use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\Conversation;
@@ -14,12 +16,10 @@ use App\Models\User;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
 use Carbon\Carbon;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -265,33 +265,12 @@ class TimelineController extends Controller
 
     private function iocs(int $minScore = 1, ?int $serverId = null, ?string $level = null): array
     {
-        $cutOffTime = Carbon::now()->startOfDay()->subDays(3);
-        $servers = YnhServer::query()->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))->get();
-        $events = YnhOsquery::select([
-            DB::raw('ynh_servers.name AS server_name'),
-            DB::raw('ynh_servers.ip_address AS server_ip_address'),
-            'ynh_osquery_rules.score',
-            'ynh_osquery_rules.comments',
-            'ynh_osquery.*'
-        ])
-            ->where('ynh_osquery.calendar_time', '>=', $cutOffTime)
-            ->join('ynh_osquery_latest_events', 'ynh_osquery_latest_events.ynh_osquery_id', '=', 'ynh_osquery.id')
-            ->join('ynh_osquery_rules', 'ynh_osquery_rules.id', '=', 'ynh_osquery.ynh_osquery_rule_id')
-            ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
-            ->whereIn('ynh_osquery_latest_events.ynh_server_id', $servers->pluck('id'))
-            ->whereNotExists(function (Builder $query) {
-                $query->select(DB::raw(1))
-                    ->from('v_dismissed')
-                    ->whereColumn('ynh_server_id', '=', 'ynh_osquery.ynh_server_id')
-                    ->whereColumn('name', '=', 'ynh_osquery.name')
-                    ->whereColumn('action', '=', 'ynh_osquery.action')
-                    ->whereColumn('columns_uid', '=', 'ynh_osquery.columns_uid')
-                    ->havingRaw('count(1) >=' . Messages::HIDE_AFTER_DISMISS_COUNT);
-            })
-            ->where('ynh_osquery_rules.is_ioc', true)
-            ->where('ynh_osquery_rules.score', '>=', $minScore)
-            ->orderBy('calendar_time', 'desc')
-            ->get();
+        $request = new Request([
+            'server_id' => $serverId,
+            'min_score' => $minScore,
+        ]);
+        $request->setUserResolver(fn() => Auth::user());
+        $events = (new EventsProcedure())->list($request)['events'];
 
         $groups = collect();
         /** @var ?Collection $group */
@@ -541,7 +520,7 @@ class TimelineController extends Controller
 
     private function vulnerabilities(?string $level = null, ?int $assetId = null): array
     {
-        $alerts = $this->alerts(null, $assetId);
+        $alerts = $this->alerts($assetId);
         $nbHigh = 0;
         $nbMedium = 0;
         $nbLow = 0;
@@ -631,21 +610,12 @@ class TimelineController extends Controller
         ];
     }
 
-    private function alerts(?string $level = null, ?int $assetId = null): Collection
+    private function alerts(?int $assetId = null): Collection
     {
-        return Asset::where('is_monitored', true)
-            ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
-            ->get()
-            ->flatMap(fn(Asset $asset) => $asset->alerts()->when($level, function ($query, $level) {
-                if ($level === 'high') {
-                    $query->where('level', 'High');
-                } else if ($level === 'medium') {
-                    $query->where('level', 'Medium');
-                } else if ($level === 'low') {
-                    $query->where('level', 'Low');
-                }
-            })->get())
-            ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
+        $request = new Request(['asset_id' => $assetId]);
+        $request->setUserResolver(fn() => Auth::user());
+        $alerts = (new VulnerabilitiesProcedure())->list($request);
+        return $alerts['high']->concat($alerts['medium'])->concat($alerts['low']);
     }
 
     private function maskPassword(string $password, int $size = 3): string

@@ -2,15 +2,71 @@
 
 namespace App\Http\Procedures;
 
+use App\Helpers\Messages;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
+use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
 class EventsProcedure extends Procedure
 {
     public static string $name = 'events';
+
+    #[RpcMethod(
+        description: "List collected events.",
+        params: [
+            "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise.",
+            "server_id" => "The server id (optional).",
+        ],
+        result: [
+            "events" => "The list of events over the last 3 days.",
+        ]
+    )]
+    public function list(Request $request): array
+    {
+        $params = $request->validate([
+            'min_score' => 'required|integer|min:0|max:100',
+            'server_id' => 'nullable|integer|exists:ynh_servers,id',
+        ]);
+
+        $serverId = $params['server_id'] ?? null;
+        $minScore = $params['min_score'] ?? 0;
+        $cutOffTime = Carbon::now()->startOfDay()->subDays(3);
+        $servers = YnhServer::query()->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))->get();
+        $events = YnhOsquery::select([
+            DB::raw('ynh_servers.name AS server_name'),
+            DB::raw('ynh_servers.ip_address AS server_ip_address'),
+            'ynh_osquery_rules.score',
+            'ynh_osquery_rules.comments',
+            'ynh_osquery.*'
+        ])
+            ->where('ynh_osquery.calendar_time', '>=', $cutOffTime)
+            ->join('ynh_osquery_latest_events', 'ynh_osquery_latest_events.ynh_osquery_id', '=', 'ynh_osquery.id')
+            ->join('ynh_osquery_rules', 'ynh_osquery_rules.id', '=', 'ynh_osquery.ynh_osquery_rule_id')
+            ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
+            ->whereIn('ynh_osquery_latest_events.ynh_server_id', $servers->pluck('id'))
+            ->whereNotExists(function (Builder $query) {
+                $query->select(DB::raw(1))
+                    ->from('v_dismissed')
+                    ->whereColumn('ynh_server_id', '=', 'ynh_osquery.ynh_server_id')
+                    ->whereColumn('name', '=', 'ynh_osquery.name')
+                    ->whereColumn('action', '=', 'ynh_osquery.action')
+                    ->whereColumn('columns_uid', '=', 'ynh_osquery.columns_uid')
+                    ->havingRaw('count(1) >=' . Messages::HIDE_AFTER_DISMISS_COUNT);
+            })
+            ->where('ynh_osquery_rules.score', '>=', $minScore);
+
+        if ($minScore > 0) {
+            $events = $events->where('ynh_osquery_rules.is_ioc', true);
+        }
+        return [
+            'events' => $events->orderBy('calendar_time', 'desc')->get(),
+        ];
+    }
 
     #[RpcMethod(
         description: "Dismiss an event (false positive).",
