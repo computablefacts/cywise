@@ -400,17 +400,17 @@ Invoke-WebRequest -Uri "{{ app_url() }}/setup/script?api_token={{ Auth::user()->
             <tbody>
             @foreach($honeypot['counts'] as $count)
             <tr>
-              <th scope="row">{{ \Illuminate\Support\Str::after($count['date'], '-') }}</th>
+              <th scope="row">{{ $count['date'] }}</th>
               <td style="--size: calc({{ $count['human_or_targeted'] }} / {{ $honeypot['max'] }});">
                 <span class="data">{{ $count['human_or_targeted'] }}</span>
                 <span class="tooltip">
-                  {{ __('Human or Targeted') }}: {{ $count['human_or_targeted'] }}<br>{{ \Illuminate\Support\Str::after($count['date'], '-') }}
+                  {{ __('Human or Targeted') }}: {{ $count['human_or_targeted'] }}<br>{{ $count['date'] }}
                 </span>
               </td>
               <td style="--size: calc({{ $count['not_human_or_targeted'] }} / {{ $honeypot['max'] }});">
                 <span class="data">{{ $count['not_human_or_targeted'] }}</span>
                 <span class="tooltip">
-                  {{ __('Bots') }}: {{ $count['not_human_or_targeted'] }}<br>{{ \Illuminate\Support\Str::after($count['date'], '-') }}
+                  {{ __('Bots') }}: {{ $count['not_human_or_targeted'] }}<br>{{ $count['date'] }}
                 </span>
               </td>
             </tr>
@@ -419,7 +419,7 @@ Invoke-WebRequest -Uri "{{ app_url() }}/setup/script?api_token={{ Auth::user()->
           </table>
         </div>
         @endif
-        @if(isset($most_recent_honeypot_events[$honeypot['name']]))
+        @if(!empty($most_recent_honeypot_events[$honeypot['name']]['events']))
         <div class="card-text mb-3">
           <table class="table">
             <thead>
