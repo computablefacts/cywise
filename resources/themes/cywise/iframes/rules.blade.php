@@ -44,6 +44,11 @@ Invoke-WebRequest -Uri "{{ app_url() }}/setup/script?api_token={{ Auth::user()->
     </div>
   </div>
 </div>
+<div class="px-3 pt-3" style="text-align: right;">
+  <a href="{{ route('iframes.rules-editor') }}">
+    +&nbsp;{{ __('create') }}
+  </a>
+</div>
 <div class="card mt-3 mb-3">
   @if($rules->isEmpty())
   <div class="card-body">
