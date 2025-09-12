@@ -41,7 +41,7 @@
 
         <div class="flex flex-col flex-wrap lg:flex-row lg:space-x-5">
 
-            @foreach(Wave\Plan::where('active', 1)->get() as $plan)
+            @foreach(Wave\Plan::where('active', 1)->orderBy('sort_order')->get() as $plan)
                 @php $features = explode(',', $plan->features); @endphp
                 <div
                     {{--  Say that you have a monthly plan that doesn't have a yearly plan, in that case we will hide the place that doesn't have a price_id --}}
@@ -55,8 +55,8 @@
                         </div>
 
                         <div class="px-8 mt-5">
-                            <span class="text-5xl font-bold">$<span x-text="billing == 'Monthly' ? '{{ $plan->monthly_price }}' : '{{ $plan->yearly_price }}'"></span></span>
-                            <span class="text-xl font-bold text-zinc-500"><span x-text="billing == 'Monthly' ? '/mo' : '/yr'"></span></span>
+                            <span class="text-5xl font-bold">{{ $plan->currency }}<span x-text="billing == 'Monthly' ? '{{ $plan->monthly_price }}' : '{{ $plan->yearly_price }}'"></span></span>
+                            <span class="text-xl font-bold text-zinc-500"><span x-text="billing == 'Monthly' ? '/mois' : '/an'"></span></span>
                         </div>
 
                         <div class="px-8 pb-10 mt-3">
