@@ -105,6 +105,8 @@ class CywiseSeeder extends Seeder
             'yearly_price_id' => config('towerify.stripe.plans.essential.yearly_price_id'),
             'onetime_price' => config('towerify.stripe.plans.essential.onetime_price'),
             'onetime_price_id' => config('towerify.stripe.plans.essential.onetime_price_id'),
+            'currency' => '€',
+            'sort_order' => 1,
         ]);
         Plan::updateOrCreate([
             'name' => config('towerify.stripe.plans.standard.name'),
@@ -119,6 +121,8 @@ class CywiseSeeder extends Seeder
             'yearly_price_id' => config('towerify.stripe.plans.standard.yearly_price_id'),
             'onetime_price' => config('towerify.stripe.plans.standard.onetime_price'),
             'onetime_price_id' => config('towerify.stripe.plans.standard.onetime_price_id'),
+            'currency' => '€',
+            'sort_order' => 2,
         ]);
         Plan::updateOrCreate([
             'name' => config('towerify.stripe.plans.premium.name'),
@@ -133,6 +137,8 @@ class CywiseSeeder extends Seeder
             'yearly_price_id' => config('towerify.stripe.plans.premium.yearly_price_id'),
             'onetime_price' => config('towerify.stripe.plans.premium.onetime_price'),
             'onetime_price_id' => config('towerify.stripe.plans.premium.onetime_price_id'),
+            'currency' => '€',
+            'sort_order' => 3,
         ]);
         Setting::updateOrCreate([
             'key' => 'site.title',
