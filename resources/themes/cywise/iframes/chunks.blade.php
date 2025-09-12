@@ -43,7 +43,7 @@
   </div>
   @else
   <div class="card-body p-0">
-    <table class="table table-hover no-bottom-margin">
+    <table class="table no-bottom-margin">
       <thead>
       <tr>
         <th></th>
