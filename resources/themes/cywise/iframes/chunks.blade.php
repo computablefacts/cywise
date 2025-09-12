@@ -104,7 +104,7 @@
           </a>
         </td>
       </tr>
-      <tr>
+      <tr class="pt-0">
         <td colspan="8">
           @foreach($chunk->tags()->orderBy('id')->get() as $tag)
           <span class="lozenge information">{{ $tag->tag }}</span>&nbsp;
