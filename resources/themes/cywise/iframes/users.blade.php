@@ -12,7 +12,7 @@
   </div>
   @else
   <div class="card-body p-0">
-    <table class="table table-hover mb-0">
+    <table class="table mb-0">
       <thead>
       <tr>
         <th>{{ __('Name') }}</th>
@@ -23,7 +23,7 @@
       </thead>
       <tbody>
       @foreach($users as $user)
-      <tr>
+      <tr style="border-bottom-color:white">
         <td>
           <span class="font-lg mb-3 fw-bold">
             {{ isset($user->fullname) ? $user->fullname : $user->name }}
@@ -39,6 +39,13 @@
         </td>
         <td>
           <input type="checkbox" data-user-id="{{ $user->id }}" {{ $user->gets_audit_report ? 'checked' : '' }}>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          @foreach(collect($user->roles->all())->sortBy('name') as $role)
+          <span class="lozenge new">{{ $role->name }}</span>
+          @endforeach
         </td>
       </tr>
       @endforeach
