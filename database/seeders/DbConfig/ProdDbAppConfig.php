@@ -67,7 +67,7 @@ class ProdDbAppConfig implements DbAppConfigInterface
 
             'towerify.stripe.plans.standard.name' => 'Standard',
             'towerify.stripe.plans.standard.description' => 'L\'offre la plus adaptée aux PME.',
-            'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI, 15 jours gratuits, Assistance par tickets (réponse sous 24h)',
+            'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI (Politique de Sécurité des Systèmes d\'Information), 15 jours gratuits, Assistance par tickets (réponse sous 24h)',
             'towerify.stripe.plans.standard.monthly_price' => '270',
             'towerify.stripe.plans.standard.monthly_price_id' => 'price_1S6SxODHRqrzgOLG2qXK0Ygm',
             'towerify.stripe.plans.standard.yearly_price' => '1080',
@@ -77,7 +77,7 @@ class ProdDbAppConfig implements DbAppConfigInterface
 
             'towerify.stripe.plans.premium.name' => 'Premium',
             'towerify.stripe.plans.premium.description' => 'L\'offre la plus adaptée aux ETI et Grands Groupes.',
-            'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Standard, CyberBuddy via Teams, SSO, Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sous 6h)',
+            'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Standard, CyberBuddy via Teams, SSO (Single Sign-On), Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sous 6h)',
             'towerify.stripe.plans.premium.monthly_price' => '810',
             'towerify.stripe.plans.premium.monthly_price_id' => 'price_1S6T7qDHRqrzgOLG1FZrhRlZ',
             'towerify.stripe.plans.premium.yearly_price' => '3240',
