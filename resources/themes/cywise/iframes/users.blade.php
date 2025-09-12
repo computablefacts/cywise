@@ -42,7 +42,7 @@
         </td>
       </tr>
       <tr>
-        <td colspan="4">
+        <td colspan="4" class="pt-0">
           @foreach(collect($user->roles->all())->sortBy('name') as $role)
           <span class="lozenge new">{{ $role->name }}</span>
           @endforeach
