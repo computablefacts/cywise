@@ -384,7 +384,7 @@ Invoke-WebRequest -Uri "{{ app_url() }}/setup/script?api_token={{ Auth::user()->
         @if(\Illuminate\Support\Str::endsWith($honeypot['name'], '.cywise.io'))
         <p>{{ __('Would you like to redirect one of your domains to this honeypot? Contact support!') }}</p>
         @endif
-        @if(count($honeypot['counts']) <= 0)
+        @if(empty($honeypot['counts']) || ($honeypot['max'] ?? 0) <= 0)
         <p>{{ __('No recent events.') }}</p>
         @else
         <div class="card-text mb-3">
