@@ -63,7 +63,7 @@
                             <p class="text-base leading-7 text-zinc-500">{{ $plan->description }}</p>
                         </div>
 
-                        <div class="p-8 mt-auto rounded-b-lg bg-zinc-50">
+                        <div class="p-8 mt-auto lg:mt-0 rounded-b-lg bg-zinc-50">
                             <ul class="flex flex-col">
                                 @foreach($features as $feature)
                                     <li class="mt-1">
