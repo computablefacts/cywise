@@ -5,6 +5,15 @@
   <form class="card-body">
     @if(isset($rule))
     <h6 class="card-title text-truncate">{{ __('Edit rule') }}</h6>
+    <div class="card mb-3" style="background-color:#fff3cd;">
+      <div class="card-body p-2">
+        <div class="row">
+          <div class="col">
+            {!! __('Rules are defined using the Osquery SQL-based query language. For detailed syntax, available tables, and examples, refer to the <a href="https://osquery.io/schema/" target="_blank">official Osquery schema documentation</a>.') !!}
+          </div>
+        </div>
+      </div>
+    </div>
     <form>
       <div class="mb-3">
         <label for="name" class="form-label">{{ __('Name') }}</label>
