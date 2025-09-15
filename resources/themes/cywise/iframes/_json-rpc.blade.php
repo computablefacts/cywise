@@ -9,7 +9,17 @@
 
   const onErrorDefault = (error) => {
     if (toaster && error.message) {
-      toaster.toastError(error.message);
+      const errors = [];
+      if (error.data) {
+        for (const [attribute, messages] of Object.entries(error.data)) {
+          if (Array.isArray(messages)) {
+            errors.push(...messages);
+          } else {
+            errors.push(messages);
+          }
+        }
+      }
+      toaster.toastError(error.message + (errors.length > 0 ? "\n" + errors.join("\n") : ""));
     }
   };
 
@@ -264,6 +274,25 @@
 
   function deleteFileApiCall(fileId) {
     executeJsonRpcApiCall('files@delete', {file_id: fileId});
+  }
+
+  function deleteOsqueryRuleApiCall(ruleId) {
+    executeJsonRpcApiCall('rules@delete', {rule_id: ruleId});
+  }
+
+  function createOsqueryRuleApiCall(name, description, comments, category, platform, interval, is_ioc, score, query,
+    onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('rules@create', {
+      name: name,
+      description: description,
+      comments: comments,
+      category: category,
+      platform: platform,
+      interval: interval,
+      is_ioc: is_ioc,
+      score: score,
+      query: query
+    }, onSuccess);
   }
 
 </script>

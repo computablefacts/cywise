@@ -7,7 +7,7 @@ use App\Models\YnhOsqueryRule;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class RuleEditorController extends Controller
+class RulesEditorController extends Controller
 {
     public function __invoke(Request $request): View
     {

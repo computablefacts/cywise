@@ -27,7 +27,7 @@ use App\Http\Controllers\Iframes\DocumentationController;
 use App\Http\Controllers\Iframes\DocumentsController;
 use App\Http\Controllers\Iframes\FrameworksController;
 use App\Http\Controllers\Iframes\PromptsController;
-use App\Http\Controllers\Iframes\RuleEditorController;
+use App\Http\Controllers\Iframes\RulesEditorController;
 use App\Http\Controllers\Iframes\RulesController;
 use App\Http\Controllers\Iframes\ScaController;
 use App\Http\Controllers\Iframes\TableController;
@@ -627,7 +627,7 @@ Route::middleware(['auth', LogHttpRequests::class])->prefix('iframes')->name('if
     Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
     Route::get('/prompts', [PromptsController::class, '__invoke'])->name('prompts');
     Route::get('/rules', [RulesController::class, '__invoke'])->name('rules');
-    Route::get('/rules/edit', [RuleEditorController::class, '__invoke'])->name('rules-editor');
+    Route::get('/rules/edit', [RulesEditorController::class, '__invoke'])->name('rules-editor');
     Route::get('/sca', [ScaController::class, '__invoke'])->name('sca');
     Route::get('/table', [TableController::class, '__invoke'])->name('table');
     Route::get('/tables', [TablesController::class, '__invoke'])->name('tables');

@@ -1,9 +1,8 @@
 @extends('theme::iframes.app')
 
 @section('content')
-<div class="card mt-3">
-  <form class="card-body">
-    @if(isset($rule))
+<div class="card mt-3 mb-3">
+  <div class="card-body">
     <h6 class="card-title text-truncate">{{ __('Edit rule') }}</h6>
     <div class="card mb-3" style="background-color:#fff3cd;">
       <div class="card-body p-2">
@@ -14,18 +13,18 @@
         </div>
       </div>
     </div>
-    <form>
+    <div class="form-group">
       <div class="mb-3">
         <label for="name" class="form-label">{{ __('Name') }}</label>
-        <input id="name" class="form-control" value="{{ $rule->name }}">
+        <input id="name" class="form-control" value="{{ $rule->displayName() }}">
       </div>
       <div class="mb-3">
         <label for="description" class="form-label">{{ __('Description') }}</label>
         <textarea id="description" class="form-control" rows="3">{{ $rule->description }}</textarea>
       </div>
       <div class="mb-3">
-        <label for="comment" class="form-label">{{ __('Comment') }}</label>
-        <textarea id="comment" class="form-control" rows="3">{{ $rule->comment }}</textarea>
+        <label for="comments" class="form-label">{{ __('Comment') }}</label>
+        <textarea id="comments" class="form-control" rows="3">{{ $rule->comments }}</textarea>
       </div>
       <div class="row mb-3">
         <div class="col">
@@ -73,6 +72,10 @@
           <label for="interval" class="form-label">{{ __('Interval (in seconds)') }}</label>
           <input id="interval" class="form-control" value="{{ $rule->interval }}">
         </div>
+        <div class="col">
+          <label for="score" class="form-label">{{ __('Impact (between 0 and 100)') }}</label>
+          <input id="score" class="form-control" value="{{ $rule->score }}">
+        </div>
       </div>
       <div class="mb-3">
         <div class="form-check form-switch">
@@ -83,12 +86,18 @@
       <div class="mb-3">
         <div id="editor" style="height:200px;width:100%;"></div>
       </div>
-    </form>
-    @else
-    <h6 class="card-title text-truncate">{{ __('Create rule') }}</h6>
-    <!-- TODO -->
-    @endif
-</div>
+      <div class="mb-3">
+        <div class="col text-center">
+          <button id="delete-rule" class="btn btn-danger {{ isset($rule->id) ? '' : 'd-none' }}">
+            {{ __('Delete') }}
+          </button>
+          <button id="create-rule" class="btn btn-primary">
+            {{ __('Save') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 @endsection
 
@@ -100,6 +109,29 @@
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/sql");
   editor.setValue('{{ $rule->query }}');
+
+  const btnDelete = document.querySelector('#delete-rule');
+  const btnCreate = document.querySelector('#create-rule');
+  const elName = document.querySelector('#name');
+  const elDescription = document.querySelector('#description');
+  const elComments = document.querySelector('#comments');
+  const elCategory = document.querySelector('#category');
+  const elPlatform = document.querySelector('#platform');
+  const elInterval = document.querySelector('#interval');
+  const elScore = document.querySelector('#score');
+  const elIoC = document.querySelector('#ioc');
+
+  btnDelete.addEventListener('click', () => {
+    const response = confirm("{{ __('Are you sure you want to delete this rule?') }}");
+    if (response) {
+      deleteOsqueryRuleApiCall('{{ isset($rule->id) ? $rule->id : 0 }}');
+    }
+  });
+  btnCreate.addEventListener('click', () => {
+    createOsqueryRuleApiCall(elName.value, elDescription.value, elComments.value, elCategory.value, elPlatform.value,
+      elInterval.value, elIoC.checked, elScore.value, editor.getValue(),
+      () => toaster.toastSuccess("{{ __('The rule has been saved.') }}"));
+  });
 
 </script>
 @endpush

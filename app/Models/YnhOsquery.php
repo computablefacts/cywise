@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App\Enums\OsqueryPlatformEnum;
 use App\Helpers\Messages;
+use App\Http\Procedures\OsqueryRulesProcedure;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -249,9 +251,8 @@ EOT;
     public static function configOsquery(): array
     {
         $schedule = [];
-        YnhOsqueryRule::where('enabled', true)
-            ->orderBy('name', 'asc')
-            ->get()
+        (new OsqueryRulesProcedure())
+            ->list(new Request())['rules']
             ->each(function (YnhOsqueryRule $rule) use (&$schedule) {
                 $schedule[$rule->name] = [
                     'query' => $rule->query,

@@ -11,7 +11,6 @@ use App\Helpers\AppStore;
 use App\Helpers\SshConnection2;
 use App\Helpers\SshKeyPair;
 use App\Traits\HasTenant2;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -727,26 +726,6 @@ EOT;
             return $ip;
         }
         return '<unavailable>';
-    }
-
-    public function osqueryEvents(Carbon $dateMin, Carbon $dateMax): Collection
-    {
-        $rules = YnhOsqueryRule::where('enabled', true)->get();
-        return YnhOsquery::where('ynh_server_id', $this->id)
-            ->whereIn('name', $rules->pluck('name'))
-            ->where('calendar_time', '>=', $dateMin)
-            ->where('calendar_time', '<=', $dateMax)
-            ->get()
-            ->map(function (YnhOsquery $event) use ($rules) {
-                /** @var YnhOsqueryRule $rule */
-                $rule = $rules->filter(fn(YnhOsqueryRule $rule) => $rule->name === $event->name)->first();
-                return [
-                    'event_id' => $event->id,
-                    'event_name' => $event->name,
-                    'rule_id' => $rule->id,
-                    'rule_name' => $rule->name,
-                ];
-            });
     }
 
     public function addOsqueryEvents(array $events): int

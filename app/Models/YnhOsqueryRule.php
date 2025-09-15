@@ -6,7 +6,9 @@ use App\Enums\OsqueryPlatformEnum;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * @property int id
@@ -25,6 +27,7 @@ use Illuminate\Support\Collection;
  * @property bool is_ioc
  * @property double score
  * @property ?string comments
+ * @property ?int created_by
  */
 class YnhOsqueryRule extends Model
 {
@@ -46,6 +49,7 @@ class YnhOsqueryRule extends Model
         'is_ioc',
         'score',
         'comments',
+        'created_by',
     ];
 
     protected $casts = [
@@ -54,18 +58,19 @@ class YnhOsqueryRule extends Model
         'is_ioc' => 'boolean',
         'score' => 'float',
         'platform' => OsqueryPlatformEnum::class,
+        'created_by' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
-    public function tenants()
+    public function user(): BelongsTo
     {
-        return $this->belongsToMany(Tenant::class, 'ynh_osquery_rules_scope_tenant', 'rule_id', 'tenant_id');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
-    public function customers()
+    public function displayName(): string
     {
-        return $this->belongsToMany(Customer::class, 'ynh_osquery_rules_scope_customer', 'rule_id', 'customer_id');
+        return Str::after($this->name, 'cywise_');
     }
 
     public function mitreAttckTactics(): array
@@ -73,11 +78,11 @@ class YnhOsqueryRule extends Model
         return $this->mitreAttck()->flatMap(fn(YnhMitreAttck $attck) => $attck->tactics)->unique()->sort()->toArray();
     }
 
-    public function mitreAttck(): Collection
+    private function mitreAttck(): Collection
     {
         if ($this->attck) {
             $refs = explode(',', $this->attck);
-            return YnhMitreAttck::whereIn('uid', $refs)->get();
+            return YnhMitreAttck::query()->whereIn('uid', $refs)->get();
         }
         return collect();
     }

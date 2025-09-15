@@ -420,9 +420,12 @@ class CywiseSeeder extends Seeder
         }
 
         $rules = $this->osquery();
-        \App\Models\YnhOsqueryRule::query()->update(['enabled' => false]);
+        \App\Models\YnhOsqueryRule::query()
+            ->whereNull('created_by')
+            ->update(['enabled' => false]);
 
         foreach ($rules as $rule) {
+            $rule['created_by'] = null; // this rule is available to all users
             \App\Models\YnhOsqueryRule::updateOrCreate(['name' => $rule['name']], $rule);
         }
     }
