@@ -134,7 +134,7 @@ class OsqueryRulesProcedure extends Procedure
                 })
                 ->get()
                 ->map(function (YnhOsqueryRule $rule) {
-                    $rule->name = Str::after($rule->name, 'cywise_');
+                    $rule->name = $rule->displayName();
                     return $rule;
                 })
                 ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE),
