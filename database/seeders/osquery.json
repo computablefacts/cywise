@@ -42,7 +42,7 @@
     "attck": null,
     "is_ioc": 1,
     "score": 50,
-    "comments": "A new authorized_keys (used to provide access through SSH to administrate the machine) was added. If it was not done one purpose it might indicate that an attacker added the key as a backdoor."
+    "comments": "A new authorized_keys (used to provide access through SSH to administrate the machine) was added. If it was not done on purpose it might indicate that an attacker added the key as a backdoor."
   },
   {
     "name": "bash_exfiltration",
