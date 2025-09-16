@@ -177,6 +177,7 @@
   "The monitoring started.": "La surveillance a commencé.",
   "The monitoring stopped.": "La surveillance a été arrêtée.",
   "The rule has been saved.": "La règle a été sauvegardée.",
+  "The rule has been removed!": "La règle a été supprimée.",
   "The scan has been restarted.": "Le scan a été relancé.",
   "The virtual table name such as active_users": "Le nom de la table virtuelle comme par exemple active_users",
   "The&nbsp;<span style=\"color: var(--c-orange-light);\">5</span>&nbsp;most recent attacks": "Les <span style=\"color: var(--c-orange-light);\">5</span> attaques les plus récentes",
