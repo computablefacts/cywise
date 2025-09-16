@@ -75,7 +75,8 @@ RUN install-php-extensions \
         opcache \
         imagick/imagick@master \
         bcmath \
-        zlib
+        zlib \
+        zip
 
 # PHP configuration
 # Use the default production configuration
