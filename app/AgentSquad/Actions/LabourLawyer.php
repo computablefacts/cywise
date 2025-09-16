@@ -104,7 +104,7 @@ N'utilise pas de markdown pour formuler ta réponse.
             'role' => RoleEnum::USER->value,
             'content' => $prompt,
         ];
-        $answer = LlmsProvider::provide($messages, $this->model, 30);
+        $answer = LlmsProvider::provide($messages, $this->model);
         array_pop($messages);
         return new SuccessfulAnswer($answer, [], !empty($answer));
     }
