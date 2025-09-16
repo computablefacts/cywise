@@ -16,15 +16,12 @@
     <div class="form-group">
       <div class="mb-3">
         <label for="name" class="form-label">{{ __('Name') }}</label>
-        <input id="name" class="form-control" value="{{ $rule->displayName() }}">
+        <input id="name" class="form-control"
+               value="{{ $rule->displayName() }}" {{ isset($rule->id) ? 'disabled' : '' }}>
       </div>
       <div class="mb-3">
         <label for="description" class="form-label">{{ __('Description') }}</label>
-        <textarea id="description" class="form-control" rows="3">{{ $rule->description }}</textarea>
-      </div>
-      <div class="mb-3">
-        <label for="comments" class="form-label">{{ __('Comment') }}</label>
-        <textarea id="comments" class="form-control" rows="3">{{ $rule->comments }}</textarea>
+        <textarea id="description" class="form-control" rows="3">{{ $rule->comments }}</textarea>
       </div>
       <div class="row mb-3">
         <div class="col">
@@ -114,7 +111,6 @@
   const btnCreate = document.querySelector('#create-rule');
   const elName = document.querySelector('#name');
   const elDescription = document.querySelector('#description');
-  const elComments = document.querySelector('#comments');
   const elCategory = document.querySelector('#category');
   const elPlatform = document.querySelector('#platform');
   const elInterval = document.querySelector('#interval');
@@ -128,8 +124,8 @@
     }
   });
   btnCreate.addEventListener('click', () => {
-    createOsqueryRuleApiCall(elName.value, elDescription.value, elComments.value, elCategory.value, elPlatform.value,
-      elInterval.value, elIoC.checked, elScore.value, editor.getValue(),
+    createOsqueryRuleApiCall(elName.value, elDescription.value, elCategory.value, elPlatform.value, elInterval.value,
+      elIoC.checked, elScore.value, editor.getValue(),
       () => toaster.toastSuccess("{{ __('The rule has been saved.') }}"));
   });
 

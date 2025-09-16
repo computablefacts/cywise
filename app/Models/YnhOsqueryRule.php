@@ -70,7 +70,7 @@ class YnhOsqueryRule extends Model
 
     public function displayName(): string
     {
-        return Str::after($this->name, 'cywise_');
+        return \Auth::user()?->isCywiseAdmin() ? $this->name : Str::after($this->name, 'cywise_');
     }
 
     public function mitreAttckTactics(): array

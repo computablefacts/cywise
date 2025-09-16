@@ -155,6 +155,11 @@ class User extends WaveUser
         }
     }
 
+    public function isCywiseAdmin()
+    {
+        return $this->email === config('towerify.admin.email');
+    }
+    
     public function tenant(): ?Tenant
     {
         if ($this->tenant_id) {

@@ -6,7 +6,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Models\User;
 use App\Models\YnhOsqueryRule;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -20,7 +19,6 @@ class OsqueryRulesProcedure extends Procedure
         params: [
             'name' => 'The rule name.',
             'description' => 'The rule description.',
-            'comments' => 'A comment that will be displayed in the timeline (optional)',
             'category' => 'The rule category.',
             'platform' => 'The rule platform.',
             'interval' => 'The rule trigger interval in seconds.',
@@ -34,10 +32,12 @@ class OsqueryRulesProcedure extends Procedure
     )]
     public function create(Request $request): array
     {
+        $user = $request->user();
         $params = $request->validate([
-            'name' => 'required|string|min:2|max:191|regex:/^[a-z]+[a-z0-9_]*[a-z0-9]+$/',
-            'description' => 'required|string|min:1|max:255',
-            'comments' => 'nullable|string|min:0|max:1000',
+            'name' => $user->isCywiseAdmin() ?
+                'required|string|min:2|max:191|regex:/^([0-9]+_cywise_)*[a-z]+[a-z0-9_]*[a-z0-9]+$/' :
+                'required|string|min:2|max:191|regex:/^[a-z]+[a-z0-9_]*[a-z0-9]+$/',
+            'description' => 'required|string|min:1|max:1000',
             'category' => 'required|string|min:1|max:191',
             'platform' => ['required', Rule::enum(OsqueryPlatformEnum::class)],
             'interval' => 'required|integer|min:0',
@@ -53,33 +53,47 @@ class OsqueryRulesProcedure extends Procedure
             throw new \Exception("The score must be 0 if the rule is not an indicator of compromise.");
         }
 
-        $user = $request->user();
-        $name = Str::startsWith($params['name'], "{$user->tenant_id}_cywise_") ?
-            $params['name'] :
-            "{$user->tenant_id}_cywise_{$params['name']}";
+        $name = $user->isCywiseAdmin() ? $params['name'] : "{$user->tenant_id}_cywise_{$params['name']}";
 
-        /** @var YnhOsqueryRule $rule */
-        $rule = YnhOsqueryRule::updateOrCreate([
-            'name' => $name
-        ], [
-            'name' => $name,
-            'description' => $params['description'],
-            'comments' => $params['comments'],
-            'category' => $params['category'],
-            'platform' => $params['platform'],
-            'interval' => $params['interval'],
-            'is_ioc' => $params['is_ioc'],
-            'score' => $params['score'],
-            'query' => $params['query'],
+        /** @var ?YnhOsqueryRule $rule */
+        $rule = YnhOsqueryRule::where('name', $name)
+            ->where(function ($query) use ($user) {
+                if (!$user->isCywiseAdmin()) {
+                    $query->whereIn('created_by', User::where('tenant_id', $user->tenant_id)->pluck('id'));
+                }
+            })
+            ->first();
 
-            // App-specific fields
-            'version' => '1.4.5',
-            'snapshot' => false,
-            'enabled' => true,
-            'attck' => null,
-            'created_by' => $user->id,
-        ]);
+        if ($rule) {
+            $rule->description = $params['description'];
+            $rule->comments = $params['description'];
+            $rule->category = $params['category'];
+            $rule->platform = $params['platform'];
+            $rule->interval = $params['interval'];
+            $rule->is_ioc = $params['is_ioc'];
+            $rule->score = $params['score'];
+            $rule->query = $params['query'];
+            $rule->save();
+        } else {
+            $rule = YnhOsqueryRule::create([
+                'name' => $name,
+                'description' => $params['description'],
+                'comments' => $params['description'],
+                'category' => $params['category'],
+                'platform' => $params['platform'],
+                'interval' => $params['interval'],
+                'is_ioc' => $params['is_ioc'],
+                'score' => $params['score'],
+                'query' => $params['query'],
 
+                // App-specific fields
+                'version' => '1.4.5',
+                'snapshot' => false,
+                'enabled' => true,
+                'attck' => null,
+                'created_by' => $user->isCywiseAdmin() ? null : $user->id,
+            ]);
+        }
         return [
             "rule" => $rule
         ];
@@ -102,13 +116,13 @@ class OsqueryRulesProcedure extends Procedure
 
         $user = $request->user();
 
-        /** @var YnhOsqueryRule $rule */
-        $rule = YnhOsqueryRule::query()
-            ->where('id', $params['rule_id'])
-            ->whereIn('created_by', User::query()->where('tenant_id', $user->tenant_id)->pluck('id'))
-            ->firstOrFail();
-
-        $rule->delete();
+        YnhOsqueryRule::where('id', $params['rule_id'])
+            ->where(function ($query) use ($user) {
+                if (!$user->isCywiseAdmin()) {
+                    $query->whereIn('created_by', User::where('tenant_id', $user->tenant_id)->pluck('id'));
+                }
+            })
+            ->delete();
 
         return [
             "msg" => 'The rule has been removed!'
@@ -129,8 +143,10 @@ class OsqueryRulesProcedure extends Procedure
             'rules' => YnhOsqueryRule::query()
                 ->where('enabled', true)
                 ->where(function ($query) use ($user) {
-                    $query->whereNull('created_by')
-                        ->orWhereIn('created_by', User::query()->where('tenant_id', $user->tenant_id)->pluck('id'));
+                    if (!$user->isCywiseAdmin()) {
+                        $query->whereNull('created_by')
+                            ->orWhereIn('created_by', User::where('tenant_id', $user->tenant_id)->pluck('id'));
+                    }
                 })
                 ->get()
                 ->sortBy(fn(YnhOsqueryRule $rule) => $rule->displayName(), SORT_NATURAL | SORT_FLAG_CASE),

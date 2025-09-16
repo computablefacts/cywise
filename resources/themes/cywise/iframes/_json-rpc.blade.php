@@ -280,12 +280,11 @@
     executeJsonRpcApiCall('rules@delete', {rule_id: ruleId});
   }
 
-  function createOsqueryRuleApiCall(name, description, comments, category, platform, interval, is_ioc, score, query,
+  function createOsqueryRuleApiCall(name, description, category, platform, interval, is_ioc, score, query,
     onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('rules@create', {
       name: name,
       description: description,
-      comments: comments,
       category: category,
       platform: platform,
       interval: interval,

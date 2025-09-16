@@ -76,7 +76,14 @@ Invoke-WebRequest -Uri "{{ app_url() }}/setup/script?api_token={{ Auth::user()->
       <tr>
         <td>
           <span class="font-lg mb-3 fw-bold">
-            @if(isset($rule->created_by))<a href="{{ route('iframes.rules-editor', ['rule_id' => $rule->id]) }}">{{ $rule->displayName() }}</a>@else{{ $rule->displayName() }}@endif&nbsp;{!! $rule->category ? '<span style="color:#ff9704">/</span>&nbsp;' . $rule->category : '' !!}
+            @if(isset($rule->created_by) || \Auth::user()?->isCywiseAdmin())
+              <a href="{{ route('iframes.rules-editor', ['rule_id' => $rule->id]) }}">
+                {{ $rule->displayName() }}
+              </a>
+            @else
+              {{ $rule->displayName() }}
+            @endif
+            &nbsp;{!! $rule->category ? '<span style="color:#ff9704">/</span>&nbsp;' . $rule->category : '' !!}
           </span>
           <div class="text-muted">
             @if(\Illuminate\Support\Str::startsWith($rule->comments, 'Needs further work on the collected data to be useful'))
