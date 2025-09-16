@@ -133,11 +133,7 @@ class OsqueryRulesProcedure extends Procedure
                         ->orWhereIn('created_by', User::query()->where('tenant_id', $user->tenant_id)->pluck('id'));
                 })
                 ->get()
-                ->map(function (YnhOsqueryRule $rule) {
-                    $rule->name = $rule->displayName();
-                    return $rule;
-                })
-                ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE),
+                ->sortBy(fn(YnhOsqueryRule $rule) => $rule->displayName(), SORT_NATURAL | SORT_FLAG_CASE),
         ];
     }
 }
