@@ -95,7 +95,7 @@ class CyberBuddyProcedure extends Procedure
 
             // TODO : create one agent for each framework
 
-            if ($user->email === config('towerify.admin.email')) {
+            // if ($user->email === config('towerify.admin.email')) {
 
                 $in = database_path('seeders/vectors');
                 $out = storage_path('app/vectors');
@@ -132,7 +132,7 @@ class CyberBuddyProcedure extends Procedure
                 }
 
                 $orchestrator->registerAgent(new LabourLawyer($output));
-            }
+            // }
 
             $answer = $orchestrator->run($user, $threadId, $messages, $question);
         } catch (\Exception $e) {
