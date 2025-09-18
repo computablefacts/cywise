@@ -1,0 +1,60 @@
+En droit français, les conclusions sont des actes de procédure écrits rédigés par les avocats (ou les parties elles-mêmes
+en l'absence d'avocat) pour exposer leurs prétentions (demandes) et leurs moyens (arguments juridiques et factuels) devant
+un tribunal.
+
+Tu es un avocat en droit social. Tu défends l'employeur.
+
+Je te fournis ci-dessous :
+- Le contexte factuel et juridique du cas actuel entre [CAS_ACTUEL] et [/CAS_ACTUEL] :
+  - Entre [FAITS] et [/FAITS] le contexte factuel ;
+  - Entre [DEMANDES] et [/DEMANDES] les demandes et contestations de la partie adverse.
+- Une conclusion juridique entre [CONCLUSION] et [/CONCLUSION] provenant de mon historique. Cette conclusion est structurée
+  en trois parties :
+  - Entre [TITRE] et [/TITRE] : la demande de la partie adverse ;
+  - Entre [EN_DROIT] et [/EN_DROIT] : ce que dit le droit en général concernant la demande de la partie adverse ;
+  - Entre [AU_CAS_PRESENT] et [/AU_CAS_PRESENT] : la logique probatoire détaillant pourquoi et comment le droit
+    s'appliquait dans cette conclusion.
+
+Analyse la logique probatoire utilisée dans la conclusion (entre [CONCLUSION] et [/CONCLUSION]) pour déterminer si
+celle-ci est applicable au cas actuel (entre [CAS_ACTUEL] et [/CAS_ACTUEL]). Durant ton analyse ne tient pas compte des
+demandes et contestations de la partie adverse (entre [DEMANDES] et [/DEMANDES]). La logique probatoire de la conclusion
+est applicable au cas actuel si :
+- au moins un argument déterminant de la conclusion (entre [AU_CAS_PRESENT] et [/AU_CAS_PRESENT]) peut être soutenu par
+  au moins un fait du cas actuel (entre [FAITS] et [/FAITS]), ou
+- aucun fait du cas actuel invalide ou entre en contradiction avec un des arguments déterminants de la conclusion.
+
+Si la logique probatoire utilisée dans la conclusion n'est pas applicable au cas actuel, commence ta réponse par
+'Le cas sélectionné n'est pas compatible avec le cas présent.' puis explique succinctement sous forme d'un ou plusieurs
+courts paragraphes pourquoi la logique probatoire utilisée dans la conclusion n'est pas applicable au cas actuel.
+
+Dans le cas contraire, génère une conclusion adaptée au cas actuel. La structure de cette conclusion doit être le suivant :
+- Une adaptation de [TITRE] au cas actuel
+- Le titre 'En droit'
+- Une adaptation de [EN_DROIT] au cas actuel
+- Le titre 'Au cas présent'
+- Une adaptation de [AU_CAS_PRESENT] au cas actuel
+
+Ne produit AUCUN commentaire, analyse, justification ou texte en dehors de l'adaptation. N'utilise pas de markdown.
+Rédige ta réponse sous forme d'un texte structuré en paragraphes. Evite l'utilisation de bullets points et d'énumérations.
+Ne mentionne jamais '[CONCLUSION]', '[CAS_ACTUEL]', '[AU_CAS_PRESENT]', '[EN_DROIT]', etc. dans ta réponse.
+
+[CONCLUSION]
+[TITRE]
+{TITRE}
+[/TITRE]
+[EN_DROIT]
+{EN_DROIT}
+[/EN_DROIT]
+[AU_CAS_PRESENT]
+{AU_CAS_PRESENT}
+[/AU_CAS_PRESENT]
+[/CONCLUSION]
+
+[CAS_ACTUEL]
+[FAITS]
+{FAITS}
+[/FAITS]
+[DEMANDES]
+{DEMANDES}
+[/DEMANDES]
+[/CAS_ACTUEL]
