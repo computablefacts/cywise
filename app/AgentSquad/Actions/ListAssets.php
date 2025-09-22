@@ -23,7 +23,7 @@ class ListAssets extends AbstractAction
                 "description" => "
                     Retrieve the list of assets (domains or IP addresses) based on their monitoring status and type.
                     Provide the action to perform followed by the asset status (monitored/monitorable/any) and the asset type (domain/ip/any), using the format: 'action:status:type'.
-                    The action (always list) must come first, followed by a colon and then the asset status (monitored/monitorable/any) and the asset type (domain/ip/any).
+                    The action (always list) must come first, followed by a colon and then the asset status (monitored/monitorable/any), followed by a colon and then the asset type (domain/ip/any).
                     For example:
                     - if the request is 'quels sont mes actifs ?', the input should be 'list:any:any'
                     - if the request is 'quels sont mes actifs surveillés ?', the input should be 'list:monitored:any'
