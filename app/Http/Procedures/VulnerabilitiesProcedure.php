@@ -17,6 +17,7 @@ class VulnerabilitiesProcedure extends Procedure
         description: "List the user's vulnerabilities.",
         params: [
             "asset_id" => "The asset id (optional).",
+            "level" => "The vulnerabilities criticality level (optional).",
         ],
         result: [
             "high" => "A list of vulnerabilities with critical severity.",
@@ -32,13 +33,24 @@ class VulnerabilitiesProcedure extends Procedure
 
         $params = $request->validate([
             'asset_id' => 'nullable|integer|exists:am_assets,id',
+            'level' => 'nullable|string|min:3|max:5|in:high,medium,low',
         ]);
 
         $assetId = $params['asset_id'] ?? null;
         $alerts = Asset::where('is_monitored', true)
             ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
             ->get()
-            ->flatMap(fn(Asset $asset) => $asset->alerts()->get())
+            ->flatMap(function (Asset $asset) use ($params) {
+                $query = $asset->alerts();
+                if (($params['level'] ?? '') === 'high') {
+                    $query->where('level', 'High');
+                } else if (($params['level'] ?? '') === 'medium') {
+                    $query->where('level', 'Medium');
+                } else if (($params['level'] ?? '') === 'low') {
+                    $query->where('level', 'Low');
+                }
+                return $query->get();
+            })
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 
         return [

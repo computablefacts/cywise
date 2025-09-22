@@ -3,8 +3,9 @@
 namespace App\Http\Procedures;
 
 use App\AgentSquad\Actions\CyberBuddy;
-use App\AgentSquad\Actions\ListAssets;
 use App\AgentSquad\Actions\LabourLawyer;
+use App\AgentSquad\Actions\ListAssets;
+use App\AgentSquad\Actions\ListVulnerabilities;
 use App\AgentSquad\Actions\ManageAssets;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Orchestrator;
@@ -94,6 +95,7 @@ class CyberBuddyProcedure extends Procedure
             $orchestrator->registerAgent(new CyberBuddy());
             $orchestrator->registerAgent(new ManageAssets());
             $orchestrator->registerAgent(new ListAssets());
+            $orchestrator->registerAgent(new ListVulnerabilities());
 
             // TODO : create one agent for each framework
 
