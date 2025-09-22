@@ -90,9 +90,10 @@ class ListVulnerabilities extends AbstractAction
         $request->setUserResolver(fn() => $user);
 
         try {
-            $high = collect($procedure->list($request)['high'] ?? []);
-            $medium = collect($procedure->list($request)['medium'] ?? []);
-            $low = collect($procedure->list($request)['low'] ?? []);
+            $result = $procedure->list($request);
+            $high = collect($result['high'] ?? []);
+            $medium = collect($result['medium'] ?? []);
+            $low = collect($result['low'] ?? []);
 
             if ($high->isEmpty() && $medium->isEmpty() && $low->isEmpty()) {
                 return new SuccessfulAnswer("No vulnerabilities found.");
