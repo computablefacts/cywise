@@ -123,6 +123,14 @@ class ListVulnerabilities extends AbstractAction
                 } else {
                     $vulnerability = $result['response'];
                 }
+
+                $result = ApiUtils2::translate($alert->remediation);
+
+                if ($result['error'] !== false) {
+                    $remediation = $alert->remediation;
+                } else {
+                    $remediation = $result['response'];
+                }
                 return "
 ### {$alert->title} {$level}
 
@@ -131,6 +139,8 @@ class ListVulnerabilities extends AbstractAction
 {$alert->port()?->service} ({$alert->port()?->product}).
 
 **Description détaillée.** {$vulnerability}
+
+**Remédiation.** {$remediation}
 
 {$cve}
                 ";
