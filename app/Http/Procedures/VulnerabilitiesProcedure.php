@@ -33,7 +33,7 @@ class VulnerabilitiesProcedure extends Procedure
 
         $params = $request->validate([
             'asset_id' => 'nullable|integer|exists:am_assets,id',
-            'level' => 'nullable|string|min:3|max:5|in:high,medium,low',
+            'level' => 'nullable|string|min:3|max:6|in:high,medium,low',
         ]);
 
         $assetId = $params['asset_id'] ?? null;
