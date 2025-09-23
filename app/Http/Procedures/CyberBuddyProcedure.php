@@ -42,7 +42,7 @@ class CyberBuddyProcedure extends Procedure
     {
         $params = $request->validate([
             'thread_id' => 'required|string|min:10|max:10|regex:/^[a-zA-Z0-9]+$/',
-            'directive' => 'required|string|min:1|max:1024',
+            'directive' => 'required|string|min:1|max:2048',
             'fallback_on_next_collection' => 'nullable|boolean',
         ]);
         $threadId = Str::trim($params['thread_id'] ?? '');

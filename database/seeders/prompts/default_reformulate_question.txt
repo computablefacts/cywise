@@ -49,6 +49,7 @@ For example, if the user's input is "L'usage des clefs USB est-il autorisé ?", 
 }
 
 Ensure your answer is in plain text format without any Markdown or HTML formatting.
+Do not explain the keywords or the JSON generation processes.
 The user's input is:
 
 {QUESTION}

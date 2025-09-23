@@ -153,11 +153,13 @@ class Orchestrator
 
         if ($answer->failure()) {
             $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An error occurred. Returning to the user.');
+            $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
             $answer->setChainOfThought($chainOfThought);
             return $answer;
         }
 
-        $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", $answer->markdown());
+        $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", strip_tags($answer->markdown()));
+        $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
 
         if ($answer->final()) {
 

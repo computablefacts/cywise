@@ -4,14 +4,20 @@ namespace App\AgentSquad\Actions;
 
 use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
+use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\PromptsProvider;
+use App\AgentSquad\ThoughtActionObservation;
 use App\AgentSquad\Vectors\AbstractVectorStore;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
 use App\Enums\RoleEnum;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Parsedown;
 
 class LabourLawyer extends AbstractAction
 {
@@ -27,7 +33,10 @@ class LabourLawyer extends AbstractAction
             "function" => [
                 "name" => "labour_lawyer",
                 "description" => "
-                    Answer questions related to the French labour law.
+                    Write conclusions (formal written pleadings through which a party (or their lawyer) sets out their 
+                    claims (what they are asking the court to grant) and the grounds (factual and legal arguments) 
+                    supporting those claims) related to the French labour law.
+                    The action's input must always be the original user's input. 
                     The action's input must always be in French, regardless of the user's language.
                 ",
                 "parameters" => [
@@ -35,7 +44,7 @@ class LabourLawyer extends AbstractAction
                     "properties" => [
                         "question" => [
                             "type" => ["string"],
-                            "description" => "The question to be asked to the labor lawyer.",
+                            "description" => "The factual arguments to be used in the conclusion and how to use them.",
                         ],
                     ],
                     "required" => ["question"],
@@ -46,7 +55,7 @@ class LabourLawyer extends AbstractAction
         ];
     }
 
-    public function __construct(string $in, string $model = 'deepseek-ai/DeepSeek-R1-0528-Turbo')
+    public function __construct(string $in, string $model = 'Qwen/Qwen3-Next-80B-A3B-Thinking')
     {
         $this->vectorStoreObjets = new FileVectorStore($in, 5, 'objets');
         $this->vectorStoreArguments = new FileVectorStore($in, 5, 'arguments');
@@ -56,56 +65,178 @@ class LabourLawyer extends AbstractAction
 
     public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
-        $vector = EmbeddingsProvider::provide($input);
-        $objets = $this->vectorStoreObjets->search($vector->embedding());
-        $arguments = $this->vectorStoreArguments->search($vector->embedding());
-        $results = array_merge(array_map(function (array $item): array {
-
-            /** @var Vector $vector */
-            $vector = $item['vector'];
-            $idx = $vector->metadata('index_objet');
-            $document = new LegalDocument("{$this->dir}/{$vector->metadata('file')}");
-
-            return [
-                'objet' => $document->objet($idx),
-                'en_droit' => $document->en_droit($idx),
-            ];
-        }, $arguments), array_map(function (array $item): array {
-
-            /** @var Vector $vector */
-            $vector = $item['vector'];
-            $idx = $vector->metadata('index_objet');
-            $document = new LegalDocument("{$this->dir}/{$vector->metadata('file')}");
-
-            return [
-                'objet' => $document->objet($idx),
-                'en_droit' => $document->en_droit($idx),
-            ];
-        }, $objets));
-
-        $enDroit = implode("\n", array_unique(array_map(fn(array $item) => "[SECTION][TOPIC]{$item['objet']}[/TOPIC][LAW]{$item['en_droit']}[/LAW][/SECTION]", $results)));
-
-        $prompt = "
-Tu es un avocat en droit social.
-Tu cherches à réaliser cette tâche : {$input}
-Utilise le texte contenu entre les balises [EN_DROIT] et [/EN_DROIT] pour développer ton argumentaire:
-- Les balises [EN_DROIT] et [/EN_DROIT] contiennent des sections thématiques placées entre [SECTION] et [/SECTION].
-- Les balises [SECTION] et [/SECTION] contiennent une thématique entre [TOPIC] et [/TOPIC] ainsi que des citations de la loi se rapportant à cette thématique entre [LAW] et [/LAW].
-Utilise toujours des citations de textes de loi pour appuyer ton argumentaire.
-Anonymise les noms de personnes et de sociétés dans ton argumentaire.
-N'utilise pas de markdown pour formuler ta réponse.
-
-[EN_DROIT]
-{$enDroit}
-[/EN_DROIT]
-        ";
-
         $messages[] = [
             'role' => RoleEnum::USER->value,
-            'content' => $prompt,
+            'content' => "
+                Tu es un avocat en droit social. Tu défends l'employeur et non le salarié. 
+                Voici ta tâche :
+                - Extrait des données d'entrée du cas présent les contestations et demandes de la partie adverse en écrivant une contestation ou demande par ligne préfixée par 'd:'
+                - Extrait des données d'entrée du cas présent les faits en écrivant un fait par ligne préfixée par 'f:'
+                - N'écrit rien d'autre dans ta réponse que les contestations, les demandes et les faits.
+
+                Voici un premier exemple de données d'entrée entre [IN] et [/IN] : 
+                
+                [IN]
+                je dois rédiger des conclusions sur un salarié ayant été licencié pour inaptitude après un avis médical 
+                rendu par le médecin du travail ; l'inaptitude est d'origine non professionnelle ; il conteste son 
+                licenciement en précisant que la recherche de reclassement n'a pas été effectuée correctement dans le 
+                Groupe dont fait partie l'entreprise qui l'emploie ; il demande des dommages et intérêts pour 
+                licenciement sans cause réelle et sérieuse de 9 mois de salaire ; il a une ancienneté de 10 ans
+                [/IN]
+                
+                Voici un exemple de sortie attendue pour ce premier exemple entre [OUT] et [/OUT] :
+                
+                [OUT]
+                d:le salarié conteste son licenciement en précisant que la recherche de reclassement n'a pas été effectuée correctement dans le Groupe dont fait partie l'entreprise qui l'emploie
+                d:le salarié demande des dommages et intérêts pour licenciement sans cause réelle et sérieuse de 9 mois de salaire
+                f:le salarié a été licencié pour inaptitude après un avis médical rendu par le médecin du travail
+                f:l'inaptitude du salarié est d'origine non professionnelle
+                f:le salarié a une ancienneté de 10 ans
+                [/OUT]
+                
+                Voici un second exemple de données d'entrée entre [IN] et [/IN] : 
+                
+                [IN]
+                je dois rédiger des conclusions sur un salarié ayant été licencié pour inaptitude après un avis médical 
+                rendu par le médecin du travail ; l'inaptitude est d'origine professionnelle ; il conteste son licenciement 
+                en précisant que le harcèlement dont il se dit victime serait à l'origine de son inaptitude ; il ajoute 
+                par ailleurs que la société n'aurait pas consulté le CSE, ce qu'elle avait l'obligation de faire ; il 
+                demande  des dommages et intérêts pour licenciement sans cause réelle et sérieuse, à hauteur de 9 mois 
+                de salaire alors qu'il a 4 ans d'ancienneté, ainsi que des dommages et intérêts pour réparer le harcèlement 
+                à hauteur de 6 mois de salaire ;
+                [/IN]
+                
+                Voici un exemple de sortie attendue pour ce second exemple entre [OUT] et [/OUT] :
+                
+                [OUT]
+                d:le salarié conteste son licenciement en affirmant que le harcèlement dont il se dit victime serait à l'origine de son inaptitude
+                d:le salarié conteste l'absence de consultation du CSE par la société, qu'il estime obligatoire
+                d:le salarié demande des dommages et intérêts pour licenciement sans cause réelle et sérieuse, à hauteur de 9 mois de salaire
+                d:le salarié demande des dommages et intérêts pour réparer le harcèlement, à hauteur de 6 mois de salaire
+                f:le salarié a été licencié pour inaptitude après un avis médical rendu par le médecin du travail
+                f:l'inaptitude du salarié est d'origine professionnelle
+                f:le salarié a une ancienneté de 4 ans
+                [/OUT]
+                
+                Voici les données d'entrée du cas présent : {$input}
+            ",
         ];
-        $answer = LlmsProvider::provide($messages, $this->model);
+        $answer = LlmsProvider::provide($messages, $this->model, 120);
         array_pop($messages);
-        return new SuccessfulAnswer($answer, [], !empty($answer));
+
+        $demandes = [];
+        $faits = [];
+
+        foreach (explode("\n", $answer) as $line) {
+            $line = trim($line);
+            if (str_starts_with($line, 'd:')) {
+                $demandes[] = substr($line, 2);
+            } elseif (str_starts_with($line, 'f:')) {
+                $faits[] = substr($line, 2);
+            }
+        }
+
+        $facts = "- " . implode("\n- ", $faits);
+        $requests = "- " . implode("\n- ", $demandes);
+
+        Log::debug("FAITS : ", $faits);
+        Log::debug("DEMANDES : ", $demandes);
+
+        $history = collect($demandes)
+            ->concat($faits)
+            ->flatMap(function (string $txt) {
+
+                $vector = EmbeddingsProvider::provide($txt);
+                $documents = $this->vectorStoreObjets->search($vector->embedding());
+
+                return array_map(function (array $item) use ($txt): array {
+
+                    /** @var Vector $vector */
+                    $vector = $item['vector'];
+                    $idx = $vector->metadata('index_objet');
+                    $document = new LegalDocument("{$this->dir}/{$vector->metadata('file')}");
+
+                    return [
+                        'src_txt' => $txt,
+                        'tgt_txt' => $document->objet($idx),
+                        'tgt_score' => $item['similarity'],
+                        'tgt_file' => "{$this->dir}/{$vector->metadata('file')}",
+                        'tgt_idx' => $idx,
+                    ];
+                }, $documents);
+            })
+            ->filter(fn(array $item) => $item['tgt_score'] >= 0.6)
+            ->sortByDesc('tgt_score')
+            ->values()
+            ->toArray();
+
+        Log::debug($history);
+
+        $chainOfThought = [];
+        $conclusions = [];
+        $sections = [];
+
+        foreach ($history as $item) {
+            if (in_array($item['src_txt'], $sections)) {
+                Log::debug("Skipping '{$item['tgt_txt']}' because it's already in a section.");
+                continue;
+            }
+
+            $idx = $item['tgt_idx'];
+            $doc = new LegalDocument($item['tgt_file']);
+            $titre = strip_tags((new Parsedown)->text($item['tgt_txt']));
+            $enDroit = strip_tags((new Parsedown)->text($doc->en_droit($idx)));
+            $auCasPresent = "";
+
+            for ($i = 0; $i < $doc->nbArguments($idx); $i++) {
+
+                $auCasPresent .= ((empty($auCasPresent) ? "- Argument : " : "\n- Argument : ") . $doc->argument($idx, $i) . " :");
+                $factz = $doc->faits($idx, $i);
+
+                for ($j = 0; $j < count($factz); $j++) {
+                    $auCasPresent .= ("\n  - Fait : " . $factz[$j]);
+                }
+            }
+
+            $prompt = PromptsProvider::provide('default_consultations', [
+                'TITRE' => $titre,
+                'EN_DROIT' => $enDroit,
+                'AU_CAS_PRESENT' => strip_tags((new Parsedown)->text($doc->au_cas_present($idx))),
+                'FAITS' => $facts,
+                'DEMANDES' => $requests,
+            ]);
+
+            // Log::debug($prompt);
+
+            $answer = LlmsProvider::provide($prompt, $this->model, 120);
+            $chainOfThought[] = new ThoughtActionObservation("I need to write about '{$item['src_txt']}'.", "Checking if '{$item['tgt_txt']}' from '{$item['tgt_file']}' is a good template...", strip_tags($answer));
+
+            Log::debug($answer);
+
+            if (Str::contains($answer, "Le cas sélectionné n'est pas compatible avec le cas présent.")) {
+                Log::debug("Skipping '{$item['tgt_txt']}' because it is not compatible with the current case.");
+                continue;
+            }
+
+            $conclusions[] = Str::replace("En droit", "<br><br>**En droit**<br><br>",
+                Str::replace("Au cas présent", "<br><br>**Au cas présent**<br><br>",
+                    preg_replace('/^(.+)$/m', '**$1**<br><br>',
+                        preg_replace("/\n{3,}/", "<br><br>",
+                            Str::trim($answer)
+                        ), 1
+                    )
+                )
+            );
+            $sections[] = $item['src_txt'];
+        }
+
+        // Log::debug($conclusions);
+
+        $conclusions = implode("<br><br>", $conclusions);
+
+        if (empty(strip_tags($conclusions))) {
+            return new FailedAnswer("Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.", $chainOfThought);
+        }
+        return new SuccessfulAnswer($conclusions, $chainOfThought, true);
     }
 }
