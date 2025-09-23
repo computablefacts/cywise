@@ -294,5 +294,19 @@
     }, onSuccess);
   }
 
+  function listRolesAndPermissionsApiCall(onSuccess, onFinally) {
+    executeJsonRpcApiCall('roles@list', {}, onSuccess, onErrorDefault, onFinally);
+  }
+
+  function addPermissionToRoleApiCall(role, permission, onFinally) {
+    executeJsonRpcApiCall('roles@addPermission', {role: role, permission: permission}, onSuccessDefault, onErrorDefault,
+      onFinally);
+  }
+
+  function removePermissionFromRoleApiCall(role, permission, onFinally) {
+    executeJsonRpcApiCall('roles@removePermission', {role: role, permission: permission}, onSuccessDefault,
+      onErrorDefault, onFinally);
+  }
+
 </script>
 @endonce

@@ -184,12 +184,19 @@
                                   id="admin_dropdown"
                                   :active="false"
                                   :open="(
-                          Request::is('users')
+                          Request::is('users') ||
+                          Request::is('roles-and-permissions') ||
+                          Request::is('traces')
                         ) ? '1' : '0'">
             <x-app.sidebar-link href="{{ route('users') }}"
                                 icon="phosphor-users"
                                 :active="Request::is('users')">
               {{ __('Users') }}
+            </x-app.sidebar-link>
+            <x-app.sidebar-link href="{{ route('roles-and-permissions') }}"
+                                icon="phosphor-shield-check"
+                                :active="Request::is('roles-and-permissions')">
+              {{ __('Roles & Permissions') }}
             </x-app.sidebar-link>
             <x-app.sidebar-link href="{{ route('traces') }}"
                                 icon="phosphor-list-dashes"

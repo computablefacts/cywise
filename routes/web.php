@@ -27,8 +27,9 @@ use App\Http\Controllers\Iframes\DocumentationController;
 use App\Http\Controllers\Iframes\DocumentsController;
 use App\Http\Controllers\Iframes\FrameworksController;
 use App\Http\Controllers\Iframes\PromptsController;
-use App\Http\Controllers\Iframes\RulesEditorController;
+use App\Http\Controllers\Iframes\RolesPermissionsController;
 use App\Http\Controllers\Iframes\RulesController;
+use App\Http\Controllers\Iframes\RulesEditorController;
 use App\Http\Controllers\Iframes\ScaController;
 use App\Http\Controllers\Iframes\TableController;
 use App\Http\Controllers\Iframes\TablesController;
@@ -626,6 +627,7 @@ Route::middleware(['auth', LogHttpRequests::class])->prefix('iframes')->name('if
     Route::get('/leaks', [TimelineController::class, '__invoke'])->name('leaks');
     Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
     Route::get('/prompts', [PromptsController::class, '__invoke'])->name('prompts');
+    Route::get('/roles-and-permissions', [RolesPermissionsController::class, '__invoke'])->name('roles-and-permissions');
     Route::get('/rules', [RulesController::class, '__invoke'])->name('rules');
     Route::get('/rules/edit', [RulesEditorController::class, '__invoke'])->name('rules-editor');
     Route::get('/sca', [ScaController::class, '__invoke'])->name('sca');
