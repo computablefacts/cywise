@@ -216,6 +216,7 @@ class Role extends \Spatie\Permission\Models\Role
 
             // Legacy
             Permission::USE_CYBER_BUDDY,
+            Permission::USE_ADVERSARY_METER,
 
             // New
             Permission::VIEW_CYBERBUDDY,
@@ -224,6 +225,7 @@ class Role extends \Spatie\Permission\Models\Role
 
             // Legacy
             Permission::USE_CYBER_BUDDY,
+            Permission::USE_ADVERSARY_METER,
 
             // ISSP
             Permission::VIEW_HARDENING,
