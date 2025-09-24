@@ -53,6 +53,7 @@ use App\Listeners\RebuildPackagesListListener;
 use App\Listeners\RemoveUserPermissionListener;
 use App\Listeners\SendAuditReportListener;
 use App\Listeners\StartAssetsDiscoverListener;
+use App\Listeners\StoreLoginTime;
 use App\Listeners\UninstallAppListener;
 use App\Listeners\UpdateServerInfosListener;
 use Illuminate\Auth\Events\Failed;
@@ -156,6 +157,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         Login::class => [
             LoginSucceededListener::class,
+            StoreLoginTime::class,
         ],
         Logout::class => [
             LogoutSucceededListener::class,

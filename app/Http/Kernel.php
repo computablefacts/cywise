@@ -37,7 +37,8 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \RalphJSmit\Livewire\Urls\Middleware\LivewireUrlsMiddleware::class
+            \RalphJSmit\Livewire\Urls\Middleware\LivewireUrlsMiddleware::class,
+            \App\Http\Middleware\RedirectToCyberBuddy::class,
         ],
 
         'api' => [
