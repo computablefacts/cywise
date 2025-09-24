@@ -6,6 +6,7 @@ use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\MemosProvider;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
 use App\Models\User;
@@ -93,6 +94,7 @@ class Orchestrator
             'COT' => $cot,
             'ACTIONS' => $actions,
             'INPUT' => $input,
+            'MEMOS' => MemosProvider::provide($user),
         ]);
         $messages[] = [
             'role' => RoleEnum::USER->value,

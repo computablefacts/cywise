@@ -22,6 +22,11 @@ Your available actions (between [ACTIONS] and [/ACTIONS]) are:
 {ACTIONS}
 [/ACTIONS]
 
+The user's memos and notes (between [MEMOS] and [/MEMOS]) are:
+[MEMOS]
+{MEMOS}
+[/MEMOS]
+
 The user's input (between [INPUT] and [/INPUT]) is:
 [INPUT]
 {INPUT}

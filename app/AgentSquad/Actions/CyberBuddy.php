@@ -9,12 +9,12 @@ use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\AgentSquad\Providers\ChunksProvider;
 use App\AgentSquad\Providers\ChunksProvider2;
 use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\MemosProvider;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
 use App\Models\Chunk;
 use App\Models\ChunkTag;
 use App\Models\File;
-use App\Models\TimelineItem;
 use App\Models\User;
 use App\Rules\IsValidCollectionName;
 use Illuminate\Support\Collection;
@@ -99,7 +99,7 @@ class CyberBuddy extends AbstractAction
         }
 
         // Fill context & answer question
-        $memos = empty($collection) ? $this->loadMemos($user) : '';
+        $memos = empty($collection) ? MemosProvider::provide($user) : '';
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
         $prompt = PromptsProvider::provide('default_answer_question', [
             'LANGUAGE' => $json['lang'],
@@ -117,21 +117,6 @@ class CyberBuddy extends AbstractAction
         array_pop($messages);
 
         return new SuccessfulAnswer($this->enhanceWithSources(strip_tags($answer)), [], !empty($answer));
-    }
-
-    private function loadMemos(User $user): string
-    {
-        $start = microtime(true);
-        $notes = TimelineItem::fetchNotes($user->id, null, null, 0)
-            ->map(function (TimelineItem $note) {
-                $attributes = $note->attributes();
-                $subject = $attributes['subject'] ?? 'Unknown subject';
-                $body = $attributes['body'] ?? '';
-                return "## Memo {$note->timestamp->format('Y-m-d H:i:s')}\n\n### {$subject}\n\n{$body}";
-            });
-        $stop = microtime(true);
-        Log::debug("[LOAD_NOTES] Loading notes took " . ((int)ceil($stop - $start)) . " seconds and returned {$notes->count()} results");
-        return $notes->join("\n\n");
     }
 
     private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): string
