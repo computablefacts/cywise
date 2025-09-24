@@ -106,8 +106,8 @@ class Orchestrator
 
         $matches = null;
         preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
-        $answer = Str::trim($matches[1][0]);
-        $json = json_decode(Str::trim($answer), true);
+        $answer = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
+        $json = json_decode($answer, true);
 
         if (!isset($json)) {
 
