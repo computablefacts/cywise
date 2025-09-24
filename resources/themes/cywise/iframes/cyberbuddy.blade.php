@@ -967,8 +967,41 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
           ${html}
         </div>
       </div>
-      <div class="tw-answer-timestamp">${formatTimestamp(ts)}</div>
+      <div class="tw-answer-timestamp" style="display:flex;gap:0.5rem;">
+        ${formatTimestamp(ts)}
+        <div class="tw-save-memo-btn" style="cursor:pointer;" title="{{ __('Save as note') }}">
+          <span class="bp4-icon bp4-icon-manually-entered-data"></span>
+        </div>
+      </div>
     `;
+
+    // Wire save button
+    const elSaveAsNote = elDirective.querySelector('.tw-save-memo-btn');
+    if (elSaveAsNote) {
+      elSaveAsNote.addEventListener('click', (e) => {
+        const elWrapper = e.currentTarget.closest('.tw-answer-wrapper');
+        if (!elWrapper) {
+          return;
+        }
+        const elMessage = elWrapper.querySelector('.tw-answer-message');
+        if (!elMessage) {
+          return;
+        }
+        let text = elMessage.innerText || '';
+        text = (text || '').trim();
+        if (!text) {
+          return;
+        }
+        if (text.length > 1000) {
+          text = text.substring(0, 1000);
+        }
+        elSaveAsNote.disabled = true;
+        createNoteApiCall(text, (result) => {
+          onSuccessDefault(result);
+          elSaveAsNote.disabled = false;
+        });
+      });
+    }
 
     const elConversation = document.querySelector('.tw-conversation');
     elConversation.appendChild(elDirective);
