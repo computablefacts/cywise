@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\AppTrace;
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,12 +32,13 @@ class LogJsonRpcRequests
         try {
 
             // user
+            /** @var User $user */
             $user = Auth::user();
 
             // In
             $verb = $request->method();
             $endpoint = $request->path();
-            $payload = json_decode($request->getContent(), true);
+            $payload = json_decode($request->getContent(), true); // TODO : deal with array payloads
             $id = $payload['id'] ?? null;
             $procedure = Str::before($payload['method'], '@');
             $method = Str::after($payload['method'], '@');
