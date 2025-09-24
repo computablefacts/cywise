@@ -38,30 +38,36 @@ class LogJsonRpcRequests
             // In
             $verb = $request->method();
             $endpoint = $request->path();
-            $payload = json_decode($request->getContent(), true); // TODO : deal with array payloads
-            $id = $payload['id'] ?? null;
-            $procedure = Str::before($payload['method'], '@');
-            $method = Str::after($payload['method'], '@');
-            $params = $payload['params'] ?? null; // json
+            $payload = json_decode($request->getContent(), true);
+            $callsIn = is_array($payload) && array_is_list($payload) ? $payload : [$payload];
 
             // Out
             $result = json_decode($response->getContent(), true);
-            $failed = isset($result['error']) || $response->status() !== 200;
+            $callsOut = is_array($result) && array_is_list($result) ? $result : [$result];
 
             // Metrics
             $durationInMs = (int)(($after - $before) * 1000);
 
-            // Update trace
-            /** @var AppTrace $trace */
-            $trace = AppTrace::create([
-                'user_id' => $user?->id,
-                'verb' => $verb,
-                'endpoint' => "/{$endpoint}",
-                'procedure' => $procedure,
-                'method' => $method,
-                'duration_in_ms' => $durationInMs,
-                'failed' => $failed,
-            ]);
+            // Update trace for each call
+            foreach ($callsIn as $call) {
+
+                $id = $call['id'] ?? null;
+                $procedure = Str::before($call['method'], '@');
+                $method = Str::after($call['method'], '@');
+                $result = collect($callsOut)->where('id', $id)->first();
+                $failed = isset($result['error']) || $response->status() !== 200;
+
+                /** @var AppTrace $trace */
+                $trace = AppTrace::create([
+                    'user_id' => $user?->id,
+                    'verb' => $verb,
+                    'endpoint' => "/{$endpoint}",
+                    'procedure' => $procedure,
+                    'method' => $method,
+                    'duration_in_ms' => $durationInMs,
+                    'failed' => $failed,
+                ]);
+            }
         } catch (\Exception $e) {
             Log::error('Failed to log JSON-RPC request/response', ['error' => $e->getMessage()]);
         }
