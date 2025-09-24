@@ -261,9 +261,6 @@ class User extends WaveUser
 
     public function sentinelApiToken(): ?string
     {
-        if (!$this->canManageServers()) {
-            return null;
-        }
         if ($this->se_api_token) {
             return $this->se_api_token;
         }
