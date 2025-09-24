@@ -31,7 +31,6 @@ class LogJsonRpcRequests
         $after = microtime(true);
         try {
 
-            // user
             /** @var User $user */
             $user = Auth::user();
 
@@ -48,7 +47,7 @@ class LogJsonRpcRequests
             // Metrics
             $durationInMs = (int)(($after - $before) * 1000);
 
-            // Update trace for each call
+            // Update traces
             foreach ($callsIn as $call) {
 
                 $id = $call['id'] ?? null;
