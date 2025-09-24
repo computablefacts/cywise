@@ -20,6 +20,11 @@ class LogJsonRpcRequests
      */
     public function handle(Request $request, Closure $next): mixed
     {
+        // 2025-09-23
+        // Calling $next($request) before the try catch to store the App Trace
+        // allow to collect duration BUT it call the Authenticate middleware first
+        // so if authentication failed the JSON RPC call is not recorded in the
+        // App Trace
         $before = microtime(true);
         $response = $next($request);
         $after = microtime(true);
