@@ -112,25 +112,23 @@ class RolesProcedure extends Procedure
     )]
     public function list(Request $request): array
     {
-        $roles = Role::query()->orderBy('name')->get();
-
-        $data = $roles->map(function (Role $role) {
-            
-            $perms = $role->permissions
-                ->pluck('name')
-                ->sort()
-                ->values()
-                ->all();
-
-            return [
-                'id' => $role->id,
-                'name' => $role->name,
-                'permissions' => $perms,
-            ];
-        })->values()->all();
-
         return [
-            'roles' => $data,
+            'roles' => Role::query()
+                ->orderBy('name')
+                ->get()
+                ->map(function (Role $role) {
+                    return [
+                        'id' => $role->id,
+                        'name' => $role->name,
+                        'permissions' => $role->permissions
+                            ->pluck('name')
+                            ->sort()
+                            ->values()
+                            ->all(),
+                    ];
+                })
+                ->values()
+                ->all(),
         ];
     }
 }
