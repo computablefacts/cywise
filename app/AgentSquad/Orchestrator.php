@@ -20,7 +20,7 @@ class Orchestrator
     /** @var AbstractAction[] $commands */
     private array $commands = [];
 
-    public function __construct(string $model = 'meta-llama/Llama-4-Scout-17B-16E-Instruct')
+    public function __construct(string $model = 'Qwen/Qwen3-Next-80B-A3B-Instruct')
     {
         $this->model = $model;
     }
