@@ -55,6 +55,9 @@ class CywiseSeeder extends Seeder
         /** @var DbAppConfigInterface $appConfig */
         $appConfig = new $appConfigClass();
         $this->setupConfigInDb($appConfig->getParams());
+
+        // Read config from DB again
+        app_config_override();
     }
 
     private function setupConfigInDb(array $configs)
