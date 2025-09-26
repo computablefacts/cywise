@@ -38,7 +38,7 @@ class TracesProcedure extends Procedure
         /** @var User $loggedInUser */
         $loggedInUser = $request->user();
 
-        if ($loggedInUser->email === config('towerify.admin.email')) {
+        if ($loggedInUser->isCywiseAdmin()) {
             return [
                 "traces" => AppTrace::select([
                     'app_traces.*',

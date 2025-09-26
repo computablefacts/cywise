@@ -99,7 +99,7 @@ class CyberBuddyProcedure extends Procedure
 
             // TODO : create one agent for each framework
 
-            if ($user->email === config('towerify.admin.email')) {
+            if ($user->isCywiseAdmin()) {
 
                 $in = database_path('seeders/vectors');
                 $out = storage_path('app/vectors');
