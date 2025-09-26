@@ -24,7 +24,7 @@ class CywiseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         $this->setupConfig(); // Should be call first
         $this->setupTenants();
@@ -39,7 +39,7 @@ class CywiseSeeder extends Seeder
         $this->setupUserPromptsAndFrameworks();
     }
 
-    private function setupConfig()
+    private function setupConfig(): void
     {
         $app_env = config('app.env');
         $appConfigClass = sprintf('Database\Seeders\DbConfig\%sDbAppConfig', Str::ucfirst($app_env));
@@ -60,7 +60,7 @@ class CywiseSeeder extends Seeder
         app_config_override();
     }
 
-    private function setupConfigInDb(array $configs)
+    private function setupConfigInDb(array $configs): void
     {
         foreach ($configs as $key => $value) {
             if (Str::startsWith($key, 'encrypted:')) {
@@ -80,7 +80,7 @@ class CywiseSeeder extends Seeder
         }
     }
 
-    private function setupWave()
+    private function setupWave(): void
     {
         Role::updateOrCreate([
             'name' => 'admin',
