@@ -3,7 +3,9 @@
         $seo = (is_array($seo)) ? ((object)$seo) : $seo;
     }
 @endphp
-@if(isset($seo->title))
+@if(isset($title))
+    <title>{{ setting('site.title', 'Laravel Wave') . ' - ' . $title }}</title>
+@elseif(isset($seo->title))
     <title>{{ $seo->title }}</title>
 @else
     <title>{{ setting('site.title', 'Laravel Wave') . ' - ' . setting('site.description', 'The Software as a Service Starter Kit built with Laravel') }}</title>
