@@ -170,21 +170,24 @@ class CywiseSeeder extends Seeder
             'description' => 'This is the default user role. This is the default role for a newly registered user.',
         ]);
 
-        Role::updateOrCreate([
+        /** @var Role $essential */
+        $essential = Role::updateOrCreate([
             'name' => Role::ESSENTIAL_PLAN,
             'guard_name' => 'web',
         ], [
             'description' => 'This is a role associated with a Essential Subscriber Plan.',
         ]);
 
-        Role::updateOrCreate([
+        /** @var Role $standard */
+        $standard = Role::updateOrCreate([
             'name' => Role::STANDARD_PLAN,
             'guard_name' => 'web',
         ], [
             'description' => 'This is a role associated with a Standard Subscriber Plan.',
         ]);
 
-        Role::updateOrCreate([
+        /** @var Role $premium */
+        $premium = Role::updateOrCreate([
             'name' => Role::PREMIUM_PLAN,
             'guard_name' => 'web',
         ], [
@@ -192,17 +195,18 @@ class CywiseSeeder extends Seeder
         ]);
 
         // Create or update plans
-        Plan::where('name', 'Essential')->update(['active' => false]); // Deal with legacy plan name
+        Plan::where('name', 'Essential')
+            ->update([
+                'active' => false,
+                'role_id' => $essential->id,
+            ]); // Deal with legacy plan name
 
         Plan::updateOrCreate([
             'name' => config('towerify.stripe.plans.essential.name'),
         ], [
             'description' => config('towerify.stripe.plans.essential.description'),
             'features' => config('towerify.stripe.plans.essential.features'),
-            'role_id' => Role::where('name', Role::ESSENTIAL_PLAN)
-                ->where('guard_name', 'web')
-                ->firstOrFail()
-                ->id,
+            'role_id' => $essential->id,
             'default' => 0,
             'monthly_price' => config('towerify.stripe.plans.essential.monthly_price'),
             'monthly_price_id' => config('towerify.stripe.plans.essential.monthly_price_id'),
@@ -219,10 +223,7 @@ class CywiseSeeder extends Seeder
         ], [
             'description' => config('towerify.stripe.plans.standard.description'),
             'features' => config('towerify.stripe.plans.standard.features'),
-            'role_id' => Role::where('name', Role::STANDARD_PLAN)
-                ->where('guard_name', 'web')
-                ->firstOrFail()
-                ->id,
+            'role_id' => $standard->id,
             'default' => 1,
             'monthly_price' => config('towerify.stripe.plans.standard.monthly_price'),
             'monthly_price_id' => config('towerify.stripe.plans.standard.monthly_price_id'),
@@ -239,10 +240,7 @@ class CywiseSeeder extends Seeder
         ], [
             'description' => config('towerify.stripe.plans.premium.description'),
             'features' => config('towerify.stripe.plans.premium.features'),
-            'role_id' => Role::where('name', Role::PREMIUM_PLAN)
-                ->where('guard_name', 'web')
-                ->firstOrFail()
-                ->id,
+            'role_id' => $premium->id,
             'default' => 0,
             'monthly_price' => config('towerify.stripe.plans.premium.monthly_price'),
             'monthly_price_id' => config('towerify.stripe.plans.premium.monthly_price_id'),
@@ -254,10 +252,10 @@ class CywiseSeeder extends Seeder
             'sort_order' => 3,
         ]);
 
-        // Remove deprecated plans
-        Plan::whereIn('name', ['basic', 'pro'])->delete();
+        // Remove unused plans
+        Plan::whereIn('name', ['Essential', 'basic', 'pro'])->delete();
 
-        // Remove deprecated roles
+        // Detach unused roles
         $deprecated = ['administrator', 'limited administrator', 'basic end user', 'basic', 'pro'];
 
         Role::whereIn('name', $deprecated)->each(fn(Role $role) => $role->permissions()->detach());
@@ -274,8 +272,6 @@ class CywiseSeeder extends Seeder
                     $user->assignRole(Role::REGISTERED);
                 }
             });
-
-        Role::whereIn('name', $deprecated)->delete();
 
         // Create missing roles
         foreach (Role::ROLES as $role => $permissions) {
@@ -329,6 +325,9 @@ class CywiseSeeder extends Seeder
             ->toArray();
 
         Permission::whereNotIn('name', $permissions)->delete();
+
+        // Remove unused roles
+        Role::whereIn('name', $deprecated)->delete();
     }
 
     private function setupCywiseAdmin(): void
