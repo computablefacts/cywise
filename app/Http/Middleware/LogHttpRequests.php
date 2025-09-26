@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\AppTrace;
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ class LogHttpRequests
         $after = microtime(true);
         try {
 
-            // user
+            /** @var User $user */
             $user = Auth::user();
 
             // In

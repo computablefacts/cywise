@@ -36,6 +36,7 @@ use App\Http\Controllers\Iframes\TablesController;
 use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Controllers\Iframes\TracesController;
 use App\Http\Controllers\Iframes\UsersController;
+use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Listeners\EndVulnsScanListener;
@@ -611,7 +612,7 @@ Route::delete('/frameworks/{id}', '\App\Http\Controllers\CyberBuddyController@un
 
 Route::post('/frameworks/{id}', '\App\Http\Controllers\CyberBuddyController@loadFramework')->middleware('auth');
 
-Route::middleware(['auth', LogHttpRequests::class])->prefix('iframes')->name('iframes.')->group(function () {
+Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class])->prefix('iframes')->name('iframes.')->group(function () {
     Route::get('/assets', [TimelineController::class, '__invoke'])->name('assets');
     Route::get('/chunks', [ChunksController::class, '__invoke'])->name('chunks');
     Route::get('/collections', [CollectionsController::class, '__invoke'])->name('collections');

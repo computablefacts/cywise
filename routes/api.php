@@ -261,7 +261,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
                 GzipCompress::class,
                 \App\Http\Middleware\LogJsonRpcRequests::class,
                 \App\Http\Middleware\Authenticate::class,
-                // \App\Http\Middleware\CheckPermissionsJsonRpcRequest::class,
+                \App\Http\Middleware\CheckPermissionsJsonRpcRequest::class,
             ]);
     });
 });

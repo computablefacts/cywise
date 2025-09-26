@@ -33,13 +33,13 @@ class CheckPermissionsJsonRpcRequest
             $method = Str::lower(Str::after($call['method'], '@'));
             $permission = "{$procedure}.{$method}";
 
-            if (!$user->checkPermissionTo($permission)) {
+            if ($user->cannot($permission)) {
                 $responses[] = [
                     'jsonrpc' => '2.0',
                     'id' => $id,
                     'error' => [
                         'code' => 403,
-                        'message' => 'Permission denied',
+                        'message' => 'Permission denied.',
                         'data' => [
                             'required_permission' => $permission,
                         ],
