@@ -99,7 +99,7 @@ class User extends WaveUser
             }
 
             // Assign the default roles
-            $user->syncRoles(Role::ADMINISTRATOR, Role::LIMITED_ADMINISTRATOR, Role::BASIC_END_USER, config('wave.default_user_role', 'registered'));
+            $user->assignRole(config('wave.default_user_role', 'registered'));
 
             // Set frameworks, templates and roles
             $user->actAs();
@@ -159,13 +159,33 @@ class User extends WaveUser
     {
         return $this->email === config('towerify.admin.email');
     }
-    
+
     public function tenant(): ?Tenant
     {
         if ($this->tenant_id) {
             return Tenant::where('id', $this->tenant_id)->first();
         }
         return null;
+    }
+
+    public function canView(string $route): bool
+    {
+        return $this->can("view.{$route}");
+    }
+
+    public function cannotView(string $route): bool
+    {
+        return $this->cannot("view.{$route}");
+    }
+
+    public function canCall(string $procedure, string $method): bool
+    {
+        return $this->can("call.{$procedure}.{$method}");
+    }
+
+    public function cannotCall(string $procedure, string $method): bool
+    {
+        return $this->cannot("call.{$procedure}.{$method}");
     }
 
     public function init(bool $forceUpdate = false): void
@@ -273,72 +293,6 @@ class User extends WaveUser
         $this->save();
 
         return $plainTextToken;
-    }
-
-    /** @deprecated */
-    public function canListServers(): bool
-    {
-        return $this->hasPermissionTo(Permission::LIST_SERVERS) || $this->canManageServers();
-    }
-
-    /** @deprecated */
-    public function canManageServers(): bool
-    {
-        return $this->hasPermissionTo(Permission::MANAGE_SERVERS);
-    }
-
-    /** @deprecated */
-    public function canListApps(): bool
-    {
-        return $this->hasPermissionTo(Permission::LIST_APPS) || $this->canManageApps();
-    }
-
-    /** @deprecated */
-    public function canManageApps(): bool
-    {
-        return $this->hasPermissionTo(Permission::MANAGE_APPS);
-    }
-
-    /** @deprecated */
-    public function canListUsers(): bool
-    {
-        return $this->hasPermissionTo(Permission::LIST_USERS) || $this->canManageUsers();
-    }
-
-    /** @deprecated */
-    public function canManageUsers(): bool
-    {
-        return $this->hasPermissionTo(Permission::MANAGE_USERS);
-    }
-
-    /** @deprecated */
-    public function canListOrders(): bool
-    {
-        return $this->canListServers() && $this->canListApps();
-    }
-
-    /** @deprecated */
-    public function canBuyStuff(): bool
-    {
-        return $this->hasPermissionTo(Permission::BUY_STUFF);
-    }
-
-    /** @deprecated */
-    public function canUseAdversaryMeter(): bool
-    {
-        return $this->hasPermissionTo(Permission::USE_ADVERSARY_METER);
-    }
-
-    /** @deprecated */
-    public function canUseAgents(): bool
-    {
-        return $this->canManageServers() || $this->hasPermissionTo(Permission::USE_AGENTS);
-    }
-
-    /** @deprecated */
-    public function canUseCyberBuddy(): bool
-    {
-        return $this->hasPermissionTo(Permission::USE_CYBER_BUDDY);
     }
 
     public function ynhUsername(): string

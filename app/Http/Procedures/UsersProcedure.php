@@ -2,8 +2,8 @@
 
 namespace App\Http\Procedures;
 
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -20,12 +20,8 @@ class UsersProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function toggleGetsAuditReport(Request $request): array
+    public function toggleGetsAuditReport(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageUsers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'user_id' => 'required|integer|exists:users,id',
         ]);

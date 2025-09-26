@@ -2,10 +2,10 @@
 
 namespace App\Http\Procedures;
 
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\HiddenAlert;
-use Illuminate\Http\Request;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -25,12 +25,8 @@ class VulnerabilitiesProcedure extends Procedure
             "low" => "A list of vulnerabilities with low severity.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'asset_id' => 'nullable|integer|exists:am_assets,id',
             'level' => 'nullable|string|min:3|max:6|in:high,medium,low',
@@ -71,12 +67,8 @@ class VulnerabilitiesProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function toggleVisibility(Request $request): array
+    public function toggleVisibility(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'uid' => 'nullable|string',
             'type' => 'nullable|string',
@@ -131,12 +123,8 @@ class VulnerabilitiesProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function markAsResolved(Request $request): array
+    public function markAsResolved(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'vulnerability_id' => 'required|integer|exists:am_alerts,id',
         ]);

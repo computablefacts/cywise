@@ -8,8 +8,8 @@ use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\Enums\AssetTypesEnum;
 use App\Http\Procedures\AssetsProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ListAssets extends AbstractAction
@@ -72,11 +72,11 @@ class ListAssets extends AbstractAction
 
         $procedure = new AssetsProcedure();
         if ($status === 'monitored') {
-            $request = new Request(['is_monitored' => true]);
+            $request = new JsonRpcRequest(['is_monitored' => true]);
         } else if ($status === 'monitorable') {
-            $request = new Request(['is_monitored' => false]);
+            $request = new JsonRpcRequest(['is_monitored' => false]);
         } else {
-            $request = new Request();
+            $request = new JsonRpcRequest();
         }
         $request->setUserResolver(fn() => $user);
 

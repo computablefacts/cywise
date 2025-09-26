@@ -7,10 +7,10 @@ use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\Http\Procedures\AssetsProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Asset;
 use App\Models\User;
 use App\Rules\IsValidAsset;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ManageAssets extends AbstractAction
@@ -68,7 +68,7 @@ class ManageAssets extends AbstractAction
             if ($azzet) {
                 return new FailedAnswer("Asset {$asset} already exists.");
             }
-            $request = new Request(['asset' => $asset, 'watch' => false]);
+            $request = new JsonRpcRequest(['asset' => $asset, 'watch' => false]);
             $request->setUserResolver(fn() => $user);
             $result = (new AssetsProcedure())->create($request);
             return new SuccessfulAnswer("Asset {$asset} added successfully.");
@@ -78,7 +78,7 @@ class ManageAssets extends AbstractAction
         }
 
         $procedure = new AssetsProcedure();
-        $request = new Request(['asset_id' => $azzet->id]);
+        $request = new JsonRpcRequest(['asset_id' => $azzet->id]);
         $request->setUserResolver(fn() => $user);
 
         try {

@@ -4,8 +4,8 @@ namespace App\Helpers;
 
 use App\Hashing\TwHasher;
 use App\Models\Role;
-use App\Models\YnhServer;
 use App\Models\User;
+use App\Models\YnhServer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,6 +21,7 @@ class EventsSeeder
 
     private static function firstOrCreateDismissTestUser(string $name, string $email, string $password): User
     {
+        /** @var User $user */
         $user = User::query()->firstOrCreate(
             ['email' => $email],
             [

@@ -8,12 +8,12 @@ use App\Events\AddUserPermission;
 use App\Events\InstallApp;
 use App\Events\RemoveUserPermission;
 use App\Events\UninstallApp;
+use App\Http\Requests\JsonRpcRequest;
+use App\Models\User;
 use App\Models\YnhApplication;
 use App\Models\YnhOrder;
 use App\Models\YnhServer;
 use App\Models\YnhUser;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Sajya\Server\Attributes\RpcMethod;
@@ -33,12 +33,8 @@ class ApplicationsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function installApp(Request $request): array
+    public function installApp(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageApps()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
             'server_id' => 'required|integer|exists:ynh_servers,id',
@@ -84,12 +80,8 @@ class ApplicationsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function uninstallApp(Request $request): array
+    public function uninstallApp(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageApps()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'application_id' => 'required|integer|exists:ynh_applications,id',
             'server_id' => 'required|integer|exists:ynh_servers,id',
@@ -127,12 +119,8 @@ class ApplicationsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function addTowerifyUserPermission(Request $request): array
+    public function addTowerifyUserPermission(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageUsers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'permission' => 'required|string|min:1|max:100',
             'user_id' => 'required|integer|exists:ynh_users,id',
@@ -173,12 +161,8 @@ class ApplicationsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function addUserPermission(Request $request): array
+    public function addUserPermission(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageUsers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'permission' => 'required|string|min:1|max:100',
             'user_id' => 'required|integer|exists:ynh_users,id',
@@ -219,12 +203,8 @@ class ApplicationsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function removeUserPermission(Request $request): array
+    public function removeUserPermission(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageUsers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'permission' => 'required|string|min:1|max:100',
             'user_id' => 'required|integer|exists:ynh_users,id',

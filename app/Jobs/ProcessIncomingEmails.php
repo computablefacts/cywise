@@ -6,6 +6,7 @@ use App\AgentSquad\Providers\PromptsProvider;
 use App\Http\Controllers\Iframes\CyberBuddyController;
 use App\Http\Procedures\TheCyberBriefProcedure;
 use App\Http\Requests\ConverseRequest;
+use App\Http\Requests\JsonRpcRequest;
 use App\Listeners\EndVulnsScanListener;
 use App\Models\Collection;
 use App\Models\Conversation;
@@ -17,7 +18,6 @@ use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Http\Request;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
@@ -72,7 +72,7 @@ class ProcessIncomingEmails implements ShouldQueue
                     ];
                 } else {
                     try {
-                        $request = new Request([
+                        $request = new JsonRpcRequest([
                             'url_or_text' => $url,
                             'prompt' => $prompt,
                         ]);

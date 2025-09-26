@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
 use App\Http\Procedures\AssetsProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Asset;
 use App\Models\AssetTag;
 use App\Models\Screenshot;
@@ -21,7 +22,7 @@ class AssetController extends Controller
 
     public function discover(Request $request): array
     {
-        return (new AssetsProcedure())->discover($request);
+        return (new AssetsProcedure())->discover(JsonRpcRequest::createFrom($request));
     }
 
     public function discoverFromIp(Request $request): array
@@ -36,7 +37,7 @@ class AssetController extends Controller
 
     public function saveAsset(Request $request): array
     {
-        return (new AssetsProcedure())->create($request);
+        return (new AssetsProcedure())->create(JsonRpcRequest::createFrom($request));
     }
 
     public function userAssets(Request $request): array
@@ -45,21 +46,21 @@ class AssetController extends Controller
             'is_monitored' => $request->string('valid'),
             'created_the_last_x_hours' => $request->integer('hours'),
         ]);
-        return (new AssetsProcedure())->list($request);
+        return (new AssetsProcedure())->list(JsonRpcRequest::createFrom($request));
     }
 
     public function assetMonitoringBegins(Asset $asset): array
     {
         $request = new Request(['asset_id' => $asset->id]);
         $request->setUserResolver(fn() => auth()->user());
-        return (new AssetsProcedure())->monitor($request);
+        return (new AssetsProcedure())->monitor(JsonRpcRequest::createFrom($request));
     }
 
     public function assetMonitoringEnds(Asset $asset): array
     {
         $request = new Request(['asset_id' => $asset->id]);
         $request->setUserResolver(fn() => auth()->user());
-        return (new AssetsProcedure())->unmonitor($request);
+        return (new AssetsProcedure())->unmonitor(JsonRpcRequest::createFrom($request));
     }
 
     public function screenshot(Screenshot $screenshot): array
@@ -75,7 +76,7 @@ class AssetController extends Controller
             'asset_id' => $asset->id,
             'tag' => $request->input('key', ''),
         ]);
-        $tag = (new AssetsProcedure())->tag($request);
+        $tag = (new AssetsProcedure())->tag(JsonRpcRequest::createFrom($request));
         return collect([[
             'id' => $tag['tag']->id,
             'key' => $tag['tag']->tag,
@@ -89,7 +90,7 @@ class AssetController extends Controller
             'tag_id' => $assetTag->id,
         ]);
         $request->setUserResolver(fn() => auth()->user());
-        (new AssetsProcedure())->untag($request);
+        (new AssetsProcedure())->untag(JsonRpcRequest::createFrom($request));
     }
 
     public function infosFromAsset(string $assetBase64, int $trialId = 0): array
@@ -99,20 +100,20 @@ class AssetController extends Controller
             'trial_id' => $trialId,
         ]);
         $request->setUserResolver(fn() => auth()->user());
-        return (new AssetsProcedure())->get($request);
+        return (new AssetsProcedure())->get(JsonRpcRequest::createFrom($request));
     }
 
     public function deleteAsset(Asset $asset): void
     {
         $request = new Request(['asset_id' => $asset->id]);
         $request->setUserResolver(fn() => auth()->user());
-        (new AssetsProcedure())->delete($request);
+        (new AssetsProcedure())->delete(JsonRpcRequest::createFrom($request));
     }
 
     public function restartScan(Asset $asset): array
     {
         $request = new Request(['asset_id' => $asset->id]);
         $request->setUserResolver(fn() => auth()->user());
-        return (new AssetsProcedure())->restartScan($request);
+        return (new AssetsProcedure())->restartScan(JsonRpcRequest::createFrom($request));
     }
 }

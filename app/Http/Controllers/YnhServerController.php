@@ -6,6 +6,7 @@ use App\Http\Procedures\ServersProcedure;
 use App\Http\Requests\CreateBackupRequest;
 use App\Http\Requests\CreateHostRequest;
 use App\Http\Requests\DownloadBackupRequest;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\YnhBackup;
 use App\Models\YnhServer;
 use Illuminate\Http\Request;
@@ -38,7 +39,7 @@ class YnhServerController extends Controller
         $request->merge([
             'order_id' => $request->input('order', 0),
         ]);
-        $server = (new ServersProcedure())->create($request);
+        $server = (new ServersProcedure())->create(JsonRpcRequest::createFrom($request));
         $tab = 'settings';
         return view('_server', compact('server', 'tab'));
     }
@@ -46,7 +47,7 @@ class YnhServerController extends Controller
     public function createBackup(YnhServer $server, CreateBackupRequest $request)
     {
         $request->merge(['server_id' => $server->id]);
-        return response()->json(['success' => (new ServersProcedure())->createBackup($request)]);
+        return response()->json(['success' => (new ServersProcedure())->createBackup(JsonRpcRequest::createFrom($request))]);
     }
 
     public function downloadBackup(YnhServer $server, YnhBackup $backup, DownloadBackupRequest $request)

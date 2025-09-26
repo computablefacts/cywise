@@ -2,9 +2,9 @@
 
 namespace App\Http\Procedures;
 
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Collection;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -22,7 +22,7 @@ class CollectionsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function update(Request $request): array
+    public function update(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'collection_id' => 'required|integer|exists:cb_prompts,id',
@@ -58,7 +58,7 @@ class CollectionsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function delete(Request $request): array
+    public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'collection_id' => 'required|integer|exists:cb_collections,id',
@@ -97,7 +97,7 @@ class CollectionsProcedure extends Procedure
             "collections" => "A list of collections.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'page' => ['nullable', 'integer', 'min:1'],

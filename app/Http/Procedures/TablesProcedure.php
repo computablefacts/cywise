@@ -9,10 +9,10 @@ use App\Helpers\ClickhouseLocal;
 use App\Helpers\ClickhouseUtils;
 use App\Helpers\LlmProvider;
 use App\Helpers\TableStorage;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Table;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -30,7 +30,7 @@ class TablesProcedure extends Procedure
             "tables" => "An array of tables.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
         return [
             'tables' => Table::query()
@@ -74,7 +74,7 @@ class TablesProcedure extends Procedure
             "message" => "A success message.",
         ]
     )]
-    public function import(Request $request): array
+    public function import(JsonRpcRequest $request): array
     {
         $validated = $request->validate([
             'storage' => ['required', Rule::enum(StorageType::class)],
@@ -117,7 +117,7 @@ class TablesProcedure extends Procedure
             'data' => 'The requested data.',
         ]
     )]
-    public function executeSqlQuery(Request $request): array
+    public function executeSqlQuery(JsonRpcRequest $request): array
     {
         $validated = $request->validate([
             'query' => 'required|string|min:1|max:5000',
@@ -214,7 +214,7 @@ class TablesProcedure extends Procedure
             "files" => "An array of files.",
         ]
     )]
-    public function listBucketContent(Request $request): array
+    public function listBucketContent(JsonRpcRequest $request): array
     {
         $validated = $request->validate([
             'storage' => ['required', Rule::enum(StorageType::class)],
@@ -261,7 +261,7 @@ class TablesProcedure extends Procedure
             "tables" => "An array of tables.",
         ]
     )]
-    public function listFileContent(Request $request): array
+    public function listFileContent(JsonRpcRequest $request): array
     {
         $validated = $request->validate([
             'storage' => ['required', Rule::enum(StorageType::class)],
@@ -299,7 +299,7 @@ class TablesProcedure extends Procedure
             "query" => "The SQL query.",
         ]
     )]
-    public function promptToQuery(Request $request): array
+    public function promptToQuery(JsonRpcRequest $request): array
     {
         $validated = $request->validate([
             'prompt' => 'required|string|min:1|max:5000',

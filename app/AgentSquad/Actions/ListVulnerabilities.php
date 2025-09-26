@@ -8,10 +8,10 @@ use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use App\Http\Procedures\VulnerabilitiesProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ListVulnerabilities extends AbstractAction
@@ -69,9 +69,9 @@ class ListVulnerabilities extends AbstractAction
 
         $procedure = new VulnerabilitiesProcedure();
         if ($asset === 'all' && $level === 'any') {
-            $request = new Request();
+            $request = new JsonRpcRequest();
         } else if ($asset === 'all') {
-            $request = new Request(['level' => $level]);
+            $request = new JsonRpcRequest(['level' => $level]);
         } else {
             /** @var Asset $azzet */
             $azzet = Asset::where('asset', $asset)->first();
@@ -82,9 +82,9 @@ class ListVulnerabilities extends AbstractAction
                 return new FailedAnswer("Asset {$asset} is not monitored.");
             }
             if ($level === 'any') {
-                $request = new Request(['asset_id' => $azzet->id]);
+                $request = new JsonRpcRequest(['asset_id' => $azzet->id]);
             } else {
-                $request = new Request(['asset_id' => $azzet->id, 'level' => $level]);
+                $request = new JsonRpcRequest(['asset_id' => $azzet->id, 'level' => $level]);
             }
         }
         $request->setUserResolver(fn() => $user);

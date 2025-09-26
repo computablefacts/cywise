@@ -3,8 +3,8 @@
 namespace App\Http\Procedures;
 
 use App\Events\SendInvitation;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -23,11 +23,8 @@ class InvitationsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function create(Request $request): array
+    public function create(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageUsers()) {
-            throw new \Exception('Missing permission.');
-        }
         if (!$request->exists('users')) {
 
             $params = $request->validate([
@@ -80,12 +77,8 @@ class InvitationsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function send(Request $request): array
+    public function send(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageUsers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'id' => 'required|integer|exists:invitations,id',
         ]);

@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 
+/** @deprecated */
 class ProductIndexRequest extends FormRequest
 {
     public function filters(Collection $properties)

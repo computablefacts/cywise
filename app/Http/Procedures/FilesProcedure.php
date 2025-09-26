@@ -2,9 +2,9 @@
 
 namespace App\Http\Procedures;
 
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\File;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -21,7 +21,7 @@ class FilesProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function delete(Request $request): array
+    public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'file_id' => 'required|integer|exists:cb_files,id',
@@ -62,7 +62,7 @@ class FilesProcedure extends Procedure
             "files" => "A list of files.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'page' => ['nullable', 'integer', 'min:1'],

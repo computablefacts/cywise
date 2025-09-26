@@ -435,7 +435,7 @@ Route::get('/performa/user/login/{performa_domain}', function (string $performa_
                 'full_name' => $user->name,
                 'email' => $user->email,
                 'privileges' => [
-                    'admin' => $user->canManageServers() ? 1 : 0,
+                    'admin' => 1,
                 ],
             ],
         ]);

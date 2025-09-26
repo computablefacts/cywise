@@ -3,9 +3,9 @@
 namespace App\Http\Procedures;
 
 use App\Enums\OsqueryPlatformEnum;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
 use App\Models\YnhOsqueryRule;
-use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -30,7 +30,7 @@ class OsqueryRulesProcedure extends Procedure
             "rule" => "An Osquery rule.",
         ]
     )]
-    public function create(Request $request): array
+    public function create(JsonRpcRequest $request): array
     {
         $user = $request->user();
         $params = $request->validate([
@@ -108,7 +108,7 @@ class OsqueryRulesProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function delete(Request $request): array
+    public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'rule_id' => 'required|integer|exists:ynh_osquery_rules,id',
@@ -136,7 +136,7 @@ class OsqueryRulesProcedure extends Procedure
             "rules" => "The list of enabled Osquery rules.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
         $user = $request->user();
         return [

@@ -11,11 +11,11 @@ use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Orchestrator;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\Enums\RoleEnum;
+use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
 use App\Models\Conversation;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -38,7 +38,7 @@ class CyberBuddyProcedure extends Procedure
             "html" => "CyberBuddy's answer in HTML.",
         ]
     )]
-    public function ask(Request $request): array
+    public function ask(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'thread_id' => 'required|string|min:10|max:10|regex:/^[a-zA-Z0-9]+$/',

@@ -3,7 +3,7 @@
 namespace App\Http\Procedures;
 
 use App\Helpers\LlmProvider;
-use Illuminate\Http\Request;
+use App\Http\Requests\JsonRpcRequest;
 use Illuminate\Support\Str;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -22,7 +22,7 @@ class TheCyberBriefProcedure extends Procedure
             "summary" => "The summary of the text or webpage.",
         ]
     )]
-    public function summarize(Request $request): array
+    public function summarize(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'url_or_text' => 'required|string',

@@ -10,11 +10,11 @@ use App\Events\DeleteAsset;
 use App\Events\PullServerInfos;
 use App\Helpers\Messages;
 use App\Helpers\SshKeyPair;
+use App\Http\Requests\JsonRpcRequest;
+use App\Models\User;
 use App\Models\YnhDomain;
 use App\Models\YnhServer;
-use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -35,12 +35,8 @@ class ServersProcedure extends Procedure
             "server" => "A server object.",
         ]
     )]
-    public function create(Request $request): array
+    public function create(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageServers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'order_id' => 'integer|min:0',
         ]);
@@ -82,12 +78,8 @@ class ServersProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function delete(Request $request): array
+    public function delete(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageServers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'server_id' => 'required|integer|exists:ynh_servers,id',
         ]);
@@ -139,12 +131,8 @@ class ServersProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function configure(Request $request): array
+    public function configure(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageServers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'name' => 'required|string|min:3|max:30',
             'ip' => 'required|ip',
@@ -243,12 +231,8 @@ class ServersProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function testSshConnection(Request $request): array
+    public function testSshConnection(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canListServers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'ip' => 'required|ip',
             'port' => 'required|integer|min:1|max:65535',
@@ -280,12 +264,8 @@ class ServersProcedure extends Procedure
             "output" => "The command output.",
         ]
     )]
-    public function executeShellCommand(Request $request): array
+    public function executeShellCommand(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageServers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'cmd' => 'required|string|max:800',
             'server_id' => 'required|integer|exists:ynh_servers,id',
@@ -327,12 +307,8 @@ class ServersProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function pullServerInfos(Request $request): array
+    public function pullServerInfos(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageServers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'server_id' => 'required|integer|exists:ynh_servers,id',
         ]);
@@ -364,12 +340,8 @@ class ServersProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function createBackup(Request $request): array
+    public function createBackup(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageServers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'server_id' => 'required|integer|exists:ynh_servers,id',
         ]);
@@ -401,12 +373,8 @@ class ServersProcedure extends Procedure
             "events" => "An array of security events.",
         ]
     )]
-    public function messages(Request $request): array
+    public function messages(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAgents()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'server_id' => 'required|integer|exists:ynh_servers,id',
         ]);

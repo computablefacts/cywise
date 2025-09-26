@@ -27,11 +27,9 @@ class CywiseSeeder extends Seeder
     public function run(): void
     {
         $this->setupConfig(); // Should be call first
-        $this->setupTenants();
-        $this->setupPermissions();
-        $this->setupRoles();
+        $this->setupPermissionsRolesAndPlans();
         $this->setupWave();
-        $this->setupUsers();
+        $this->setupCywiseAdmin();
         $this->setupOssecRules();
         $this->setupOsqueryRules();
         $this->fillMissingOsqueryUids();
@@ -82,67 +80,6 @@ class CywiseSeeder extends Seeder
 
     private function setupWave(): void
     {
-        Role::updateOrCreate([
-            'name' => 'admin',
-            'guard_name' => 'web',
-        ], [
-            'description' => 'The admin user has full access to all features including the ability to access the admin panel.',
-        ]);
-        Role::updateOrCreate([
-            'name' => 'registered',
-            'guard_name' => 'web',
-        ], [
-            'description' => 'This is the default user role. If a user has this role they have created an account; however, they are not a subscriber.',
-        ]);
-        Plan::where('name', 'Essential')->update(['active' => false]); // Deal with legacy plan name
-        Plan::updateOrCreate([
-            'name' => config('towerify.stripe.plans.essential.name'),
-        ], [
-            'description' => config('towerify.stripe.plans.essential.description'),
-            'features' => config('towerify.stripe.plans.essential.features'),
-            'role_id' => Role::where('name', 'administrator')->where('guard_name', 'web')->firstOrFail()->id,
-            'default' => 0,
-            'monthly_price' => config('towerify.stripe.plans.essential.monthly_price'),
-            'monthly_price_id' => config('towerify.stripe.plans.essential.monthly_price_id'),
-            'yearly_price' => config('towerify.stripe.plans.essential.yearly_price'),
-            'yearly_price_id' => config('towerify.stripe.plans.essential.yearly_price_id'),
-            'onetime_price' => config('towerify.stripe.plans.essential.onetime_price'),
-            'onetime_price_id' => config('towerify.stripe.plans.essential.onetime_price_id'),
-            'currency' => '€',
-            'sort_order' => 1,
-        ]);
-        Plan::updateOrCreate([
-            'name' => config('towerify.stripe.plans.standard.name'),
-        ], [
-            'description' => config('towerify.stripe.plans.standard.description'),
-            'features' => config('towerify.stripe.plans.standard.features'),
-            'role_id' => Role::where('name', 'administrator')->where('guard_name', 'web')->firstOrFail()->id,
-            'default' => 1,
-            'monthly_price' => config('towerify.stripe.plans.standard.monthly_price'),
-            'monthly_price_id' => config('towerify.stripe.plans.standard.monthly_price_id'),
-            'yearly_price' => config('towerify.stripe.plans.standard.yearly_price'),
-            'yearly_price_id' => config('towerify.stripe.plans.standard.yearly_price_id'),
-            'onetime_price' => config('towerify.stripe.plans.standard.onetime_price'),
-            'onetime_price_id' => config('towerify.stripe.plans.standard.onetime_price_id'),
-            'currency' => '€',
-            'sort_order' => 2,
-        ]);
-        Plan::updateOrCreate([
-            'name' => config('towerify.stripe.plans.premium.name'),
-        ], [
-            'description' => config('towerify.stripe.plans.premium.description'),
-            'features' => config('towerify.stripe.plans.premium.features'),
-            'role_id' => Role::where('name', 'administrator')->where('guard_name', 'web')->firstOrFail()->id,
-            'default' => 0,
-            'monthly_price' => config('towerify.stripe.plans.premium.monthly_price'),
-            'monthly_price_id' => config('towerify.stripe.plans.premium.monthly_price_id'),
-            'yearly_price' => config('towerify.stripe.plans.premium.yearly_price'),
-            'yearly_price_id' => config('towerify.stripe.plans.premium.yearly_price_id'),
-            'onetime_price' => config('towerify.stripe.plans.premium.onetime_price'),
-            'onetime_price_id' => config('towerify.stripe.plans.premium.onetime_price_id'),
-            'currency' => '€',
-            'sort_order' => 3,
-        ]);
         Setting::updateOrCreate([
             'key' => 'site.title',
         ], [
@@ -216,51 +153,185 @@ class CywiseSeeder extends Seeder
         ]);
     }
 
-    private function setupTenants(): void
+    private function setupPermissionsRolesAndPlans(): void
     {
-        //
-    }
+        // Create or update roles associated to plans
+        Role::updateOrCreate([
+            'name' => Role::ADMIN,
+            'guard_name' => 'web',
+        ], [
+            'description' => 'This is the role you will have as the developer and administrator.',
+        ]);
 
-    private function setupPermissions(): void
-    {
-        // Remove support for legacy permissions
-        Permission::where('name', 'configure ssh connections')->delete();
-        Permission::where('name', 'configure app permissions')->delete();
-        Permission::where('name', 'configure user apps')->delete();
-        Permission::where('name', 'deploy apps')->delete();
-        Permission::where('name', 'launch apps')->delete();
-        Permission::where('name', 'send invitations')->delete();
+        Role::updateOrCreate([
+            'name' => Role::REGISTERED,
+            'guard_name' => 'web',
+        ], [
+            'description' => 'This is the default user role. This is the default role for a newly registered user.',
+        ]);
 
-        // Create missing permissions
-        foreach (Role::ROLES as $role => $permissions) {
-            foreach ($permissions as $permission) {
-                $perm = Permission::firstOrCreate(
-                    ['name' => $permission],
-                    [
-                        'name' => $permission,
-                        'guard_name' => 'web',
-                    ]
-                );
-            }
-        }
-    }
+        Role::updateOrCreate([
+            'name' => Role::ESSENTIAL_PLAN,
+            'guard_name' => 'web',
+        ], [
+            'description' => 'This is a role associated with a Essential Subscriber Plan.',
+        ]);
 
-    private function setupRoles(): void
-    {
+        Role::updateOrCreate([
+            'name' => Role::STANDARD_PLAN,
+            'guard_name' => 'web',
+        ], [
+            'description' => 'This is a role associated with a Standard Subscriber Plan.',
+        ]);
+
+        Role::updateOrCreate([
+            'name' => Role::PREMIUM_PLAN,
+            'guard_name' => 'web',
+        ], [
+            'description' => 'This is a role associated with a Premium Subscriber plan.',
+        ]);
+
+        // Create or update plans
+        Plan::where('name', 'Essential')->update(['active' => false]); // Deal with legacy plan name
+
+        Plan::updateOrCreate([
+            'name' => config('towerify.stripe.plans.essential.name'),
+        ], [
+            'description' => config('towerify.stripe.plans.essential.description'),
+            'features' => config('towerify.stripe.plans.essential.features'),
+            'role_id' => Role::where('name', Role::ESSENTIAL_PLAN)
+                ->where('guard_name', 'web')
+                ->firstOrFail()
+                ->id,
+            'default' => 0,
+            'monthly_price' => config('towerify.stripe.plans.essential.monthly_price'),
+            'monthly_price_id' => config('towerify.stripe.plans.essential.monthly_price_id'),
+            'yearly_price' => config('towerify.stripe.plans.essential.yearly_price'),
+            'yearly_price_id' => config('towerify.stripe.plans.essential.yearly_price_id'),
+            'onetime_price' => config('towerify.stripe.plans.essential.onetime_price'),
+            'onetime_price_id' => config('towerify.stripe.plans.essential.onetime_price_id'),
+            'currency' => '€',
+            'sort_order' => 1,
+        ]);
+
+        Plan::updateOrCreate([
+            'name' => config('towerify.stripe.plans.standard.name'),
+        ], [
+            'description' => config('towerify.stripe.plans.standard.description'),
+            'features' => config('towerify.stripe.plans.standard.features'),
+            'role_id' => Role::where('name', Role::STANDARD_PLAN)
+                ->where('guard_name', 'web')
+                ->firstOrFail()
+                ->id,
+            'default' => 1,
+            'monthly_price' => config('towerify.stripe.plans.standard.monthly_price'),
+            'monthly_price_id' => config('towerify.stripe.plans.standard.monthly_price_id'),
+            'yearly_price' => config('towerify.stripe.plans.standard.yearly_price'),
+            'yearly_price_id' => config('towerify.stripe.plans.standard.yearly_price_id'),
+            'onetime_price' => config('towerify.stripe.plans.standard.onetime_price'),
+            'onetime_price_id' => config('towerify.stripe.plans.standard.onetime_price_id'),
+            'currency' => '€',
+            'sort_order' => 2,
+        ]);
+
+        Plan::updateOrCreate([
+            'name' => config('towerify.stripe.plans.premium.name'),
+        ], [
+            'description' => config('towerify.stripe.plans.premium.description'),
+            'features' => config('towerify.stripe.plans.premium.features'),
+            'role_id' => Role::where('name', Role::PREMIUM_PLAN)
+                ->where('guard_name', 'web')
+                ->firstOrFail()
+                ->id,
+            'default' => 0,
+            'monthly_price' => config('towerify.stripe.plans.premium.monthly_price'),
+            'monthly_price_id' => config('towerify.stripe.plans.premium.monthly_price_id'),
+            'yearly_price' => config('towerify.stripe.plans.premium.yearly_price'),
+            'yearly_price_id' => config('towerify.stripe.plans.premium.yearly_price_id'),
+            'onetime_price' => config('towerify.stripe.plans.premium.onetime_price'),
+            'onetime_price_id' => config('towerify.stripe.plans.premium.onetime_price_id'),
+            'currency' => '€',
+            'sort_order' => 3,
+        ]);
+
+        // Remove deprecated plans
+        Plan::whereIn('name', ['basic', 'pro'])->delete();
+
+        // Remove deprecated roles
+        $deprecated = ['administrator', 'limited administrator', 'basic end user', 'basic', 'pro'];
+
+        Role::whereIn('name', $deprecated)->each(fn(Role $role) => $role->permissions()->detach());
+
+        User::query()
+            ->whereHas('roles', fn($query) => $query->whereIn('name', $deprecated))
+            ->each(function (User $user) use ($deprecated) {
+
+                $user->roles()
+                    ->wherePivotIn('role_id', Role::whereIn('name', $deprecated)->pluck('id'))
+                    ->detach();
+
+                if (!$user->hasRole(Role::REGISTERED)) {
+                    $user->assignRole(Role::REGISTERED);
+                }
+            });
+
+        Role::whereIn('name', $deprecated)->delete();
+
         // Create missing roles
         foreach (Role::ROLES as $role => $permissions) {
+
+            Log::debug("Creating role {$role}...");
+
             /** @var Role $role */
-            $role = Role::firstOrcreate([
-                'name' => $role
-            ]);
+            $role = Role::firstOrcreate(['name' => $role]);
+            $role->permissions()->detach();
+        }
+        foreach (Role::ROLES as $role => $permissions) {
+
+            /** @var Role $role */
+            $role = Role::where('name', $role)->first();
+
+            // Create missing permissions
             foreach ($permissions as $permission) {
+
+                Log::debug("Creating permission {$permission}...");
+
+                if (Str::startsWith($permission, 'call.')) {
+                    $perm = Permission::firstOrCreate(
+                        ['name' => $permission],
+                        ['guard_name' => 'web'] // TODO : use api instead
+                    );
+                }
+                if (Str::startsWith($permission, 'view.')) {
+                    $perm = Permission::firstOrCreate(
+                        ['name' => $permission],
+                        ['guard_name' => 'web']
+                    );
+                }
+            }
+
+            // Attach permissions to role
+            foreach ($permissions as $permission) {
+
+                Log::debug("Attaching permission {$permission} to role {$role->name}...");
+
                 $perm = Permission::where('name', $permission)->firstOrFail();
                 $role->permissions()->syncWithoutDetaching($perm);
             }
         }
+
+        // Remove unused permissions
+        $permissions = Role::all()
+            ->flatMap(fn(Role $role) => $role->permissions()->get())
+            ->map(fn(\Spatie\Permission\Models\Permission $perm) => $perm->name)
+            ->unique()
+            ->values()
+            ->toArray();
+
+        Permission::whereNotIn('name', $permissions)->delete();
     }
 
-    private function setupUsers(): void
+    private function setupCywiseAdmin(): void
     {
         // Create super admin
         $email = config('towerify.admin.email');

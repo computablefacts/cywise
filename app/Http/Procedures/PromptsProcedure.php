@@ -2,9 +2,9 @@
 
 namespace App\Http\Procedures;
 
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Prompt;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -21,7 +21,7 @@ class PromptsProcedure extends Procedure
             "prompt" => "A prompt object.",
         ]
     )]
-    public function get(Request $request): array
+    public function get(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'name' => 'required|string|min:1|max:191|exists:cb_prompts,name',
@@ -53,7 +53,7 @@ class PromptsProcedure extends Procedure
             "prompt" => "A prompt object.",
         ]
     )]
-    public function create(Request $request): array
+    public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'name' => 'required|string|min:1|max:191',
@@ -94,7 +94,7 @@ class PromptsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function update(Request $request): array
+    public function update(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'prompt_id' => 'required|integer|exists:cb_prompts,id',
@@ -130,7 +130,7 @@ class PromptsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function delete(Request $request): array
+    public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'prompt_id' => 'required|integer|exists:cb_prompts,id',
@@ -168,7 +168,7 @@ class PromptsProcedure extends Procedure
             "prompts" => "A list of prompts.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'page' => ['nullable', 'integer', 'min:1'],

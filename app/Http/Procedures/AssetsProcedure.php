@@ -4,6 +4,7 @@ namespace App\Http\Procedures;
 
 use App\Events\BeginPortsScan;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
+use App\Http\Requests\JsonRpcRequest;
 use App\Listeners\CreateAssetListener;
 use App\Listeners\DeleteAssetListener;
 use App\Mail\HoneypotRequested;
@@ -54,7 +55,7 @@ class AssetsProcedure extends Procedure
             "subdomains" => "An array of subdomains.",
         ]
     )]
-    public function discover(Request $request): array
+    public function discover(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'domain' => 'required|string|min:1|max:191',
@@ -112,12 +113,8 @@ class AssetsProcedure extends Procedure
             'hiddenAlerts' => "The asset's hidden vulnerabilities (if any).",
         ]
     )]
-    public function get(Request $request): array
+    public function get(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'asset' => 'required|string|min:1|max:191',
             'trial_id' => 'integer|min:0',
@@ -151,7 +148,7 @@ class AssetsProcedure extends Procedure
                         'asset' => $asset->asset,
                         'trial_id' => $trialId,
                     ]);
-                    return $this->get($request2);
+                    return $this->get(JsonRpcRequest::createFrom($request2));
                 }
             }
             throw new \Exception("The asset could not be identified : {$domainOrIpOrRange}");
@@ -291,12 +288,8 @@ class AssetsProcedure extends Procedure
             "asset" => "An asset object.",
         ]
     )]
-    public function create(Request $request): array
+    public function create(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'asset' => 'required|string|min:1|max:191',
             'watch' => 'boolean',
@@ -331,12 +324,8 @@ class AssetsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function delete(Request $request): array
+    public function delete(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'asset_id' => 'required|integer|exists:am_assets,id',
         ]);
@@ -367,12 +356,8 @@ class AssetsProcedure extends Procedure
             "assets" => "A list of assets.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'is_monitored' => 'boolean',
             'created_the_last_x_hours' => 'integer|min:0',
@@ -442,12 +427,8 @@ class AssetsProcedure extends Procedure
             "asset" => "The monitored asset.",
         ]
     )]
-    public function monitor(Request $request): array
+    public function monitor(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'asset_id' => 'required|integer|exists:am_assets,id',
         ]);
@@ -473,12 +454,8 @@ class AssetsProcedure extends Procedure
             "asset" => "The unmonitored asset.",
         ]
     )]
-    public function unmonitor(Request $request): array
+    public function unmonitor(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'asset_id' => 'required|integer|exists:am_assets,id',
         ]);
@@ -508,12 +485,8 @@ class AssetsProcedure extends Procedure
             "tag" => "The added tag.",
         ]
     )]
-    public function tag(Request $request): array
+    public function tag(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'asset_id' => 'required|integer|exists:am_assets,id',
             'tag' => 'required|string|min:1|max:191',
@@ -551,12 +524,8 @@ class AssetsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function untag(Request $request): array
+    public function untag(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'asset_id' => 'required|integer|exists:am_assets,id',
             'tag_id' => 'required|integer|exists:am_assets_tags,id',
@@ -582,11 +551,8 @@ class AssetsProcedure extends Procedure
             "tags" => "The list of tags.",
         ]
     )]
-    public function listTags(Request $request): array
+    public function listTags(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
         return [
             'tags' => AssetTag::query()
                 ->orderBy('tag')
@@ -607,12 +573,8 @@ class AssetsProcedure extends Procedure
             "asset" => "The scanned asset.",
         ]
     )]
-    public function restartScan(Request $request): array
+    public function restartScan(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'asset_id' => 'required|integer|exists:am_assets,id',
         ]);
@@ -640,12 +602,8 @@ class AssetsProcedure extends Procedure
             "group" => "The group object.",
         ]
     )]
-    public function group(Request $request): array
+    public function group(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'tag' => 'required|string|exists:am_assets_tags,tag',
         ]);
@@ -666,12 +624,8 @@ class AssetsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function degroup(Request $request): array
+    public function degroup(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
         ]);
@@ -692,11 +646,8 @@ class AssetsProcedure extends Procedure
             "groups" => "The list of groups.",
         ]
     )]
-    public function listGroups(Request $request): array
+    public function listGroups(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
         return [
             'groups' => AssetTagHash::all()->toArray(),
         ];
@@ -711,12 +662,8 @@ class AssetsProcedure extends Procedure
             "group" => "The group.",
         ]
     )]
-    public function getGroup(Request $request): array
+    public function getGroup(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
         ]);
@@ -736,12 +683,8 @@ class AssetsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function assetsInGroup(Request $request): array
+    public function assetsInGroup(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
         ]);
@@ -773,12 +716,8 @@ class AssetsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function vulnerabilitiesInGroup(Request $request): array
+    public function vulnerabilitiesInGroup(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
         ]);
@@ -827,12 +766,8 @@ class AssetsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function resolveVulnerabilityInGroup(Request $request): array
+    public function resolveVulnerabilityInGroup(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAdversaryMeter()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
             'vulnerability_id' => 'required|integer|exists:am_alerts,id',

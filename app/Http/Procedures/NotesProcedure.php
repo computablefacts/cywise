@@ -3,10 +3,10 @@
 namespace App\Http\Procedures;
 
 use App\Http\Controllers\Iframes\TimelineController;
+use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
 use App\Models\TimelineItem;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -23,7 +23,7 @@ class NotesProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function create(Request $request): array
+    public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'note' => 'required|string|min:1|max:1000',
@@ -51,7 +51,7 @@ class NotesProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function delete(Request $request): array
+    public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'note_id' => 'required|integer|exists:t_items,id',

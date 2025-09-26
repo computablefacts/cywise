@@ -6,6 +6,7 @@ use App\Enums\HoneypotCloudProvidersEnum;
 use App\Enums\HoneypotCloudSensorsEnum;
 use App\Enums\HoneypotStatusesEnum;
 use App\Http\Procedures\AssetsProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Mail\HoneypotRequested;
 use App\Mail\MailCoachHoneypotRequested;
 use App\Models\Alert;
@@ -391,17 +392,17 @@ class HoneypotController extends Controller
 
     public function assetTags(): array
     {
-        return (new AssetsProcedure())->listTags(new Request());
+        return (new AssetsProcedure())->listTags(new JsonRpcRequest());
     }
 
     public function getHashes(): array
     {
-        return (new AssetsProcedure())->listGroups(new Request())['groups'];
+        return (new AssetsProcedure())->listGroups(new JsonRpcRequest())['groups'];
     }
 
     public function createHash(Request $request): AssetTagHash
     {
-        return (new AssetsProcedure())->group($request)['group'];
+        return (new AssetsProcedure())->group(JsonRpcRequest::createFrom($request))['group'];
     }
 
     public function deleteHash(AssetTagHash $hash): JsonResponse
@@ -409,7 +410,7 @@ class HoneypotController extends Controller
         $request = new Request(['group' => $hash->hash]);
         $request->setUserResolver(fn() => auth()->user());
         return response()->json([
-            'message' => (new AssetsProcedure())->degroup($request)['msg']
+            'message' => (new AssetsProcedure())->degroup(JsonRpcRequest::createFrom($request))['msg']
         ]);
     }
 

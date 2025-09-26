@@ -6,7 +6,7 @@ use App\Check\AssetsDiscoverCheck;
 use App\Events\StartAssetsDiscover;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
 use App\Http\Procedures\AssetsProcedure;
-use Illuminate\Http\Request;
+use App\Http\Requests\JsonRpcRequest;
 use Illuminate\Support\Facades\Log;
 
 class StartAssetsDiscoverListener extends AbstractListener
@@ -30,7 +30,7 @@ class StartAssetsDiscoverListener extends AbstractListener
         $start = microtime(true);
 
         ApiUtils::timeout(round($check->getFailedDurationThresholdSeconds() * 1.5));
-        $request = new Request(['domain' => $check->getDomain()]);
+        $request = new JsonRpcRequest(['domain' => $check->getDomain()]);
         try {
             $response = (new AssetsProcedure())->discover($request);
         } catch (\Exception $e) {

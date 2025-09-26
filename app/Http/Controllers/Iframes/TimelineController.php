@@ -7,6 +7,7 @@ use App\Helpers\Messages;
 use App\Http\Controllers\Controller;
 use App\Http\Procedures\EventsProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\Conversation;
@@ -265,7 +266,7 @@ class TimelineController extends Controller
 
     private function iocs(int $minScore = 1, ?int $serverId = null, ?string $level = null): array
     {
-        $request = new Request([
+        $request = new JsonRpcRequest([
             'server_id' => $serverId,
             'min_score' => $minScore,
         ]);
@@ -612,7 +613,7 @@ class TimelineController extends Controller
 
     private function alerts(?int $assetId = null): Collection
     {
-        $request = new Request(['asset_id' => $assetId]);
+        $request = new JsonRpcRequest(['asset_id' => $assetId]);
         $request->setUserResolver(fn() => Auth::user());
         $alerts = (new VulnerabilitiesProcedure())->list($request);
         return $alerts['high']->concat($alerts['medium'])->concat($alerts['low']);

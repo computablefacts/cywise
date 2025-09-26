@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Iframes;
 use App\Http\Controllers\Controller;
 use App\Http\Procedures\AssetsProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Honeypot;
 use App\Models\HoneypotEvent;
@@ -20,18 +21,18 @@ class DashboardController extends Controller
         $procedure = new AssetsProcedure();
 
         $request->replace(['is_monitored' => true]);
-        $nbMonitored = count($procedure->list($request)['assets'] ?? []);
+        $nbMonitored = count($procedure->list(JsonRpcRequest::createFrom($request))['assets'] ?? []);
 
         $request->replace(['is_monitored' => false]);
-        $nbMonitorable = count($procedure->list($request)['assets'] ?? []);
+        $nbMonitorable = count($procedure->list(JsonRpcRequest::createFrom($request))['assets'] ?? []);
 
         $procedure = new VulnerabilitiesProcedure();
 
-        $alerts = $procedure->list($request);
+        $alerts = $procedure->list(JsonRpcRequest::createFrom($request));
         $nbHigh = count($alerts['high'] ?? []);
         $nbMedium = count($alerts['medium'] ?? []);
         $nbLow = count($alerts['low'] ?? []);
-        
+
         $todo = collect($alerts['high'] ?? [])
             ->concat($alerts['medium'] ?? [])
             ->concat($alerts['low'] ?? [])

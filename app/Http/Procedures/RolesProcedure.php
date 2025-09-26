@@ -2,9 +2,9 @@
 
 namespace App\Http\Procedures;
 
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Permission;
 use App\Models\Role;
-use Illuminate\Http\Request;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -22,7 +22,7 @@ class RolesProcedure extends Procedure
             'msg' => 'Success message.',
         ]
     )]
-    public function addPermission(Request $request): array
+    public function addPermission(JsonRpcRequest $request): array
     {
         $user = $request->user();
 
@@ -68,9 +68,10 @@ class RolesProcedure extends Procedure
             'msg' => 'Success message.',
         ]
     )]
-    public function removePermission(Request $request): array
+    public function removePermission(JsonRpcRequest $request): array
     {
         $user = $request->user();
+
         if (!$user || !$user->isCywiseAdmin()) {
             throw new \Exception('Missing permission.');
         }
@@ -110,7 +111,7 @@ class RolesProcedure extends Procedure
             'roles' => 'Array of roles with permissions',
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
         return [
             'roles' => Role::query()

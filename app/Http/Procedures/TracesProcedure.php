@@ -2,9 +2,9 @@
 
 namespace App\Http\Procedures;
 
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\AppTrace;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -22,12 +22,8 @@ class TracesProcedure extends Procedure
             "traces" => "An array of traces.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canManageUsers()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'limit' => 'nullable|integer|min:1|max:1000',
         ]);

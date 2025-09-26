@@ -3,11 +3,11 @@
 namespace App\Http\Procedures;
 
 use App\Helpers\Messages;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -26,7 +26,7 @@ class EventsProcedure extends Procedure
             "events" => "The list of events over the last 3 days.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'min_score' => 'required|integer|min:0|max:100',
@@ -77,12 +77,8 @@ class EventsProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function dismiss(Request $request): array
+    public function dismiss(JsonRpcRequest $request): array
     {
-        if (!$request->user()->canUseAgents()) {
-            throw new \Exception('Missing permission.');
-        }
-
         $params = $request->validate([
             'event_id' => 'required|integer|exists:ynh_osquery,id',
         ]);

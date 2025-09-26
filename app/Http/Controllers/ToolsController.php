@@ -6,6 +6,7 @@ use App\Enums\HoneypotCloudProvidersEnum;
 use App\Enums\HoneypotCloudSensorsEnum;
 use App\Enums\HoneypotStatusesEnum;
 use App\Http\Procedures\AssetsProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Mail\HoneypotRequested;
 use App\Mail\MailCoachHoneypotRequested;
 use App\Models\Honeypot;
@@ -189,6 +190,6 @@ class ToolsController extends Controller
         $trial = YnhTrial::where('hash', $hash)->firstOrFail();
         $request->replace(['domain' => $trial->domain]);
 
-        return (new AssetsProcedure())->discover($request)['subdomains'];
+        return (new AssetsProcedure())->discover(JsonRpcRequest::createFrom($request))['subdomains'];
     }
 }

@@ -3,9 +3,9 @@
 namespace App\Http\Procedures;
 
 use App\Helpers\ApiUtilsFacade as ApiUtils;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\Chunk;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -23,7 +23,7 @@ class ChunksProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function delete(Request $request): array
+    public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'chunk_id' => 'required|integer|exists:cb_chunks,id',
@@ -59,7 +59,7 @@ class ChunksProcedure extends Procedure
             "msg" => "A success message.",
         ]
     )]
-    public function update(Request $request): array
+    public function update(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'chunk_id' => 'required|integer|exists:cb_chunks,id',
@@ -127,7 +127,7 @@ class ChunksProcedure extends Procedure
             "chunks" => "A list of chunks.",
         ]
     )]
-    public function list(Request $request): array
+    public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'page' => ['nullable', 'integer', 'min:1'],
