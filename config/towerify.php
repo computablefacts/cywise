@@ -17,7 +17,7 @@ return [
         'nonce' => env('HASHER_NONCE'),
     ],
     'adversarymeter' => [
-        'ip_addresses' => explode(',', env('AM_IP_ADDRESSES')),
+        'ip_addresses' => explode(',', env('AM_IP_ADDRESSES', '')),
         'api' => env('AM_API'),
         'api_username' => env('AM_API_USERNAME'),
         'api_password' => env('AM_API_PASSWORD'),
