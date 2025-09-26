@@ -14,7 +14,7 @@ $html = (new Parsedown)->text(file_get_contents($file));
 $layout = ((auth()->guest()) ? 'layouts.marketing' : 'layouts.app');
 ?>
 
-<x-dynamic-component :component="$layout">
+<x-dynamic-component :component="$layout" :title="__('Privacy Policy')">
   <x-app.container>
     <x-card class="lg:p-10">
       <x-app.heading

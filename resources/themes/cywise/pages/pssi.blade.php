@@ -5,7 +5,7 @@ use function Laravel\Folio\{name};
 name('pssi');
 ?>
 
-<x-layouts.marketing>
+<x-layouts.marketing :title="__('Politique de Sécurité des Systèmes d\'Information')">
   <x-container class="py-0">
     <!-- PSSI : BEGIN -->
     <div class="relative isolate overflow-hidden bg-white py-24 sm:py-32">
