@@ -23,19 +23,25 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
         $this->hideSensitiveRequestDetails();
 
-        $isLocal = $this->app->environment('local');
-
-        Telescope::filterBatch(function (Collection $entries) use ($isLocal) {
-            return $isLocal || $entries->contains(function (IncomingEntry $entry) {
-                    return $entry->isReportableException() ||
-                        $entry->isFailedRequest() ||
-                        $entry->isFailedJob() ||
-                        $this->isLogEntry($entry) ||
-                        $this->isSlowQuery($entry) ||
-                        $this->isSlowRequest($entry) ||
-                        $entry->isScheduledTask() ||
-                        $entry->hasMonitoredTag();
-                });
+        Telescope::filterBatch(function (Collection $entries) {
+            if ($this->app->environment('local')) {
+                return true;
+            }
+            return $entries->contains(function (IncomingEntry $entry) {
+                if ($entry->type === EntryType::REQUEST) {
+                    if (($entry->content['response_status'] ?? 0) === 503 && ($entry->content['uri'] ?? '') === '/check-health?fresh=') {
+                        return false; // Drop health check requests
+                    }
+                }
+                return $entry->isReportableException() ||
+                    $entry->isFailedRequest() ||
+                    $entry->isFailedJob() ||
+                    $this->isLogEntry($entry) ||
+                    $this->isSlowQuery($entry) ||
+                    $this->isSlowRequest($entry) ||
+                    $entry->isScheduledTask() ||
+                    $entry->hasMonitoredTag();
+            });
         });
 
         Telescope::tag(function (IncomingEntry $entry) {
