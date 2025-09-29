@@ -143,9 +143,9 @@ class OsqueryRulesProcedure extends Procedure
             'rules' => YnhOsqueryRule::query()
                 ->where('enabled', true)
                 ->where(function ($query) use ($user) {
-                    if (!$user->isCywiseAdmin()) {
-                        $query->whereNull('created_by')
-                            ->orWhereIn('created_by', User::where('tenant_id', $user->tenant_id)->pluck('id'));
+                    $query->whereNull('created_by');
+                    if ($user && !$user->isCywiseAdmin()) {
+                        $query->orWhereIn('created_by', User::where('tenant_id', $user->tenant_id)->pluck('id'));
                     }
                 })
                 ->get()
