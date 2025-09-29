@@ -137,7 +137,7 @@ Route::group([
         return response("ok", 200)
             ->header('Content-Type', 'text/plain');
     });
-})->middleware(['throttle:240,1']);
+})->middleware(['throttle:480,1']);
 
 Route::group([
     'prefix' => 'inventory',

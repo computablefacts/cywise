@@ -335,35 +335,20 @@ class EndVulnsScanListener extends AbstractListener
 
         $currentTaskName = $task['current_task'] ?? null;
         $currentTaskStatus = $task['current_task_status'] ?? null;
+        $service = $task['service'] ?? null;
 
+        if ($service === 'closed') { // The port status (opened) was a false positive
+            $port = $scan->port()->first();
+            $port->closed = 1;
+            $port->save();
+            $this->markScanAsCompleted($scan);
+            return;
+        }
         if ($currentTaskName !== 'alerter' || $currentTaskStatus !== 'DONE') {
-
-            $isCsc = isset($task['tags']) && collect($task['tags'])->filter(fn(string $tag) => Str::startsWith(Str::lower($tag), 'csc_'))->isNotEmpty();
-
-            if (!$isCsc) {
-
-                if ($currentTaskStatus && Str::startsWith($currentTaskStatus, 'DONE_')) {
-                    $event->sink();
-                    return;
-                }
-
-                $service = $task['service'] ?? null;
-
-                if ($service !== 'closed') {
-                    $event->sink();
-                } else { // End the scan!
-
-                    $port = $scan->port()->first();
-                    $port->closed = 1;
-                    $port->save();
-
-                    $this->markScanAsCompleted($scan);
-                }
-                return;
-            }
+            $event->sink();
+            return;
         }
 
-        $service = $task['service'] ?? null;
         $product = $task['product'] ?? null;
         $ssl = $task['ssl'] ?? null;
 
