@@ -244,7 +244,7 @@ name('tpe-pme');
             <dl class="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
               <div class="flex flex-col gap-y-2 border-b border-dotted border-gray-200 pb-4">
                 <dt class="text-sm/6 text-gray-600">
-                  Users
+                  {{ __('Users') }}
                 </dt>
                 <dd class="order-first text-5xl font-semibold tracking-tight">
                   <span>{{ $nbUsers[0] }}</span> {{ $nbUsers[1] }}
@@ -252,7 +252,7 @@ name('tpe-pme');
               </div>
               <div class="flex flex-col gap-y-2 border-b border-dotted border-gray-200 pb-4">
                 <dt class="text-sm/6 text-gray-600">
-                  Monitored Servers
+                  {{ __('Monitored Servers') }}
                 </dt>
                 <dd class="order-first text-5xl font-semibold tracking-tight">
                   <span>{{ $nbAssets[0] }}</span> {{ $nbAssets[1] }}
@@ -261,7 +261,7 @@ name('tpe-pme');
               <div
                 class="flex flex-col gap-y-2 max-sm:border-b max-sm:border-dotted max-sm:border-gray-200 max-sm:pb-4">
                 <dt class="text-sm/6 text-gray-600">
-                  Compromised Credentials
+                  {{ __('Compromised Credentials') }}
                 </dt>
                 <dd class="order-first text-5xl font-semibold tracking-tight">
                   <span>{{ $nbLeaks[0] }}</span> {{ $nbLeaks[1] }}
