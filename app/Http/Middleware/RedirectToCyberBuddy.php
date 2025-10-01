@@ -24,15 +24,18 @@ class RedirectToCyberBuddy
         $loginTime = session('login_time');
 
         if ($request->routeIs('dashboard')
-            && $user && $user->hasRole(Role::CYBERBUDDY_ONLY)
-            && $loginTime && now()->diffInSeconds($loginTime, true) < 30) {
+            && $user && $user->hasRole(Role::CYBERBUDDY_ONLY)) {
 
-            Log::debug('RedirectToCyberBuddy', [
-                'user' => $user->email,
-                'loginTime' => $loginTime,
-                'diffInSeconds' => now()->diffInSeconds($loginTime, true),
-            ]);
-            return redirect()->route('cyberbuddy');
+            if (!$user->canView('iframes.dashboard')
+                || ($loginTime && now()->diffInSeconds($loginTime, true) < 30)) {
+
+                Log::debug('RedirectToCyberBuddy', [
+                    'user' => $user->email,
+                    'loginTime' => $loginTime,
+                    'diffInSeconds' => now()->diffInSeconds($loginTime, true),
+                ]);
+                return redirect()->route('cyberbuddy');
+            }
         }
 
         return $next($request);
