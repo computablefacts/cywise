@@ -37,22 +37,23 @@ class VulnerabilitiesProcedure extends Procedure
             ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
             ->get()
             ->flatMap(function (Asset $asset) use ($params) {
-                $query = $asset->alerts();
                 if (($params['level'] ?? '') === 'high') {
-                    $query->where('level', 'High');
+                    $query = $asset->alertsWithCriticalityHigh();
                 } else if (($params['level'] ?? '') === 'medium') {
-                    $query->where('level', 'Medium');
+                    $query = $asset->alertsWithCriticalityMedium();
                 } else if (($params['level'] ?? '') === 'low') {
-                    $query->where('level', 'Low');
+                    $query = $asset->alertsWithCriticalityLow();
+                } else {
+                    $query = $asset->alerts();
                 }
                 return $query->get();
             })
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 
         return [
-            'high' => $alerts->filter(fn(Alert $alert) => $alert->level === 'High')->values(),
-            'medium' => $alerts->filter(fn(Alert $alert) => $alert->level === 'Medium')->values(),
-            'low' => $alerts->filter(fn(Alert $alert) => $alert->level === 'Low')->values(),
+            'high' => $alerts->filter(fn(Alert $alert) => $alert->isHigh())->values(),
+            'medium' => $alerts->filter(fn(Alert $alert) => $alert->isMedium())->values(),
+            'low' => $alerts->filter(fn(Alert $alert) => $alert->isLow())->values(),
         ];
     }
 

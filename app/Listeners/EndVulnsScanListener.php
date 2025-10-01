@@ -77,9 +77,9 @@ class EndVulnsScanListener extends AbstractListener
 
         $onboarding = route('tools.cybercheck', ['hash' => $trial->hash, 'step' => 5]);
         $alerts = $assets->flatMap(fn(Asset $asset) => $asset->alerts()->get())->filter(fn(Alert $alert) => $alert->is_hidden === 0);
-        $alertsHigh = $alerts->filter(fn(Alert $alert) => $alert->level === 'High');
-        $alertsMedium = $alerts->filter(fn(Alert $alert) => $alert->level === 'Medium');
-        $alertsLow = $alerts->filter(fn(Alert $alert) => $alert->level === 'Low');
+        $alertsHigh = $alerts->filter(fn(Alert $alert) => $alert->isHigh());
+        $alertsMedium = $alerts->filter(fn(Alert $alert) => $alert->isMedium());
+        $alertsLow = $alerts->filter(fn(Alert $alert) => $alert->isLow());
         $nbServers = $alerts->map(fn(Alert $alert) => $alert->port()->ip)->unique()->count();
         $from = config('towerify.freshdesk.from_email');
         $to = $user->email;
@@ -90,11 +90,11 @@ class EndVulnsScanListener extends AbstractListener
             ->concat($alertsLow)
             ->map(function (Alert $alert) {
 
-                if ($alert->level === 'High') {
+                if ($alert->isHigh()) {
                     $level = "(criticité haute)";
-                } elseif ($alert->level === 'Medium') {
+                } elseif ($alert->isMedium()) {
                     $level = "(criticité moyenne)";
-                } elseif ($alert->level === 'Low') {
+                } elseif ($alert->isLow()) {
                     $level = "(criticité basse)";
                 } else {
                     $level = "";

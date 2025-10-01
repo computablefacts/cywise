@@ -37,13 +37,16 @@ class DashboardController extends Controller
             ->concat($alerts['medium'] ?? [])
             ->concat($alerts['low'] ?? [])
             ->sortBy(function (Alert $alert) {
-                if ($alert->level === 'High') {
+                if ($alert->isCritical()) {
+                    return 0;
+                }
+                if ($alert->isHigh()) {
                     return 1;
                 }
-                if ($alert->level === 'Medium') {
+                if ($alert->isMedium()) {
                     return 2;
                 }
-                if ($alert->level === 'Low') {
+                if ($alert->isLow()) {
                     return 3;
                 }
                 return 4;

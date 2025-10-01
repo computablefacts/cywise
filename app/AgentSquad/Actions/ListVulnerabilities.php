@@ -102,11 +102,11 @@ class ListVulnerabilities extends AbstractAction
             $preamble = "Here are the vulnerabilities associated to your assets in markdown format:";
             $vulnerabilities = $high->concat($medium)->concat($low)->map(function (Alert $alert) {
 
-                if ($alert->level === 'High') {
+                if ($alert->isHigh()) {
                     $level = "(criticité haute)";
-                } elseif ($alert->level === 'Medium') {
+                } elseif ($alert->isMedium()) {
                     $level = "(criticité moyenne)";
-                } elseif ($alert->level === 'Low') {
+                } elseif ($alert->isLow()) {
                     $level = "(criticité basse)";
                 } else {
                     $level = "";

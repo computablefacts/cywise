@@ -13,11 +13,11 @@
         <div class="card-text mb-3">
           @foreach($todo as $item)
           <div class="d-flex justify-content-start align-items-center mb-2">
-            @if($item->level === 'High')
+            @if($item->isHigh())
             <span class="dot-red"></span>
-            @elseif ($item->level === 'Medium')
+            @elseif ($item->isMedium())
             <span class="dot-orange"></span>
-            @elseif($item->level === 'Low')
+            @elseif($item->isLow())
             <span class="dot-green"></span>
             @else
             <span class="dot-blue"></span>

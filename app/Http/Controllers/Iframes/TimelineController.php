@@ -160,11 +160,11 @@ class TimelineController extends Controller
                     $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
 
                     $alerts = $asset->is_monitored ?
-                        $asset->alerts()->get()->filter(fn($alert) => $alert->is_hidden === 0) :
+                        $asset->alerts()->get()->filter(fn(Alert $alert) => $alert->is_hidden === 0) :
                         collect();
-                    $hasHigh = $alerts->contains(fn($alert) => $alert->level === 'High');
-                    $hasMedium = $alerts->contains(fn($alert) => $alert->level === 'Medium');
-                    $hasLow = $alerts->contains(fn($alert) => $alert->level === 'Low');
+                    $hasHigh = $alerts->contains(fn(Alert $alert) => $alert->isHigh());
+                    $hasMedium = $alerts->contains(fn(Alert $alert) => $alert->isMedium());
+                    $hasLow = $alerts->contains(fn(Alert $alert) => $alert->isLow());
 
                     if ($hasHigh) {
                         $bgColor = 'var(--c-red)';
@@ -529,11 +529,11 @@ class TimelineController extends Controller
 
         /** @var Alert $alert */
         foreach ($alerts as $alert) {
-            if ($alert->level === 'High') {
+            if ($alert->isHigh()) {
                 $nbHigh++;
-            } else if ($alert->level === 'Medium') {
+            } else if ($alert->isMedium()) {
                 $nbMedium++;
-            } else if ($alert->level === 'Low') {
+            } else if ($alert->isLow()) {
                 $nbLow++;
             } else {
                 $nbSuspect++;
@@ -541,13 +541,13 @@ class TimelineController extends Controller
         }
         if (!empty($level)) {
             $alerts = $alerts->filter(function (Alert $alert) use ($level) {
-                if ($level === 'high' && $alert->level === 'High') {
+                if ($level === 'high' && $alert->isHigh()) {
                     return true;
                 }
-                if ($level === 'medium' && $alert->level === 'Medium') {
+                if ($level === 'medium' && $alert->isMedium()) {
                     return true;
                 }
-                if ($level === 'low' && $alert->level === 'Low') {
+                if ($level === 'low' && $alert->isLow()) {
                     return true;
                 }
                 return false;
@@ -566,15 +566,15 @@ class TimelineController extends Controller
                 $asset = $alert->asset();
                 $port = $alert->port();
 
-                if ($alert->level === 'High') {
+                if ($alert->isHigh()) {
                     $txtColor = "white";
                     $bgColor = "var(--c-red)";
                     $level = "(" . __("high") . ")";
-                } else if ($alert->level === 'Medium') {
+                } else if ($alert->isMedium()) {
                     $txtColor = "white";
                     $bgColor = "var(--c-orange-light)";
                     $level = "(" . __("medium") . ")";
-                } else if ($alert->level === 'Low') {
+                } else if ($alert->isLow()) {
                     $txtColor = "white";
                     $bgColor = "var(--c-green)";
                     $level = "(" . __("low") . ")";

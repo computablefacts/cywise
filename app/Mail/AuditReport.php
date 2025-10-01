@@ -68,9 +68,9 @@ class AuditReport extends Mailable
             ->get()
             ->flatMap(fn(Asset $asset) => $asset->alerts()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
-        $alertsHigh = $alerts->filter(fn(Alert $alert) => $alert->level === 'High');
-        $alertsMedium = $alerts->filter(fn(Alert $alert) => $alert->level === 'Medium');
-        $alertsLow = $alerts->filter(fn(Alert $alert) => $alert->level === 'Low');
+        $alertsHigh = $alerts->filter(fn(Alert $alert) => $alert->isHigh());
+        $alertsMedium = $alerts->filter(fn(Alert $alert) => $alert->isMedium());
+        $alertsLow = $alerts->filter(fn(Alert $alert) => $alert->isLow());
         $assetsMonitored = Asset::where('is_monitored', true)->orderBy('asset')->get();
         $assetsNotMonitored = Asset::where('is_monitored', false)->orderBy('asset')->get();
         $assetsDiscovered = Asset::where('created_at', '>=', $cutOffTime)->orderBy('asset')->get();

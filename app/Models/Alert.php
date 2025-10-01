@@ -81,4 +81,29 @@ class Alert extends Model
         }
         return $events;
     }
+
+    public function isCritical(): bool
+    {
+        return $this->level === 'Critical';
+    }
+
+    public function isHigh(): bool
+    {
+        return $this->isCritical() || $this->level === 'High';
+    }
+
+    public function isMedium(): bool
+    {
+        return $this->level === 'Medium';
+    }
+
+    public function isLow(): bool
+    {
+        return $this->level === 'Low';
+    }
+    
+    public function isUnverified(): bool
+    {
+        return $this->level === 'High (unverified)';
+    }
 }

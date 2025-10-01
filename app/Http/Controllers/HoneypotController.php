@@ -271,10 +271,10 @@ class HoneypotController extends Controller
         $nbVulnerabilities = Asset::all()
             ->map(function (Asset $asset) {
                 return [
-                    'high' => $asset->alerts()->where('level', 'High')->count(),
-                    'high_unverified' => $asset->alerts()->where('level', 'High (unverified)')->count(),
-                    'medium' => $asset->alerts()->where('level', 'Medium')->count(),
-                    'low' => $asset->alerts()->where('level', 'Low')->count(),
+                    'high' => $asset->alertsWithCriticalityHigh()->count(),
+                    'high_unverified' => $asset->alertsWithCriticalityUnverified()->count(),
+                    'medium' => $asset->alertsWithCriticalityMedium()->count(),
+                    'low' => $asset->alertsWithCriticalityLow()->count(),
                 ];
             })
             ->reduce(function (array $carry, array $counts) {

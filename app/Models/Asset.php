@@ -114,6 +114,26 @@ class Asset extends Model
             ->where('am_assets.id', $this->id);
     }
 
+    public function alertsWithCriticalityHigh(): Builder
+    {
+        return $this->alerts()->whereIn('level', ['Critical', 'High']);
+    }
+
+    public function alertsWithCriticalityMedium(): Builder
+    {
+        return $this->alerts()->where('level', 'Medium');
+    }
+
+    public function alertsWithCriticalityLow(): Builder
+    {
+        return $this->alerts()->where('level', 'Low');
+    }
+
+    public function alertsWithCriticalityUnverified(): Builder
+    {
+        return $this->alerts()->where('level', 'High (unverified)');
+    }
+
     public function alerts(): Builder
     {
         $hiddenAlerts = HiddenAlert::whereNotNull('uid')
