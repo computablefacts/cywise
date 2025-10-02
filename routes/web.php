@@ -38,6 +38,7 @@ use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Listeners\EndVulnsScanListener;
 use App\Mail\AuditReport;
+use App\Mail\MailCoachPerformaRequested;
 use App\Models\Honeypot;
 use App\Models\YnhServer;
 use App\Models\YnhTrial;
@@ -190,6 +191,11 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
     $server->is_frozen = false;
     $server->added_with_curl = true;
     $server->save();
+
+    // Send a Performa setup request if the tenant does not have a Performa domain yet
+    if (!$user->performa_domain || !$user->performa_secret) {
+        MailCoachPerformaRequested::sendEmail();
+    }
 
     // 1. In the browser, go to "https://app.towerify.io" and login using your user account
     // 2. On the server, run as root: curl -s https://app.towerify.io/setup/script?api_token=<token>&server_ip=<ip>&server_name=<name> | bash
