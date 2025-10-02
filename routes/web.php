@@ -37,13 +37,10 @@ use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Listeners\EndVulnsScanListener;
-use App\Mail\AuditReport;
 use App\Mail\MailCoachPerformaRequested;
-use App\Models\Honeypot;
 use App\Models\YnhServer;
 use App\Models\YnhTrial;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -476,52 +473,6 @@ Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialI
     }
     return response('Unauthorized', 403)->header('Content-Type', 'text/plain');
 })->middleware('auth');
-
-/** @deprecated */
-Route::get('/audit-report', function () {
-    /** @var AuditReport $report */
-    $report = AuditReport::create()['report'];
-    \App\Mail\MailCoachAuditReport::sendEmail($report);
-    return $report;
-})->middleware('auth');
-
-/** @deprecated */
-Route::post('am/api/v2/public/honeypots/{dns}', function (string $dns, \Illuminate\Http\Request $request) {
-
-    if (!$request->hasFile('data')) {
-        return response('Missing attachment', 500)
-            ->header('Content-Type', 'text/plain');
-    }
-
-    $file = $request->file('data');
-
-    if (!$file->isValid()) {
-        return response('Invalid attachment', 500)
-            ->header('Content-Type', 'text/plain');
-    }
-
-    $honeypot = Honeypot::where('dns', $dns)->first();
-
-    if (!$honeypot) {
-        return response('Unknown honeypot', 500)
-            ->header('Content-Type', 'text/plain');
-    }
-
-    $filename = $file->getClientOriginalName();
-    $timestamp = Carbon::createFromFormat('Y.m.d_H.i.s', \Illuminate\Support\Str::substr($filename, \Illuminate\Support\Str::position($filename, '-access.') + 8, 19));
-    $events = collect(implode(gzfile($file->getRealPath())))
-        ->flatMap(fn(string $line) => json_decode(trim($line), true));
-
-    if ($events->isEmpty()) {
-        return response('ok (empty file)', 200)
-            ->header('Content-Type', 'text/plain');
-    }
-
-    \App\Events\IngestHoneypotsEvents::dispatch($timestamp, $dns, $events->toArray());
-
-    return response("ok ({$events->count()} events in file)", 200)
-        ->header('Content-Type', 'text/plain');
-})->middleware(['throttle:240,1']);
 
 Route::post('/llm1', '\App\Http\Controllers\CyberBuddyController@llm1')->middleware('auth');
 
