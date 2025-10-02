@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MailCoach
 {
@@ -26,7 +27,7 @@ class MailCoach
                 'first_name' => $name,
                 'last_name' => '',
                 'skip_confirmation' => true,
-                'tags' => [],
+                'tags' => [Str::after($email, '@')],
             ]);
             if ($response->successful()) {
                 $json = $response->json();
