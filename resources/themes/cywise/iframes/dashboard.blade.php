@@ -259,15 +259,15 @@
       </div>
     </div>
     <!-- ACTIONS : BEGIN -->
-    <!-- AGENTS & METRICS : BEGIN -->
-    <div class="row">
-      <div class="col">
-        @include('theme::iframes._agent')
-      </div>
-    </div>
-    <!-- AGENTS & METRICS : END -->
   </div>
 </div>
+<!-- AGENTS & METRICS : BEGIN -->
+<div class="row pb-3">
+  <div class="col">
+    @include('theme::iframes._agent')
+  </div>
+</div>
+<!-- AGENTS & METRICS : END -->
 <!-- APPS : BEGIN -->
 @php
 $apps = \App\Models\YnhServer::forUser(request()->user())
@@ -278,7 +278,7 @@ $apps = \App\Models\YnhServer::forUser(request()->user())
 ], SORT_NATURAL | SORT_FLAG_CASE);
 @endphp
 @if($apps->isNotEmpty())
-<div class="row pt-3">
+<div class="row">
   <div class="col">
     <div class="card">
       <div class="card-body p-0">
