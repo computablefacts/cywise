@@ -26,7 +26,7 @@ class MailCoach
                 'first_name' => $name,
                 'last_name' => '',
                 'skip_confirmation' => true,
-                'tags' => ['external'],
+                'tags' => [],
             ]);
             if ($response->successful()) {
                 $json = $response->json();
