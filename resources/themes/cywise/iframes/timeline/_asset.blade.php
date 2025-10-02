@@ -38,6 +38,10 @@
               onclick="stopMonitoringAsset('{{ $asset->id }}')">
         <span class="bp4-icon bp4-icon-symbol-square"></span>
       </button>
+      <button class="show-replies" title="{{ __('Restart Scan') }}"
+              onclick="restartScan('{{ $asset->id }}')">
+        <span class="bp4-icon bp4-icon-repeat"></span>
+      </button>
       @endif
     </div>
   </div>
