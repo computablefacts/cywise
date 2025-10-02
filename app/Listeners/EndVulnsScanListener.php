@@ -16,7 +16,6 @@ use App\Models\YnhTrial;
 use Carbon\Carbon;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -180,7 +179,7 @@ class EndVulnsScanListener extends AbstractListener
         $trial->save();
     }
 
-    public static function sendEmail(string $from, string $to, string $subject, string $title, string $beforeCta, string $ctaLink = "", string $ctaName = "", string $afterCta = ""): ?array
+    public static function sendEmail(string $from, string $to, string $subject, string $title, string $beforeCta, string $ctaLink = "", string $ctaName = "", string $afterCta = ""): void
     {
         $header = empty($title) ? "" : "
             <tr>
@@ -213,44 +212,6 @@ class EndVulnsScanListener extends AbstractListener
             </tr> 
         ";
         MailCoachSimpleEmail::sendEmail($subject, $title, "<table cellspacing=\"0\" cellpadding=\"0\" style=\"margin: auto;\">{$header}{$body1}{$cta}{$body2}</table>", $to, $from);
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . config('towerify.sendgrid.api_key'),
-            'Accept' => 'application/json',
-        ])->post(config('towerify.sendgrid.api'), [
-            "personalizations" => [[
-                "to" => [[
-                    "email" => $to,
-                ]],
-                "dynamic_template_data" => [
-                    "sender" => [
-                        "name" => config('app.name'),
-                        "address" => "178 boulevard Haussmann",
-                        "city" => "Paris",
-                        "country" => "France",
-                        "postcode" => "75008",
-                    ],
-                    "email" => [
-                        "subject" => $subject,
-                        "title" => $title,
-                        "text_before_cta" => $beforeCta,
-                        "text_after_cta" => $afterCta,
-                        "cta_link" => $ctaLink,
-                        "cta_name" => $ctaName,
-                    ]
-                ]
-            ]],
-            "from" => [
-                "email" => $from,
-            ],
-            "template_id" => "d-a7f35a5a052e4ac4b127d6f12034331d"
-        ]);
-        if ($response->successful()) {
-            $json = $response->json();
-            // Log::debug($json);
-            return $json;
-        }
-        Log::error($response->body());
-        return [];
     }
 
     private static function maskPassword(string $password, int $size = 3): string

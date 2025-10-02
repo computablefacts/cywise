@@ -64,6 +64,6 @@ class MailCoachHoneypotRequested extends Mailable
                 'cloud_sensor' => $this->sensor->value,
                 'dns' => $this->dns,
             ])
-            ->faking(true);
+            ->faking(app()->environment('local', 'dev'));
     }
 }

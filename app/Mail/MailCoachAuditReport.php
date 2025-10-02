@@ -51,6 +51,6 @@ class MailCoachAuditReport extends Mailable
                 'title' => "Rapport d'audit",
                 'content' => $this->htmlContent,
             ])
-            ->faking(true);
+            ->faking(app()->environment('local', 'dev'));
     }
 }

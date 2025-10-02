@@ -7,13 +7,11 @@ use App\Enums\HoneypotCloudSensorsEnum;
 use App\Enums\HoneypotStatusesEnum;
 use App\Http\Procedures\AssetsProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\HoneypotRequested;
 use App\Mail\MailCoachHoneypotRequested;
 use App\Models\Honeypot;
 use App\Models\User;
 use App\Models\YnhTrial;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -103,15 +101,7 @@ class ToolsController extends Controller
                     'cloud_provider' => HoneypotCloudProvidersEnum::AWS,
                     'cloud_sensor' => HoneypotCloudSensorsEnum::HTTP,
                 ]);
-                $subject = "Setup of honeypot {$honeypot->dns} requested";
-                $body = [
-                    'id' => $honeypot->id,
-                    'sensor' => $honeypot->cloud_sensor,
-                    'provider' => $honeypot->cloud_provider,
-                    'query' => "UPDATE am_honeypots SET status = 'setup_complete' WHERE id = {$honeypot->id};",
-                ];
                 MailCoachHoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
-                Mail::to(config('towerify.freshdesk.to_email'))->send(new HoneypotRequested(config('towerify.freshdesk.from_email'), 'Support', $subject, $body));
 
                 // HTTPS
                 /** @var Honeypot $honeypot */
@@ -121,15 +111,7 @@ class ToolsController extends Controller
                     'cloud_provider' => HoneypotCloudProvidersEnum::AWS,
                     'cloud_sensor' => HoneypotCloudSensorsEnum::HTTPS,
                 ]);
-                $subject = "Setup of honeypot {$honeypot->dns} requested";
-                $body = [
-                    'id' => $honeypot->id,
-                    'sensor' => $honeypot->cloud_sensor,
-                    'provider' => $honeypot->cloud_provider,
-                    'query' => "UPDATE am_honeypots SET status = 'setup_complete' WHERE id = {$honeypot->id};",
-                ];
                 MailCoachHoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
-                Mail::to(config('towerify.freshdesk.to_email'))->send(new HoneypotRequested(config('towerify.freshdesk.from_email'), 'Support', $subject, $body));
 
                 // SSH
                 /** @var Honeypot $honeypot */
@@ -139,15 +121,7 @@ class ToolsController extends Controller
                     'cloud_provider' => HoneypotCloudProvidersEnum::AWS,
                     'cloud_sensor' => HoneypotCloudSensorsEnum::SSH,
                 ]);
-                $subject = "Setup of honeypot {$honeypot->dns} requested";
-                $body = [
-                    'id' => $honeypot->id,
-                    'sensor' => $honeypot->cloud_sensor,
-                    'provider' => $honeypot->cloud_provider,
-                    'query' => "UPDATE am_honeypots SET status = 'setup_complete' WHERE id = {$honeypot->id};",
-                ];
                 MailCoachHoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
-                Mail::to(config('towerify.freshdesk.to_email'))->send(new HoneypotRequested(config('towerify.freshdesk.from_email'), 'Support', $subject, $body));
 
                 $trial->honeypots = true;
                 $trial->save();

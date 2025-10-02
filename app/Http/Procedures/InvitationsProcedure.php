@@ -2,7 +2,6 @@
 
 namespace App\Http\Procedures;
 
-use App\Events\SendInvitation;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
 use Sajya\Server\Attributes\RpcMethod;
@@ -83,8 +82,7 @@ class InvitationsProcedure extends Procedure
             'id' => 'required|integer|exists:invitations,id',
         ]);
 
-        $invitation = Invitation::where('id', $params['id'])->firstOrFail();
-        SendInvitation::dispatch($invitation);
+        // TODO : send invitation through MailCoach
 
         return [
             'msg' => 'The invitation has been sent!'

@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\SendAuditReport;
 use App\Mail\AuditReport;
-use Illuminate\Support\Facades\Mail;
+use App\Mail\MailCoachAuditReport;
 
 class SendAuditReportListener extends AbstractListener
 {
@@ -24,7 +24,7 @@ class SendAuditReportListener extends AbstractListener
         $report = AuditReport::create();
 
         if (!$report['is_empty']) {
-            Mail::to($user->email)->send($report['report']);
+            MailCoachAuditReport::sendEmail($report['report']);
         }
     }
 }

@@ -7,7 +7,6 @@ use App\Enums\HoneypotCloudSensorsEnum;
 use App\Enums\HoneypotStatusesEnum;
 use App\Http\Procedures\AssetsProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\HoneypotRequested;
 use App\Mail\MailCoachHoneypotRequested;
 use App\Models\Alert;
 use App\Models\Asset;
@@ -16,12 +15,10 @@ use App\Models\Attacker;
 use App\Models\HiddenAlert;
 use App\Models\Honeypot;
 use App\Models\HoneypotEvent;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 /** @deprecated */
 class HoneypotController extends Controller
@@ -375,17 +372,7 @@ class HoneypotController extends Controller
                 $honeypot->save();
 
                 if ($statuses[$nextIdx] === HoneypotStatusesEnum::HONEYPOT_SETUP) {
-                    /** @var User $user */
-                    $user = Auth::user();
-                    $subject = "Setup of honeypot {$honeypot->dns} requested";
-                    $body = [
-                        'id' => $honeypot->id,
-                        'sensor' => $honeypot->cloud_sensor,
-                        'provider' => $honeypot->cloud_provider,
-                        'query' => "UPDATE am_honeypots SET status = 'setup_complete' WHERE id = {$honeypot->id};",
-                    ];
                     MailCoachHoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
-                    Mail::to(config('towerify.freshdesk.to_email'))->send(new HoneypotRequested($user->email, $user->name, $subject, $body));
                 }
             });
     }
