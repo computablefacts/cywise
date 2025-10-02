@@ -47,7 +47,7 @@ class MailCoachPerformaRequested extends Mailable
      */
     public function build()
     {
-        $dns = Str::lower(Str::random(4) . '-' . Str::random(4) . '-' . Str::random(4));
+        $dns = 'a' . Str::lower(Str::random(3) . '-' . Str::random(4) . '-' . Str::random(4));
         $secret = Str::lower(Str::random(24));
         return $this
             ->from(config('towerify.freshdesk.from_email'), 'Support')
