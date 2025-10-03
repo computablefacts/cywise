@@ -141,6 +141,22 @@
     executeJsonRpcApiCall('assets@create', {asset: asset, watch: monitor}, onSuccess);
   }
 
+  function deleteAssetApiCall(assetId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('assets@delete', {asset_id: assetId}, onSuccess);
+  }
+
+  function monitorAssetApiCall(assetId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('assets@monitor', {asset_id: assetId}, onSuccess);
+  }
+
+  function unmonitorAssetApiCall(assetId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('assets@unmonitor', {asset_id: assetId}, onSuccess);
+  }
+
+  function restartAssetScanApiCall(assetId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('assets@restartScan', {asset_id: assetId}, onSuccess);
+  }
+
   function askCyberBuddyApiCall(threadId, directive, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
     executeJsonRpcApiCall('cyberbuddy@ask', {thread_id: threadId, directive: directive}, onSuccess,
       (response) => toaster.toastError(response.message), onFinally);

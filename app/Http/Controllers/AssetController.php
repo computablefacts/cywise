@@ -49,20 +49,6 @@ class AssetController extends Controller
         return (new AssetsProcedure())->list(JsonRpcRequest::createFrom($request));
     }
 
-    public function assetMonitoringBegins(Asset $asset): array
-    {
-        $request = new Request(['asset_id' => $asset->id]);
-        $request->setUserResolver(fn() => auth()->user());
-        return (new AssetsProcedure())->monitor(JsonRpcRequest::createFrom($request));
-    }
-
-    public function assetMonitoringEnds(Asset $asset): array
-    {
-        $request = new Request(['asset_id' => $asset->id]);
-        $request->setUserResolver(fn() => auth()->user());
-        return (new AssetsProcedure())->unmonitor(JsonRpcRequest::createFrom($request));
-    }
-
     public function screenshot(Screenshot $screenshot): array
     {
         return [
@@ -101,19 +87,5 @@ class AssetController extends Controller
         ]);
         $request->setUserResolver(fn() => auth()->user());
         return (new AssetsProcedure())->get(JsonRpcRequest::createFrom($request));
-    }
-
-    public function deleteAsset(Asset $asset): void
-    {
-        $request = new Request(['asset_id' => $asset->id]);
-        $request->setUserResolver(fn() => auth()->user());
-        (new AssetsProcedure())->delete(JsonRpcRequest::createFrom($request));
-    }
-
-    public function restartScan(Asset $asset): array
-    {
-        $request = new Request(['asset_id' => $asset->id]);
-        $request->setUserResolver(fn() => auth()->user());
-        return (new AssetsProcedure())->restartScan(JsonRpcRequest::createFrom($request));
     }
 }

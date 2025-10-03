@@ -488,67 +488,21 @@
 
   /* EVENTS */
 
-  const dismissEvent = (eventId) => {
-    dismissEventApiCall(eventId);
-  }
+  const dismissEvent = (eventId) => dismissEventApiCall(eventId);
 
   /* VULNERABILITIES */
 
-  const hideByUid = (uid) => {
-    toggleVulnerabilityVisibilityApiCall(uid, null, null);
-  }
-
-  const hideByType = (type) => {
-    toggleVulnerabilityVisibilityApiCall(null, type, null);
-  }
-
-  const hideByTitle = (title) => {
-    toggleVulnerabilityVisibilityApiCall(null, null, title);
-  }
-
-  const startMonitoringAsset = (assetId) => {
-    apiCall('POST', `/inventory/asset/${assetId}/monitoring/begin`)
-    .then((response) => {
-      if (response.ok) {
-        toaster.toastSuccess("{{ __('The monitoring started.') }}");
-      } else {
-        toaster.toastError("{{ __('An error occurred.') }}")
-      }
-    });
-  }
-
-  const stopMonitoringAsset = (assetId) => {
-    apiCall('POST', `/inventory/asset/${assetId}/monitoring/end`)
-    .then((response) => {
-      if (response.ok) {
-        toaster.toastSuccess("{{ __('The monitoring stopped.') }}");
-      } else {
-        toaster.toastError("{{ __('An error occurred.') }}")
-      }
-    });
-  }
-
-  const deleteAsset = (assetId) => {
-    apiCall('DELETE', `/adversary/assets/${assetId}`)
-    .then((response) => {
-      if (response.ok) {
-        toaster.toastSuccess("{{ __('The asset will be deleted soon.') }}");
-      } else {
-        toaster.toastError("{{ __('An error occurred.') }}")
-      }
-    });
-  }
-
-  const restartScan = (assetId) => {
-    apiCall('POST', `/adversary/assets/restart/${assetId}`)
-    .then((response) => {
-      if (response.ok) {
-        toaster.toastSuccess("{{ __('The scan has been restarted.') }}");
-      } else {
-        toaster.toastError("{{ __('An error occurred.') }}")
-      }
-    });
-  }
+  const hideByUid = (uid) => toggleVulnerabilityVisibilityApiCall(uid, null, null);
+  const hideByType = (type) => toggleVulnerabilityVisibilityApiCall(null, type, null);
+  const hideByTitle = (title) => toggleVulnerabilityVisibilityApiCall(null, null, title);
+  const startMonitoringAsset = (assetId) => monitorAssetApiCall(assetId,
+    () => toaster.toastSuccess("{{ __('The monitoring started.') }}"));
+  const stopMonitoringAsset = (assetId) => unmonitorAssetApiCall(assetId,
+    () => toaster.toastSuccess("{{ __('The monitoring stopped.') }}"));
+  const deleteAsset = (assetId) => deleteAssetApiCall(assetId,
+    () => toaster.toastSuccess("{{ __('The asset will be deleted soon.') }}"));
+  const restartScan = (assetId) => restartAssetScanApiCall(assetId,
+    () => toaster.toastSuccess("{{ __('The scan has been restarted.') }}"));
 
 </script>
 @endpush

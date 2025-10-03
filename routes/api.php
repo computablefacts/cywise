@@ -146,8 +146,6 @@ Route::group([
     Route::post('assets/discover/from/ip', '\App\Http\Controllers\AssetController@discoverFromIp');
     Route::post('assets', '\App\Http\Controllers\AssetController@saveAsset');
     Route::get('assets', '\App\Http\Controllers\AssetController@userAssets');
-    Route::post('asset/{asset}/monitoring/begin', '\App\Http\Controllers\AssetController@assetMonitoringBegins');
-    Route::post('asset/{asset}/monitoring/end', '\App\Http\Controllers\AssetController@assetMonitoringEnds');
 })->middleware(['auth:sanctum']);
 
 Route::group([
@@ -166,8 +164,6 @@ Route::group([
 Route::group([
     'prefix' => 'adversary',
 ], function () {
-    Route::delete('assets/{asset}', '\App\Http\Controllers\AssetController@deleteAsset');
-    Route::post('assets/restart/{asset}', '\App\Http\Controllers\AssetController@restartScan');
     Route::get('infos-from-asset/{asset}', '\App\Http\Controllers\AssetController@infosFromAsset');
     Route::get('attacker-index', '\App\Http\Controllers\HoneypotController@attackerIndex');
     Route::get('recent-events', '\App\Http\Controllers\HoneypotController@recentEvents');
