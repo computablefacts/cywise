@@ -17,7 +17,7 @@
       <div class="mb-3">
         <label for="name" class="form-label">{{ __('Name') }}</label>
         <input id="name" class="form-control"
-               value="{{ $rule->displayName() }}" {{ isset($rule->id) ? 'disabled' : '' }}>
+               value="{{ isset($rule->id) ? $rule->displayName() : '' }}" {{ isset($rule->id) ? 'disabled' : '' }}>
       </div>
       <div class="mb-3">
         <label for="description" class="form-label">{{ __('Description') }}</label>
