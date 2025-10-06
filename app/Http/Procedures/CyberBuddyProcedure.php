@@ -141,7 +141,7 @@ class CyberBuddyProcedure extends Procedure
             $answer = $orchestrator->run($user, $threadId, $messages, $question);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-            $answer = new FailedAnswer("Sorry, an error occurred: {$e->getMessage()}");
+            $answer = new FailedAnswer('cyberbuddy_procedure', "Sorry, an error occurred: {$e->getMessage()}");
         }
 
         // Update the conversation
@@ -156,6 +156,7 @@ class CyberBuddyProcedure extends Procedure
             'timestamp' => Carbon::now()->toIso8601ZuluString(),
             'chain_of_thought' => $answer->chainOfThought(),
             'html' => $answer->html(),
+            'agent' => $answer->agent(),
         ];
         $conversation->dom = json_encode($messages);
         $conversation->save();

@@ -86,16 +86,16 @@ class CyberBuddy extends AbstractAction
         $json = json_decode($answer, true);
 
         if (!$json) {
-            return new FailedAnswer("The answer is not a valid JSON: {$answer}");
+            return new FailedAnswer('cyberbuddy',"The answer is not a valid JSON: {$answer}");
         }
         if (($json['lang'] ?? '') !== 'french' && ($json['lang'] ?? '') !== 'english') {
-            return new FailedAnswer("The language is unknown: {$answer}");
+            return new FailedAnswer('cyberbuddy',"The language is unknown: {$answer}");
         }
         if (empty($json['question_en'] ?? '') && empty($json['question_fr'] ?? '')) {
-            return new FailedAnswer("The questions are missing: {$answer}");
+            return new FailedAnswer('cyberbuddy',"The questions are missing: {$answer}");
         }
         if (empty($json['keywords_en'] ?? []) && empty($json['keywords_fr'] ?? [])) {
-            return new FailedAnswer("The keywords are missing: {$answer}");
+            return new FailedAnswer('cyberbuddy',"The keywords are missing: {$answer}");
         }
 
         // Fill context & answer question
@@ -116,7 +116,7 @@ class CyberBuddy extends AbstractAction
         $answer = LlmsProvider::provide($messages, self::MODEL_ANSWER, 120);
         array_pop($messages);
 
-        return new SuccessfulAnswer($this->enhanceWithSources(strip_tags($answer)), [], !empty($answer));
+        return new SuccessfulAnswer('cyberbuddy', $this->enhanceWithSources(strip_tags($answer)), [], !empty($answer));
     }
 
     private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): string

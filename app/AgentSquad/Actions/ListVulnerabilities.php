@@ -61,10 +61,10 @@ class ListVulnerabilities extends AbstractAction
         $asset = Str::trim(Str::afterLast($input, ':'));
 
         if ($action !== 'list') {
-            return new FailedAnswer("Invalid action. Please use list.");
+            return new FailedAnswer('list_vulnerabilities',"Invalid action. Please use list.");
         }
         if (!in_array($level, ['high', 'medium', 'low', 'any'])) {
-            return new FailedAnswer("Invalid status. Please use high, medium, low, or any.");
+            return new FailedAnswer('list_vulnerabilities',"Invalid status. Please use high, medium, low, or any.");
         }
 
         $procedure = new VulnerabilitiesProcedure();
@@ -76,10 +76,10 @@ class ListVulnerabilities extends AbstractAction
             /** @var Asset $azzet */
             $azzet = Asset::where('asset', $asset)->first();
             if (!$azzet) {
-                return new FailedAnswer("Asset {$asset} not found.");
+                return new FailedAnswer('list_vulnerabilities',"Asset {$asset} not found.");
             }
             if (!$azzet->is_monitored) {
-                return new FailedAnswer("Asset {$asset} is not monitored.");
+                return new FailedAnswer('list_vulnerabilities',"Asset {$asset} is not monitored.");
             }
             if ($level === 'any') {
                 $request = new JsonRpcRequest(['asset_id' => $azzet->id]);
@@ -96,7 +96,7 @@ class ListVulnerabilities extends AbstractAction
             $low = collect($result['low'] ?? []);
 
             if ($high->isEmpty() && $medium->isEmpty() && $low->isEmpty()) {
-                return new SuccessfulAnswer("No vulnerabilities found.");
+                return new SuccessfulAnswer('list_vulnerabilities', "No vulnerabilities found.");
             }
 
             $preamble = "Here are the vulnerabilities associated to your assets in markdown format:";
@@ -146,9 +146,9 @@ class ListVulnerabilities extends AbstractAction
 {$cve}
                 ";
             })->join("\n\n");
-            return new SuccessfulAnswer("{$preamble}\n\n{$vulnerabilities}");
+            return new SuccessfulAnswer('list_vulnerabilities', "{$preamble}\n\n{$vulnerabilities}");
         } catch (\Exception $e) {
-            return new FailedAnswer("Action {$action} failed when applied to criticality level {$level} and asset {$asset}:\n\n{$e->getMessage()}");
+            return new FailedAnswer('list_vulnerabilities', "Action {$action} failed when applied to criticality level {$level} and asset {$asset}:\n\n{$e->getMessage()}");
         }
     }
 }

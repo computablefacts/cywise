@@ -4,8 +4,8 @@ namespace App\AgentSquad\Answers;
 
 class SuccessfulAnswer extends AbstractAnswer
 {
-    public function __construct(string $answer, array $chainOfThought = [], bool $final = false)
+    public function __construct(string $agent, string $answer, array $chainOfThought = [], bool $final = false)
     {
-        parent::__construct($answer, $chainOfThought, true, $final);
+        parent::__construct($agent, $answer, $chainOfThought, true, $final);
     }
 }

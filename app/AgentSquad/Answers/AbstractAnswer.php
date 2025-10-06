@@ -7,14 +7,16 @@ use Parsedown;
 
 abstract class AbstractAnswer
 {
+    private string $agent;
     private string $answer;
     /** @var ThoughtActionObservation[] $chainOfThought */
     private array $chainOfThought;
     private bool $success;
     private bool $final;
 
-    protected function __construct(string $answer, array $chainOfThought = [], bool $success = true, bool $final = false)
+    protected function __construct(string $agent, string $answer, array $chainOfThought = [], bool $success = true, bool $final = false)
     {
+        $this->agent = $agent;
         $this->answer = $answer;
         $this->chainOfThought = $chainOfThought;
         $this->success = $success;
@@ -24,6 +26,11 @@ abstract class AbstractAnswer
     public function __toString()
     {
         return ($this->success ? '[SUCCESS] ' : '[FAILURE] ') . $this->answer;
+    }
+
+    public function agent(): string
+    {
+        return $this->agent;
     }
 
     public function chainOfThought(): array
