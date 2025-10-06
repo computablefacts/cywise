@@ -8,8 +8,6 @@ use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\LlmsProvider;
-use App\AgentSquad\Providers\PromptsProvider;
-use App\AgentSquad\ThoughtActionObservation;
 use App\AgentSquad\Vectors\AbstractVectorStore;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
@@ -139,6 +137,9 @@ class LabourLawyer extends AbstractAction
         $facts = "- " . implode("\n- ", $faits);
         $requests = "- " . implode("\n- ", $demandes);
 
+        \Cache::put("labour_lawyer_{$threadId}_{$user->id}_facts", $facts, 60 * 5);
+        \Cache::put("labour_lawyer_{$threadId}_{$user->id}_requests", $requests, 60 * 5);
+
         Log::debug("FAITS : ", $faits);
         Log::debug("DEMANDES : ", $demandes);
 
@@ -175,12 +176,16 @@ class LabourLawyer extends AbstractAction
         $chainOfThought = [];
         $conclusions = [];
         $sections = [];
+        $thinking = [];
 
-        foreach ($history as $item) {
-            if (in_array($item['src_txt'], $sections)) {
+        for ($k = 0; $k < count($history); $k++) {
+
+            $item = $history[$k];
+
+            /* if (in_array($item['src_txt'], $sections)) {
                 Log::debug("Skipping '{$item['tgt_txt']}' because it's already in a section.");
                 continue;
-            }
+            } */
 
             $idx = $item['tgt_idx'];
             $doc = new LegalDocument($item['tgt_file']);
@@ -188,17 +193,27 @@ class LabourLawyer extends AbstractAction
             $enDroit = strip_tags((new Parsedown)->text($doc->en_droit($idx)));
             $auCasPresent = "";
 
+            \Cache::put("labour_lawyer_{$threadId}_{$user->id}_{$k}_{$idx}", $item, 60 * 5);
+
             for ($i = 0; $i < $doc->nbArguments($idx); $i++) {
 
-                $auCasPresent .= ((empty($auCasPresent) ? "- Argument : " : "\n- Argument : ") . $doc->argument($idx, $i) . " :");
+                $file = Str::afterLast($doc->file(), '/');
+                $auCasPresent .= ($i === 0 ? "<b>[<span style=\"color:#ffaa00\">{$k}.{$idx}</span>] {$titre} (<i>{$file}</i>)</b><br><br><ul>" : "");
+                $auCasPresent .= ("<li><b>Argument.</b> " . $doc->argument($idx, $i) . "<ul>");
                 $factz = $doc->faits($idx, $i);
 
                 for ($j = 0; $j < count($factz); $j++) {
-                    $auCasPresent .= ("\n  - Fait : " . $factz[$j]);
+                    $auCasPresent .= ("<li><b>Fait.</b> " . $factz[$j] . "</li>");
                 }
+                $auCasPresent .= "</ul></li><br>";
+                $auCasPresent .= ($i === $doc->nbArguments($idx) - 1 ? "</ul>" : "");
             }
 
-            $prompt = PromptsProvider::provide('default_consultations', [
+            $auCasPresent = Str::trim($auCasPresent);
+            $thinking[] = $auCasPresent;
+            Log::debug($auCasPresent);
+
+            /* $prompt = PromptsProvider::provide('default_consultations', [
                 'TITRE' => $titre,
                 'EN_DROIT' => $enDroit,
                 'AU_CAS_PRESENT' => strip_tags((new Parsedown)->text($doc->au_cas_present($idx))),
@@ -227,16 +242,17 @@ class LabourLawyer extends AbstractAction
                     )
                 )
             );
-            $sections[] = $item['src_txt'];
+            $sections[] = $item['src_txt']; */
         }
+        return new SuccessfulAnswer('labour_lawyer', implode("", $thinking), [], true);
 
         // Log::debug($conclusions);
 
         $conclusions = implode("<br><br>", $conclusions);
 
         if (empty(strip_tags($conclusions))) {
-            return new FailedAnswer("Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.", $chainOfThought);
+            return new FailedAnswer('labour_lawyer', "Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.", $chainOfThought);
         }
-        return new SuccessfulAnswer($conclusions, $chainOfThought, true);
+        return new SuccessfulAnswer('labour_lawyer', $conclusions, $chainOfThought, true);
     }
 }
