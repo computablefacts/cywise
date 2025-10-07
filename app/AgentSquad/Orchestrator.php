@@ -134,8 +134,8 @@ class Orchestrator
         $answer = LlmsProvider::provide($messages, $this->model);
         array_pop($messages);
 
-        Log::debug("[ORCHESTRATOR] Prompt: {$prompt}");
-        Log::debug("[ORCHESTRATOR] Answer: {$answer}");
+        // Log::debug("[ORCHESTRATOR] Prompt: {$prompt}");
+        // Log::debug("[ORCHESTRATOR] Answer: {$answer}");
 
         $matches = null;
         preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);

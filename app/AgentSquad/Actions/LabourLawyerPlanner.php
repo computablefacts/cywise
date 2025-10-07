@@ -140,8 +140,8 @@ class LabourLawyerPlanner extends AbstractAction
         \Cache::put("labour_lawyer_{$threadId}_{$user->id}_facts", $facts, 60 * 5);
         \Cache::put("labour_lawyer_{$threadId}_{$user->id}_requests", $requests, 60 * 5);
 
-        Log::debug("FAITS : ", $faits);
-        Log::debug("DEMANDES : ", $demandes);
+        // Log::debug("FAITS : ", $faits);
+        // Log::debug("DEMANDES : ", $demandes);
 
         $history = collect($demandes)
             ->concat($faits)
@@ -211,7 +211,7 @@ class LabourLawyerPlanner extends AbstractAction
 
             $auCasPresent = Str::trim($auCasPresent);
             $thinking[] = $auCasPresent;
-            Log::debug($auCasPresent);
+            // Log::debug($auCasPresent);
 
             /* $prompt = PromptsProvider::provide('default_consultations', [
                 'TITRE' => $titre,

@@ -67,7 +67,7 @@ class LabourLawyerWriter extends AbstractAction
             }
         }
 
-        Log::debug($history);
+        // Log::debug($history);
 
         $chainOfThought = [];
         $conclusions = [];
@@ -93,7 +93,7 @@ class LabourLawyerWriter extends AbstractAction
             $answer = LlmsProvider::provide($prompt, $this->model, 120);
             $chainOfThought[] = new ThoughtActionObservation("I need to write about '{$item['src_txt']}'.", "Checking if '{$item['tgt_txt']}' from '{$item['tgt_file']}' is a good template...", strip_tags($answer));
 
-            Log::debug($answer);
+            // Log::debug($answer);
 
             if (Str::contains($answer, "Le cas sélectionné n'est pas compatible avec le cas présent.")) {
                 Log::debug("Skipping '{$item['tgt_txt']}' because it is not compatible with the current case.");
