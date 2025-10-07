@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Parsedown;
 
-class LabourLawyer extends AbstractAction
+class LabourLawyerPlanner extends AbstractAction
 {
     private AbstractVectorStore $vectorStoreObjets;
     private AbstractVectorStore $vectorStoreArguments;

@@ -3,7 +3,8 @@
 namespace App\Http\Procedures;
 
 use App\AgentSquad\Actions\CyberBuddy;
-use App\AgentSquad\Actions\LabourLawyer;
+use App\AgentSquad\Actions\LabourLawyerPlanner;
+use App\AgentSquad\Actions\LabourLawyerWriter;
 use App\AgentSquad\Actions\ListAssets;
 use App\AgentSquad\Actions\ListVulnerabilities;
 use App\AgentSquad\Actions\ManageAssets;
@@ -135,7 +136,8 @@ class CyberBuddyProcedure extends Procedure
                     Log::debug("File '{$output}.zip' unpacked.");
                 }
 
-                $orchestrator->registerAgent(new LabourLawyer($output));
+                $orchestrator->registerAgent(new LabourLawyerPlanner($output));
+                $orchestrator->registerAgent(new LabourLawyerWriter());
             }
 
             $answer = $orchestrator->run($user, $threadId, $messages, $question);
@@ -156,7 +158,7 @@ class CyberBuddyProcedure extends Procedure
             'timestamp' => Carbon::now()->toIso8601ZuluString(),
             'chain_of_thought' => $answer->chainOfThought(),
             'html' => $answer->html(),
-            'next_agent' => $answer->nextAgent(),
+            'next_action' => $answer->nextAction(),
         ];
         $conversation->dom = json_encode($messages);
         $conversation->save();

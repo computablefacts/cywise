@@ -12,15 +12,15 @@ abstract class AbstractAnswer
     private array $chainOfThought;
     private bool $success;
     private bool $final;
-    private string $nextAgent;
+    private ?string $nextAction;
 
-    protected function __construct(string $answer, array $chainOfThought = [], bool $success = true, bool $final = false, string $nextAgent = null)
+    protected function __construct(string $answer, array $chainOfThought = [], bool $success = true, bool $final = false, ?string $nextAction = null)
     {
         $this->answer = $answer;
         $this->chainOfThought = $chainOfThought;
         $this->success = $success;
         $this->final = $final;
-        $this->nextAgent = $nextAgent;
+        $this->nextAction = $nextAction;
     }
 
     public function __toString()
@@ -28,9 +28,9 @@ abstract class AbstractAnswer
         return ($this->success ? '[SUCCESS] ' : '[FAILURE] ') . $this->answer;
     }
 
-    public function nextAgent(): string
+    public function nextAction(): ?string
     {
-        return $this->nextAgent;
+        return $this->nextAction;
     }
 
     public function chainOfThought(): array

@@ -2,7 +2,6 @@
 
 namespace App\AgentSquad;
 
-use App\AgentSquad\Actions\LegalDocument;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
@@ -13,7 +12,6 @@ use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Parsedown;
 
 class Orchestrator
 {
@@ -87,83 +85,41 @@ class Orchestrator
             }
             return new FailedAnswer($markdown, $chainOfThought);
         }
+        if (!empty($messages)) {
 
-        if (count($messages) > 0) {
+            $lastMessage = $messages[count($messages) - 1];
+            $nextAction = $lastMessage['next_action'] ?? null;
 
-            $prev = $messages[count($messages) - 1];
+            if (isset($nextAction)) {
 
-            if (isset($prev['next_agent']) && $prev['next_agent'] === 'labour_lawyer_writer') {
+                $answer = $this->agents[$nextAction]->execute($user, $threadId, $messages, $input);
 
-                $history = [];
-                preg_match_all('/(\d+)\.(\d+)/', $input, $matches);
+                /* if ($answer->failure()) {
+                    $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", 'An error occurred. Returning to the user.');
+                    $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
+                    $answer->setChainOfThought($chainOfThought);
+                    return $answer;
+                } */
 
-                foreach ($matches[0] as $i => $match) {
+                $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", strip_tags($answer->markdown()));
+                $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
 
-                    $k = $matches[1][$i];
-                    $idx = $matches[2][$i];
-                    $item = \Cache::get("labour_lawyer_{$threadId}_{$user->id}_{$k}_{$idx}");
+                if ($answer->final()) {
 
-                    if ($item != null) {
-                        $history[] = $item;
+                    $answer->setChainOfThought($chainOfThought);
+                    $markdown = Str::trim(Str::replace('I_DONT_KNOW', '', $answer->markdown()));
+
+                    if (empty($markdown)) {
+                        return new FailedAnswer(__("I apologize, but I couldn't find any relevant references in my library."), $chainOfThought);
                     }
+                    return $answer;
                 }
-
-                Log::debug($history);
-
-                $chainOfThought = [];
-                $conclusions = [];
-
-                foreach ($history as $item) {
-
-                    $idx = $item['tgt_idx'];
-                    $doc = new LegalDocument($item['tgt_file']);
-                    $titre = strip_tags((new Parsedown)->text($item['tgt_txt']));
-                    $enDroit = strip_tags((new Parsedown)->text($doc->en_droit($idx)));
-                    $facts = \Cache::get("labour_lawyer_{$threadId}_{$user->id}_facts");
-                    $requests = \Cache::get("labour_lawyer_{$threadId}_{$user->id}_requests");
-                    $prompt = PromptsProvider::provide('default_consultations', [
-                        'TITRE' => $titre,
-                        'EN_DROIT' => $enDroit,
-                        'AU_CAS_PRESENT' => strip_tags((new Parsedown)->text($doc->au_cas_present($idx))),
-                        'FAITS' => $facts,
-                        'DEMANDES' => $requests,
-                    ]);
-
-                    // Log::debug($prompt);
-
-                    $answer = LlmsProvider::provide($prompt, $this->model, 120);
-                    $chainOfThought[] = new ThoughtActionObservation("I need to write about '{$item['src_txt']}'.", "Checking if '{$item['tgt_txt']}' from '{$item['tgt_file']}' is a good template...", strip_tags($answer));
-
-                    Log::debug($answer);
-
-                    if (Str::contains($answer, "Le cas sélectionné n'est pas compatible avec le cas présent.")) {
-                        Log::debug("Skipping '{$item['tgt_txt']}' because it is not compatible with the current case.");
-                        continue;
-                    }
-
-                    $conclusions[] = Str::replace("En droit", "<br><br>**En droit**<br><br>",
-                        Str::replace("Au cas présent", "<br><br>**Au cas présent**<br><br>",
-                            preg_replace('/^(.+)$/m', '**$1**<br><br>',
-                                preg_replace("/\n{3,}/", "<br><br>",
-                                    Str::trim($answer)
-                                ), 1
-                            )
-                        )
-                    );
-                }
-
-                $conclusions = implode("<br><br>", $conclusions);
-
-                if (empty(strip_tags($conclusions))) {
-                    return new FailedAnswer("Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.", $chainOfThought);
-                }
-                return new SuccessfulAnswer($conclusions, $chainOfThought, true);
             }
         }
 
         $template = '{"thought":"describe here succinctly your thoughts about the question you have been asked", "action_name":"set here the name of the action to execute", "action_input":"set here the input for the action"}';
         $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
-        $actions = implode("\n", array_map(fn(AbstractAction $action) => "[ACTION][NAME]{$action->name()}[/NAME][DESCRIPTION]{$action->description()}[/DESCRIPTION][/ACTION]", $this->agents));
+        $actions = implode("\n", array_map(fn(AbstractAction $action) => "[ACTION][NAME]{$action->name()}[/NAME][DESCRIPTION]{$action->description()}[/DESCRIPTION][/ACTION]", array_filter($this->agents, fn(AbstractAction $action) => $action->isInvokable())));
         $prompt = PromptsProvider::provide('default_orchestrator', [
             'TEMPLATE' => $template,
             'COT' => $cot,

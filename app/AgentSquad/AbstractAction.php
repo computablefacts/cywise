@@ -19,5 +19,10 @@ abstract class AbstractAction
         return $this->schema()['function']['description'] ?? '';
     }
 
+    public function isInvokable(): bool
+    {
+        return true;
+    }
+
     public abstract function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer;
 }
