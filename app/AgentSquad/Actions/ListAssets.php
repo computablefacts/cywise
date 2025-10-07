@@ -61,13 +61,13 @@ class ListAssets extends AbstractAction
         $category = Str::trim(Str::afterLast($input, ':'));
 
         if ($action !== 'list') {
-            return new FailedAnswer('list_assets', "Invalid action. Please use list.");
+            return new FailedAnswer("Invalid action. Please use list.");
         }
         if (!in_array($status, ['monitored', 'monitorable', 'any'])) {
-            return new FailedAnswer('list_assets', "Invalid status. Please use monitored, monitorable, or any.");
+            return new FailedAnswer("Invalid status. Please use monitored, monitorable, or any.");
         }
         if (!in_array($category, ['domain', 'ip', 'any'])) {
-            return new FailedAnswer('list_assets', "Invalid category. Please use domain, ip, or any.");
+            return new FailedAnswer("Invalid category. Please use domain, ip, or any.");
         }
 
         $procedure = new AssetsProcedure();
@@ -91,7 +91,7 @@ class ListAssets extends AbstractAction
                 return true;
             });
             if ($assets->isEmpty()) {
-                return new SuccessfulAnswer('list_assets', "There are no assets of category '{$category}' and status '{$status}'.");
+                return new SuccessfulAnswer("There are no assets of category '{$category}' and status '{$status}'.");
             }
             if ($assets->count() === 1) {
 
@@ -100,7 +100,7 @@ class ListAssets extends AbstractAction
                 $preamble = "1 {$status} {$category} has been found:";
                 $list = $assets->map(fn(array $asset) => "- {$asset['asset']}")->implode("\n");
 
-                return new SuccessfulAnswer('list_assets', "{$preamble}\n\n{$list}");
+                return new SuccessfulAnswer("{$preamble}\n\n{$list}");
             }
 
             $status = $status === 'any' ? '' : $status;
@@ -108,9 +108,9 @@ class ListAssets extends AbstractAction
             $preamble = "{$assets->count()} {$status} {$category} have been found:";
             $list = $assets->map(fn(array $asset) => "- {$asset['asset']}")->implode("\n");
 
-            return new SuccessfulAnswer('list_assets', "{$preamble}\n\n{$list}");
+            return new SuccessfulAnswer("{$preamble}\n\n{$list}");
         } catch (\Exception $e) {
-            return new FailedAnswer('list_assets', "Action {$action} failed when applied to assets of category {$category} and status {$status}:\n\n{$e->getMessage()}");
+            return new FailedAnswer("Action {$action} failed when applied to assets of category {$category} and status {$status}:\n\n{$e->getMessage()}");
         }
     }
 }

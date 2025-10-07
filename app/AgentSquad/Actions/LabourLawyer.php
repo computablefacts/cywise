@@ -244,15 +244,15 @@ class LabourLawyer extends AbstractAction
             );
             $sections[] = $item['src_txt']; */
         }
-        return new SuccessfulAnswer('labour_lawyer', implode("", $thinking), [], true);
+        return new SuccessfulAnswer(implode("", $thinking), [], true, 'labour_lawyer_writer');
 
         // Log::debug($conclusions);
 
         $conclusions = implode("<br><br>", $conclusions);
 
         if (empty(strip_tags($conclusions))) {
-            return new FailedAnswer('labour_lawyer', "Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.", $chainOfThought);
+            return new FailedAnswer("Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.", $chainOfThought);
         }
-        return new SuccessfulAnswer('labour_lawyer', $conclusions, $chainOfThought, true);
+        return new SuccessfulAnswer($conclusions, $chainOfThought, true);
     }
 }

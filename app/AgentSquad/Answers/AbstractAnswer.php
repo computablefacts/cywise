@@ -7,20 +7,20 @@ use Parsedown;
 
 abstract class AbstractAnswer
 {
-    private string $agent;
     private string $answer;
     /** @var ThoughtActionObservation[] $chainOfThought */
     private array $chainOfThought;
     private bool $success;
     private bool $final;
+    private string $nextAgent;
 
-    protected function __construct(string $agent, string $answer, array $chainOfThought = [], bool $success = true, bool $final = false)
+    protected function __construct(string $answer, array $chainOfThought = [], bool $success = true, bool $final = false, string $nextAgent = null)
     {
-        $this->agent = $agent;
         $this->answer = $answer;
         $this->chainOfThought = $chainOfThought;
         $this->success = $success;
         $this->final = $final;
+        $this->nextAgent = $nextAgent;
     }
 
     public function __toString()
@@ -28,9 +28,9 @@ abstract class AbstractAnswer
         return ($this->success ? '[SUCCESS] ' : '[FAILURE] ') . $this->answer;
     }
 
-    public function agent(): string
+    public function nextAgent(): string
     {
-        return $this->agent;
+        return $this->nextAgent;
     }
 
     public function chainOfThought(): array

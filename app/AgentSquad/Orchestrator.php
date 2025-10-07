@@ -58,14 +58,14 @@ class Orchestrator
             return $this->processInput($user, $threadId, $messages, $input);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-            return new FailedAnswer('orchestrator', "Sorry, an error occurred: {$e->getMessage()}");
+            return new FailedAnswer("Sorry, an error occurred: {$e->getMessage()}");
         }
     }
 
     private function processCommand(User $user, string $threadId, array $messages, string $command): AbstractAnswer
     {
         if (!isset($this->commands[$command])) {
-            return new FailedAnswer('orchestrator', "Sorry, I did not find your command: {$command}");
+            return new FailedAnswer("Sorry, I did not find your command: {$command}");
         }
         return $this->commands[$command]->execute($user, $threadId, $messages, $command);
     }
@@ -85,14 +85,14 @@ class Orchestrator
             if (empty($markdown)) {
                 $markdown = __("I apologize, but I couldn't find any relevant references in my library.");
             }
-            return new FailedAnswer('orchestrator', $markdown, $chainOfThought);
+            return new FailedAnswer($markdown, $chainOfThought);
         }
 
         if (count($messages) > 0) {
 
             $prev = $messages[count($messages) - 1];
 
-            if (isset($prev['agent']) && $prev['agent'] === 'labour_lawyer') {
+            if (isset($prev['next_agent']) && $prev['next_agent'] === 'labour_lawyer_writer') {
 
                 $history = [];
                 preg_match_all('/(\d+)\.(\d+)/', $input, $matches);
@@ -155,9 +155,9 @@ class Orchestrator
                 $conclusions = implode("<br><br>", $conclusions);
 
                 if (empty(strip_tags($conclusions))) {
-                    return new FailedAnswer('labour_lawyer_writer', "Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.", $chainOfThought);
+                    return new FailedAnswer("Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.", $chainOfThought);
                 }
-                return new SuccessfulAnswer('labour_lawyer_writer', $conclusions, $chainOfThought, true);
+                return new SuccessfulAnswer($conclusions, $chainOfThought, true);
             }
         }
 
@@ -202,28 +202,28 @@ class Orchestrator
             }
         }
         if (empty($json)) {
-            return new FailedAnswer('orchestrator', "Invalid JSON response: {$answer}", $chainOfThought);
+            return new FailedAnswer("Invalid JSON response: {$answer}", $chainOfThought);
         }
         if (!isset($json['thought'])) {
-            return new FailedAnswer('orchestrator', "The thought is missing: {$answer}", $chainOfThought);
+            return new FailedAnswer("The thought is missing: {$answer}", $chainOfThought);
         }
         if (!isset($json['action_name'])) {
-            return new FailedAnswer('orchestrator', "The action name is missing: {$answer}", $chainOfThought);
+            return new FailedAnswer("The action name is missing: {$answer}", $chainOfThought);
         }
         if (!isset($json['action_input'])) {
-            return new FailedAnswer('orchestrator', "The action input is missing: {$answer}", $chainOfThought);
+            return new FailedAnswer("The action input is missing: {$answer}", $chainOfThought);
         }
         if ($json['action_name'] === 'respond_to_user') {
             $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'Responding to the user.');
-            return new SuccessfulAnswer('orchestrator', $json['action_input'], $chainOfThought);
+            return new SuccessfulAnswer($json['action_input'], $chainOfThought);
         }
         if ($json['action_name'] === 'clarify_request') {
             $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'Asking for clarification.');
-            return new SuccessfulAnswer('orchestrator', $json['action_input'], $chainOfThought);
+            return new SuccessfulAnswer($json['action_input'], $chainOfThought);
         }
         if (!isset($this->agents[$json['action_name']])) {
             $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An unknown action was requested. Returning to the user.');
-            return new FailedAnswer('orchestrator', "The action is unknown: {$answer}", $chainOfThought);
+            return new FailedAnswer("The action is unknown: {$answer}", $chainOfThought);
         }
 
         $answer = $this->agents[$json['action_name']]->execute($user, $threadId, $messages, $json['action_input']);
@@ -244,7 +244,7 @@ class Orchestrator
             $markdown = Str::trim(Str::replace('I_DONT_KNOW', '', $answer->markdown()));
 
             if (empty($markdown)) {
-                return new FailedAnswer('orchestrator', __("I apologize, but I couldn't find any relevant references in my library."), $chainOfThought);
+                return new FailedAnswer(__("I apologize, but I couldn't find any relevant references in my library."), $chainOfThought);
             }
             return $answer;
         }

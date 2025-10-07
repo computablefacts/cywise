@@ -58,7 +58,7 @@ class ManageAssets extends AbstractAction
         $asset = Str::trim(Str::after($input, ':'));
 
         if (!IsValidAsset::test($asset)) {
-            return new FailedAnswer('manage_assets',"Invalid asset. Please provide a valid domain or IP address.");
+            return new FailedAnswer("Invalid asset. Please provide a valid domain or IP address.");
         }
 
         /** @var Asset $azzet */
@@ -66,15 +66,15 @@ class ManageAssets extends AbstractAction
 
         if ($action === 'add') {
             if ($azzet) {
-                return new FailedAnswer('manage_assets',"Asset {$asset} already exists.");
+                return new FailedAnswer("Asset {$asset} already exists.");
             }
             $request = new JsonRpcRequest(['asset' => $asset, 'watch' => false]);
             $request->setUserResolver(fn() => $user);
             $result = (new AssetsProcedure())->create($request);
-            return new SuccessfulAnswer('manage_assets', "Asset {$asset} added successfully.");
+            return new SuccessfulAnswer("Asset {$asset} added successfully.");
         }
         if (!$azzet) {
-            return new FailedAnswer('manage_assets', "Asset {$asset} does not exist.");
+            return new FailedAnswer("Asset {$asset} does not exist.");
         }
 
         $procedure = new AssetsProcedure();
@@ -85,19 +85,19 @@ class ManageAssets extends AbstractAction
             if ($action === 'remove') {
                 $result = $procedure->unmonitor($request);
                 $result = $procedure->delete($request);
-                return new SuccessfulAnswer('manage_assets', "Asset {$asset} removed successfully.");
+                return new SuccessfulAnswer("Asset {$asset} removed successfully.");
             }
             if ($action === 'monitor') {
                 $result = $procedure->monitor($request);
-                return new SuccessfulAnswer('manage_assets', "Asset {$asset} monitored successfully.");
+                return new SuccessfulAnswer("Asset {$asset} monitored successfully.");
             }
             if ($action === 'unmonitor') {
                 $result = $procedure->unmonitor($request);
-                return new SuccessfulAnswer('manage_assets', "Asset {$asset} unmonitored successfully.");
+                return new SuccessfulAnswer("Asset {$asset} unmonitored successfully.");
             }
         } catch (\Exception $e) {
-            return new FailedAnswer('manage_assets', "Action {$action} failed when applied to asset {$asset}:\n\n{$e->getMessage()}");
+            return new FailedAnswer("Action {$action} failed when applied to asset {$asset}:\n\n{$e->getMessage()}");
         }
-        return new FailedAnswer('manage_assets', "Invalid action. Please use add, remove, monitor, or unmonitor.");
+        return new FailedAnswer("Invalid action. Please use add, remove, monitor, or unmonitor.");
     }
 }
