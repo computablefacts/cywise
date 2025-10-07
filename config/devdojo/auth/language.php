@@ -34,6 +34,10 @@ return [
         'sign_in' => 'Sign in',
         'button' => 'Continue',
         'email_registration_disabled' => 'Email registration is currently disabled. Please use social login.',
+        'invitation_not_valid' => 'Invalid invitation.',
+        'invitation_expired' => 'Expired invitation.',
+        'invitation_already_used' => 'This invitation has already be used.',
+        'registrations_valid' => 'Create your account to accept the invitation.',
     ],
     'verify' => [
         'page_title' => 'Verify Your Account',

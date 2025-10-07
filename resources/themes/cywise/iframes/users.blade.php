@@ -1,6 +1,11 @@
 @extends('theme::iframes.app')
 
 @section('content')
+<div class="px-3 pt-3" style="text-align: right;">
+  <a href="{{ route('iframes.user-invitation') }}">
+    {{ __('+ new') }}
+  </a>
+</div>
 <div class="card mt-3 mb-3">
   @if($users->isEmpty())
   <div class="card-body">

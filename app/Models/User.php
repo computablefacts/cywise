@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Helpers\MailCoach;
 use App\Jobs\DeleteEmbeddedChunks;
 use App\Rules\IsValidCollectionName;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,7 @@ use Wave\User as WaveUser;
  */
 class User extends WaveUser
 {
-    use HasApiTokens, Notifiable, HasProfileKeyValues;
+    use HasFactory, HasApiTokens, Notifiable, HasProfileKeyValues;
 
     public $guard_name = 'web';
 

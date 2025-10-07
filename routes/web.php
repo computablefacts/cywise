@@ -33,6 +33,7 @@ use App\Http\Controllers\Iframes\TablesController;
 use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Controllers\Iframes\TracesController;
 use App\Http\Controllers\Iframes\UsersController;
+use App\Http\Controllers\Iframes\UsersInvitationController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
@@ -56,6 +57,7 @@ Wave::routes();
 
 // See https://devdojo.com/question/customizing-the-two-factor-authentication
 Route::view('/auth/login', 'vendor/auth/pages/auth/login');
+Route::view('/auth/register', 'vendor/auth/pages/auth/register');
 
 // See https://devdojo.com/wave/docs/features/user-profiles
 Route::redirect('profile/{username}', '/dashboard');
@@ -522,5 +524,6 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/tables', [TablesController::class, '__invoke'])->name('tables');
     Route::get('/traces', [TracesController::class, '__invoke'])->name('traces');
     Route::get('/users', [UsersController::class, '__invoke'])->name('users');
+    Route::get('/users/invitation', [UsersInvitationController::class, '__invoke'])->name('user-invitation');
     Route::get('/vulnerabilities', [TimelineController::class, '__invoke'])->name('vulnerabilities');
 });

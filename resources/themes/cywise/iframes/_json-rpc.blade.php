@@ -324,5 +324,9 @@
       onErrorDefault, onFinally);
   }
 
+  function createUserInvitationApiCall(email, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('invitations@create', {email: email}, onSuccess);
+  }
+
 </script>
 @endonce
