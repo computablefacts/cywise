@@ -42,7 +42,7 @@
                                     <span>You are currently subscribed to the {{ auth()->user()->plan()->name }} {{ auth()->user()->planInterval() }} Plan.</span>
                                 </div>
                             </x-app.alert>
-                            <p class="my-4">Manage your subscription by clicking below. Edit this page from the following file:  <x-code-inline>resources/views/{{ $theme->folder }}/pages/settings/subscription.blade.php</x-code-inline></p>
+                            <p class="my-4">Manage your subscription by clicking below.</p>
                             @if (session('update'))
                                 <div class="my-4 text-sm text-green-600">Successfully updated your subscription</div>
                             @endif
