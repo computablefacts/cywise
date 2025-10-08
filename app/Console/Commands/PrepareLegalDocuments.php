@@ -47,7 +47,7 @@ class PrepareLegalDocuments extends Command
         if (is_dir($in)) {
             $this->processDirectory($in, $out, $prompt);
         } elseif (is_file($in)) {
-            $this->processFile($in, $in, $prompt);
+            $this->processFile($in, $out, $prompt);
         } else {
             throw new \Exception('Invalid input path : ' . $in);
         }
@@ -76,13 +76,16 @@ class PrepareLegalDocuments extends Command
 
     private function processFile(string $file, string $output, string $prompt): void
     {
-        if (!Str::endsWith($file, '.docx') && !Str::endsWith($file, '.doc') && !Str::endsWith($file, '.pdf')) {
+        if (!Str::endsWith($file, '.docx') && !Str::endsWith($file, '.doc') /* && !Str::endsWith($file, '.pdf') */) {
             Log::warning("Skipping file $file : not a .docx or .pdf file.");
             return;
         }
 
         $filename = Str::slug(basename($file));
+        $lua = base_path("app/Console/Commands/extract.lua");
+        $html = "{$output}/{$filename}.html";
         $md = "{$output}/{$filename}.md";
+        $mdFinal = "{$output}/{$filename}_final.md";
         $json = "{$output}/{$filename}.json";
 
         if (!file_exists($md)) {
@@ -90,10 +93,14 @@ class PrepareLegalDocuments extends Command
             if (Str::endsWith($file, '.pdf')) {
                 shell_exec("pdftotext -layout \"$file\" - | pandoc -f markdown -t markdown_strict --extract-media=\"{$output}/attachments/{$filename}\" -o \"$md\"");
             } else {
-                shell_exec("pandoc -t markdown_strict --extract-media=\"{$output}/attachments/{$filename}\" \"$file\" -o \"$md\"");
+                shell_exec("unoconv -o \"$html\" \"$file\"");
+                shell_exec("pandoc \"$html\" -t markdown_strict -o \"$md\"");
+                shell_exec("pandoc \"$md\" -t markdown --lua-filter=\"$lua\" -o \"$mdFinal\"");
+                shell_exec("find \"{$output}\" -type f ! -name \"*_final.md\" -delete");
             }
             $this->info("File converted to markdown.");
         }
+        return;
         if (!file_exists($md)) {
             $this->warn("Skipping file {$filename} : no markdown file.");
             return;
