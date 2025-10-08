@@ -54,6 +54,10 @@ class ProdDbAppConfig implements DbAppConfigInterface
 
             'encrypted:towerify.stripe.key' => 'emqKPsH94Gp4!ziy_fBp0naOHlnV28A5fDfY8hWrQy6w9QGUja3fZeIXG4n6214U4OIP+eFJQRwRO5qJ3sFJvM9wMBuwUhpXnMLkT2gpRUG1kdzHVIaGSQeq/6bhwJTF3xNwDTDcvQf70F73uldge+VVroUKdqFgKZiClNQ==',
             'encrypted:towerify.stripe.secret' => 'r0ZRSP5WHOFJ?H8z_031Fm8fYryEEHjmkax3GINurDzaYtrE0bpWVIAI0y8zxlwqDxoPRKEJ5y0W6Dq+wJp3JEA5FoL+NuZ42bN5Jd8blDdwJqeSqyKsTPWZKmr3sdpNUinLRxf4XxFRRXMpYOCRDOzqrk0qZeOw4HLRfkg==',
+            'encrypted:wave.stripe.publishable_key' => 'emqKPsH94Gp4!ziy_fBp0naOHlnV28A5fDfY8hWrQy6w9QGUja3fZeIXG4n6214U4OIP+eFJQRwRO5qJ3sFJvM9wMBuwUhpXnMLkT2gpRUG1kdzHVIaGSQeq/6bhwJTF3xNwDTDcvQf70F73uldge+VVroUKdqFgKZiClNQ==',
+            'encrypted:wave.stripe.secret_key' => 'r0ZRSP5WHOFJ?H8z_031Fm8fYryEEHjmkax3GINurDzaYtrE0bpWVIAI0y8zxlwqDxoPRKEJ5y0W6Dq+wJp3JEA5FoL+NuZ42bN5Jd8blDdwJqeSqyKsTPWZKmr3sdpNUinLRxf4XxFRRXMpYOCRDOzqrk0qZeOw4HLRfkg==',
+            'encrypted:devdojo.billing.keys.stripe.publishable_key' => 'emqKPsH94Gp4!ziy_fBp0naOHlnV28A5fDfY8hWrQy6w9QGUja3fZeIXG4n6214U4OIP+eFJQRwRO5qJ3sFJvM9wMBuwUhpXnMLkT2gpRUG1kdzHVIaGSQeq/6bhwJTF3xNwDTDcvQf70F73uldge+VVroUKdqFgKZiClNQ==',
+            'encrypted:devdojo.billing.keys.stripe.secret_key' => 'r0ZRSP5WHOFJ?H8z_031Fm8fYryEEHjmkax3GINurDzaYtrE0bpWVIAI0y8zxlwqDxoPRKEJ5y0W6Dq+wJp3JEA5FoL+NuZ42bN5Jd8blDdwJqeSqyKsTPWZKmr3sdpNUinLRxf4XxFRRXMpYOCRDOzqrk0qZeOw4HLRfkg==',
 
             'towerify.stripe.plans.essential.name' => 'Essentiel',
             'towerify.stripe.plans.essential.description' => 'L\'offre la plus adaptée aux TPE.',
