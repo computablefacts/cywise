@@ -98,7 +98,8 @@ function ends_with_quote(text)
          string.match(text, "»%s*%.%s*$") or -- ».
          string.match(text, "»%s*%(.+%)%s*$") or -- » ()
          string.match(text, "»%s*%.%s*%(.+%)%s*$") or -- ». ()
-         string.match(text, "»%s*%(.+%)%s*%.%s*$") -- » ().
+         string.match(text, "»%s*%(.+%)%s*%.%s*$") or -- » ().
+         string.match(text, "»%s*%.%s*%(.+%)%s*%.%s*$") -- ». ().
 end
 
 -- Détecter une fin de citation sur plusieurs lignes
