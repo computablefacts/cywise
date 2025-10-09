@@ -57,7 +57,7 @@ class LlmProvider
             ]];
         }
         return match ($this->provider) {
-            self::DEEP_INFRA => $this->callDeepInfra($messages, $model ?? 'meta-llama/Llama-4-Scout-17B-16E-Instruct', 0.7, $tools),
+            self::DEEP_INFRA => $this->callDeepInfra($messages, $model ?? 'Qwen/Qwen3-Next-80B-A3B-Instruct', 0.7, $tools),
             self::DEEP_SEEK => $this->callDeepSeek($messages, $model ?? 'deepseek-chat', 0.7, $tools),
             self::OPEN_AI => $this->callOpenAi($messages, $model ?? 'gpt-4o', 0.7, $tools),
             self::GEMINI => $this->callGemini($messages, $model ?? 'gemini-2.0-flash', 0.7, $tools),

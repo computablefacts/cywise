@@ -2,14 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\AgentSquad\Actions\LegalDocument;
-use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\LlmsProvider;
-use App\AgentSquad\Vectors\AbstractVectorStore;
-use App\AgentSquad\Vectors\FileVectorStore;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Symfony\Component\DomCrawler\Crawler;
 
 class PrepareLegalDocuments extends Command
 {
@@ -18,7 +15,7 @@ class PrepareLegalDocuments extends Command
      *
      * @var string
      */
-    protected $signature = 'legal:prepare {input} {output} {prompt}';
+    protected $signature = 'legal:prepare {input} {output}';
 
     /**
      * The console command description.
@@ -27,10 +24,6 @@ class PrepareLegalDocuments extends Command
      */
     protected $description = 'Convert a legal document to a list of chunks.';
 
-    private AbstractVectorStore $vectorStoreObjets;
-    private AbstractVectorStore $vectorStoreArguments;
-    private string $model;
-
     /**
      * Execute the console command.
      */
@@ -38,24 +31,17 @@ class PrepareLegalDocuments extends Command
     {
         $in = $this->argument('input');
         $out = $this->argument('output');
-        $prompt = $this->argument('prompt');
-
-        $this->vectorStoreObjets = new FileVectorStore($out, 4, 'objets');
-        $this->vectorStoreArguments = new FileVectorStore($out, 4, 'arguments');
-        $this->model = 'google/gemini-2.5-pro';
 
         if (is_dir($in)) {
-            $this->processDirectory($in, $out, $prompt);
+            $this->processDirectory($in, $out);
         } elseif (is_file($in)) {
-            $this->processFile($in, $out, $prompt);
+            $this->processFile($in, $out);
         } else {
             throw new \Exception('Invalid input path : ' . $in);
         }
-
-        $this->updateVectorDatabase($out);
     }
 
-    private function processDirectory(string $dir, string $output, string $prompt): void
+    private function processDirectory(string $dir, string $output): void
     {
         $ffs = scandir($dir);
 
@@ -67,113 +53,177 @@ class PrepareLegalDocuments extends Command
         }
         foreach ($ffs as $ff) {
             if (is_dir($dir . '/' . $ff)) {
-                $this->processDirectory($dir . '/' . $ff, $output, $prompt);
+                $this->processDirectory($dir . '/' . $ff, $output);
             } else if (is_file($dir . '/' . $ff)) {
-                $this->processFile($dir . '/' . $ff, $output, $prompt);
+                $this->processFile($dir . '/' . $ff, $output);
             }
         }
     }
 
-    private function processFile(string $file, string $output, string $prompt): void
+    private function processFile(string $file, string $output): void
     {
-        if (!Str::endsWith($file, '.docx') && !Str::endsWith($file, '.doc') /* && !Str::endsWith($file, '.pdf') */) {
-            Log::warning("Skipping file $file : not a .docx or .pdf file.");
+        if (!Str::endsWith($file, '.docx') && !Str::endsWith($file, '.doc')) {
+            Log::warning("Skipping file $file : not a .doc or .docx file.");
             return;
         }
 
         $filename = Str::slug(basename($file));
-        $lua = base_path("app/Console/Commands/extract.lua");
         $html = "{$output}/{$filename}.html";
-        $md = "{$output}/{$filename}.md";
-        $mdFinal = "{$output}/{$filename}_final.md";
         $json = "{$output}/{$filename}.json";
+        $doc = [];
 
-        if (!file_exists($md)) {
-            $this->info("Converting {$filename} to markdown...");
-            if (Str::endsWith($file, '.pdf')) {
-                shell_exec("pdftotext -layout \"$file\" - | pandoc -f markdown -t markdown_strict --extract-media=\"{$output}/attachments/{$filename}\" -o \"$md\"");
-            } else {
-                shell_exec("unoconv -o \"$html\" \"$file\"");
-                shell_exec("pandoc \"$html\" -t markdown_strict -o \"$md\"");
-                shell_exec("pandoc \"$md\" -t markdown --lua-filter=\"$lua\" -o \"$mdFinal\"");
-                shell_exec("find \"{$output}\" -type f ! -name \"*_final.md\" -delete");
+        if (file_exists($json)) {
+            $doc = json_decode(file_get_contents($json));
+        } else {
+
+            if (!file_exists($html)) {
+                $this->info("Converting {$filename} to HTML...");
+                shell_exec("unoconv -o \"{$html}\" \"{$file}\"");
+                $this->info("File converted to HTML.");
             }
-            $this->info("File converted to markdown.");
-        }
-        return;
-        if (!file_exists($md)) {
-            $this->warn("Skipping file {$filename} : no markdown file.");
-            return;
-        }
-        if (!file_exists($json)) {
-
-            $this->info("Building JSON document from {$filename}...");
-
-            $start = microtime(true);
-            $markdown = file_get_contents($md);
-            $prompt = \Illuminate\Support\Facades\File::get($prompt);
-            $prompt = Str::replace('{DOC}', $markdown, $prompt);
-            $answer = LlmsProvider::provide($prompt, $this->model, 30 * 60);
-            $array = json_decode($answer, true);
-            $end = microtime(true);
-            $durationInSeconds = $end - $start;
-
-            $this->info("JSON document built in {$durationInSeconds} seconds.");
-
-            if ($array) {
-                file_put_contents($json, json_encode($array, JSON_PRETTY_PRINT));
+            if (!file_exists($html)) {
+                $this->warn("Skipping file {$filename} : no HTML file.");
+                return;
             }
-        }
-        if (!file_exists($json)) {
-            $this->warn("Skipping file {$filename} : no json file.");
-            return;
-        }
-    }
 
-    private function updateVectorDatabase(string $output): void
-    {
-        $files = glob("{$output}/*.json");
+            $crawler = new Crawler(file_get_contents($html));
 
-        /** @var string $file */
-        foreach ($files as $file) {
+            foreach ($crawler as $domElement) {
+                $doc = array_merge($doc, $this->parse($domElement));
+            }
 
-            $document = new LegalDocument($file);
+            $result = [];
 
-            for ($i = 0; $i < $document->nbObjets(); $i++) {
+            foreach ($doc as $cur) {
 
-                $metadata = [
-                    'file' => $file,
-                    'index_objet' => $i,
-                ];
+                $key = key($cur);
+                $value = current($cur);
 
-                if (empty($this->vectorStoreObjets->find($metadata))) {
-                    $objet = $document->objet($i);
-                    $vector = EmbeddingsProvider::provide($objet, $metadata);
-                    $this->vectorStoreObjets->addVector($vector);
-                }
-                for ($j = 0; $j < $document->nbArguments($i); $j++) {
+                if (empty($result) || $key === 's' || $key === 'ss' || $key === 'c') {
+                    $result[] = $cur;
+                } else {
 
-                    $metadata['index_argument'] = $j;
+                    $last = $result[count($result) - 1];
+                    $lastKey = key($last);
+                    $lastValue = current($last);
 
-                    if (empty($this->vectorStoreArguments->find($metadata))) {
-                        $argument = $document->argument($i, $j);
-                        $vector = EmbeddingsProvider::provide($argument, $metadata);
-                        $this->vectorStoreArguments->addVector($vector);
+                    if ($key === $lastKey) {
+                        $result[count($result) - 1] = [$key => array_merge($lastValue, $value)];
+                    } else {
+                        $result[] = $cur;
                     }
                 }
             }
+
+            $blocks = $this->blocks($result);
+            $kb = $this->knowledgeBase(implode("\n\n", $blocks));
+
+            file_put_contents($json, json_encode([
+                'kb' => $kb,
+                'doc' => $result,
+            ], JSON_PRETTY_PRINT));
+
+            shell_exec("find \"{$output}\" -type f ! -name \"*.json\" -delete");
         }
     }
 
-    /** @deprecated */
-    private function objet(string $str): string
+    private function knowledgeBase(string $conclusions): array
     {
-        $prompt = "
-            Ta réponse devra être en plein texte sans markdown.
-            Retourne uniquement l'objet de cette phrase en enlevant notamment les noms de personnes et de sociétés :
-            
-            {$str}
-        ";
-        return LlmsProvider::provide($prompt, $this->model, 30 * 60);
+        $prompt = \Illuminate\Support\Facades\File::get(base_path("/app/Console/Commands/prompt_structure_conclusions.txt"));
+        $prompt = Str::replace('{CONCLUSIONS}', $conclusions, $prompt);
+        // Log::debug($prompt);
+        $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 30 * 60);
+        // Log::debug($answer);
+        $matches = null;
+        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
+        $answer = '[' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), ']'), '[') . ']'; //  deal with "]<｜end▁of▁sentence｜>"
+        $json = json_decode($answer, true) ?? [];
+        Log::debug($json);
+        return $json;
+    }
+
+    private function blocks(array $doc): array
+    {
+        $block = '';
+        $blocks = [];
+
+        foreach ($doc as $cur) {
+
+            $key = key($cur);
+            $value = current($cur);
+
+            if ($key === 'p') {
+                $block .= implode("\n\n", $value) . "\n\n";
+            } else if ($key === 'c') {
+                $block .= "> " . implode("\n> ", $value) . "\n\n";
+            } else if ($key === 'ss') {
+                $block .= "## " . Str::upper(implode(" ", $value)) . "\n\n";
+            } else if (empty($block)) {
+                $block .= "# " . Str::upper(implode(" ", $value)) . "\n\n";
+            } else {
+                $blocks[] = $block;
+                $block = "# " . Str::upper(implode(" ", $value)) . "\n\n";
+            }
+        }
+        if (!empty($block)) {
+            $blocks[] = $block;
+        }
+        return $blocks;
+    }
+
+    private function parse(\DOMNode $node): array
+    {
+        $text = [];
+        $citation = [];
+        /** @var \DOMNode $childNode */
+        foreach ($node->childNodes as $childNode) {
+            if ($childNode->nodeName === 'p') {
+
+                $paragraph = $this->trim($childNode->nodeValue);
+                $hasLeftMargin = false;
+
+                if ($childNode instanceof \DOMElement && $childNode->hasAttribute('style')) {
+                    $style = $childNode->getAttribute('style');
+                    preg_match('/margin-left:\s*([^;]+)/', $style, $matches);
+                    $hasLeftMargin = !empty($matches[1]);
+                }
+                if (preg_match('/^\s*en\s+droit/i', $paragraph, $matches)) {
+                    $text[] = ['ss' => [$paragraph]];
+                } else if (preg_match('/^\s*au\s+cas\s+pr/i', $paragraph, $matches)) {
+                    $text[] = ['ss' => [$paragraph]];
+                } else if (Str::startsWith($paragraph, ['I.', 'II.', 'III.', 'IV.', 'V.', 'VI.', 'VII.', 'VIII.', 'IX.', 'X.',])) {
+                    if (Str::startsWith(Str::after($paragraph, '.'), ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])) { // subsection
+                        $text[] = ['ss' => [$paragraph]];
+                    } else { // section
+                        $text[] = ['s' => [$paragraph]];
+                    }
+                } else if (Str::startsWith($paragraph, '«') && Str::contains($paragraph, '»')) { // citation on a single line
+                    $text[] = ['c' => [$paragraph]];
+                } else if (Str::startsWith($paragraph, '«') && !Str::contains($paragraph, '»')) { // citation begins
+                    $citation[] = $paragraph;
+                } else if (!empty($citation)) { // we are building a multilines citation
+                    $citation[] = $paragraph;
+                    if (Str::contains($paragraph, '»') && !Str::contains($paragraph, '«')) { // citation ends
+                        $text[] = ['c' => $citation];
+                        $citation = [];
+                    } elseif (!$hasLeftMargin) { // fail gracefully: citation with missing ending
+                        $text[] = ['c' => $citation];
+                        $citation = [];
+                    }
+                } else if (!empty($paragraph)) {
+                    $text[] = ['p' => [$paragraph]];
+                }
+            } else if (!empty($citation)) { // enumeration in citation
+                $citation = array_merge($citation, array_merge(...array_map(fn($item) => $item['p'], $this->parse($childNode))));
+            } else {
+                $text = array_merge($text, $this->parse($childNode));
+            }
+        }
+        return $text;
+    }
+
+    private function trim(string $str): string
+    {
+        return Str::trim(preg_replace(['/\t+/', '/\n/'], [' ', ' '], $str));
     }
 }
