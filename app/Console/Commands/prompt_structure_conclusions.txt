@@ -183,26 +183,24 @@ d'utiliser les formules telles que « Dire et juger », « Sous toutes réserves
 
 # TA TÂCHE
 
-Tu es un avocat en droit social. Ton objectif est de te construire une base de connaissance de prétentions de la partie
-adverse et de la manière dont tu as répondu à celles-ci. Les demandes et prétentions commencent souvent par "Sur..."
+Tu es un avocat en droit social. Ton objectif est de te construire une base de connaissance de prétentions. Dans les
+conclusions entre [CONCLUSIONS] et [/CONCLUSIONS], les prétentions commencent généralement par "Sur..." et sont rédigées
+en utilisant un syllogisme.
 
-Extrait des conclusions entre [CONCLUSIONS] et [/CONCLUSIONS] les différentes demandes et prétentions que tu peux y
-trouver. Pour chaque demande et chaque prétention : commence par extraire le titre de la demande ou de la prétention puis
-extrait ensuite la « majeure », la « mineure » et la « conclusion ». Attention : ne raccourci pas et ne synthétise pas
-les conclusions. Préserve les citations. Extrait le texte original tel quel. Cependant, anonymise le nom des personnes
-physiques en "Mr. A" et des personnes morales en "Sté. X".
+Extrait des conclusions entre [CONCLUSIONS] et [/CONCLUSIONS] les différentes prétentions que tu peux y trouver. Soit exhaustif.
+Pour chaque prétention : commence par extraire le titre de la prétention et extrait ensuite la « majeure », la « mineure »
+et la « conclusion ». Dans la mesure du possible évite de trop restructurer le texte extrait. Préserve les citations du
+texte extrait. Anonymise le nom des personnes physiques en "Mr. A" et des personnes morales en "Sté. X".
 
-Génère pour chacune de ces demandes et de ces prétentions un objet au format JSON possédant la structure suivante :
-- un attribut "pretention" de type "string" avec la prétention extraite (optionnel) ;
-- un attribut "demande" de type "string" avec la demande extraite (optionnel) ;
-- un attribut "majeure" de type "string" avec la majeure extraite (obligatoire) ;
-- un attribut "mineure" de type "string" avec la mineure extraite (obligatoire) ;
-- un attribut "conclusion" de type "string" avec la conclusion extraite (obligatoire).
+Génère pour chacune de ces prétentions un objet au format JSON possédant la structure suivante :
+- un attribut "pretention" de type "string" avec la prétention extraite ;
+- un attribut "majeure" de type "string" avec la majeure extraite ;
+- un attribut "mineure" de type "string" avec la mineure extraite ;
+- un attribut "conclusion" de type "string" avec la conclusion extraite.
 
-Chaque objet JSON devra posséder **exactement un** attribut "demande" **ou** un attribut "pretention".
-Si tu ne trouves ni demandes ni prétentions dans les conclusions, renvoie un tableau JSON vide.
-Ecrit seulement l'objet JSON dans ta réponse.
-N'utilise pas de markdown et n'encadre pas l'objet JSON avec ``` ou ```json.
+Ecrit seulement le tableau d'objets JSON dans ta réponse.
+N'utilise pas de markdown et n'encadre pas le tableau d'objets JSON avec ``` ou ```json.
+Si tu ne trouves pas de prétentions dans les conclusions, renvoie un tableau JSON vide.
 
 [CONCLUSIONS]
 {CONCLUSIONS}
