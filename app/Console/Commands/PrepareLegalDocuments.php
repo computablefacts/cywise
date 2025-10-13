@@ -2,7 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Vectors\FileVectorStore;
+use App\AgentSquad\Vectors\Vector;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -39,6 +42,65 @@ class PrepareLegalDocuments extends Command
         } else {
             throw new \Exception('Invalid input path : ' . $in);
         }
+
+        $vectors = new FileVectorStore($out);
+
+        foreach (glob("{$out}/*.json", GLOB_BRACE) as $file) {
+            if (!is_file($file)) {
+                continue;
+            }
+            if (Str::endsWith($file, '_final.json')) {
+                continue;
+            }
+
+            $doc = json_decode(file_get_contents($file), true);
+
+            if (!isset($doc)) {
+                $this->warn("Invalid JSON in file {$file}");
+                continue;
+            }
+
+            $kb = $doc['kb'] ?? [];
+            $newKb = [];
+
+            foreach ($kb as $item) {
+
+                $pretention = Str::upper($item['pretention'] ?? '');
+                $majeure = $item['majeure'] ?? '';
+                $mineure = $item['mineure'] ?? '';
+                $conclusion = $item['conclusion'] ?? '';
+
+                if (!empty($pretention) && empty($item['arguments_clefs']) && empty($item['embedding'])) {
+                    $prompt = "Voici une prétention dans des conclusions juridiques :\n\n# Prétention\n\n{$pretention}\n\n# Majeure\n\n{$majeure}\n\n# Mineure\n\n{$mineure}\n\n# Conclusion\n\n{$conclusion}\n\nSynthétise en un court paragraphe les arguments clefs utilisés.";
+                    $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 30 * 60);
+                    $this->info("\n{$pretention}\n\n{$answer}");
+                    $item['arguments_clefs'] = "{$pretention}\n\n{$answer}";
+                    $item['embedding'] = EmbeddingsProvider::provide($item['arguments_clefs'])->embedding();
+                }
+                $newKb[] = $item;
+            }
+
+            $doc['kb'] = $newKb;
+            $doc['filename'] = basename($file);
+
+            file_put_contents(Str::replace('.json', '_final.json', $file), json_encode($doc, JSON_PRETTY_PRINT));
+
+            $embeddings = array_map(
+                fn(array $pretention) => new Vector(
+                    $pretention['arguments_clefs'],
+                    $pretention['embedding'],
+                    [
+                        'file' => $doc['filename'],
+                        'pretention' => $pretention['pretention'] ?? '',
+                        'majeure' => $pretention['majeure'] ?? '',
+                        'mineure' => $pretention['mineure'] ?? '',
+                        'conclusion' => $pretention['conclusion'] ?? '',
+                    ]
+                ),
+                array_filter($doc['kb'], fn(array $item) => isset($item['embedding']))
+            );
+            $vectors->addVectors($embeddings);
+        }
     }
 
     private function processDirectory(string $dir, string $output): void
@@ -60,11 +122,11 @@ class PrepareLegalDocuments extends Command
         }
     }
 
-    private function processFile(string $file, string $output): void
+    private function processFile(string $file, string $output): array
     {
         if (!Str::endsWith($file, '.docx') && !Str::endsWith($file, '.doc')) {
             Log::warning("Skipping file $file : not a .doc or .docx file.");
-            return;
+            return [];
         }
 
         $filename = Str::slug(basename($file));
@@ -73,58 +135,58 @@ class PrepareLegalDocuments extends Command
         $doc = [];
 
         if (file_exists($json)) {
-            $doc = json_decode(file_get_contents($json));
-        } else {
+            return json_decode(file_get_contents($json), true);
+        }
+        if (!file_exists($html)) {
+            $this->info("Converting {$filename} to HTML...");
+            shell_exec("unoconv -o \"{$html}\" \"{$file}\"");
+            $this->info("File converted to HTML.");
+        }
+        if (!file_exists($html)) {
+            $this->warn("Skipping file {$filename} : no HTML file.");
+            return [];
+        }
 
-            if (!file_exists($html)) {
-                $this->info("Converting {$filename} to HTML...");
-                shell_exec("unoconv -o \"{$html}\" \"{$file}\"");
-                $this->info("File converted to HTML.");
-            }
-            if (!file_exists($html)) {
-                $this->warn("Skipping file {$filename} : no HTML file.");
-                return;
-            }
+        $crawler = new Crawler(file_get_contents($html));
 
-            $crawler = new Crawler(file_get_contents($html));
+        foreach ($crawler as $domElement) {
+            $doc = array_merge($doc, $this->parse($domElement));
+        }
 
-            foreach ($crawler as $domElement) {
-                $doc = array_merge($doc, $this->parse($domElement));
-            }
+        $result = [];
 
-            $result = [];
+        foreach ($doc as $cur) {
 
-            foreach ($doc as $cur) {
+            $key = key($cur);
+            $value = current($cur);
 
-                $key = key($cur);
-                $value = current($cur);
+            if (empty($result) || $key === 's' || $key === 'ss' || $key === 'c') {
+                $result[] = $cur;
+            } else {
 
-                if (empty($result) || $key === 's' || $key === 'ss' || $key === 'c') {
-                    $result[] = $cur;
+                $last = $result[count($result) - 1];
+                $lastKey = key($last);
+                $lastValue = current($last);
+
+                if ($key === $lastKey) {
+                    $result[count($result) - 1] = [$key => array_merge($lastValue, $value)];
                 } else {
-
-                    $last = $result[count($result) - 1];
-                    $lastKey = key($last);
-                    $lastValue = current($last);
-
-                    if ($key === $lastKey) {
-                        $result[count($result) - 1] = [$key => array_merge($lastValue, $value)];
-                    } else {
-                        $result[] = $cur;
-                    }
+                    $result[] = $cur;
                 }
             }
-
-            $blocks = $this->blocks($result);
-            $kb = $this->knowledgeBase(implode("\n\n", $blocks));
-
-            file_put_contents($json, json_encode([
-                'kb' => $kb,
-                'doc' => $result,
-            ], JSON_PRETTY_PRINT));
-
-            shell_exec("find \"{$output}\" -type f ! -name \"*.json\" -delete");
         }
+
+        $blocks = $this->blocks($result);
+        $kb = $this->knowledgeBase(implode("\n\n", $blocks));
+        $doc = [
+            'kb' => $kb,
+            'doc' => $result,
+        ];
+
+        file_put_contents($json, json_encode($doc, JSON_PRETTY_PRINT));
+        shell_exec("find \"{$output}\" -type f ! -name \"*.json\" -delete");
+
+        return $doc;
     }
 
     private function knowledgeBase(string $conclusions): array
