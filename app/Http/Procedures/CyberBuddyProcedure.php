@@ -3,8 +3,7 @@
 namespace App\Http\Procedures;
 
 use App\AgentSquad\Actions\CyberBuddy;
-use App\AgentSquad\Actions\LabourLawyerPlanner;
-use App\AgentSquad\Actions\LabourLawyerWriter;
+use App\AgentSquad\Actions\LabourLawyerConclusionsWriter;
 use App\AgentSquad\Actions\ListAssets;
 use App\AgentSquad\Actions\ListVulnerabilities;
 use App\AgentSquad\Actions\ManageAssets;
@@ -136,8 +135,7 @@ class CyberBuddyProcedure extends Procedure
                     Log::debug("File '{$output}.zip' unpacked.");
                 }
 
-                $orchestrator->registerAgent(new LabourLawyerPlanner($output));
-                $orchestrator->registerAgent(new LabourLawyerWriter());
+                $orchestrator->registerAgent(new LabourLawyerConclusionsWriter("/opt/a_data/07_datasets/XXX/out"));
             }
 
             $answer = $orchestrator->run($user, $threadId, $messages, $question);

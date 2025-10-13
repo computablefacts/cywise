@@ -10,19 +10,14 @@ use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Vectors\AbstractVectorStore;
 use App\AgentSquad\Vectors\FileVectorStore;
-use App\AgentSquad\Vectors\Vector;
 use App\Enums\RoleEnum;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Parsedown;
 
-class LabourLawyerPlanner extends AbstractAction
+class LabourLawyerConclusionsWriter extends AbstractAction
 {
-    private AbstractVectorStore $vectorStoreObjets;
-    private AbstractVectorStore $vectorStoreArguments;
+    private AbstractVectorStore $vectorStore;
     private string $dir;
-    private string $model;
 
     static function schema(): array
     {
@@ -53,12 +48,10 @@ class LabourLawyerPlanner extends AbstractAction
         ];
     }
 
-    public function __construct(string $in, string $model = 'Qwen/Qwen3-Next-80B-A3B-Thinking')
+    public function __construct(string $in)
     {
-        $this->vectorStoreObjets = new FileVectorStore($in, 5, 'objets');
-        $this->vectorStoreArguments = new FileVectorStore($in, 5, 'arguments');
+        $this->vectorStore = new FileVectorStore($in, 5);
         $this->dir = $in;
-        $this->model = $model;
     }
 
     public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
@@ -119,140 +112,59 @@ class LabourLawyerPlanner extends AbstractAction
                 Voici les données d'entrée du cas présent : {$input}
             ",
         ];
-        $answer = LlmsProvider::provide($messages, $this->model, 120);
+        $answer = LlmsProvider::provide($messages, 'google/gemini-2.5-flash', 120);
         array_pop($messages);
 
-        $demandes = [];
+        $pretentions = [];
         $faits = [];
 
         foreach (explode("\n", $answer) as $line) {
             $line = trim($line);
             if (str_starts_with($line, 'd:')) {
-                $demandes[] = substr($line, 2);
+                $pretentions[] = substr($line, 2);
             } elseif (str_starts_with($line, 'f:')) {
                 $faits[] = substr($line, 2);
             }
         }
 
-        $facts = "- " . implode("\n- ", $faits);
-        $requests = "- " . implode("\n- ", $demandes);
-
-        \Cache::put("labour_lawyer_{$threadId}_{$user->id}_facts", $facts, 60 * 5);
-        \Cache::put("labour_lawyer_{$threadId}_{$user->id}_requests", $requests, 60 * 5);
-
-        // Log::debug("FAITS : ", $faits);
-        // Log::debug("DEMANDES : ", $demandes);
-
-        $history = collect($demandes)
+        $conclusions = collect($pretentions)
             ->concat($faits)
-            ->flatMap(function (string $txt) {
+            ->flatMap(function (string $pretention) {
 
-                $vector = EmbeddingsProvider::provide($txt);
-                $documents = $this->vectorStoreObjets->search($vector->embedding());
+                $vector = EmbeddingsProvider::provide($pretention);
+                $vectors = $this->vectorStore->search($vector->embedding());
+                $pretentions = array_map(function (array $vector) {
+                    $vector['file'] = $vector['vector']->metadata('file');
+                    $vector['pretention'] = $vector['vector']->metadata('pretention');
+                    $vector['majeure'] = $vector['vector']->metadata('majeure');
+                    $vector['mineure'] = $vector['vector']->metadata('mineure');
+                    $vector['conclusion'] = $vector['vector']->metadata('conclusion');
+                    unset($vector['vector']);
+                    return $vector;
+                }, $vectors);
 
-                return array_map(function (array $item) use ($txt): array {
-
-                    /** @var Vector $vector */
-                    $vector = $item['vector'];
-                    $idx = $vector->metadata('index_objet');
-                    $document = new LegalDocument("{$this->dir}/{$vector->metadata('file')}");
-
-                    return [
-                        'src_txt' => $txt,
-                        'tgt_txt' => $document->objet($idx),
-                        'tgt_score' => $item['similarity'],
-                        'tgt_file' => "{$this->dir}/{$vector->metadata('file')}",
-                        'tgt_idx' => $idx,
-                    ];
-                }, $documents);
+                return $pretentions;
             })
-            ->filter(fn(array $item) => $item['tgt_score'] >= 0.6)
-            ->sortByDesc('tgt_score')
-            ->values()
-            ->toArray();
+            ->map(function (array $p) {
 
-        Log::debug($history);
+                $pretention = Str::upper($p['pretention'] ?? '');
+                $majeure = $p['majeure'] ?? '';
+                $mineure = $p['mineure'] ?? '';
+                $conclusion = $p['conclusion'] ?? '';
 
-        $chainOfThought = [];
-        $conclusions = [];
-        $sections = [];
-        $thinking = [];
+                return "[PRETENTION]# {$pretention}\n\n## En droit\n\n{$majeure}\n\n## Au cas présent\n\n{$mineure}\n\n## Conclusion\n\n{$conclusion}[/PRETENTION]";
+            })
+            ->join("");
 
-        for ($k = 0; $k < count($history); $k++) {
+        $prompt = file_get_contents(app_path('Console/Commands/prompt_write_conclusions.txt'));
+        $prompt = Str::replace('{PRETENTIONS}', $conclusions, $prompt);
+        $prompt = Str::replace('{AU_CAS_PRESENT}', $input, $prompt);
+        \Log::debug($prompt);
+        $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 2 * 60);
 
-            $item = $history[$k];
-
-            /* if (in_array($item['src_txt'], $sections)) {
-                Log::debug("Skipping '{$item['tgt_txt']}' because it's already in a section.");
-                continue;
-            } */
-
-            $idx = $item['tgt_idx'];
-            $doc = new LegalDocument($item['tgt_file']);
-            $titre = strip_tags((new Parsedown)->text($item['tgt_txt']));
-            $enDroit = strip_tags((new Parsedown)->text($doc->en_droit($idx)));
-            $auCasPresent = "";
-
-            \Cache::put("labour_lawyer_{$threadId}_{$user->id}_{$k}_{$idx}", $item, 60 * 5);
-
-            for ($i = 0; $i < $doc->nbArguments($idx); $i++) {
-
-                $file = Str::afterLast($doc->file(), '/');
-                $auCasPresent .= ($i === 0 ? "<b>[<span style=\"color:#ffaa00\">{$k}.{$idx}</span>] {$titre} (<i>{$file}</i>)</b><br><br><ul>" : "");
-                $auCasPresent .= ("<li><b>Argument.</b> " . $doc->argument($idx, $i) . "<ul>");
-                $factz = $doc->faits($idx, $i);
-
-                for ($j = 0; $j < count($factz); $j++) {
-                    $auCasPresent .= ("<li><b>Fait.</b> " . $factz[$j] . "</li>");
-                }
-                $auCasPresent .= "</ul></li><br>";
-                $auCasPresent .= ($i === $doc->nbArguments($idx) - 1 ? "</ul>" : "");
-            }
-
-            $auCasPresent = Str::trim($auCasPresent);
-            $thinking[] = $auCasPresent;
-            // Log::debug($auCasPresent);
-
-            /* $prompt = PromptsProvider::provide('default_consultations', [
-                'TITRE' => $titre,
-                'EN_DROIT' => $enDroit,
-                'AU_CAS_PRESENT' => strip_tags((new Parsedown)->text($doc->au_cas_present($idx))),
-                'FAITS' => $facts,
-                'DEMANDES' => $requests,
-            ]);
-
-            // Log::debug($prompt);
-
-            $answer = LlmsProvider::provide($prompt, $this->model, 120);
-            $chainOfThought[] = new ThoughtActionObservation("I need to write about '{$item['src_txt']}'.", "Checking if '{$item['tgt_txt']}' from '{$item['tgt_file']}' is a good template...", strip_tags($answer));
-
-            Log::debug($answer);
-
-            if (Str::contains($answer, "Le cas sélectionné n'est pas compatible avec le cas présent.")) {
-                Log::debug("Skipping '{$item['tgt_txt']}' because it is not compatible with the current case.");
-                continue;
-            }
-
-            $conclusions[] = Str::replace("En droit", "<br><br>**En droit**<br><br>",
-                Str::replace("Au cas présent", "<br><br>**Au cas présent**<br><br>",
-                    preg_replace('/^(.+)$/m', '**$1**<br><br>',
-                        preg_replace("/\n{3,}/", "<br><br>",
-                            Str::trim($answer)
-                        ), 1
-                    )
-                )
-            );
-            $sections[] = $item['src_txt']; */
+        if (!empty($answer)) {
+            return new SuccessfulAnswer($answer, [], true);
         }
-        return new SuccessfulAnswer(implode("", $thinking), [], true, 'labour_lawyer_writer');
-
-        // Log::debug($conclusions);
-
-        $conclusions = implode("<br><br>", $conclusions);
-
-        if (empty(strip_tags($conclusions))) {
-            return new FailedAnswer("Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.", $chainOfThought);
-        }
-        return new SuccessfulAnswer($conclusions, $chainOfThought, true);
+        return new FailedAnswer("Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.");
     }
 }
