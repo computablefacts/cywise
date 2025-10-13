@@ -188,17 +188,16 @@ Tu es un avocat en droit social. Tu cherches à rédiger la section DISCUSSION d
 
 Les paramètres de ton cas sont : {AU_CAS_PRESENT}
 
-Tu trouveras entre [DISCUSSION] et [/DISCUSSION] des exemples passés de discussions de prétentions de la partie adverse
-(entre [PRETENTION] et [/PRETENTION]).
-
-Utilise les paramètres de ton propre cas pour sélectionner les exemples de prétentions les plus adaptés. Lors de la
-sélection de ces exemples, favorise ceux dont les moyens de droit sont les plus pertinents et fouillés. Rédige ensuite
-ta section DISCUSSION sur la base de ces exemples.
+Sélectionne les exemples (entre [DISCUSSION] et [/DISCUSSION]) de prétentions (entre [PRETENTION] et [/PRETENTION]) les
+plus proches des paramètres de ton cas présent. Lors de la sélection de ces exemples, favorise ceux dont les moyens
+de droit et les moyens de faits sont les plus pertinents. Si pour une même prétention, plusieurs exemples semblent convenir,
+choisi tous ceux qui apportent un nouvel argument en faveur de la société que tu défends. Rédige ensuite ta section
+DISCUSSION sur la base de ces exemples.
 
 Attention ! Suit scrupuleusement les recommandations de la section UNE DISCUSSION DES PRETENTIONS ET DES MOYENS DE FAIT
 ET DE DROIT SUR LESQUELS CHACUNE DE CES PRETENTIONS EST FONDEE du GUIDE DES BONNES PRATIQUES DE LA REDACTION DE CONCLUSIONS
-lors de la rédaction de ta section DISCUSSION. Soit le plus détaillé exhaustif possible dans la rédaction. Cite abondamment
-la loi et la jurisprudence. Copie le style d'écriture des exemples sélectionnés.
+lors de la rédaction de ta section DISCUSSION. Soit le plus détaillé et exhaustif dans la rédaction. Cite abondamment
+la loi et la jurisprudence. Imite le style d'écriture des exemples sélectionnés.
 
 [DISCUSSION]
 {PRETENTIONS}
