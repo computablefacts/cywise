@@ -135,7 +135,7 @@ class CyberBuddyProcedure extends Procedure
                     Log::debug("File '{$output}.zip' unpacked.");
                 }
 
-                $orchestrator->registerAgent(new LabourLawyerConclusionsWriter("/opt/a_data/07_datasets/XXX/out"));
+                $orchestrator->registerAgent(new LabourLawyerConclusionsWriter($output));
             }
 
             $answer = $orchestrator->run($user, $threadId, $messages, $question);

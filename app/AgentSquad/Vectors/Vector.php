@@ -18,6 +18,22 @@ class Vector implements JsonSerializable
     public static function fromString(string $str): Vector
     {
         $array = json_decode($str, true);
+        if (!isset($array)) {
+            \Log::error("Invalid JSON vector: {$str}");
+            return new self('');
+        }
+        if (!isset($array['text'])) {
+            \Log::error("Missing 'text' field in vector: {$str}");
+            return new self('');
+        }
+        if (!isset($array['embedding'])) {
+            \Log::error("Missing 'embedding' field in vector: {$str}");
+            return new self('');
+        }
+        if (!isset($array['metadata'])) {
+            \Log::error("Missing 'metadata' field in vector: {$str}");
+            return new self('');
+        }
         return new self($array['text'], $array['embedding'], $array['metadata']);
     }
 
@@ -50,5 +66,10 @@ class Vector implements JsonSerializable
     public function metadata(string $key): mixed
     {
         return $this->metadata[$key] ?? null;
+    }
+
+    public function isValid(): bool
+    {
+        return !empty($this->text) && !empty($this->embedding);
     }
 }

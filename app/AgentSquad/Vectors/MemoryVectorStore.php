@@ -26,7 +26,9 @@ class MemoryVectorStore extends AbstractVectorStore
     protected function vectors(): \Generator
     {
         foreach ($this->vectors as $vector) {
-            yield $vector;
+            if ($vector->isValid()) {
+                yield $vector;
+            }
         }
     }
 }

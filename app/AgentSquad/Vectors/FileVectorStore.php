@@ -49,7 +49,10 @@ class FileVectorStore extends AbstractVectorStore
             $f = fopen($filename, 'r');
             try {
                 while ($line = fgets($f)) {
-                    yield Vector::fromString($line);
+                    $vector = Vector::fromString($line);
+                    if ($vector->isValid()) {
+                        yield $vector;
+                    }
                 }
             } finally {
                 fclose($f);
