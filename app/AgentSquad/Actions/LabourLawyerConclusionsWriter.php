@@ -78,8 +78,11 @@ class LabourLawyerConclusionsWriter extends AbstractAction
                 Voici un exemple de sortie attendue pour ce premier exemple entre [OUT] et [/OUT] :
                 
                 [OUT]
-                d:le salarié conteste son licenciement en précisant que la recherche de reclassement n'a pas été effectuée correctement dans le Groupe dont fait partie l'entreprise qui l'emploie
-                d:le salarié demande des dommages et intérêts pour licenciement sans cause réelle et sérieuse de 9 mois de salaire
+                d:Sur l'origine non professionnelle de l'inaptitude
+                d:Sur le bien fondé du licenciement pour inaptitude professionnelle
+                d:Sur la prétendue violation de l'obligation de reclassement
+                d:Sur la demande de requalification du licenciement en licenciement sans cause réelle et sérieuse
+                d:Sur la demande de dommages et intérêts de 9 mois de salaire
                 f:le salarié a été licencié pour inaptitude après un avis médical rendu par le médecin du travail
                 f:l'inaptitude du salarié est d'origine non professionnelle
                 f:le salarié a une ancienneté de 10 ans
@@ -100,10 +103,13 @@ class LabourLawyerConclusionsWriter extends AbstractAction
                 Voici un exemple de sortie attendue pour ce second exemple entre [OUT] et [/OUT] :
                 
                 [OUT]
-                d:le salarié conteste son licenciement en affirmant que le harcèlement dont il se dit victime serait à l'origine de son inaptitude
-                d:le salarié conteste l'absence de consultation du CSE par la société, qu'il estime obligatoire
-                d:le salarié demande des dommages et intérêts pour licenciement sans cause réelle et sérieuse, à hauteur de 9 mois de salaire
-                d:le salarié demande des dommages et intérêts pour réparer le harcèlement, à hauteur de 6 mois de salaire
+                d:Sur l'origine professionnelle de l'inaptitude
+                d:Sur le harcèlement allégué par Mr. A
+                d:Sur l'obligation de l'entreprise de consulter le CSE
+                d:Sur la demande de requalification du licenciement en licenciement sans cause réelle et sérieuse
+                d:Sur la demande de dommages et intérêts pour licenciement nul
+                d:Sur la demande de dommages et intérêts de 9 mois de salaire pour licenciement sans cause réelle et sérieuse
+                d:Sur la demande de dommages et intérêts de 6 mois de salaire pour harcèlement
                 f:le salarié a été licencié pour inaptitude après un avis médical rendu par le médecin du travail
                 f:l'inaptitude du salarié est d'origine professionnelle
                 f:le salarié a une ancienneté de 4 ans
@@ -129,7 +135,7 @@ class LabourLawyerConclusionsWriter extends AbstractAction
 
         $conclusions = collect($pretentions)
             ->concat($faits)
-            ->flatMap(function (string $pretention) {
+            ->map(function (string $pretention) {
 
                 $vector = EmbeddingsProvider::provide($pretention);
                 $vectors = $this->vectorStore->search($vector->embedding());
@@ -142,9 +148,15 @@ class LabourLawyerConclusionsWriter extends AbstractAction
                     unset($vector['vector']);
                     return $vector;
                 }, $vectors);
+                $pretentions = array_filter($pretentions, fn(array $vector) => $vector['similarity'] >= 0.6);
 
-                return $pretentions;
+                if (empty($pretentions)) {
+                    \Log::error("No similar pretention found for: {$pretention}");
+                    return [];
+                }
+                return head($pretentions);
             })
+            ->filter(fn(array $p) => !empty($p))
             ->map(function (array $p) {
 
                 $pretention = Str::upper($p['pretention'] ?? '');
@@ -152,14 +164,15 @@ class LabourLawyerConclusionsWriter extends AbstractAction
                 $mineure = $p['mineure'] ?? '';
                 $conclusion = $p['conclusion'] ?? '';
 
-                return "[PRETENTION]\n# {$pretention}\n\n## En droit\n\n{$majeure}\n\n## Au cas présent\n\n{$mineure}\n\n## Conclusion\n\n{$conclusion}[/PRETENTION]";
+                return "# {$pretention}\n\n## En droit\n\n{$majeure}\n\n## Au cas présent\n\n{$mineure}\n\n## Conclusion\n\n{$conclusion}";
             })
-            ->join("\n");
+            ->unique()
+            ->join("\n\n");
 
         $prompt = file_get_contents(app_path('Console/Commands/prompt_write_conclusions.txt'));
         $prompt = Str::replace('{PRETENTIONS}', $conclusions, $prompt);
-        $prompt = Str::replace('{AU_CAS_PRESENT}', $input, $prompt);
-        \Log::debug($prompt);
+        $prompt = Str::replace('{AU_CAS_PRESENT}', "- " . implode("\n- ", $faits), $prompt);
+        // \Log::debug($prompt);
         $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 2 * 60);
 
         if (!empty($answer)) {
