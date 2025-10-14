@@ -152,9 +152,9 @@ class LabourLawyerConclusionsWriter extends AbstractAction
                 $mineure = $p['mineure'] ?? '';
                 $conclusion = $p['conclusion'] ?? '';
 
-                return "[PRETENTION]# {$pretention}\n\n## En droit\n\n{$majeure}\n\n## Au cas présent\n\n{$mineure}\n\n## Conclusion\n\n{$conclusion}[/PRETENTION]";
+                return "[PRETENTION]\n# {$pretention}\n\n## En droit\n\n{$majeure}\n\n## Au cas présent\n\n{$mineure}\n\n## Conclusion\n\n{$conclusion}[/PRETENTION]";
             })
-            ->join("");
+            ->join("\n");
 
         $prompt = file_get_contents(app_path('Console/Commands/prompt_write_conclusions.txt'));
         $prompt = Str::replace('{PRETENTIONS}', $conclusions, $prompt);

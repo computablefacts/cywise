@@ -1,79 +1,4 @@
-# GUIDE DES BONNES PRATIQUES DE LA REDACTION DE CONCLUSIONS
-
-Les conclusions désignent l’ensemble des arguments et demandes formulés par une partie devant une juridiction.
-
-Les conclusions constituent des actes essentiels de la procédure civile. Elles expriment, en s'appuyant sur des moyens
-de fait et des moyens de droit, les demandes des parties auxquelles le juge devra répondre. Elles sont déposées au greffe
-et communiquées à l'adversaire.
-
-Elles ont notamment pour but d'emporter la conviction du juge et obtenir gain de cause pour le justiciable. Le juge va
-découvrir le litige à travers l'écrit de l'avocat. Des conclusions qui comprennent une démonstration claire, efficace et
-concise permettent une meilleure appréhension du litige.
-
-Le rédacteur doit ainsi veiller à la présentation de ses conclusions, à la qualité rédactionnelle et à la qualité du
-raisonnement juridique.
-
-## I. LES REGLES COMMUNES
-
-L'emploi des majuscules se fait avec modération.
-
-Le style. À l'image de l'ensemble des juridictions françaises qui abandonnent la rédaction en « attendu », le style
-direct, davantage compréhensible pour le justiciable, est à privilégier.
-
-Le vocabulaire. Pour une meilleure compréhension par le justiciable les termes anciens pourraient être utilement
-remplacés par des termes modernes (par exemple, préférer « situé » à « sis », « ce » à « ledit », « ci-dessus » à
-« susvisé/susmentionné »). Il est recommandé de ne plus utiliser la dénomination « mademoiselle/Mlle ». Les femmes
-doivent être indistinctement désignées par « Madame/Mme ». Pour les enfants mineurs, les prénoms et noms peuvent
-suffire, sans autre précision.
-
-Les acronymes et abréviations. L'usage des acronymes (TJ, CA, CC, CPC ...) pour les juridictions est à proscrire afin
-de rendre plus compréhensibles les éléments de discussion. En cas d'usage notamment pour des personnes morales, il est
-souhaitable d'indiquer une première fois le nom de l'entité suivi de l'acronyme (Société nationale des chemins de fer
-français – SNCF) puis de poursuivre la rédaction en utilisant l'acronyme. Il pourra en être de même pour les abréviations.
-
-Les citations de textes sont présentées entre guillemets ou en italique.
-
-### I.1. L'EN-TETE DES CONCLUSIONS
-
-Il est d'usage d'indiquer le type de conclusions : conclusions en réponse, conclusions en demande, conclusions d'appelant,
-conclusions en défense, conclusions d'intimé, conclusions contenant appel incident, conclusions d'intervention volontaire,
-..., le terme récapitulatif, qui au demeurant ne s'attache qu'au dispositif et ne permet pas d'identifier le contexte
-général des demandes qui seront exposées, n'a pas grand intérêt. L'expression conclusions récapitulatives est inutile.
-Les conclusions seront numérotées dans l'ordre chronologique de leur remise au greffe afin qu'elles puissent être mieux
-identifiées.
-
-En revanche, il convient impérativement d'indiquer, ces mentions étant prévues à peine d'irrecevabilité des conclusions
-l'état civil complet de la partie qui conclut, à savoir :
-- pour les personnes physiques : les nom, prénom, date et lieu de naissance, nationalité, profession, adresse du domicile,
-- pour les personnes morales : la forme sociale de la société (SA, SARL, SAS, SNC, SCI, SELARL...), sa dénomination, son
-  siège social et l'organe qui la représente.
-
-Ces mentions seront indiquées pour chacune des parties pour qui il est conclu.
-
-La qualité de la partie ou des parties qui concluent et de la ou des parties antagonistes sera précisée : demandeur,
-défendeur, intervenant(e) forcé(e), intervenant(e) volontaire, appelant(e), intimé(e), appelant(e) incident(e), intimé(e)
-incident(e), appelant(e) provoqué(e), intimé(e) provoqué(e), ainsi que le nom de l'avocat qui représente la ou les parties
-et de l'avocat plaidant.
-
-Afin d'éviter que les conclusions soient éventuellement déclarées irrecevables, il convient de préciser le destinataire
-des conclusions notamment par les mentions suivantes : Plaise au tribunal, Plaise au juge de la mise en état, Plaise à
-la cour, Plaise au conseiller de la mise en état, ou encore Conclusions d'incident devant le juge/conseiller de la mise
-en état... .
-
-Il est recommandé d'établir un plan après l'en-tête des conclusions ou après le rappel des faits et de la procédure en
-cas de conclusions volumineuses afin d'en faciliter la lecture.
-
-### I.2. UN EXPOSE DISTINCT DES FAITS ET DE LA PROCEDURE
-
-Procéder distinctement à un exposé des faits et de la procédure.
-
-Il est conseillé de procéder à un rappel des faits et de la procédure chronologique afin de faciliter la compréhension
-de la situation factuelle du litige soumis à la juridiction et de ne pas répéter inutilement les faits.
-
-Il n’est pas nécessaire à ce stade d'introduire les éléments de la démonstration juridique qui devront figurer dans la
-discussion.
-
-### I.3. UNE DISCUSSION DES PRETENTIONS ET DES MOYENS DE FAIT ET DE DROIT SUR LESQUELS CHACUNE DE CES PRETENTIONS EST FONDEE
+# CONSIGNES CONCERNANT LA REDACTION DE LA SECTION DISCUSSION DE CONCLUSIONS
 
 La prétention, définition : Aux termes de l'article 4 du code de procédure civile, « l'objet du litige est déterminé par
 les prétentions respectives des parties. Ces prétentions sont fixées par l'acte introductif d'instance et par les
@@ -117,87 +42,19 @@ qui est la prétention, la demande d'application de la règle de droit aux faits
 
 La rédaction devra être claire, concise et évitera les répétitions et redites inutiles.
 
-### I.4. L'INDICATION POUR CHAQUE PRETENTION DES PIECES INVOQUEES ET DE LEUR NUMEROTATION
-
-A chaque affirmation factuelle sur laquelle repose une prétention doit correspondre au moins une pièce qui sera numérotée
-et chaque pièce invoquée sera numérotée.
-
-Bien entendu, il peut être fait référence aux pièces de la partie adverse et dans ce cas il sera précisé le numéro de
-cette pièce avec l'indication « pièce adverse n° ».
-
-### I.5. LA PRESENTATION DISTINCTE DES MOYENS NOUVEAUX
-
-Il est fait obligation par les dispositions communes précitées de présenter de manière formellement distincte les moyens
-qui n'auraient pas été formulés dans les conclusions précédentes, ou, en cause d'appel, les nouveaux moyens par rapport
-aux précédentes écritures invoqués au soutien des prétentions.
-
-Il est souhaitable d'intégrer les nouveaux moyens à l'endroit de la discussion adéquat. L'introduction en paragraphe
-final, décorrélé de toute logique avec la discussion précédente, manque de lisibilité.
-
-L'utilisation du caractère gras n'est pas conseillée car elle distraira le lecteur des mots en caractère plus clair.
-Le caractère italique est à proscrire car il est utilisé en cas de citations.
-
-En revanche, un trait en marge de la phrase ou du groupe de phrases permettra de distinguer les moyens nouveaux présentés
-dans les dernières conclusions.
-
-Cela peut être utile pour l'avocat adverse qui peut vite identifier les nouveaux moyens et prétentions. Cela permettra
-par ailleurs, au magistrat de la mise en état, d'apprécier l'éventuelle nécessité de nouvelles conclusions en réponse.
-
-En cas de conclusions multiples, il ne faut pas oublier de supprimer la marque spécifique des précédents moyens ou prétentions.
-
-### I.6. LE PRINCIPE DE LA CONCENTRATION DES MOYENS DEGAGES PAR LA JURISPRUDENCE
-
-Il incombe aux parties, demandeur et défendeur, de concentrer, dès l'instance relative à la première demande, l'ensemble
-de leurs moyens à l'appui de leurs prétentions.
-
-Le principe de concentration des moyens, tel que défini par l’arrêt Cesareo, oblige le plaideur à présenter au cours du
-même procès (tribunal judiciaire et cour d'appel) tous les fondements juridiques de nature à justifier sa demande.
-
-A défaut, la sanction est l'irrecevabilité de la demande car le principe de l'autorité de la chose jugée s'oppose à
-l'introduction d'une instance entre les mêmes parties, tendant au même objet mais avec des moyens différents.
-
-D'où l'importance, pour chaque prétention, de bien faire apparaître, distinctement, le fondement juridique de la demande.
-
-S'il y a plusieurs moyens de droit envisagés, il conviendra de les présenter dans l'ordre chronologique, de celui qui
-semble le plus pertinent au moins pertinent. Les formules telles que « titre principal », « à titre subsidiaire »,
-« à titre plus subsidiaire, très subsidiaire ou infiniment subsidiaire » pourront être utilisées. Des phrases de
-transition telles que « si le tribunal ne devait pas retenir ce moyen, alors il devra retenir tel autre » pourront
-également être employées.
-
-### I.7. LE DISPOSITIF
-
-Le dispositif doit uniquement récapituler les prétentions émises dans le cadre de la discussion. Il ne contient que les
-demandes, aucun moyen de fait ou de droit.
-
-Il convient de reporter toutes les prétentions précédemment exposées dans le cadre de la discussion dans l'ordre de
-présentation, à savoir les exceptions de procédure, en précisant éventuellement in limine litis pour ces exceptions,
-puis les fins de non-recevoir et enfin les demandes au fond, car le juge ne statue que sur les prétentions énoncées
-au dispositif.
-
-A défaut de prétentions énoncées au dispositif, le juge n'a pas à statuer, quand bien même les moyens de fait et de
-droit ont été « longuement » développés dans le corps des conclusions ou que les prétentions oubliées ont été présentées
-dans le dispositif des précédentes écritures sur lesquelles le juge ne statuera pas.
-
-Il est inutile de rappeler ou de viser dans le dispositif les articles des lois et des différents codes, ou les contrats,
-mise en demeure et acte de la procédure, puisque cela aura été fait dans la discussion. Il est également inutile
-d'utiliser les formules telles que « Dire et juger », « Sous toutes réserves », « Et ce sera justice ».
-
 # TA TÂCHE
 
 Tu es un avocat en droit social. Tu cherches à rédiger la section DISCUSSION de tes conclusions.
 
-Les paramètres de ton cas sont : {AU_CAS_PRESENT}
+Les prétentions de la partie adverse sont : {AU_CAS_PRESENT}
 
-Sélectionne les exemples (entre [DISCUSSION] et [/DISCUSSION]) de prétentions (entre [PRETENTION] et [/PRETENTION]) les
-plus proches des paramètres de ton cas présent. Lors de la sélection de ces exemples, favorise ceux dont les moyens
-de droit et les moyens de faits sont les plus pertinents. Si pour une même prétention, plusieurs exemples semblent convenir,
-choisi tous ceux qui apportent un nouvel argument en faveur de la société que tu défends. Rédige ensuite ta section
-DISCUSSION sur la base de ces exemples.
+Sélectionne les prétentions entre [PRETENTION] et [/PRETENTION] les plus proches des prétentions de la partie adverse.
+Lors de la sélection des prétentions, favorise ceux dont les moyens de droit sont les plus pertinents et les plus développés.
+Rédige ensuite ta section DISCUSSION sur la base de ces prétentions.
 
-Attention ! Suit scrupuleusement les recommandations de la section UNE DISCUSSION DES PRETENTIONS ET DES MOYENS DE FAIT
-ET DE DROIT SUR LESQUELS CHACUNE DE CES PRETENTIONS EST FONDEE du GUIDE DES BONNES PRATIQUES DE LA REDACTION DE CONCLUSIONS
-lors de la rédaction de ta section DISCUSSION. Soit le plus détaillé et exhaustif dans la rédaction. Cite abondamment
-la loi et la jurisprudence. Imite le style d'écriture des exemples sélectionnés.
+Attention ! Suit scrupuleusement les CONSIGNES CONCERNANT LA REDACTION DE LA SECTION DISCUSSION DE CONCLUSIONS lors de
+la rédaction de ta section DISCUSSION. Soit le plus détaillé et exhaustif dans la rédaction. Cite abondamment la loi et
+la jurisprudence. Imite le style d'écriture des exemples sélectionnés.
 
 [DISCUSSION]
 {PRETENTIONS}
