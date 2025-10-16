@@ -45,6 +45,10 @@ jobs:
         run: npm install --verbose
       - name: Build assets
         run: npm run build
+      - name: Remove checksum for migration
+        run: rm -f storage/app/migration-checksum_tw-testdb.txt
+      - name: Remove checksum for seeder
+        run: rm -f storage/app/seeder-checksum_tw-testdb.txt
       - name: Run Unit Tests
         run: php vendor/bin/pest -c phpunit.xml --testdox
         env:
