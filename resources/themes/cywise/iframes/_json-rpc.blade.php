@@ -256,6 +256,10 @@
     executeJsonRpcApiCall('tables@promptToQuery', {prompt: prompt}, onSuccess);
   }
 
+  function updateTableDescriptionApiCall(name, description, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('tables@updateDescription', {name: name, description: description}, onSuccess);
+  }
+
   function toggleGetsAuditReportApiCall(userId, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('users@toggleGetsAuditReport', {user_id: userId}, onSuccess);
   }

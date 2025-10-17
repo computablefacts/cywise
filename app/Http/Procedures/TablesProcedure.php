@@ -306,7 +306,7 @@ class TablesProcedure extends Procedure
         ]);
         /** @var User $user */
         $user = Auth::user();
-        $prompt = $request->input('prompt');
+        $prompt = $validated['prompt'];
         $query = ClickhouseUtils::promptToQuery(Table::where('created_by', $user->id)->get(), $prompt);
 
         if (empty($query)) {
@@ -314,6 +314,52 @@ class TablesProcedure extends Procedure
         }
         return [
             'query' => LlmProvider::cleanSqlQuery($query),
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Update a table description.",
+        params: [
+            'name' => 'The table name.',
+            'description' => 'The new description.',
+        ],
+        result: [
+            'message' => 'A success message.',
+            'data' => 'The updated table object.',
+        ]
+    )]
+    public function updateDescription(JsonRpcRequest $request): array
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|min:1|max:100',
+            'description' => 'required|string|min:1|max:2000',
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        /** @var Table|null $table */
+        $table = Table::query()
+            ->where('name', $validated['name'])
+            ->first();
+
+        if (!$table) {
+            throw new \Exception('Table not found.');
+        }
+
+        $table->description = $validated['description'] ?? '';
+        $table->save();
+
+        return [
+            'message' => 'The description has been updated.',
+            'data' => [
+                'name' => $table->name,
+                'nb_rows' => \Illuminate\Support\Number::format($table->nb_rows, locale: 'sv'),
+                'nb_columns' => count($table->schema),
+                'description' => $table->description,
+                'last_update' => $table->finished_at ? $table->finished_at->format('Y-m-d H:i') : '',
+                'status' => $table->status(),
+            ],
         ];
     }
 }
