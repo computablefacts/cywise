@@ -91,6 +91,27 @@ class ImportTableListener extends AbstractListener
 
             $schema = Str::replace("\'", "'", Str::replace("\n", ',', $output));
 
+            // Row count sanity check (+/- 10%) before altering existing tables
+            $prevRowCountStr = ClickhouseClient::numberOfRows($normalizedTableName);
+            $prevRowCount = $prevRowCountStr ? intval($prevRowCountStr) : 0;
+
+            if ($prevRowCount > 0) {
+
+                $newRowCountStr = ClickhouseLocal::numberOfRows($tableOut);
+                $newRowCount = $newRowCountStr ? intval($newRowCountStr) : 0;
+                $diff = abs($newRowCount - $prevRowCount);
+
+                if (($diff / $prevRowCount) > 0.10) {
+                    $percent = round(($diff / max($prevRowCount, 1)) * 100, 2);
+                    $tbl->last_error = __('The number of rows differs by more than 10% (expected :expected, got :actual, diff :percent%)', [
+                        'expected' => $prevRowCount,
+                        'actual' => $newRowCount,
+                        'percent' => $percent,
+                    ]);
+                    $tbl->save();
+                    return;
+                }
+            }
             if ($copy) {
 
                 // Instead of dropping the existing table, create a temporary table and fill it
