@@ -182,6 +182,7 @@
   "The monitoring started.": "La surveillance a commencé.",
   "The monitoring stopped.": "La surveillance a été arrêtée.",
   "The number of rows differs by more than 10% (expected :expected, got :actual, diff :percent%)": "Le nombre de lignes diffère de plus de 10% (attendu : :expected, obtenu : :actual, écart : :percent%)",
+  "The new file must contain at least all the current table columns (:missing)": "Le nouveau fichier doit contenir au minimum toutes les colonnes de la table actuelle (:missing)",
   "The rule has been saved.": "La règle a été sauvegardée.",
   "The rule has been removed!": "La règle a été supprimée.",
   "The scan has been restarted.": "Le scan a été relancé.",

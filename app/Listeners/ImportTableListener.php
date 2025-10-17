@@ -69,6 +69,24 @@ class ImportTableListener extends AbstractListener
 
         try {
 
+            // Validate that incoming file columns are a superset of the existing table columns
+            $tableDescription = ClickhouseClient::describeTable($normalizedTableName);
+
+            if (!empty($tableDescription)) {
+
+                $prevColumnNames = collect($tableDescription)->map(fn(array $c) => $c['new_name'])->values()->all();
+                $newColumnNames = collect($columns)->map(fn(array $c) => ClickhouseUtils::normalizeColumnName($c['new_name']))->values()->all();
+                $missing = collect($prevColumnNames)->diff($newColumnNames)->values()->all();
+
+                if (!empty($missing)) {
+                    $tbl->last_error = __('The new file must contain at least all the current table columns (:missing)', [
+                        'missing' => implode(', ', $missing),
+                    ]);
+                    $tbl->save();
+                    return;
+                }
+            }
+
             // Transform the TSV file to a Parquet file and write it to the user-defined output directory
             $query = "INSERT INTO FUNCTION {$tableOut} SELECT {$distinct} {$colNames} FROM {$tableIn}";
             $output = ClickhouseLocal::executeQuery($query);
