@@ -31,6 +31,7 @@ class TableStorage
             case StorageType::AZURE_BLOB_STORAGE:
                 return self::credentialsFromOptionsAzure($options);
         }
+        throw new InvalidParameterException("{$options['storage']} is not a valid storage type.");
     }
 
     private static function credentialsFromOptionsS3(array $options): array
@@ -64,6 +65,7 @@ class TableStorage
             case StorageType::AZURE_BLOB_STORAGE:
                 return self::inDiskAzure($credentials);
         }
+        throw new InvalidParameterException("{$credentials['storage']} is not a valid storage type.");
     }
 
     private static function inDiskS3(array $credentials): Filesystem
@@ -103,6 +105,7 @@ class TableStorage
             case StorageType::AZURE_BLOB_STORAGE:
                 return self::outDiskAzure($credentials);
         }
+        throw new InvalidParameterException("{$credentials['storage']} is not a valid storage type.");
     }
 
     private static function outDiskS3(array $credentials): Filesystem
@@ -142,6 +145,7 @@ class TableStorage
             case StorageType::AZURE_BLOB_STORAGE:
                 return self::inClickhouseTableFunctionAzure($credentials, $tableName);
         }
+        throw new InvalidParameterException("{$credentials['storage']} is not a valid storage type.");
     }
 
     private static function inClickhouseTableFunctionS3(array $credentials, string $tableName): string
@@ -170,6 +174,7 @@ class TableStorage
             case StorageType::AZURE_BLOB_STORAGE:
                 return self::outClickhouseTableFunctionAzure($credentials, $tableName, $suffix);
         }
+        throw new InvalidParameterException("{$credentials['storage']} is not a valid storage type.");
     }
 
     private static function outClickhouseTableFunctionS3(array $credentials, string $tableName, string $suffix = ''): string
@@ -198,6 +203,7 @@ class TableStorage
             case StorageType::AZURE_BLOB_STORAGE:
                 return self::outClickhouseTableEngineAzure($credentials, $tableName, $suffix);
         }
+        throw new InvalidParameterException("{$credentials['storage']} is not a valid storage type.");
     }
 
     private static function outClickhouseTableEngineS3(array $credentials, string $tableName, string $suffix = ''): string

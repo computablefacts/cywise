@@ -166,6 +166,11 @@
     executeJsonRpcApiCall('tables@list', {}, onSuccess);
   }
 
+  function listLocalBucketContentApiCall(onSuccess = onSuccessDefault) {
+    listAwsBucketContentApiCall('local-region', 'local-access_key_id', 'local-secret_access_key', 'local-input',
+      'local-output', onSuccess);
+  }
+
   function listAwsBucketContentApiCall(region, access_key_id, secret_access_key, input_folder, output_folder,
     onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('tables@listBucketContent', {
@@ -185,6 +190,11 @@
       'input_folder': input_folder,
       'output_folder': output_folder,
     }, onSuccess);
+  }
+
+  function listLocalFileContentApiCall(tables, onSuccess = onSuccessDefault) {
+    listAwsFileContentApiCall('local-region', 'local-access_key_id', 'local-secret_access_key', 'local-input',
+      'local-output', tables, onSuccess);
   }
 
   function listAwsFileContentApiCall(region, access_key_id, secret_access_key, input_folder, output_folder, tables,
@@ -209,6 +219,11 @@
       'output_folder': output_folder,
       'tables': tables,
     }, onSuccess);
+  }
+
+  function importLocalFileApiCall(tables, updatable, copy, deduplicate, description, onSuccess = onSuccessDefault) {
+    importAwsFileApiCall('local-region', 'local-access_key_id', 'local-secret_access_key', 'local-input',
+      'local-output', tables, updatable, copy, deduplicate, description, onSuccess);
   }
 
   function importAwsFileApiCall(region, access_key_id, secret_access_key, input_folder, output_folder, tables,

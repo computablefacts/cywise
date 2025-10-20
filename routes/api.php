@@ -3,6 +3,7 @@
 use App\Events\BeginVulnsScan;
 use App\Events\EndPortsScan;
 use App\Events\EndVulnsScan;
+use App\Http\Controllers\TablesUploadController;
 use App\Models\Asset;
 use App\Models\Honeypot;
 use App\Models\Port;
@@ -191,6 +192,8 @@ Route::group([
 })->middleware(['auth:sanctum']);
 
 Route::middleware('auth:api')->get('/v2/public/whoami', fn(Request $request) => Auth::user());
+
+Route::middleware('auth:api')->post('/tables/tsv/upload', [TablesUploadController::class, 'upload']);
 
 Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
 

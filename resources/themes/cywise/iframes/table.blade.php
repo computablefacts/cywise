@@ -181,10 +181,27 @@
           </div>
         </div>
       </div>
+      <div id="upload-settings" class="hidden">
+        <div class="row mt-2">
+          <div class="col">
+            <h5 class="card-title">
+              {{ __('2.2 Upload from this computer') }}
+            </h5>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col">
+            <div id="upload-dropzone" class="p-4 border border-2 border-dashed text-center" style="cursor:pointer;">
+              {{ __('Drag & drop TSV files here or click to browse') }}
+            </div>
+            <input id="upload-input" type="file" accept=".tsv,text/tab-separated-values" multiple class="d-none"/>
+          </div>
+        </div>
+      </div>
       <div class="row mt-2">
         <div class="col text-center">
           <button class="btn btn-primary prev-button" data-prev="1">{{ __('< Previous step') }}</button>
-          <button class="btn btn-primary next-button" data-next="3">{{ __('Next step >') }}</button>
+          <button id="upload-table" class="btn btn-primary next-button" data-next="3">{{ __('Next step >') }}</button>
         </div>
       </div>
     </div>
@@ -358,7 +375,11 @@
     button.addEventListener('click', (event) => {
       const currentStep = parseInt(button.getAttribute('data-next')) - 1;
       let moveToNextStep = true;
-      if (event.target && event.target.id === 'get-columns') {
+      if (event.target && event.target.id === 'upload-table') {
+        event.preventDefault();
+        event.stopPropagation();
+        moveToNextStep = uploadTables();
+      } else if (event.target && event.target.id === 'get-columns') {
         event.preventDefault();
         event.stopPropagation();
         moveToNextStep = getTablesColumns();
@@ -417,30 +438,42 @@
   const AZURE_STORAGE = {
     label: "{{ __('Azure Blob Storage') }}", value: 'azure'
   };
+  const LOCAL_STORAGE = {
+    label: "{{ __('This computer (upload)') }}", value: 'local'
+  };
 
   const elStorageType = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
     type: 'RadioGroup',
     container: 'storage-kinds-container',
     inline: false,
-    items: [AWS_STORAGE, AZURE_STORAGE],
+    items: [AWS_STORAGE, AZURE_STORAGE, LOCAL_STORAGE],
     selected_item: AWS_STORAGE.value,
   });
 
   const storageTypeButtons = document.querySelectorAll('#storage-kinds-container input');
   const awsSettings = document.getElementById('aws-settings');
   const azureSettings = document.getElementById('azure-settings');
+  const uploadSettings = document.getElementById('upload-settings');
 
   storageTypeButtons.forEach(button => {
     button.addEventListener('change', () => {
       if (elStorageType.el.selectedItem === AWS_STORAGE.value) {
         console.log('AWS_STORAGE selected')
         azureSettings.classList.add('hidden')
+        uploadSettings.classList.add('hidden')
         awsSettings.classList.remove('hidden')
       }
       if (elStorageType.el.selectedItem === AZURE_STORAGE.value) {
         console.log('AZURE_STORAGE selected')
         awsSettings.classList.add('hidden')
+        uploadSettings.classList.add('hidden')
         azureSettings.classList.remove('hidden')
+      }
+      if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
+        console.log('LOCAL_STORAGE selected')
+        awsSettings.classList.add('hidden')
+        azureSettings.classList.add('hidden')
+        uploadSettings.classList.remove('hidden')
       }
     });
   });
@@ -479,11 +512,77 @@
     type: 'TextInput', container: 'azure-output-folder', placeholder: 'ex. my_container/out/',
   });
 
+  // Upload & Drag & Drop handlers
+  const uploadDropzone = document.getElementById('upload-dropzone');
+  const uploadInput = document.getElementById('upload-input');
+  const uploadButton = document.getElementById('upload-button');
+  let uploadSelectedFiles = [];
+  let isUpdatingTheListOfTables = false;
+
+  const refreshUploadList = () => {
+    if (uploadSelectedFiles.length === 0) {
+      uploadDropzone.innerHTML = "{{ __('Drag & drop TSV files here or click to browse') }}";
+    } else {
+      uploadDropzone.innerHTML = uploadSelectedFiles.map(f => f.name).join(', ')
+        + "<br><br>{{ __('Drag & drop TSV files here or click to browse') }}";
+    }
+  }
+
+  uploadDropzone.addEventListener('click', (e) => uploadInput.click());
+  uploadDropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadDropzone.classList.add('bg-light');
+  });
+  uploadDropzone.addEventListener('dragleave', () => uploadDropzone.classList.remove('bg-light'));
+  uploadDropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadDropzone.classList.remove('bg-light');
+    const files = Array.from(e.dataTransfer.files || []);
+    uploadSelectedFiles = uploadSelectedFiles.concat(files.filter(f => f.name.endsWith('.tsv')));
+    refreshUploadList();
+  });
+  uploadInput.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files || []);
+    uploadSelectedFiles = uploadSelectedFiles.concat(files.filter(f => f.name.endsWith('.tsv')));
+    refreshUploadList();
+  });
+
   const elVirtualTableName = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
     type: 'TextInput', container: 'vtable-name', placeholder: "{{ __('The virtual table name such as active_users') }}"
   });
 
+  const uploadTables = () => {
+    if (uploadSelectedFiles.length === 0) {
+      toaster.toastError("{{ __('Please select at least one TSV file.') }}");
+      return false;
+    }
+
+    const form = new FormData();
+    uploadSelectedFiles.forEach(f => form.append('files[]', f));
+    isUpdatingTheListOfTables = true;
+
+    axios.post('/api/tables/tsv/upload', form, {
+      headers: {
+        'Content-Type': 'multipart/form-data', 'Authorization': 'Bearer {{ Auth::user()->sentinelApiToken() }}',
+      }
+    })
+    .then(response => {
+      toaster.toastSuccess("{{ __('Files uploaded successfully!') }}");
+      uploadSelectedFiles = [];
+      refreshUploadList();
+    })
+    .catch(error => toaster.toastAxiosError(error))
+    .finally(() => {
+      isUpdatingTheListOfTables = false;
+      listTables();
+    });
+    return true;
+  };
+
   const listTables = () => {
+    if (isUpdatingTheListOfTables) {
+      return true;
+    }
 
     const elListTables = document.getElementById('list-tables');
     elListTables.innerHTML = "<tr><td colspan=\"4\" class=\"text-center\">{{ __('Loading...') }}</td></tr>";
@@ -514,6 +613,8 @@
       } else if (elStorageType.el.selectedItem === AZURE_STORAGE.value) {
         listAzureBucketContentApiCall(elAzureConnectionString.el.value, elAwsInputFolder.el.value,
           elAwsOutputFolder.el.value, onSuccess);
+      } else if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
+        listLocalBucketContentApiCall(onSuccess);
       } else {
         // TODO
       }
@@ -522,6 +623,7 @@
     } else {
       // TODO
     }
+    return true;
   };
 
   const getTablesColumns = () => {
@@ -565,6 +667,8 @@
     } else if (elStorageType.el.selectedItem === AZURE_STORAGE.value) {
       listAzureFileContentApiCall(elAzureConnectionString.el.value, elAwsInputFolder.el.value,
         elAwsOutputFolder.el.value, tables, onSuccess);
+    } else if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
+      listLocalFileContentApiCall(tables, onSuccess);
     } else {
       // TODO
     }
@@ -599,6 +703,8 @@
     } else if (elStorageType.el.selectedItem === AZURE_STORAGE.value) {
       importAzureFileApiCall(elAzureConnectionString.el.value, elAwsInputFolder.el.value, elAwsOutputFolder.el.value,
         tables, updatable, copy, deduplicate, description, onSuccess);
+    } else if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
+      importLocalFileApiCall(tables, updatable, copy, deduplicate, description, onSuccess);
     } else {
       // TODO
     }

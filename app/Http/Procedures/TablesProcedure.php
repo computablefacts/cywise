@@ -94,8 +94,8 @@ class TablesProcedure extends Procedure
             'deduplicate' => 'required|boolean',
             'description' => 'required|string|min:1',
         ]);
-        /** @var User $user */
-        $user = Auth::user();
+        $user = $request->user();
+        $validated = $this->fixupLocalFiles($user, $validated);
         $count = TableStorage::dispatchImportTable($validated, $user);
         return [
             'message' => "{$count} table will be imported soon.",
@@ -123,7 +123,7 @@ class TablesProcedure extends Procedure
             'query' => 'required|string|min:1|max:5000',
             'store' => 'required|boolean',
         ]);
-        $user = Auth::user();
+        $user = $request->user();
         $name = $request->input('name', 'v_table');
         $description = $request->input('description', '');
         $query = $request->input('query');
@@ -225,6 +225,7 @@ class TablesProcedure extends Procedure
             'input_folder' => 'required|string|min:0|max:100',
             'output_folder' => 'required|string|min:0|max:100',
         ]);
+        $validated = $this->fixupLocalFiles($request->user(), $validated);
         $credentials = TableStorage::credentialsFromOptions($validated);
         $disk = TableStorage::inDisk($credentials);
         $diskFiles = $disk->files();
@@ -274,6 +275,7 @@ class TablesProcedure extends Procedure
             'tables' => 'required|array|min:1|max:1',
             'tables.*' => 'required|string|min:0|max:250',
         ]);
+        $validated = $this->fixupLocalFiles($request->user(), $validated);
         $credentials = TableStorage::credentialsFromOptions($validated);
         $tables = collect($validated['tables']);
         $columns = $tables->map(function (string $table) use ($credentials) {
@@ -361,5 +363,20 @@ class TablesProcedure extends Procedure
                 'status' => $table->status(),
             ],
         ];
+    }
+
+    private function fixupLocalFiles(User $user, array $validated): array
+    {
+        if ($validated['storage'] === StorageType::AWS_S3->value && (
+                $validated['region'] === 'local-region' ||
+                $validated['access_key_id'] === 'local-access_key_id' ||
+                $validated['secret_access_key'] === 'local-secret_access_key')) {
+            $validated['region'] = config('filesystems.disks.tables-s3.region');
+            $validated['access_key_id'] = config('filesystems.disks.tables-s3.key');
+            $validated['secret_access_key'] = config('filesystems.disks.tables-s3.secret');
+            $validated['input_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$user->tenant_id}/{$user->id}/";
+            $validated['output_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$user->tenant_id}/";
+        }
+        return $validated;
     }
 }

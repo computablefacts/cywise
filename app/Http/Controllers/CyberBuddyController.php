@@ -538,7 +538,7 @@ class CyberBuddyController extends Controller
             'files.*' => [
                 'required',
                 'file',
-                'max:10240',
+                'max:10240', // up to ~10MB per file
                 new IsValidFileType()
             ],
         ]);
