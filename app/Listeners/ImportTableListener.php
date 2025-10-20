@@ -70,6 +70,9 @@ class ImportTableListener extends AbstractListener
 
         try {
 
+            // Ensure database exists, otherwise create it
+            ClickhouseClient::createDatabase();
+
             // Validate that incoming file columns are a superset of the existing table columns
             $tableDescription = ClickhouseClient::describeTable($normalizedTableName);
 

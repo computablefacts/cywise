@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
@@ -35,6 +36,33 @@ class ClickhouseClient
     public static function getExecuteQueryLastError(): ?string
     {
         return self::$executeQueryLastError;
+    }
+
+    public static function createDatabase(): ?string
+    {
+        $host = config('towerify.clickhouse.host');
+        $username = config('towerify.clickhouse.username');
+        $password = config('towerify.clickhouse.password');
+        $database = config('towerify.clickhouse.database');
+        /** @var User $user */
+        $user = \Auth::user();
+        $tenant = $user ? "_{$user->tenant_id}" : '_0';
+        $query = "CREATE DATABASE IF NOT EXISTS {$database}{$tenant}";
+        $cmd = "clickhouse-client --host '{$host}' --secure --user '{$username}' --password '{$password}' --query \"{$query}\"";
+
+        self::$executeQueryLastError = null;
+        $process = Process::fromShellCommandline($cmd);
+        $process->setTimeout(null);
+        $process->run();
+
+        if ($process->isSuccessful()) {
+            $output = trim($process->getOutput());
+            return empty($output) ? 'ok' : $output;
+        }
+
+        self::$executeQueryLastError = $process->getErrorOutput();
+        Log::error(self::$executeQueryLastError);
+        return null;
     }
 
     public static function showTables(): ?string
@@ -86,6 +114,9 @@ class ClickhouseClient
         $username = config('towerify.clickhouse.username');
         $password = config('towerify.clickhouse.password');
         $database = config('towerify.clickhouse.database');
-        return "clickhouse-client --host '{$host}' --secure --user '{$username}' --password '{$password}' --database '{$database}' --query \"{$query}\"";
+        /** @var User $user */
+        $user = \Auth::user();
+        $tenant = $user ? "_{$user->tenant_id}" : '_0';
+        return "clickhouse-client --host '{$host}' --secure --user '{$username}' --password '{$password}' --database '{$database}{$tenant}' --query \"{$query}\"";
     }
 }
