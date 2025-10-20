@@ -216,12 +216,21 @@ class TableStorage
         return Str::replace('azureBlobStorage(', 'AzureBlobStorage(', self::outClickhouseTableFunctionAzure($credentials, $tableName, $suffix));
     }
 
-    public static function dispatchImportTable(array $validated, User $user): int
+    public static function dispatchImportTable(array $params, User $user): int
     {
-        $tables = collect($validated['tables'])->groupBy('table');
-        $credentials = self::credentialsFromOptions($validated);
+        $tables = collect($params['tables'])->groupBy('table');
+        $credentials = self::credentialsFromOptions($params);
         foreach ($tables as $table => $columns) {
-            ImportTable::dispatch($user, $credentials, $validated['copy'], $validated['deduplicate'], $validated['updatable'], $table, $columns->toArray(), $validated['description']);
+            ImportTable::dispatch(
+                $user,
+                $credentials,
+                $params['copy'],
+                $params['deduplicate'],
+                $params['updatable'],
+                $table,
+                $columns->toArray(),
+                $params['description'],
+            );
         }
         return $tables->count();
     }

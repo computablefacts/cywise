@@ -271,6 +271,10 @@
     executeJsonRpcApiCall('tables@promptToQuery', {prompt: prompt}, onSuccess);
   }
 
+  function forceTableImportApiCall(tableId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('tables@forceImport', {table_id: tableId}, onSuccess);
+  }
+
   function updateTableDescriptionApiCall(name, description, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('tables@updateDescription', {name: name, description: description}, onSuccess);
   }

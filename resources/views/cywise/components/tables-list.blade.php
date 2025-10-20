@@ -7,6 +7,7 @@
     <th>{{ __('Description') }}</th>
     <th>{{ __('Last Update') }}</th>
     <th>{{ __('Status') }}</th>
+    <th>{{ __('Action') }}</th>
   </tr>
   </thead>
   <tbody id="databases-and-tables">
@@ -15,7 +16,7 @@
 </table>
 <script>
 
-  const escapeHtml = (str) => str
+  const escapeHtml = (str) => String(str || '')
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
@@ -65,18 +66,31 @@
     return false;
   }
 
+  const forceTableImport = (tableId) => {
+    if (confirm("{{ __('Are you sure you want to force the import of this table?') }}")) {
+      forceTableImportApiCall(tableId);
+    }
+    return false;
+  }
+
   const elDatabasesAndTables = document.getElementById('databases-and-tables');
-  elDatabasesAndTables.innerHTML = "<tr><td colspan='6'>{{ __('Loading...') }}</td></tr>";
+  elDatabasesAndTables.innerHTML = "<tr><td colspan='7'>{{ __('Loading...') }}</td></tr>";
 
   document.addEventListener('DOMContentLoaded', function () {
     listTablesApiCall(response => {
       if (!response.tables || response.tables.length === 0) {
-        elDatabasesAndTables.innerHTML = "<tr><td colspan='6'>{{ __('No tables found.') }}</td></tr>";
+        elDatabasesAndTables.innerHTML = "<tr><td colspan='7'>{{ __('No tables found.') }}</td></tr>";
       } else {
         const rows = response.tables.map(table => {
 
           const safeDesc = escapeHtml(table.description || '');
           const safeDescAttr = escapeAttr(table.description || '');
+          const status = String(table.status || '');
+          const showForceImportButton = status.startsWith('Warning:');
+          const btnAction = showForceImportButton
+            ? `<button class="btn btn-sm btn-danger text-white" onclick="return forceTableImport(${table.id})">
+                {{ __('Force import') }}
+              </button>` : '';
 
           return `
             <tr>
@@ -106,8 +120,9 @@
               </td>
               <td>${table.last_update}</td>
               <td>
-                <span class="lozenge new">${table.status}</span>
+                <span class="lozenge new">${status}</span>
               </td>
+              <td>${btnAction}</td>
             </tr>
           `;
         });

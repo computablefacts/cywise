@@ -37,6 +37,7 @@ class TablesProcedure extends Procedure
                 ->orderBy('name')
                 ->get()
                 ->map(fn(Table $table) => [
+                    'id' => $table->id,
                     'name' => $table->name,
                     'nb_rows' => \Illuminate\Support\Number::format($table->nb_rows, locale: 'sv'),
                     'nb_columns' => count($table->schema),
@@ -76,7 +77,7 @@ class TablesProcedure extends Procedure
     )]
     public function import(JsonRpcRequest $request): array
     {
-        $validated = $request->validate([
+        $params = $request->validate([
             'storage' => ['required', Rule::enum(StorageType::class)],
             'region' => 'required_if:storage,' . StorageType::AWS_S3->value . '|string|min:0|max:100',
             'access_key_id' => 'required_if:storage,' . StorageType::AWS_S3->value . '|string|min:0|max:100',
@@ -95,10 +96,63 @@ class TablesProcedure extends Procedure
             'description' => 'required|string|min:1',
         ]);
         $user = $request->user();
-        $validated = $this->fixupLocalFiles($user, $validated);
-        $count = TableStorage::dispatchImportTable($validated, $user);
+        $params = $this->fixupLocalFiles($user, $params);
+        $count = TableStorage::dispatchImportTable($params, $user);
         return [
             'message' => "{$count} table will be imported soon.",
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Force the import of a given table.",
+        params: [
+            'table_id' => 'The identifier of the table to reimport.',
+        ],
+        result: [
+            "message" => "A success message.",
+        ]
+    )]
+    public function forceImport(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'table_id' => 'required|int|exists:cb_tables,id',
+        ]);
+
+        /** @var Table $table */
+        $table = Table::where('id', $params['table_id'])->firstOrFail();
+
+        if (!empty($table->last_error)) {
+            throw new \Exception('Tables with errors cannot be reimported.');
+        }
+        if (empty($table->last_warning)) {
+            throw new \Exception('Tables without warnings cannot be reimported.');
+        }
+
+        $isRowcountWarning = Str::contains($table->last_warning, 'The number of rows differs by more than 10%', true);
+        $isMissingColumnsWarning = Str::contains($table->last_warning, 'The new file must contain at least all the current table columns', true);
+
+        if (!$isRowcountWarning && !$isMissingColumnsWarning) {
+            throw new \Exception('These warnings cannot be bypassed.');
+        }
+        if ($isRowcountWarning) {
+            $table->bypass_rowcount_warning = true;
+            $table->save();
+        } elseif ($isMissingColumnsWarning) {
+            $table->bypass_missing_columns_warning = true;
+            $table->save();
+        }
+
+        $params = array_merge($table->credentials, [
+            'tables' => collect($table->schema)->map(fn(array $column) => array_merge($column, ['table' => $table->name]))->values()->all(),
+            'updatable' => $table->updatable,
+            'copy' => $table->copied,
+            'deduplicate' => $table->deduplicated,
+            'description' => $table->description,
+        ]);
+        $count = TableStorage::dispatchImportTable($params, $request->user());
+
+        return [
+            'message' => "{$count} table will be reimported soon.",
         ];
     }
 
@@ -119,7 +173,7 @@ class TablesProcedure extends Procedure
     )]
     public function executeSqlQuery(JsonRpcRequest $request): array
     {
-        $validated = $request->validate([
+        $params = $request->validate([
             'query' => 'required|string|min:1|max:5000',
             'store' => 'required|boolean',
         ]);
@@ -216,7 +270,7 @@ class TablesProcedure extends Procedure
     )]
     public function listBucketContent(JsonRpcRequest $request): array
     {
-        $validated = $request->validate([
+        $params = $request->validate([
             'storage' => ['required', Rule::enum(StorageType::class)],
             'region' => 'required_if:storage,' . StorageType::AWS_S3->value . '|string|min:0|max:100',
             'access_key_id' => 'required_if:storage,' . StorageType::AWS_S3->value . '|string|min:0|max:100',
@@ -225,8 +279,8 @@ class TablesProcedure extends Procedure
             'input_folder' => 'required|string|min:0|max:100',
             'output_folder' => 'required|string|min:0|max:100',
         ]);
-        $validated = $this->fixupLocalFiles($request->user(), $validated);
-        $credentials = TableStorage::credentialsFromOptions($validated);
+        $params = $this->fixupLocalFiles($request->user(), $params);
+        $credentials = TableStorage::credentialsFromOptions($params);
         $disk = TableStorage::inDisk($credentials);
         $diskFiles = $disk->files();
         $files = [];
@@ -264,7 +318,7 @@ class TablesProcedure extends Procedure
     )]
     public function listFileContent(JsonRpcRequest $request): array
     {
-        $validated = $request->validate([
+        $params = $request->validate([
             'storage' => ['required', Rule::enum(StorageType::class)],
             'region' => 'required_if:storage,' . StorageType::AWS_S3->value . '|string|min:0|max:100',
             'access_key_id' => 'required_if:storage,' . StorageType::AWS_S3->value . '|string|min:0|max:100',
@@ -275,9 +329,9 @@ class TablesProcedure extends Procedure
             'tables' => 'required|array|min:1|max:1',
             'tables.*' => 'required|string|min:0|max:250',
         ]);
-        $validated = $this->fixupLocalFiles($request->user(), $validated);
-        $credentials = TableStorage::credentialsFromOptions($validated);
-        $tables = collect($validated['tables']);
+        $params = $this->fixupLocalFiles($request->user(), $params);
+        $credentials = TableStorage::credentialsFromOptions($params);
+        $tables = collect($params['tables']);
         $columns = $tables->map(function (string $table) use ($credentials) {
 
             $clickhouseTable = TableStorage::inClickhouseTableFunction($credentials, $table);
@@ -303,12 +357,12 @@ class TablesProcedure extends Procedure
     )]
     public function promptToQuery(JsonRpcRequest $request): array
     {
-        $validated = $request->validate([
+        $params = $request->validate([
             'prompt' => 'required|string|min:1|max:5000',
         ]);
         /** @var User $user */
         $user = Auth::user();
-        $prompt = $validated['prompt'];
+        $prompt = $params['prompt'];
         $query = ClickhouseUtils::promptToQuery(Table::where('created_by', $user->id)->get(), $prompt);
 
         if (empty($query)) {
@@ -365,18 +419,18 @@ class TablesProcedure extends Procedure
         ];
     }
 
-    private function fixupLocalFiles(User $user, array $validated): array
+    private function fixupLocalFiles(User $user, array $params): array
     {
-        if ($validated['storage'] === StorageType::AWS_S3->value && (
-                $validated['region'] === 'local-region' ||
-                $validated['access_key_id'] === 'local-access_key_id' ||
-                $validated['secret_access_key'] === 'local-secret_access_key')) {
-            $validated['region'] = config('filesystems.disks.tables-s3.region');
-            $validated['access_key_id'] = config('filesystems.disks.tables-s3.key');
-            $validated['secret_access_key'] = config('filesystems.disks.tables-s3.secret');
-            $validated['input_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$user->tenant_id}/{$user->id}/";
-            $validated['output_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$user->tenant_id}/";
+        if ($params['storage'] === StorageType::AWS_S3->value && (
+                $params['region'] === 'local-region' ||
+                $params['access_key_id'] === 'local-access_key_id' ||
+                $params['secret_access_key'] === 'local-secret_access_key')) {
+            $params['region'] = config('filesystems.disks.tables-s3.region');
+            $params['access_key_id'] = config('filesystems.disks.tables-s3.key');
+            $params['secret_access_key'] = config('filesystems.disks.tables-s3.secret');
+            $params['input_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$user->tenant_id}/{$user->id}/";
+            $params['output_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$user->tenant_id}/";
         }
-        return $validated;
+        return $params;
     }
 }

@@ -59,6 +59,7 @@ class ImportTableListener extends AbstractListener
             'copied' => $copy,
             'deduplicated' => $deduplicate,
             'last_error' => null,
+            'last_warning' => null,
             'started_at' => Carbon::now(),
             'finished_at' => null,
             'created_by' => $user->id,
@@ -79,11 +80,16 @@ class ImportTableListener extends AbstractListener
                 $missing = collect($prevColumnNames)->diff($newColumnNames)->values()->all();
 
                 if (!empty($missing)) {
-                    $tbl->last_error = __('The new file must contain at least all the current table columns (:missing)', [
-                        'missing' => implode(', ', $missing),
-                    ]);
-                    $tbl->save();
-                    return;
+                    $missing = implode(', ', $missing);
+                    $message = "The new file must contain at least all the current table columns ({$missing})";
+                    if ($tbl->bypass_missing_columns_warning) {
+                        Log::warning("Bypassing missing columns warning for table {$normalizedTableName}: {$message}");
+                    } else {
+                        $tbl->last_error = null;
+                        $tbl->last_warning = $message;
+                        $tbl->save();
+                        return;
+                    }
                 }
             }
 
@@ -121,13 +127,15 @@ class ImportTableListener extends AbstractListener
 
                 if (($diff / $prevRowCount) > 0.10) {
                     $percent = round(($diff / max($prevRowCount, 1)) * 100, 2);
-                    $tbl->last_error = __('The number of rows differs by more than 10% (expected :expected, got :actual, diff :percent%)', [
-                        'expected' => $prevRowCount,
-                        'actual' => $newRowCount,
-                        'percent' => $percent,
-                    ]);
-                    $tbl->save();
-                    return;
+                    $message = "The number of rows differs by more than 10% (expected {$prevRowCount}, got {$newRowCount}, diff {$percent}%)";
+                    if ($tbl->bypass_rowcount_warning) {
+                        Log::warning("Bypassing rowcount warning for table {$normalizedTableName}: {$message}");
+                    } else {
+                        $tbl->last_error = null;
+                        $tbl->last_warning = $message;
+                        $tbl->save();
+                        return;
+                    }
                 }
             }
             if ($copy) {
@@ -191,6 +199,9 @@ class ImportTableListener extends AbstractListener
             }
 
             $tbl->last_error = null;
+            $tbl->last_warning = null;
+            $tbl->bypass_rowcount_warning = false;
+            $tbl->bypass_missing_columns_warning = false;
             $tbl->finished_at = Carbon::now();
             $tbl->nb_rows = ClickhouseClient::numberOfRows($normalizedTableName) ?? 0;
             $tbl->save();
