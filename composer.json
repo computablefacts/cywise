@@ -52,6 +52,7 @@
         "symfony/dom-crawler": "^7.3",
         "symfony/process": "^7.3",
         "symfony/yaml": "^7.3",
+        "techamica/smtpserver-api": "^1.0",
         "tymon/jwt-auth": "@dev",
         "wamania/php-stemmer": "^4.0",
         "webklex/laravel-imap": "^6.2"

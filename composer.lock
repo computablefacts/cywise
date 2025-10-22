@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d3478b337607f6618f8ef2c686e2f977",
+    "content-hash": "5782ad0f7601784cb3f8f7ea4264684a",
     "packages": [
         {
             "name": "24slides/laravel-saml2",
@@ -11972,6 +11972,43 @@
             "time": "2025-07-10T08:47:49+00:00"
         },
         {
+            "name": "techamica/smtpserver-api",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/techamica/smtpserver-api.git",
+                "reference": "4ce1bd7aadeb0a79ae910507092c5217fb85f039"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/techamica/smtpserver-api/zipball/4ce1bd7aadeb0a79ae910507092c5217fb85f039",
+                "reference": "4ce1bd7aadeb0a79ae910507092c5217fb85f039",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Smtp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Techamica",
+                    "email": "is@woano.com"
+                }
+            ],
+            "description": "API vendor in PHP for https://smtpserver.com",
+            "support": {
+                "issues": "https://github.com/techamica/smtpserver-api/issues",
+                "source": "https://github.com/techamica/smtpserver-api/tree/1.0.4"
+            },
+            "time": "2021-12-23T19:15:24+00:00"
+        },
+        {
             "name": "tijsverkoyen/css-to-inline-styles",
             "version": "v2.3.0",
             "source": {
@@ -16428,7 +16465,6 @@
         "ext-dom": "*",
         "ext-exif": "*",
         "ext-gd": "*",
-        "ext-libxml": "*",
         "ext-openssl": "*",
         "ext-pcntl": "*",
         "ext-pdo": "*",
