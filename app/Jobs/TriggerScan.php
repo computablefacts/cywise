@@ -39,6 +39,11 @@ class TriggerScan implements ShouldQueue
         Asset::whereNull('next_scan_id')
             ->where('is_monitored', true)
             ->whereNull('ynh_trial_id')
+            ->whereNotExists(function ($query) {
+                $query->select('dns')
+                    ->from('am_honeypots')
+                    ->whereRaw('am_assets.asset = am_honeypots.dns');
+            })
             ->get()
             ->concat(
                 Asset::select('am_assets.*')
@@ -46,6 +51,11 @@ class TriggerScan implements ShouldQueue
                     ->whereNull('am_assets.next_scan_id')
                     ->where('am_assets.is_monitored', true)
                     ->where('ynh_trials.completed', false)
+                    ->whereNotExists(function ($query) {
+                        $query->select('dns')
+                            ->from('am_honeypots')
+                            ->whereRaw('am_assets.asset = am_honeypots.dns');
+                    })
                     ->get()
             )
             ->filter(function (Asset $asset) use ($minDate) {
