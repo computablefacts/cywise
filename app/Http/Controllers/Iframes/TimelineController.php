@@ -26,6 +26,85 @@ use Illuminate\View\View;
 
 class TimelineController extends Controller
 {
+    public static function fetchLeaks(User $user): Collection
+    {
+        $now = Carbon::now()->utc()->subDays(15);
+        $leaks = TimelineItem::fetchLeaks($user->id, $now, null, 0);
+
+        if ($leaks->isEmpty()) {
+
+            $tlds = "'" . Asset::all()
+                    ->map(fn(Asset $asset) => $asset->tld())
+                    ->filter(fn(?string $tld) => !empty($tld))
+                    ->unique()
+                    ->join("','") . "'";
+
+            if ($tlds === "''") {
+                $leaks = collect();
+            } else {
+                $query = "
+                  SELECT DISTINCT 
+                    min(db_date) AS leak_date, 
+                    lower(concat(login, '@', login_email_domain)) AS email, 
+                    concat(url_scheme, '://', url_subdomain, '.', url_domain) AS website, 
+                    password
+                  FROM dumps_login_email_domain 
+                  WHERE login_email_domain IN ({$tlds})
+                  GROUP BY email, website, password
+                  ORDER BY email, website ASC
+                ";
+
+                // Log::debug($query);
+
+                $output = JosianneClient::executeQuery($query);
+                $leaks = collect(explode("\n", $output))
+                    ->filter(fn(string $line) => !empty($line) && $line !== 'ok')
+                    ->map(function (string $line) {
+                        $obj = explode("\t", $line);
+                        return [
+                            'leak_date' => Str::before(Str::trim($obj[0]), ' '),
+                            'email' => Str::trim($obj[1]),
+                            'website' => Str::trim($obj[2]),
+                            'password' => $this->maskPassword(Str::trim($obj[3])),
+                        ];
+                    })
+                    ->map(function (array $credentials) {
+                        // if (preg_match("/(?i)\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|(([^\s()<>]+|(([^\s()<>]+)))*))+(?:(([^\s()<>]+|(([^\s()<>]+)))*)|[^\s`!()[]{};:'\".,<>?«»“”‘’]))/", $credentials['website'])) {
+                        if (filter_var($credentials['website'], FILTER_VALIDATE_URL)) {
+                            return $credentials;
+                        }
+                        return [
+                            'leak_date' => $credentials['leak_date'],
+                            'email' => $credentials['email'],
+                            'website' => '',
+                            'password' => $credentials['password'],
+                        ];
+                    })
+                    ->unique(fn(array $credentials) => $credentials['email'] . $credentials['website'] . $credentials['password']);
+            }
+            if (count($leaks) > 0) {
+
+                // Get previous leaks
+                $leaksPrev = TimelineItem::fetchLeaks($user->id, null, $now, 0)
+                    ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']));
+
+                $leaks = $leaks->filter(function (array $leak) use ($leaksPrev) {
+                    return !$leaksPrev->contains(function (object $leakPrev) use ($leak) {
+                        return $leakPrev->email === $leak['email'] &&
+                            $leakPrev->website === $leak['website'] &&
+                            $leakPrev->password === $leak['password'];
+                    });
+                });
+
+                // Only add the new leaks
+                if (count($leaks) > 0) {
+                    $leaks->chunk(10)->each(fn(Collection $leaksChunk) => TimelineItem::createLeak($user, $leaksChunk->values()->toArray()));
+                }
+            }
+        }
+        return TimelineItem::fetchLeaks($user->id, null, null, 0);
+    }
+
     public static function noteAndMemo(User $user, TimelineItem $item): array
     {
         $timestamp = $item->timestamp->utc()->format('Y-m-d H:i:s');
@@ -419,82 +498,7 @@ class TimelineController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        $now = Carbon::now()->utc()->subDays(30);
-        $leaks = TimelineItem::fetchLeaks($user->id, $now, null, 0);
-
-        if ($leaks->isEmpty()) {
-
-            $tlds = "'" . Asset::all()
-                    ->map(fn(Asset $asset) => $asset->tld())
-                    ->filter(fn(?string $tld) => !empty($tld))
-                    ->unique()
-                    ->join("','") . "'";
-
-            if ($tlds === "''") {
-                $leaks = collect();
-            } else {
-                $query = "
-                  SELECT DISTINCT 
-                    min(db_date) AS leak_date, 
-                    lower(concat(login, '@', login_email_domain)) AS email, 
-                    concat(url_scheme, '://', url_subdomain, '.', url_domain) AS website, 
-                    password
-                  FROM dumps_login_email_domain 
-                  WHERE login_email_domain IN ({$tlds})
-                  GROUP BY email, website, password
-                  ORDER BY email, website ASC
-                ";
-
-                // Log::debug($query);
-
-                $output = JosianneClient::executeQuery($query);
-                $leaks = collect(explode("\n", $output))
-                    ->filter(fn(string $line) => !empty($line) && $line !== 'ok')
-                    ->map(function (string $line) {
-                        $obj = explode("\t", $line);
-                        return [
-                            'leak_date' => Str::before(Str::trim($obj[0]), ' '),
-                            'email' => Str::trim($obj[1]),
-                            'website' => Str::trim($obj[2]),
-                            'password' => $this->maskPassword(Str::trim($obj[3])),
-                        ];
-                    })
-                    ->map(function (array $credentials) {
-                        // if (preg_match("/(?i)\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|(([^\s()<>]+|(([^\s()<>]+)))*))+(?:(([^\s()<>]+|(([^\s()<>]+)))*)|[^\s`!()[]{};:'\".,<>?«»“”‘’]))/", $credentials['website'])) {
-                        if (filter_var($credentials['website'], FILTER_VALIDATE_URL)) {
-                            return $credentials;
-                        }
-                        return [
-                            'leak_date' => $credentials['leak_date'],
-                            'email' => $credentials['email'],
-                            'website' => '',
-                            'password' => $credentials['password'],
-                        ];
-                    })
-                    ->unique(fn(array $credentials) => $credentials['email'] . $credentials['website'] . $credentials['password']);
-            }
-            if (count($leaks) > 0) {
-
-                // Get previous leaks
-                $leaksPrev = TimelineItem::fetchLeaks($user->id, null, $now, 0)
-                    ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']));
-
-                $leaks = $leaks->filter(function (array $leak) use ($leaksPrev) {
-                    return !$leaksPrev->contains(function (object $leakPrev) use ($leak) {
-                        return $leakPrev->email === $leak['email'] &&
-                            $leakPrev->website === $leak['website'] &&
-                            $leakPrev->password === $leak['password'];
-                    });
-                });
-
-                // Only add the new leaks
-                if (count($leaks) > 0) {
-                    $leaks->chunk(10)->each(fn(Collection $leaksChunk) => TimelineItem::createLeak($user, $leaksChunk->values()->toArray()));
-                }
-            }
-        }
-
-        $leaks = TimelineItem::fetchLeaks($user->id, null, null, 0);
+        $leaks = self::fetchLeaks($user);
 
         return [
             'nb_leaks' => $leaks->count(),

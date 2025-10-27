@@ -1,16 +1,178 @@
 @extends('theme::iframes.app')
 
 @section('content')
+<!-- ASSETS : BEGIN -->
+<div class="row pt-3">
+  <div class="col">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-content-center">
+              <span class="bg-blue text-white avatar">
+                <span class="bp4-icon bp4-icon-globe-network"></span>
+              </span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="h5 mb-0">
+              <b>{{ $nb_monitored + $nb_monitorable }}</b>
+            </div>
+            <div class="text-muted">
+              <a href="{{ route('iframes.assets') }}" class="link">
+                {{ __('Assets') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col ps-0">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-content-center">
+              <span class="bg-blue text-white avatar">
+                <span class="bp4-icon bp4-icon-globe-network"></span>
+              </span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="h5 mb-0">
+              <b>{{ $nb_monitored }}</b>
+            </div>
+            <div class="text-muted">
+              <a href="{{ route('iframes.assets', [ 'status' => 'monitored' ]) }}" class="link">
+                {{ __('Assets Monitored') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col ps-0">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-content-center">
+              <span class="bg-blue text-white avatar">
+                <span class="bp4-icon bp4-icon-globe-network"></span>
+              </span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="h5 mb-0">
+              <b>{{ $nb_monitorable }}</b>
+            </div>
+            <div class="text-muted">
+              <a href="{{ route('iframes.assets', [ 'status' => 'monitorable' ]) }}" class="link">
+                {{ __('Assets Monitorable') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ASSETS : END -->
+<!-- VULNERABILITIES : BEGIN -->
+<div class="row pt-3">
+  <div class="col">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-content-center">
+              <span class="bg-red text-white avatar">
+                <span class="bp4-icon bp4-icon-issue"></span>
+              </span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="h5 mb-0">
+              <b>{{ $nb_high }}</b>
+            </div>
+            <div class="text-muted">
+              <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'high' ]) }}" class="link">
+                {{ __('High') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col ps-0">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-content-center">
+              <span class="bg-orange text-white avatar">
+                <span class="bp4-icon bp4-icon-issue"></span>
+              </span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="h5 mb-0">
+              <b>{{ $nb_medium }}</b>
+            </div>
+            <div class="text-muted">
+              <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'medium' ]) }}" class="link">
+                {{ __('Medium') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col ps-0">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-content-center">
+              <span class="bg-green text-white avatar">
+                <span class="bp4-icon bp4-icon-issue"></span>
+              </span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="h5 mb-0">
+              <b>{{ $nb_low }}</b>
+            </div>
+            <div class="text-muted">
+              <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'low' ]) }}" class="link">
+                {{ __('Low') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- VULNERABILITIES : END -->
 <div class="row pt-3">
   <!-- CYBERTODO : BEGIN -->
-  @if(count($todo) > 0)
-  <div class="col-4 pe-0">
+  <div class="col-6">
     <div class="card">
       <div class="card-body">
         <h6 class="card-title">
           {!! __('Your 5 most critical vulnerabilities to fix!') !!}
         </h6>
-        <div class="card-text mb-3">
+        @if(count($todo) <= 0)
+        <div class="card-text">
+          {{ __('Good job! No vulnerabilities to fix.') }}
+        </div>
+        @else
+        <div class="card-text">
           @foreach($todo as $item)
           <div class="d-flex justify-content-start align-items-center mb-2">
             @if($item->isHigh())
@@ -35,297 +197,55 @@
           </div>
           @endforeach
         </div>
+        @endif
       </div>
     </div>
   </div>
-  @endif
   <!-- CYBERTODO : END -->
-  <div class="col">
-    <!-- ASSETS : BEGIN -->
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-body p-3">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <div class="d-flex align-content-center">
-                  <span class="bg-blue text-white avatar">
-                    <span class="bp4-icon bp4-icon-globe-network"></span>
-                  </span>
-                </div>
-              </div>
-              <div class="col">
-                <div class="h5 mb-0">
-                  <b>{{ $nb_monitored + $nb_monitorable }}</b>
-                </div>
-                <div class="text-muted">
-                  <a href="{{ route('iframes.assets') }}" class="link">
-                    {{ __('Assets') }}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col ps-0">
-        <div class="card">
-          <div class="card-body p-3">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <div class="d-flex align-content-center">
-                  <span class="bg-blue text-white avatar">
-                    <span class="bp4-icon bp4-icon-globe-network"></span>
-                  </span>
-                </div>
-              </div>
-              <div class="col">
-                <div class="h5 mb-0">
-                  <b>{{ $nb_monitored }}</b>
-                </div>
-                <div class="text-muted">
-                  <a href="{{ route('iframes.assets', [ 'status' => 'monitored' ]) }}" class="link">
-                    {{ __('Assets Monitored') }}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col ps-0">
-        <div class="card">
-          <div class="card-body p-3">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <div class="d-flex align-content-center">
-                  <span class="bg-blue text-white avatar">
-                    <span class="bp4-icon bp4-icon-globe-network"></span>
-                  </span>
-                </div>
-              </div>
-              <div class="col">
-                <div class="h5 mb-0">
-                  <b>{{ $nb_monitorable }}</b>
-                </div>
-                <div class="text-muted">
-                  <a href="{{ route('iframes.assets', [ 'status' => 'monitorable' ]) }}" class="link">
-                    {{ __('Assets Monitorable') }}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- ASSETS : END -->
-    <!-- VULNERABILITIES : BEGIN -->
-    <div class="row pt-3">
-      <div class="col">
-        <div class="card">
-          <div class="card-body p-3">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <div class="d-flex align-content-center">
-                  <span class="bg-red text-white avatar">
-                    <span class="bp4-icon bp4-icon-issue"></span>
-                  </span>
-                </div>
-              </div>
-              <div class="col">
-                <div class="h5 mb-0">
-                  <b>{{ $nb_high }}</b>
-                </div>
-                <div class="text-muted">
-                  <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'high' ]) }}" class="link">
-                    {{ __('High') }}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col ps-0">
-        <div class="card">
-          <div class="card-body p-3">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <div class="d-flex align-content-center">
-                  <span class="bg-orange text-white avatar">
-                    <span class="bp4-icon bp4-icon-issue"></span>
-                  </span>
-                </div>
-              </div>
-              <div class="col">
-                <div class="h5 mb-0">
-                  <b>{{ $nb_medium }}</b>
-                </div>
-                <div class="text-muted">
-                  <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'medium' ]) }}" class="link">
-                    {{ __('Medium') }}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col ps-0">
-        <div class="card">
-          <div class="card-body p-3">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <div class="d-flex align-content-center">
-                  <span class="bg-green text-white avatar">
-                    <span class="bp4-icon bp4-icon-issue"></span>
-                  </span>
-                </div>
-              </div>
-              <div class="col">
-                <div class="h5 mb-0">
-                  <b>{{ $nb_low }}</b>
-                </div>
-                <div class="text-muted">
-                  <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'low' ]) }}" class="link">
-                    {{ __('Low') }}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- VULNERABILITIES : END -->
-    <!-- ACTIONS : BEGIN -->
-    <div class="row pt-3">
-      <div class="col pe-0">
-        <!-- ACTION PROTECT : BEGIN -->
-        <div class="card">
-          <div class="card-body">
-            <h6 class="card-title">{{ __('Would you like to protect a new domain?') }}</h6>
-            <div class="card-text mb-3">
-              {{ __('Enter a domain name or an IP address belonging to you below:') }}
-            </div>
-            <form>
-              <div class="row">
-                <div class="col">
-                  <input type="text"
-                         class="form-control"
-                         id="asset"
-                         placeholder="example.com ou 93.184.215.14"
-                         autofocus>
-                </div>
-              </div>
-              <div class="row mt-3">
-                <div class="col align-content-center">
-                  <button type="button"
-                          onclick="createAsset()"
-                          class="btn btn-primary"
-                          style="width: 100%;">
-                    {{ __('Monitor >') }}
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-        <!-- ACTION PROTECT : END -->
-      </div>
-      <div class="col">
-        <!-- ACTION CYBERBUDDY : BEGIN -->
-        <div class="card">
-          <div class="card-body">
-            <h6 class="card-title">
-              {{ __('Do you have a question related to Cyber?') }}
-            </h6>
-            <div class="card-text mb-3">
-              {{ __('Click here to launch CyberBuddy:') }}
-            </div>
-            <form>
-              <div class="row">
-                <div class="col align-content-center">
-                  <a href="{{ route('iframes.cyberbuddy') }}" class="btn btn-primary" style="width: 100%;">
-                    {{ __('Start Conversation >') }}
-                  </a>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-        <!-- ACTION CYBERBUDDY : END -->
-      </div>
-    </div>
-    <!-- ACTIONS : BEGIN -->
-  </div>
-</div>
-<!-- AGENTS & METRICS : BEGIN -->
-<div class="row pb-3">
-  <div class="col">
-    @include('theme::iframes._agent')
-  </div>
-</div>
-<!-- AGENTS & METRICS : END -->
-<!-- APPS : BEGIN -->
-@php
-$apps = \App\Models\YnhServer::forUser(request()->user())
-->flatMap(fn(\App\Models\YnhServer $server) => $server->applications)
-->sortBy([
-['server.name', 'asc'],
-['name', 'asc'],
-], SORT_NATURAL | SORT_FLAG_CASE);
-@endphp
-@if($apps->isNotEmpty())
-<div class="row">
-  <div class="col">
+  <!-- LEAKS : BEGIN -->
+  <div class="col ps-0">
     <div class="card">
-      <div class="card-body p-0">
-        <table class="table">
-          <thead>
-          <tr>
-            <th>{{ __('Server') }}</th>
-            <th>{{ __('Name') }}</th>
-            <th>{{ __('Description') }}</th>
-            <th>{{ __('Sku') }}</th>
-            <th>{{ __('Version') }}</th>
-          </tr>
-          </thead>
-          <tbody>
-          @foreach($apps as $app)
-          <tr>
-            <td>
-          <span class="font-lg mb-3 fw-bold">
-            {{ $app->server->name }}
-          </span>
-            </td>
-            <td>
-              <span class="font-lg mb-3 fw-bold">
-                <a href="https://{{ $app->path }}" target="_blank">
-                  {{ $app->name }}
-                </a>
-              </span>
-            </td>
-            <td>
-              {{ $app->description }}
-            </td>
-            <td>
-              {{ $app->sku }}
-            </td>
-            <td>
-              {{ $app->version }}
-            </td>
-          </tr>
-          @endforeach
-          </tbody>
-        </table>
+      <div class="card-body">
+        <h6 class="card-title">
+          {!! __('Your last 10 leaks discovered!') !!}
+        </h6>
+        @if(count($leaks) <= 0)
+        <div class="card-text">
+          {{ __('Good job! No passwords to change.') }}
+        </div>
+        @else
+        <div class="card-text">
+          <table class="table table-sm mb-0">
+            <thead>
+            <tr>
+              <th style="color:var(--bs-body-color);">{{ __('Est. Leak Date') }}</th>
+              <th style="color:var(--bs-body-color);">{{ __('Email') }}</th>
+              <th style="color:var(--bs-body-color);">{{ __('Password') }}</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($leaks as $l)
+            <tr>
+              <td style="color:var(--bs-body-color);">{{ empty($l->leak_date) ? '-' : $l->leak_date }}</td>
+              <td style="color:var(--bs-body-color);">{{ $l->email }}</td>
+              <td style="color:var(--bs-body-color);">{{ empty($l->password) ? '-' : $l->password }}</td>
+              <td>
+                <span class="lozenge new" style="font-size: 0.8rem;">
+                  {{ empty($l->website) ? __('leak') : __('infostealer log') }}
+                </span>
+              </td>
+            </tr>
+            @endforeach
+            </tbody>
+          </table>
+        </div>
+        @endif
       </div>
     </div>
   </div>
+  <!-- LEAKS : END -->
 </div>
-@endif
-<!-- APPS : END -->
 <!-- HONEYPOTS : BEGIN -->
 @if(count($honeypots) > 0)
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
@@ -433,6 +353,131 @@ $apps = \App\Models\YnhServer::forUser(request()->user())
 </div>
 @endif
 <!-- HONEYPOTS : END -->
+<!-- ACTIONS : BEGIN -->
+<div class="row pt-3">
+  <!-- ACTION PROTECT : BEGIN -->
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title">{{ __('Would you like to protect a new domain?') }}</h6>
+        <div class="card-text mb-3">
+          {{ __('Enter a domain name or an IP address belonging to you below:') }}
+        </div>
+        <form>
+          <div class="row">
+            <div class="col">
+              <input type="text"
+                     class="form-control"
+                     id="asset"
+                     placeholder="example.com ou 93.184.215.14"
+                     autofocus>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col align-content-center">
+              <button type="button"
+                      onclick="createAsset()"
+                      class="btn btn-primary"
+                      style="width: 100%;">
+                {{ __('Monitor >') }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- ACTION PROTECT : END -->
+  <!-- ACTION CYBERBUDDY : BEGIN -->
+  <div class="col ps-0">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title">
+          {{ __('Do you have a question related to Cyber?') }}
+        </h6>
+        <div class="card-text mb-3">
+          {{ __('Click here to launch CyberBuddy:') }}
+        </div>
+        <form>
+          <div class="row">
+            <div class="col align-content-center">
+              <a href="{{ route('iframes.cyberbuddy') }}" class="btn btn-primary" style="width: 100%;">
+                {{ __('Start Conversation >') }}
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- ACTION CYBERBUDDY : END -->
+</div>
+<!-- ACTIONS : BEGIN -->
+<!-- AGENTS & METRICS : BEGIN -->
+<div class="row pb-3">
+  <div class="col">
+    @include('theme::iframes._agent')
+  </div>
+</div>
+<!-- AGENTS & METRICS : END -->
+<!-- APPS : BEGIN -->
+@php
+$apps = \App\Models\YnhServer::forUser(request()->user())
+->flatMap(fn(\App\Models\YnhServer $server) => $server->applications)
+->sortBy([
+['server.name', 'asc'],
+['name', 'asc'],
+], SORT_NATURAL | SORT_FLAG_CASE);
+@endphp
+@if($apps->isNotEmpty())
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-body p-0">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>{{ __('Server') }}</th>
+            <th>{{ __('Name') }}</th>
+            <th>{{ __('Description') }}</th>
+            <th>{{ __('Sku') }}</th>
+            <th>{{ __('Version') }}</th>
+          </tr>
+          </thead>
+          <tbody>
+          @foreach($apps as $app)
+          <tr>
+            <td>
+          <span class="font-lg mb-3 fw-bold">
+            {{ $app->server->name }}
+          </span>
+            </td>
+            <td>
+              <span class="font-lg mb-3 fw-bold">
+                <a href="https://{{ $app->path }}" target="_blank">
+                  {{ $app->name }}
+                </a>
+              </span>
+            </td>
+            <td>
+              {{ $app->description }}
+            </td>
+            <td>
+              {{ $app->sku }}
+            </td>
+            <td>
+              {{ $app->version }}
+            </td>
+          </tr>
+          @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
+<!-- APPS : END -->
 @endsection
 
 @push('scripts')

@@ -9,6 +9,7 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Honeypot;
 use App\Models\HoneypotEvent;
+use App\Models\TimelineItem;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,12 @@ class DashboardController extends Controller
         $nbHigh = count($alerts['high'] ?? []);
         $nbMedium = count($alerts['medium'] ?? []);
         $nbLow = count($alerts['low'] ?? []);
+
+        $leaks = TimelineController::fetchLeaks(\Auth::user())
+            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
+            ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE)
+            ->reverse()
+            ->take(10);
 
         $todo = collect($alerts['high'] ?? [])
             ->concat($alerts['medium'] ?? [])
@@ -92,6 +99,7 @@ class DashboardController extends Controller
             'nb_medium' => $nbMedium,
             'nb_low' => $nbLow,
             'todo' => $todo,
+            'leaks' => $leaks,
             'honeypots' => $honeypots,
             'most_recent_honeypot_events' => $mostRecentHoneypotEvents,
         ]);
