@@ -161,7 +161,7 @@
 <!-- VULNERABILITIES : END -->
 <div class="row pt-3">
   <!-- CYBERTODO : BEGIN -->
-  <div class="col-6">
+  <div class="col-5">
     <div class="card">
       <div class="card-body">
         <h6 class="card-title">
@@ -353,6 +353,64 @@
 </div>
 @endif
 <!-- HONEYPOTS : END -->
+<!-- APPS : BEGIN -->
+@php
+$apps = \App\Models\YnhServer::forUser(request()->user())
+->flatMap(fn(\App\Models\YnhServer $server) => $server->applications)
+->sortBy([
+['server.name', 'asc'],
+['name', 'asc'],
+], SORT_NATURAL | SORT_FLAG_CASE);
+@endphp
+@if($apps->isNotEmpty())
+<div class="row pt-3">
+  <div class="col">
+    <div class="card">
+      <div class="card-body p-0">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>{{ __('Server') }}</th>
+            <th>{{ __('Name') }}</th>
+            <th>{{ __('Description') }}</th>
+            <th>{{ __('Sku') }}</th>
+            <th>{{ __('Version') }}</th>
+          </tr>
+          </thead>
+          <tbody>
+          @foreach($apps as $app)
+          <tr>
+            <td>
+          <span class="font-lg mb-3 fw-bold">
+            {{ $app->server->name }}
+          </span>
+            </td>
+            <td>
+              <span class="font-lg mb-3 fw-bold">
+                <a href="https://{{ $app->path }}" target="_blank">
+                  {{ $app->name }}
+                </a>
+              </span>
+            </td>
+            <td>
+              {{ $app->description }}
+            </td>
+            <td>
+              {{ $app->sku }}
+            </td>
+            <td>
+              {{ $app->version }}
+            </td>
+          </tr>
+          @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
+<!-- APPS : END -->
 <!-- ACTIONS : BEGIN -->
 <div class="row pt-3">
   <!-- ACTION PROTECT : BEGIN -->
@@ -420,64 +478,6 @@
   </div>
 </div>
 <!-- AGENTS & METRICS : END -->
-<!-- APPS : BEGIN -->
-@php
-$apps = \App\Models\YnhServer::forUser(request()->user())
-->flatMap(fn(\App\Models\YnhServer $server) => $server->applications)
-->sortBy([
-['server.name', 'asc'],
-['name', 'asc'],
-], SORT_NATURAL | SORT_FLAG_CASE);
-@endphp
-@if($apps->isNotEmpty())
-<div class="row">
-  <div class="col">
-    <div class="card">
-      <div class="card-body p-0">
-        <table class="table">
-          <thead>
-          <tr>
-            <th>{{ __('Server') }}</th>
-            <th>{{ __('Name') }}</th>
-            <th>{{ __('Description') }}</th>
-            <th>{{ __('Sku') }}</th>
-            <th>{{ __('Version') }}</th>
-          </tr>
-          </thead>
-          <tbody>
-          @foreach($apps as $app)
-          <tr>
-            <td>
-          <span class="font-lg mb-3 fw-bold">
-            {{ $app->server->name }}
-          </span>
-            </td>
-            <td>
-              <span class="font-lg mb-3 fw-bold">
-                <a href="https://{{ $app->path }}" target="_blank">
-                  {{ $app->name }}
-                </a>
-              </span>
-            </td>
-            <td>
-              {{ $app->description }}
-            </td>
-            <td>
-              {{ $app->sku }}
-            </td>
-            <td>
-              {{ $app->version }}
-            </td>
-          </tr>
-          @endforeach
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-@endif
-<!-- APPS : END -->
 @endsection
 
 @push('scripts')
