@@ -249,7 +249,7 @@
 <!-- HONEYPOTS : BEGIN -->
 @if(count($honeypots) > 0)
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
-<div class="row pt-3 pb-3 pe-3">
+<div class="row pt-3 pe-3">
   @foreach($honeypots as $honeypot)
   <div class="col pe-0">
     <div class="card">
