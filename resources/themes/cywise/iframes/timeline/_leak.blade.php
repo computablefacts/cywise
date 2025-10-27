@@ -16,6 +16,7 @@
       <table>
         <thead>
         <tr>
+          <th>{{ __('Est. Leak Date') }}</th>
           <th>{{ __('Email') }}</th>
           <th>{{ __('Website') }}</th>
           <th>{{ __('Password') }}</th>
@@ -25,12 +26,13 @@
         <tbody>
         @foreach(json_decode($leak->attributes()['credentials']) as $l)
         <tr>
+          <td>{{ empty($l->leak_date) ? '-' : $l->leak_date }}</td>
           <td>{{ $l->email }}</td>
           <td>{{ empty($l->website) ? '-' : $l->website }}</td>
           <td>{{ empty($l->password) ? '-' : $l->password }}</td>
           <td>
           <span class="lozenge new" style="font-size: 0.8rem;">
-            {{ empty($l->website) ? __('leak') : __('possible compromise') }}
+            {{ empty($l->website) ? __('leak') : __('infostealer log') }}
           </span>
           </td>
         </tr>

@@ -21,7 +21,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -434,18 +433,30 @@ class TimelineController extends Controller
             if ($tlds === "''") {
                 $leaks = collect();
             } else {
-                $query = "SELECT DISTINCT lower(concat(login, '@', login_email_domain)) AS email, concat(url_scheme, '://', url_subdomain, '.', url_domain) AS website, password FROM dumps_login_email_domain WHERE login_email_domain IN ({$tlds}) ORDER BY email, website ASC";
+                $query = "
+                  SELECT DISTINCT 
+                    min(db_date) AS leak_date, 
+                    lower(concat(login, '@', login_email_domain)) AS email, 
+                    concat(url_scheme, '://', url_subdomain, '.', url_domain) AS website, 
+                    password
+                  FROM dumps_login_email_domain 
+                  WHERE login_email_domain IN ({$tlds})
+                  GROUP BY email, website, password
+                  ORDER BY email, website ASC
+                ";
 
-                Log::debug($query);
+                // Log::debug($query);
 
                 $output = JosianneClient::executeQuery($query);
                 $leaks = collect(explode("\n", $output))
                     ->filter(fn(string $line) => !empty($line) && $line !== 'ok')
                     ->map(function (string $line) {
+                        $obj = explode("\t", $line);
                         return [
-                            'email' => Str::trim(Str::before($line, "\t")),
-                            'website' => Str::trim(Str::between($line, "\t", "\t")),
-                            'password' => $this->maskPassword(Str::trim(Str::afterLast($line, "\t"))),
+                            'leak_date' => Str::before(Str::trim($obj[0]), ' '),
+                            'email' => Str::trim($obj[1]),
+                            'website' => Str::trim($obj[2]),
+                            'password' => $this->maskPassword(Str::trim($obj[3])),
                         ];
                     })
                     ->map(function (array $credentials) {
@@ -454,6 +465,7 @@ class TimelineController extends Controller
                             return $credentials;
                         }
                         return [
+                            'leak_date' => $credentials['leak_date'],
                             'email' => $credentials['email'],
                             'website' => '',
                             'password' => $credentials['password'],
