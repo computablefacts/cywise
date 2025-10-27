@@ -29,12 +29,6 @@ class EndVulnsScanListener extends AbstractListener
         }
 
         $user = $trial->createdBy();
-
-        if (!$user->is_active) {
-            Log::warning("User {$user->email} is inactive");
-            return;
-        }
-
         $assets = $trial->assets()->get();
         $scansInProgress = $assets->contains(fn(Asset $asset) => $asset->scanInProgress()->isNotEmpty());
 
