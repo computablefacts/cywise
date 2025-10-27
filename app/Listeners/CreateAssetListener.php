@@ -6,6 +6,7 @@ use App\Enums\AssetTypesEnum;
 use App\Events\CreateAsset;
 use App\Models\Asset;
 use App\Models\AssetTag;
+use App\Models\Honeypot;
 use App\Models\User;
 use App\Models\YnhTrial;
 use App\Rules\IsValidAsset;
@@ -29,6 +30,10 @@ class CreateAssetListener extends AbstractListener
             $assetType = AssetTypesEnum::IP;
         } else {
             $assetType = AssetTypesEnum::RANGE;
+        }
+        if (Honeypot::where('dns', $asset)->exists()) {
+            Log::warning("Cannot create asset '{$asset}' because it is an honeypot");
+            return null;
         }
         if ($trialId > 0) {
             /** @var YnhTrial $trial */
