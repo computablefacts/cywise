@@ -367,38 +367,38 @@ $apps = \App\Models\YnhServer::forUser(request()->user())
   <div class="col">
     <div class="card">
       <div class="card-body p-0">
-        <table class="table">
+        <table class="table table-sm">
           <thead>
           <tr>
-            <th>{{ __('Server') }}</th>
-            <th>{{ __('Name') }}</th>
-            <th>{{ __('Description') }}</th>
-            <th>{{ __('Sku') }}</th>
-            <th>{{ __('Version') }}</th>
+            <th style="color:var(--bs-body-color);">{{ __('Server') }}</th>
+            <th style="color:var(--bs-body-color);">{{ __('Name') }}</th>
+            <th style="color:var(--bs-body-color);">{{ __('Description') }}</th>
+            <th style="color:var(--bs-body-color);">{{ __('Sku') }}</th>
+            <th style="color:var(--bs-body-color);">{{ __('Version') }}</th>
           </tr>
           </thead>
           <tbody>
           @foreach($apps as $app)
           <tr>
-            <td>
-          <span class="font-lg mb-3 fw-bold">
-            {{ $app->server->name }}
-          </span>
+            <td style="color:var(--bs-body-color);">
+              <span class="font-lg mb-3 fw-bold">
+                {{ $app->server->name }}
+              </span>
             </td>
-            <td>
+            <td style="color:var(--bs-body-color);">
               <span class="font-lg mb-3 fw-bold">
                 <a href="https://{{ $app->path }}" target="_blank">
                   {{ $app->name }}
                 </a>
               </span>
             </td>
-            <td>
+            <td style="color:var(--bs-body-color);">
               {{ $app->description }}
             </td>
-            <td>
+            <td style="color:var(--bs-body-color);">
               {{ $app->sku }}
             </td>
-            <td>
+            <td style="color:var(--bs-body-color);">
               {{ $app->version }}
             </td>
           </tr>
