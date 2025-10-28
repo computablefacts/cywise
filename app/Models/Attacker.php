@@ -50,9 +50,19 @@ class Attacker extends Model
         return $this->events()->where('targeted', true);
     }
 
-    public function ips(): Collection
+    public function curatedWordlist(): HasMany
     {
-        return HoneypotEvent::where('attacker_id', $this->id)
+        return $this->events()->where('event', 'curated_wordlist');
+    }
+
+    public function curatedPasswords(): HasMany
+    {
+        return $this->events()->where('event', 'manual_actions_password_targeted');
+    }
+
+    public function knownIpAddresses(): Collection
+    {
+        return $this->events()
             ->get()
             ->pluck('ip')
             ->unique()
@@ -60,7 +70,7 @@ class Attacker extends Model
             ->values();
     }
 
-    public function tools(): Collection
+    public function usedTools(): Collection
     {
         return $this->events()
             ->where('event', 'tool_detected')
@@ -71,7 +81,7 @@ class Attacker extends Model
             ->values();
     }
 
-    public function cves(): Collection
+    public function testedCves(): Collection
     {
         return $this->events()
             ->where('event', 'cve_tested')
@@ -82,12 +92,9 @@ class Attacker extends Model
             ->values();
     }
 
-    public function aggressiveness(?int $totalNumberOfEvents = null): string
+    public function aggressiveness(int $totalNumberOfEvents): string
     {
-        if ($totalNumberOfEvents == null) {
-            $totalNumberOfEvents = HoneypotEvent::count();
-        }
-        $numberOfEvents = HoneypotEvent::where('attacker_id', $this->id)->count();
+        $numberOfEvents = $this->events()->count();
         $ratio = $numberOfEvents / $totalNumberOfEvents * 100;
         if ($ratio <= 33) {
             return 'low';

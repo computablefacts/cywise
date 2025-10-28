@@ -166,29 +166,9 @@ Route::group([
     'prefix' => 'adversary',
 ], function () {
     Route::get('infos-from-asset/{asset}', '\App\Http\Controllers\AssetController@infosFromAsset');
-    Route::get('attacker-index', '\App\Http\Controllers\HoneypotController@attackerIndex');
-    Route::get('recent-events', '\App\Http\Controllers\HoneypotController@recentEvents');
-    Route::get('blacklist-ips/{attackerId?}', '\App\Http\Controllers\HoneypotController@blacklistIps');
     Route::get('vulnerabilities/{attackerId?}', '\App\Http\Controllers\HoneypotController@getVulnerabilitiesWithAssetInfo');
     Route::get('vulnerabilities2/{asset}', '\App\Http\Controllers\HoneypotController@getVulnerabilitiesWithAssetInfo2');
-    Route::get('activity/{attacker}', '\App\Http\Controllers\HoneypotController@attackerActivity');
-    Route::get('profile/{attacker}', '\App\Http\Controllers\HoneypotController@attackerProfile');
-    Route::get('profile/stats/{attacker}', '\App\Http\Controllers\HoneypotController@attackerStats');
-    Route::get('profile/tools/{attacker}', '\App\Http\Controllers\HoneypotController@attackerTools');
-    Route::get('profile/competency/{attacker}', '\App\Http\Controllers\HoneypotController@attackerCompetency');
-    Route::get('last/events/{attackerId?}', '\App\Http\Controllers\HoneypotController@getMostRecentEvent');
-    Route::get('last/honeypots', '\App\Http\Controllers\HoneypotController@lastHoneypots');
-    Route::get('honeypots/stats/{dns}', '\App\Http\Controllers\HoneypotController@getHoneypotEventStats');
     Route::get('alerts/stats', '\App\Http\Controllers\HoneypotController@getAlertStats');
-    Route::get('honeypots/status', '\App\Http\Controllers\HoneypotController@honeypotsStatus');
-    Route::get('assets/tags', '\App\Http\Controllers\HoneypotController@assetTags');
-    Route::get('hashes', '\App\Http\Controllers\HoneypotController@getHashes');
-    Route::post('hashes', '\App\Http\Controllers\HoneypotController@createHash');
-    Route::delete('hashes/{assetHashTag}', '\App\Http\Controllers\HoneypotController@deleteHash');
-    Route::post('hidden-alerts', '\App\Http\Controllers\HoneypotController@createHiddenAlert');
-    Route::delete('hidden-alerts/{hiddenAlert}', '\App\Http\Controllers\HoneypotController@deleteHiddenAlert');
-    Route::post('honeypots', '\App\Http\Controllers\HoneypotController@postHoneypots');
-    Route::post('honeypots/set-next-step', '\App\Http\Controllers\HoneypotController@moveHoneypotsConfigurationToNextStep');
 })->middleware(['auth:sanctum']);
 
 Route::middleware('auth:api')->get('/v2/public/whoami', fn(Request $request) => Auth::user());
@@ -243,6 +223,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\CyberScribeProcedure::class,
             \App\Http\Procedures\EventsProcedure::class,
             \App\Http\Procedures\FilesProcedure::class,
+            \App\Http\Procedures\HoneypotsProcedure::class,
             \App\Http\Procedures\InvitationsProcedure::class,
             \App\Http\Procedures\NotesProcedure::class,
             \App\Http\Procedures\PromptsProcedure::class,

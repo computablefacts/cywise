@@ -4,15 +4,13 @@ namespace App\Http\Controllers\Iframes;
 
 use App\Http\Controllers\Controller;
 use App\Http\Procedures\AssetsProcedure;
+use App\Http\Procedures\HoneypotsProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Honeypot;
-use App\Models\HoneypotEvent;
 use App\Models\TimelineItem;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -63,7 +61,9 @@ class DashboardController extends Controller
 
         $honeypots = Honeypot::all()
             ->map(function (Honeypot $honeypot) {
-                $counts = $this->honeypotEventCounts($honeypot);
+                $request = new JsonRpcRequest(['honeypot_id' => $honeypot->id]);
+                $request->setUserResolver(fn() => \Auth::user());
+                $counts = (new HoneypotsProcedure())->counts($request)['counts'];
                 $max = collect($counts)->max(fn($count) => $count['human_or_targeted'] + $count['not_human_or_targeted']);
                 $sum = collect($counts)->sum(fn($count) => $count['human_or_targeted'] + $count['not_human_or_targeted']);
                 return [
@@ -81,7 +81,12 @@ class DashboardController extends Controller
 
         $mostRecentHoneypotEvents = Honeypot::all()
             ->map(function (Honeypot $honeypot) {
-                $events = $this->mostRecentHoneypotEvents($honeypot);
+                $request = new JsonRpcRequest([
+                    'honeypot_id' => $honeypot->id,
+                    'limit' => 5,
+                ]);
+                $request->setUserResolver(fn() => \Auth::user());
+                $events = (new HoneypotsProcedure())->events($request)['events'];
                 return [
                     'name' => $honeypot->dns,
                     'events' => $events,
@@ -103,51 +108,5 @@ class DashboardController extends Controller
             'honeypots' => $honeypots,
             'most_recent_honeypot_events' => $mostRecentHoneypotEvents,
         ]);
-    }
-
-    private function honeypotEventCounts(Honeypot $honeypot): array
-    {
-        $cutOffTime = Carbon::now()->startOfDay()->subMonth();
-        return HoneypotEvent::select(
-            DB::raw("DATE_FORMAT(timestamp, '%Y-%m-%d') AS date"),
-            DB::raw("SUM(CASE WHEN human = 1 OR targeted = 1 THEN 1 ELSE 0 END) AS human_or_targeted"),
-            DB::raw("SUM(CASE WHEN human = 0 AND targeted = 0 THEN 1 ELSE 0 END) AS not_human_or_targeted")
-        )
-            ->where('timestamp', '>=', $cutOffTime)
-            ->where('honeypot_id', $honeypot->id)
-            ->groupBy('date')
-            ->orderBy('date', 'desc') // keep only the most recent ones
-            ->limit(10)
-            ->get()
-            ->sortBy('date') // most recent date at the end
-            ->toArray();
-    }
-
-    private function mostRecentHoneypotEvents(Honeypot $honeypot): array
-    {
-        /** @var array $ips */
-        $ips = config('towerify.adversarymeter.ip_addresses');
-        return HoneypotEvent::select(
-            'am_honeypots_events.*',
-            DB::raw("CASE WHEN am_attackers.name IS NULL THEN '-' ELSE am_attackers.name END AS internal_name"),
-            DB::raw("CASE WHEN am_attackers.id IS NULL THEN '-' ELSE am_attackers.id END AS attacker_id"),
-        )
-            ->where('honeypot_id', $honeypot->id)
-            ->whereNotIn('ip', $ips)
-            ->leftJoin('am_attackers', 'am_attackers.id', '=', 'am_honeypots_events.attacker_id')
-            ->orderBy('timestamp', 'desc')
-            ->limit(5)
-            ->get()
-            ->map(function (HoneypotEvent $event) {
-                return [
-                    'timestamp' => $event->timestamp->utc()->format('Y-m-d H:i:s'),
-                    'event_type' => $event->event,
-                    'event_details' => $event->details,
-                    'attacker_ip' => $event->ip,
-                    'attacker_name' => $event->internal_name,
-                    'attacker_id' => $event->attacker_id,
-                ];
-            })
-            ->toArray();
     }
 }
