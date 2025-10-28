@@ -4,8 +4,8 @@ namespace App\Listeners;
 
 use App\Events\EndVulnsScan;
 use App\Helpers\ApiUtilsFacade as ApiUtils2;
-use App\Helpers\JosianneClient;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
+use App\Http\Controllers\Iframes\TimelineController;
 use App\Mail\MailCoachSimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
@@ -37,37 +37,8 @@ class EndVulnsScanListener extends AbstractListener
             return;
         }
 
-        $query = "SELECT DISTINCT lower(concat(login, '@', login_email_domain)) AS email, concat(url_scheme, '://', url_subdomain, '.', url_domain) AS website, password FROM dumps_login_email_domain WHERE login_email_domain = '{$assets->first()->tld}' ORDER BY email, website ASC";
-
-        Log::debug($query);
-
-        $output = JosianneClient::executeQuery($query);
-        $leaks = collect(explode("\n", $output))
-            ->filter(fn(string $line) => !empty($line) && $line !== 'ok')
-            ->map(function (string $line) {
-                return [
-                    'email' => Str::trim(Str::before($line, "\t")),
-                    'website' => Str::trim(Str::between($line, "\t", "\t")),
-                    'password' => self::maskPassword(Str::trim(Str::afterLast($line, "\t"))),
-                ];
-            })
-            ->map(function (array $credentials) {
-                // if (preg_match("/(?i)\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|(([^\s()<>]+|(([^\s()<>]+)))*))+(?:(([^\s()<>]+|(([^\s()<>]+)))*)|[^\s`!()[]{};:'\".,<>?«»“”‘’]))/", $credentials['website'])) {
-                if (filter_var($credentials['website'], FILTER_VALIDATE_URL)) {
-                    return $credentials;
-                }
-                return [
-                    'email' => $credentials['email'],
-                    'website' => '',
-                    'password' => $credentials['password'],
-                ];
-            })
-            ->unique(fn(array $credentials) => $credentials['email'] . $credentials['website'] . $credentials['password'])
-            ->values();
+        $leaks = TimelineController::fetchLeaks($user);
         $msgLeaks = $leaks->isNotEmpty() ? "<li>J'ai trouvé <b>{$leaks->count()}</b> identifiants fuités ou compromis appartenant au domaine {$assets->first()->tld}.</li>" : "";
-
-        unset($output);
-
         $onboarding = route('tools.cybercheck', ['hash' => $trial->hash, 'step' => 5]);
         $alerts = $assets->flatMap(fn(Asset $asset) => $asset->alerts()->get())->filter(fn(Alert $alert) => $alert->is_hidden === 0);
         $alertsHigh = $alerts->filter(fn(Alert $alert) => $alert->isHigh());
