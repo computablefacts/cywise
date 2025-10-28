@@ -65,7 +65,7 @@ class TimelineController extends Controller
                             'leak_date' => Str::before(Str::trim($obj[0]), ' '),
                             'email' => Str::trim($obj[1]),
                             'website' => Str::trim($obj[2]),
-                            'password' => $this->maskPassword(Str::trim($obj[3])),
+                            'password' => self::maskPassword(Str::trim($obj[3])),
                         ];
                     })
                     ->map(function (array $credentials) {
@@ -122,6 +122,17 @@ class TimelineController extends Controller
                 'note' => $item,
             ])->render(),
         ];
+    }
+
+    private static function maskPassword(string $password, int $size = 3): string
+    {
+        if (Str::length($password) <= 2) {
+            return Str::repeat('*', Str::length($password));
+        }
+        if (Str::length($password) <= 2 * $size) {
+            return self::maskPassword($password, 1);
+        }
+        return Str::substr($password, 0, $size) . Str::repeat('*', Str::length($password) - 2 * $size) . Str::substr($password, -$size, $size);
     }
 
     public function __invoke(Request $request): View
@@ -633,16 +644,5 @@ class TimelineController extends Controller
         $request->setUserResolver(fn() => Auth::user());
         $alerts = (new VulnerabilitiesProcedure())->list($request);
         return $alerts['high']->concat($alerts['medium'])->concat($alerts['low']);
-    }
-
-    private function maskPassword(string $password, int $size = 3): string
-    {
-        if (Str::length($password) <= 2) {
-            return Str::repeat('*', Str::length($password));
-        }
-        if (Str::length($password) <= 2 * $size) {
-            return $this->maskPassword($password, 1);
-        }
-        return Str::substr($password, 0, $size) . Str::repeat('*', Str::length($password) - 2 * $size) . Str::substr($password, -$size, $size);
     }
 }
