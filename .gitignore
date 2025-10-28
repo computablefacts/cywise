@@ -14,7 +14,8 @@
 /storage/app/public/livewire-tmp/*
 /storage/app/vectors
 /storage/debugbar/*
-/storage/migration-checksum_*.txt
+/storage/app/migration-checksum_*.txt
+/storage/app/seeder-checksum_*.txt
 /storage/scout/*.index
 /storage/scout/*.index-shm
 /storage/scout/*.index-wal
