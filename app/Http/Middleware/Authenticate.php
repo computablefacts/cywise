@@ -19,10 +19,10 @@ class Authenticate extends Middleware
     public function handle($request, $next, ...$guards)
     {
         // Check either the bearer token or the query string (Sanctum)
-        $token = $request->bearerToken() ?: $request->input('api_token');
-        if (!empty($token)) {
+        $api_token = $request->bearerToken() ?: $request->input('api_token');
+        if (!empty($api_token)) {
             /** @var \Laravel\Sanctum\PersonalAccessToken $token */
-            $token = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+            $token = \Laravel\Sanctum\PersonalAccessToken::findToken($api_token);
             if ($token) { // Ensure the token exists
                 if ($token->expires_at === null || $token->expires_at > Carbon::now()) { // Ensure the token hasn't expired'
                     /** @var User $user */
@@ -30,6 +30,15 @@ class Authenticate extends Middleware
                     $user->actAs();
                     return $next($request);
                 }
+            }
+
+            /** @var \Wave\ApiKey $token */
+            $token = \Wave\ApiKey::query()->where('key', '=', $api_token)->first();
+            if ($token) { // Ensure the token exists
+                /** @var User $user */
+                $user = $token->user()->first();
+                $user->actAs();
+                return $next($request);
             }
         }
         return parent::handle($request, $next, ...$guards);
