@@ -253,7 +253,7 @@
   @foreach($honeypots as $honeypot)
   <div class="col pe-0">
     <div class="card">
-      <div class="card-body">
+      <div class="card-body overflow-hidden">
         <h6 class="card-title text-truncate">
           {{ $honeypot['type'] }}&nbsp;<span style="color: var(--c-orange-light);">/</span>&nbsp;{{ $honeypot['name'] }}
         </h6>
