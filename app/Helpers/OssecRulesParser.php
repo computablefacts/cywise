@@ -286,7 +286,7 @@ class OssecRulesParser
 
     private static function matchPattern(string $string, string $pattern): bool
     {
-        Log::debug("Matching {$string} against {$pattern}");
+        //Log::debug("Matching {$string} against {$pattern}");
 
         // Determine if the match must be negated
         $negate = false;
