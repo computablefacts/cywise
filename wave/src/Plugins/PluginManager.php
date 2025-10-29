@@ -20,8 +20,11 @@ class PluginManager
     public function loadPlugins()
     {
         $installedPlugins = $this->getInstalledPlugins();
-        
-        \Log::info("Installed plugins: " . json_encode($installedPlugins));
+
+        // Only log when there are actually plugins to load
+        if (!empty($installedPlugins)) {
+            Log::info('Loading plugins: '.json_encode($installedPlugins));
+        }
 
         foreach ($installedPlugins as $pluginName) {
             $studlyPluginName = Str::studly($pluginName);
