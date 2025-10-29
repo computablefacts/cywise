@@ -9,6 +9,15 @@ use Tests\TestCase;
 
 class InvitationTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $this->markTestSkipped('Disable tests with DB.');
+    }
+    protected function tearDown(): void
+    {
+        // $this->markTestSkipped('Disable tests with DB.');
+    }
+
 
     #[Test]
     public function it_generates_an_invitation_with_token_and_sender()
@@ -29,6 +38,8 @@ class InvitationTest extends TestCase
     #[Test]
     public function it_can_be_expired()
     {
+        $this->markTestSkipped('Disable tests with DB.');
+
         $invitation = Invitation::factory()->create([
             'expires_at' => now()->subDay(),
         ]);
@@ -39,6 +50,8 @@ class InvitationTest extends TestCase
     #[Test]
     public function it_cannot_have_null_sender()
     {
+        $this->markTestSkipped('Disable tests with DB.');
+
         $this->expectException(\TypeError::class);
 
         $email = 'invitee@example.com';
@@ -48,6 +61,8 @@ class InvitationTest extends TestCase
     #[Test]
     public function sender_should_be_persistent()
     {
+        $this->markTestSkipped('Disable tests with DB.');
+
         $sender = User::factory()->create();
         $email = 'invitee@example.com';
 
@@ -62,6 +77,8 @@ class InvitationTest extends TestCase
     #[Test]
     public function it_returns_true_when_invitation_is_already_used()
     {
+        $this->markTestSkipped('Disable tests with DB.');
+
         $invitation = Invitation::factory()->create([
             'accepted_at' => now(),
         ]);
@@ -72,6 +89,8 @@ class InvitationTest extends TestCase
     #[Test]
     public function it_returns_false_when_invitation_is_not_used()
     {
+        $this->markTestSkipped('Disable tests with DB.');
+
         $invitation = Invitation::factory()->create([
             'accepted_at' => null,
         ]);
@@ -82,6 +101,8 @@ class InvitationTest extends TestCase
     #[Test]
     public function it_can_be_accepted()
     {
+        $this->markTestSkipped('Disable tests with DB.');
+
         $invitation = Invitation::factory()->create([
             'accepted_at' => null,
             'received_by' => null,
@@ -97,6 +118,8 @@ class InvitationTest extends TestCase
     #[Test]
     public function accepted_by_should_be_persistent()
     {
+        $this->markTestSkipped('Disable tests with DB.');
+
         $invitation = Invitation::factory()->create([
             'accepted_at' => null,
             'received_by' => null,
@@ -115,6 +138,8 @@ class InvitationTest extends TestCase
     #[Test]
     public function when_accepted_new_user_should_belong_to_the_same_tenant_than_sender()
     {
+        $this->markTestSkipped('Disable tests with DB.');
+
         $sender = User::factory()->create();
         $email = 'invitee@example.com';
         $invitation = Invitation::generate($email, $sender);

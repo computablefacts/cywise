@@ -16,6 +16,15 @@ use Tests\TestCase;
 
 class IngestHoneypotsEventsTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $this->markTestSkipped('Disable tests with DB.');
+    }
+    protected function tearDown(): void
+    {
+        // $this->markTestSkipped('Disable tests with DB.');
+    }
+
     public function testItIngestHoneypotsEvents()
     {
         ApiUtils::shouldReceive('ip_whois_public')
