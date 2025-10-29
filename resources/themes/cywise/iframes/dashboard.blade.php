@@ -159,9 +159,10 @@
   </div>
 </div>
 <!-- VULNERABILITIES : END -->
+<!-- CYBERTODO : BEGIN -->
+@if(count($todo) > 0)
 <div class="row pt-3">
-  <!-- CYBERTODO : BEGIN -->
-  <div class="col-5">
+  <div class="col">
     <div class="card">
       <div class="card-body">
         <h6 class="card-title">
@@ -201,9 +202,13 @@
       </div>
     </div>
   </div>
-  <!-- CYBERTODO : END -->
-  <!-- LEAKS : BEGIN -->
-  <div class="col ps-0">
+</div>
+@endif
+<!-- CYBERTODO : END -->
+<!-- LEAKS : BEGIN -->
+@if(count($leaks) > 0)
+<div class="row pt-3">
+  <div class="col">
     <div class="card">
       <div class="card-body">
         <h6 class="card-title">
@@ -220,6 +225,7 @@
             <tr>
               <th style="color:var(--bs-body-color);">{{ __('Est. Leak Date') }}</th>
               <th style="color:var(--bs-body-color);">{{ __('Email') }}</th>
+              <th>{{ __('Website') }}</th>
               <th style="color:var(--bs-body-color);">{{ __('Password') }}</th>
               <th></th>
             </tr>
@@ -229,6 +235,7 @@
             <tr>
               <td style="color:var(--bs-body-color);">{{ empty($l->leak_date) ? '-' : $l->leak_date }}</td>
               <td style="color:var(--bs-body-color);">{{ $l->email }}</td>
+              <td>{{ empty($l->website) ? '-' : $l->website }}</td>
               <td style="color:var(--bs-body-color);">{{ empty($l->password) ? '-' : $l->password }}</td>
               <td>
                 <span class="lozenge new" style="font-size: 0.8rem;">
@@ -244,8 +251,9 @@
       </div>
     </div>
   </div>
-  <!-- LEAKS : END -->
 </div>
+@endif
+<!-- LEAKS : END -->
 <!-- HONEYPOTS : BEGIN -->
 @if(count($honeypots) > 0)
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
