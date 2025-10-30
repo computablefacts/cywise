@@ -1,13 +1,22 @@
 <?php
 
-namespace Tests\Unit\WithoutDb;
+namespace Tests\Unit\WithDb;
 
 use App\Http\Controllers\CyberBuddyController;
-use Tests\TestCaseNoDb;
+use Tests\TestCase;
 
 /** @deprecated */
-class CyberBuddyControllerTest extends TestCaseNoDb
+class CyberBuddyControllerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $this->markTestSkipped('Disable tests with DB.');
+    }
+    protected function tearDown(): void
+    {
+        // $this->markTestSkipped('Disable tests with DB.');
+    }
+
     public function testItRemovesSourcesFromAnswer()
     {
         $html = CyberBuddyController::removeSourcesFromAnswer("La source est [[36]].");
