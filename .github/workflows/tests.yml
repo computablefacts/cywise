@@ -45,8 +45,8 @@ jobs:
         run: npm install --verbose
       - name: Build assets
         run: npm run build
-      - name: Create database
-        run: php artisan migrate
+      - name: Create and fill database
+        run: php artisan migrate --seed --seeder CywiseSeeder
         env:
           APP_ENV: testing
           DB_CONNECTION: mysql
