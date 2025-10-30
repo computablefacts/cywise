@@ -435,8 +435,7 @@ $apps = \App\Models\YnhServer::forUser(request()->user())
               <input type="text"
                      class="form-control"
                      id="asset"
-                     placeholder="example.com ou 93.184.215.14"
-                     autofocus>
+                     placeholder="example.com ou 93.184.215.14">
             </div>
           </div>
           <div class="row mt-3">
