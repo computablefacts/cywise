@@ -49,12 +49,23 @@ jobs:
         run: php artisan migrate --seed --seeder CywiseSeeder
         env:
           APP_ENV: testing
+          APP_KEY: 'base64:YZzRGIAPQgqSLZBJ7rILm7B05FfdvxSBaHVoQFzBuS0='
+          ADMIN_EMAIL: qa@computablefacts.com
+          ADMIN_USERNAME: qa
+          ADMIN_PASSWORD: whatapassword
+          CACHE_DRIVER: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          QUEUE_DRIVER: sync
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
           DB_DATABASE: 'tw_testdb'
           DB_USERNAME: 'tw_testuser'
           DB_PASSWORD: 'z0rglub'
+          DROP_SCAN_EVENTS_AFTER_X_MINUTES: 1
+          DROP_DISCOVERY_EVENTS_AFTER_X_MINUTES: 1
+          DAYS_BETWEEN_SCANS: 5
       - name: Remove checksum for migration
         run: rm -f storage/app/migration-checksum_tw-testdb.txt
       - name: Remove checksum for seeder
