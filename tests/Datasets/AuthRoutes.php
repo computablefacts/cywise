@@ -3,9 +3,9 @@
 dataset('authroutes', function () {
     return [
         '/',
-        '/blog',
-        '/blog/marketing',
-        '/blog/marketing/best-ways-to-market-your-application',
+//        '/blog',
+//        '/blog/marketing',
+//        '/blog/marketing/best-ways-to-market-your-application',
         '/dashboard',
 //        '/profile/admin',
         '/notifications',
@@ -26,7 +26,7 @@ dataset('authroutes', function () {
 //        '/admin/plans/1/edit',
         '/admin/posts',
         '/admin/posts/5/edit',
-        '/admin/media',
+//        '/admin/media',
         '/admin/pages',
         '/admin/pages/1/edit',
         '/admin/categories',
