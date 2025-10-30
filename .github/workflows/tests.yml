@@ -47,7 +47,7 @@ jobs:
       - name: Build assets
         run: npm run build
       - name: Create database
-        run: php artisan migrate
+        run: php artisan migrate --env testing
       - name: Remove checksum for migration
         run: rm -f storage/app/migration-checksum_tw-testdb.txt
       - name: Remove checksum for seeder
