@@ -24,7 +24,7 @@ use Illuminate\Support\Str;
 class CyberBuddy extends AbstractAction
 {
     private const string MODEL_REFORMULATE = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
-    private const string MODEL_ANSWER = 'Qwen/Qwen3-235B-A22B-Thinking-2507';
+    private const string MODEL_ANSWER = 'deepseek-ai/DeepSeek-R1-Turbo';
 
     static function schema(): array
     {
