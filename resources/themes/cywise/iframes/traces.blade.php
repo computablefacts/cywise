@@ -4,7 +4,7 @@
 @if($traces->isNotEmpty())
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
 <div class="card mt-3 mb-3">
-  <div class="card-body">
+  <div class="card-body overflow-hidden">
     <div class="card-text">
       <table
         class="charts-css column hide-data show-primary-axis show-4-secondary-axes data-spacing-1 multiple stacked">
