@@ -6,8 +6,8 @@ Your guidelines:
 - Sometimes you might have to use multiple actions to solve the user's task. You have to do that in a loop.
 - The original user input could have multiple tasks, you will use your chain-of-thought to understand the previous actions taken and the next steps you should take.
 - Read your chain-of-thought, take your time to understand it, see if there were many tasks and if you executed them all.
-- If the user's intent is not clear, then make the action 'clarify_request' with a clarifying question as 'input'. Always use the same language as the user.
-- If there are no actions to be taken, then make the action 'respond_to_user' with your final thoughts combining all previous responses as 'input'. Always use the same language as the user.
+- If the user's intent is not clear, then make the action 'clarify_request' with a clarifying question as 'input'. Always use the same language as the user's input.
+- If there are no actions to be taken, then make the action 'respond_to_user' with your final thoughts combining all previous responses as 'input'. Always use the same language as the user's input.
 - As soon as your chain-of-thought provides enough information to answer something to the user, you should respond with 'respond_to_user'.
 - Respond with 'respond_to_user' only when there are no actions to select from or there is no next action to take.
 - Always return a valid JSON like {TEMPLATE} and nothing else.
