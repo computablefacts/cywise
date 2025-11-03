@@ -221,15 +221,26 @@ class User extends WaveUser
             // TODO : create CyberScribe's templates
             // TODO : create user's private collection privcol*
 
+            // Cleanup old collections
+            Log::debug("[{$this->email}] Removing legacy frameworks...");
+
+            \App\Models\YnhFramework::whereIn('file', [
+                'seeders/frameworks/nis2/annex-implementing-regulation-of-nis2-on-t-m.jsonl.gz',
+                'seeders/frameworks/gdpr/gdpr.jsonl.gz',
+                'seeders/frameworks/dora/dora.jsonl.gz',
+            ])
+                ->get()
+                ->each(function (YnhFramework $framework) {
+                    $framework->is_deleted = true;
+                    $framework->save();
+                });
+
             // Create shadow collections for some frameworks
             Log::debug("[{$this->email}] Loading frameworks...");
 
             $frameworks = \App\Models\YnhFramework::whereIn('file', [
                 'seeders/frameworks/anssi/anssi-guide-hygiene.jsonl.gz',
                 'seeders/frameworks/anssi/anssi-genai-security-recommendations-1.0.jsonl.gz',
-                'seeders/frameworks/nis2/annex-implementing-regulation-of-nis2-on-t-m.jsonl.gz',
-                'seeders/frameworks/gdpr/gdpr.jsonl.gz',
-                'seeders/frameworks/dora/dora.jsonl.gz',
             ])->get();
 
             Log::debug("[{$this->email}] {$frameworks->count()} frameworks loaded.");
