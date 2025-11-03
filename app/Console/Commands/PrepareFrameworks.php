@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
-use App\Models\User;
 use App\Models\YnhFramework;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -137,6 +136,8 @@ class PrepareFrameworks extends Command
                 ];
 
                 file_put_contents($filename, json_encode($chunk) . PHP_EOL, FILE_APPEND);
+
+                // TODO : put hypothetical questions in a separate file vectors file (at least for ANSSI)
             }
         }
     }
