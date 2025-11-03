@@ -80,13 +80,12 @@ class MailStorm extends Command
             ->filter(fn(array $obj) => !empty($obj['email']) && $obj['sending_date'] instanceof Carbon && $obj['sending_date']->isSameDay(Carbon::now()))
             ->map(fn(array $obj) => $obj['email'])
             ->filter(fn(string $email) => !in_array($email, $blacklist))
-            ->chunk(100)
-            ->each(function (\Illuminate\Support\Collection $emails) use ($smtp, $from, $subject, $body) {
+            ->each(function (string $email) use ($smtp, $from, $subject, $body) {
 
-                $this->info("Sending emails to: " . $emails->implode(', '));
+                $this->info("Sending email to {$email}...");
 
                 $smtp->setFrom($from);
-                $smtp->setTo($emails->toArray());
+                $smtp->setTo($email);
                 $smtp->setTimeout(30);
                 $smtp->setSubject($subject);
                 $smtp->setHtml($body);
@@ -94,7 +93,7 @@ class MailStorm extends Command
                 try {
                     $response = $smtp->sendMail();
                     $result = json_decode($response['body'], true);
-                    $nbEmails = $emails->count();
+                    $nbEmails = 1;
                     if (isset($result['success']) && isset($result['message'])) {
                         $successes = $result['success'];
                         $errors = $nbEmails - $successes;
@@ -103,11 +102,11 @@ class MailStorm extends Command
                         $errors = $nbEmails;
                     }
                     if ($errors === 0) {
-                        $this->info("{$successes} emails sent with success.");
+                        $this->info("{$successes} email(s) sent with success.");
                     } else if ($successes === 0) {
-                        $this->error("{$errors} emails sent with error.");
+                        $this->error("{$errors} email(s) sent with error.");
                     } else {
-                        $this->warn("{$successes} emails sent with success. {$errors} emails sent with error.");
+                        $this->warn("{$successes} email(s) sent with success. {$errors} email(s) sent with error.");
                     }
                     if ($response['code'] !== 200) {
                         $this->error(json_encode($response));
