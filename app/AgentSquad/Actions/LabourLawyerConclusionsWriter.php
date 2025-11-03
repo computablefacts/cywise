@@ -10,6 +10,7 @@ use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Vectors\AbstractVectorStore;
 use App\AgentSquad\Vectors\FileVectorStore;
+use App\AgentSquad\Vectors\Vector;
 use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Support\Str;
@@ -140,11 +141,13 @@ class LabourLawyerConclusionsWriter extends AbstractAction
                 $vector = EmbeddingsProvider::provide($pretention);
                 $vectors = $this->vectorStore->search($vector->embedding());
                 $pretentions = array_map(function (array $vector) {
-                    $vector['file'] = $vector['vector']->metadata('file');
-                    $vector['pretention'] = $vector['vector']->metadata('pretention');
-                    $vector['majeure'] = $vector['vector']->metadata('majeure');
-                    $vector['mineure'] = $vector['vector']->metadata('mineure');
-                    $vector['conclusion'] = $vector['vector']->metadata('conclusion');
+                    /** @var Vector $vec */
+                    $vec = $vector['vector'];
+                    $vector['file'] = $vec->metadata('file');
+                    $vector['pretention'] = $vec->metadata('pretention');
+                    $vector['majeure'] = $vec->metadata('majeure');
+                    $vector['mineure'] = $vec->metadata('mineure');
+                    $vector['conclusion'] = $vec->metadata('conclusion');
                     unset($vector['vector']);
                     return $vector;
                 }, $vectors);

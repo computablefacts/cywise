@@ -8,9 +8,12 @@ use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\AgentSquad\Providers\ChunksProvider;
 use App\AgentSquad\Providers\ChunksProvider2;
+use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\MemosProvider;
 use App\AgentSquad\Providers\PromptsProvider;
+use App\AgentSquad\Vectors\FileVectorStore;
+use App\AgentSquad\Vectors\Vector;
 use App\Enums\RoleEnum;
 use App\Models\Chunk;
 use App\Models\ChunkTag;
@@ -98,12 +101,39 @@ class CyberBuddy extends AbstractAction
             return new FailedAnswer("The keywords are missing: {$answer}");
         }
 
+        // Extract similar questions from Rowden's Cybersecurity QAA dataset
+        $rowden = [];
+
+        if (!empty($json['question_en'] ?? '')) {
+
+            $embedding = EmbeddingsProvider::provide($json['question_en'] ?? '')?->embedding() ?? [];
+
+            if (!empty($embedding)) {
+                $start = microtime(true);
+                $dir = FileVectorStore::unpack("rowden_cybersecurityqaa.zip");
+                $vectorStore = new FileVectorStore($dir, 5);
+                $rowden = array_map(function (array $vector) {
+                    /** @var Vector $vec */
+                    $vec = $vector['vector'];
+                    $question = $vec->text();
+                    $answer = $vec->metadata('answer');
+                    $source = $vec->metadata('source');
+                    $source = empty($source) ? 'n/a' : $source;
+                    $similarity = $vector['similarity'];
+                    return "## Note 0\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** {$source}\n**Score:** {$similarity}";
+                }, $vectorStore->search($embedding));
+                $stop = microtime(true);
+                $nbResults = count($rowden);
+                Log::debug("[ROWDEN_QAA] Searching Rowden's Cybersecurity QAA took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+            }
+        }
+
         // Fill context & answer question
         $memos = empty($collection) ? MemosProvider::provide($user) : '';
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
         $prompt = PromptsProvider::provide('default_answer_question', [
             'LANGUAGE' => $json['lang'],
-            'NOTES' => $chunks,
+            'NOTES' => $chunks . "\n\n" . implode("\n\n", $rowden),
             'MEMOS' => $memos,
             'QUESTION' => $json['lang'] === 'english' ?
                 $json['question_en'] :

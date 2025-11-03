@@ -10,6 +10,7 @@ use App\AgentSquad\Actions\ManageAssets;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Orchestrator;
 use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Vectors\FileVectorStore;
 use App\Enums\RoleEnum;
 use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
@@ -99,42 +100,8 @@ class CyberBuddyProcedure extends Procedure
 
             // TODO : create one agent for each framework
 
-            if ($user->isCywiseAdmin()) {
-
-                $in = database_path('seeders/vectors');
-                $out = storage_path('app/vectors');
-
-                if (!file_exists($out)) {
-
-                    Log::debug("Creating directory '{$out}'...");
-
-                    if (!mkdir($out, 0755, true)) {
-                        throw new \Exception("Failed to create directory: {$out}");
-                    }
-
-                    Log::debug("Directory '{$out}' created.");
-                }
-
-                $input = "{$in}/labour_lawyer." . config('app.env') . ".zip.enc";
-                $output = "{$out}/labour_lawyer";
-
-                if (file_exists($input) && (!file_exists($output) || !is_dir($output))) {
-
-                    Log::debug("Decrypting file '{$input}'...");
-
-                    $file = cywise_decrypt_file(config('towerify.hasher.nonce'), $input);
-                    copy($file, "{$output}.zip");
-
-                    Log::debug("File '{$input}' decrypted.");
-                    Log::debug("Unpacking file '{$output}.zip'...");
-
-                    $files = cywise_unpack_files($out, "labour_lawyer.zip");
-                    rename($files[0], $output);
-                    unlink("{$output}.zip");
-
-                    Log::debug("File '{$output}.zip' unpacked.");
-                }
-
+            if ($user->isCywiseAdmin() && !app()->environment('local')) {
+                $output = FileVectorStore::unpack("labour_lawyer." . config('app.env') . ".zip.enc");
                 $orchestrator->registerAgent(new LabourLawyerConclusionsWriter($output));
             }
 
