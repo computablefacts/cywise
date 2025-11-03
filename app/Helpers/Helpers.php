@@ -139,15 +139,19 @@ if (!function_exists('cywise_decrypt_file')) {
     }
 }
 if (!function_exists('cywise_pack_files')) {
-    function cywise_pack_files(string $dir, string $pattern): string
+    function cywise_pack_files(string $dir, string $pattern, ?string $name = null): string
     {
         if (!is_dir($dir)) {
             throw new \Exception("Directory not found: {$dir}");
         }
 
         $zip = new \ZipArchive();
-        $filename = "$dir/packed_" . date('Y-m-d_H-i-s') . '.zip';
 
+        if (empty($name)) {
+            $filename = "$dir/packed_" . date('Y-m-d_H-i-s') . '.zip';
+        } else {
+            $filename = "$dir/$name.zip";
+        }
         if ($zip->open($filename, \ZipArchive::CREATE) !== TRUE) {
             throw new \Exception("Cannot create zip file: {$filename}");
         }
