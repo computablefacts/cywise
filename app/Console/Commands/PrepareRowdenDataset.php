@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Vectors\FileVectorStore;
-use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -31,9 +30,6 @@ class PrepareRowdenDataset extends Command
     {
         $in = $this->argument('input');
         $out = $this->argument('output');
-        $user = User::query()->where('email', config('towerify.admin.email'))->first();
-
-        $user->actAs(); // otherwise the tenant will not be properly set
 
         if (file_exists($in) && is_dir($out)) {
 
