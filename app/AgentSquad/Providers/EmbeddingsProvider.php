@@ -10,18 +10,20 @@ class EmbeddingsProvider
 {
     public static function provide(string $text, array $metadata = []): ?Vector
     {
-        try {
-            $start = microtime(true);
-            $provider = new EmbeddingProvider(EmbeddingProvider::DEEP_INFRA);
-            $embedding = $provider->execute($text)['data'][0]['embedding'] ?? [];
-            $vector = new Vector($text, $embedding, $metadata);
-            $stop = microtime(true);
-            Log::debug("[EMBEDDINGS_PROVIDER] Computing embeddings took " . ((int)ceil($stop - $start)) . " seconds");
-            return $vector;
-        } catch (\Exception $e) {
-            Log::debug("[EMBEDDINGS_PROVIDER] Computing embeddings failed");
-            Log::error($e->getMessage());
-            return null;
-        }
+        return \Cache::remember('embeddings_provider_' . md5($text), 7 * 24 * 60, function () use ($text, $metadata) {
+            try {
+                $start = microtime(true);
+                $provider = new EmbeddingProvider(EmbeddingProvider::DEEP_INFRA);
+                $embedding = $provider->execute($text)['data'][0]['embedding'] ?? [];
+                $vector = new Vector($text, $embedding, $metadata);
+                $stop = microtime(true);
+                Log::debug("[EMBEDDINGS_PROVIDER] Computing embeddings took " . ((int)ceil($stop - $start)) . " seconds");
+                return $vector;
+            } catch (\Exception $e) {
+                Log::debug("[EMBEDDINGS_PROVIDER] Computing embeddings failed");
+                Log::error($e->getMessage());
+                return null;
+            }
+        });
     }
 }
