@@ -14,19 +14,21 @@ class ChunksProvider
         if ($collections->isEmpty() || empty($language) || empty($keywords)) {
             return collect();
         }
-        try {
-            $start = microtime(true);
-            $chunks = Chunk::search("{$language}:{$keywords}")
-                ->whereIn('collection_id', $collections->pluck('id'))
-                ->take($take)
-                ->get();
-            $stop = microtime(true);
-            Log::debug("[CHUNKS_PROVIDER] Search for '{$language}:{$keywords}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
-            return $chunks;
-        } catch (\Exception $e) {
-            Log::debug("[CHUNKS_PROVIDER] Search for '{$language}:{$keywords}' failed");
-            Log::error($e->getMessage());
-            return collect();
-        }
+        return \Cache::remember('chunks_provider_' . md5($collections->pluck('id')->implode('_') . "{$language}{$keywords}"), 7 * 24 * 60, function () use ($collections, $language, $keywords, $take) {
+            try {
+                $start = microtime(true);
+                $chunks = Chunk::search("{$language}:{$keywords}")
+                    ->whereIn('collection_id', $collections->pluck('id'))
+                    ->take($take)
+                    ->get();
+                $stop = microtime(true);
+                Log::debug("[CHUNKS_PROVIDER] Search for '{$language}:{$keywords}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
+                return $chunks;
+            } catch (\Exception $e) {
+                Log::debug("[CHUNKS_PROVIDER] Search for '{$language}:{$keywords}' failed");
+                Log::error($e->getMessage());
+                return collect();
+            }
+        });
     }
 }
