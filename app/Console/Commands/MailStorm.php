@@ -80,6 +80,7 @@ class MailStorm extends Command
             ->filter(fn(array $obj) => !empty($obj['email']) && $obj['sending_date'] instanceof Carbon && $obj['sending_date']->isSameDay(Carbon::now()))
             ->map(fn(array $obj) => $obj['email'])
             ->filter(fn(string $email) => !in_array($email, $blacklist))
+            ->unique()
             ->each(function (string $email) use ($smtp, $from, $subject, $body) {
 
                 $this->info("Sending email to {$email}...");
