@@ -17,6 +17,7 @@ class LlmsProvider
             $stop = microtime(true);
             $answer = $response['choices'][0]['message']['content'] ?? '';
             $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
+            $answer = Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
             Log::debug("[LLMS_PROVIDER] LLM api call took " . ((int)ceil($stop - $start)) . " seconds");
             return $answer;
         } catch (\Exception $e) {
