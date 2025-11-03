@@ -33,9 +33,6 @@ class PrepareFrameworks extends Command
     {
         $in = $this->argument('input');
         $out = $this->argument('output');
-        $user = User::query()->where('email', config('towerify.admin.email'))->first();
-
-        $user->actAs(); // otherwise the tenant will not be properly set
 
         if (is_dir($in)) {
             $this->processDirectory($in, $out);
