@@ -297,21 +297,24 @@ class CyberBuddy extends AbstractAction
             $id = Str::replace(['[', ']'], '', $ref);
             /** @var Chunk $chunk */
             $chunk = Chunk::find($id);
-            /** @var File $file */
-            $file = $chunk?->file()->first();
-            $src = $file ? "<a href=\"{$file->downloadUrl()}\" style=\"text-decoration:none;color:black\">{$file->name_normalized}.{$file->extension}</a>, p. {$chunk?->page}" : "";
-            if (Str::startsWith($chunk?->text ?? '', 'ESSENTIAL DIRECTIVE')) {
-                $color = '#1DD288';
-            } else if (Str::startsWith($chunk?->text ?? '', 'STANDARD DIRECTIVE')) {
-                $color = '#C5C3C3';
-            } else if (Str::startsWith($chunk?->text ?? '', 'ADVANCED DIRECTIVE')) {
-                $color = '#FDC99D';
+            if (!$chunk) {
+                $answer = Str::replace($ref, "", $answer);
             } else {
-                $color = '#F8B500';
-            }
-            $tt = $chunk?->text ?? '';
-            $answer = Str::replace($ref, "<b style=\"color:{$color}\">[{$id}]</b>", $answer);
-            $references[$id] = "
+                /** @var File $file */
+                $file = $chunk?->file()->first();
+                $src = $file ? "<a href=\"{$file->downloadUrl()}\" style=\"text-decoration:none;color:black\">{$file->name_normalized}.{$file->extension}</a>, p. {$chunk?->page}" : "";
+                if (Str::startsWith($chunk?->text ?? '', 'ESSENTIAL DIRECTIVE')) {
+                    $color = '#1DD288';
+                } else if (Str::startsWith($chunk?->text ?? '', 'STANDARD DIRECTIVE')) {
+                    $color = '#C5C3C3';
+                } else if (Str::startsWith($chunk?->text ?? '', 'ADVANCED DIRECTIVE')) {
+                    $color = '#FDC99D';
+                } else {
+                    $color = '#F8B500';
+                }
+                $tt = $chunk?->text ?? '';
+                $answer = Str::replace($ref, "<b style=\"color:{$color}\">[{$id}]</b>", $answer);
+                $references[$id] = "
 <li style=\"padding:0;margin-bottom:0.25rem\">
   <b style=\"color:{$color}\">[{$id}]</b>&nbsp;
   <div class=\"cb-tooltip-list\">
@@ -321,9 +324,12 @@ class CyberBuddy extends AbstractAction
     </span>
   </div>
 </li>";
+            }
         }
         ksort($references);
-        $answer = "{$answer}<br><br><b>Sources :</b><ul>" . collect($references)->values()->join("") . "</ul>";
+        if (!empty($references)) {
+            $answer = "{$answer}<br><br><b>Sources :</b><ul>" . collect($references)->values()->join("") . "</ul>";
+        }
         return Str::replace(["\n\n", "\n-"], "<br>", $answer);
     }
 }
