@@ -97,7 +97,7 @@ class Cleanup implements ShouldQueue
             Log::debug("Empty framework collections for user {$user->email} removed.");
             Log::debug("Removing vectors with missing references for user {$user->email}...");
 
-            Vector::all()->each(function (Vector $vector) {
+            Vector::cursor()->each(function (Vector $vector) {
 
                 $hasCollection = true;
                 $hasFile = true;
