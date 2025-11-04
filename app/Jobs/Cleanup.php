@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\User;
+use App\Models\Vector;
 use App\Models\YnhFramework;
 use App\Models\YnhOsquery;
 use App\Models\YnhOsqueryLatestEvent;
@@ -94,6 +95,34 @@ class Cleanup implements ShouldQueue
             });
 
             Log::debug("Empty framework collections for user {$user->email} removed.");
+            Log::debug("Removing vectors with missing references for user {$user->email}...");
+
+            Vector::all()->each(function (Vector $vector) {
+
+                $hasCollection = true;
+                $hasFile = true;
+                $hasChunk = true;
+
+                if (!$vector->collection()?->exists()) {
+                    $vector->collection_id = null;
+                    $hasCollection = false;
+                }
+                if (!$vector->file()?->exists()) {
+                    $vector->file_id = null;
+                    $hasFile = false;
+                }
+                if (!$vector->chunk()?->exists()) {
+                    $vector->chunk_id = null;
+                    $hasChunk = false;
+                }
+                if (!$hasCollection && !$hasFile && !$hasChunk) {
+                    $vector->delete();
+                } else {
+                    $vector->save();
+                }
+            });
+
+            Log::debug("Vectors with missing references for user {$user->email} removed.");
             Log::debug("Purging conversations of user {$user->email} that are over 6 months old...");
 
             Conversation::where('updated_at', '<=', Carbon::now()->startOfDay()->subMonths(6))
