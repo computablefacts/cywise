@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Helpers\MailCoach;
-use App\Jobs\DeleteEmbeddedChunks;
-use App\Rules\IsValidCollectionName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -189,7 +187,7 @@ class User extends WaveUser
         return $this->cannot("call.{$procedure}.{$method}");
     }
 
-    public function init(bool $forceUpdate = false): void
+    public function init(): void
     {
         try {
             // Set the user's prompts
@@ -207,85 +205,9 @@ class User extends WaveUser
 
             Log::debug("[{$this->email}] User's prompts updated.");
 
-            // Get the oldest user of the tenant. We will automatically attach the frameworks to this user
-            Log::debug("[{$this->email}] Searching oldest user in tenant {$this->tenant_id}...");
-
-            $oldestTenantUser = User::query()
-                ->when($this->tenant_id, fn($query) => $query->where('tenant_id', '=', $this->tenant_id))
-                ->when($this->customer_id, fn($query) => $query->where('customer_id', '=', $this->customer_id))
-                ->orderBy('created_at')
-                ->first();
-
-            Log::debug("[{$this->email}] Oldest user in tenant {$this->tenant_id} is {$oldestTenantUser?->email}.");
-
             // TODO : create CyberScribe's templates
             // TODO : create user's private collection privcol*
 
-            // Cleanup old collections
-            Log::debug("[{$this->email}] Removing legacy frameworks...");
-
-            \App\Models\YnhFramework::whereIn('file', [
-                'seeders/frameworks/nis2/annex-implementing-regulation-of-nis2-on-t-m.jsonl.gz',
-                'seeders/frameworks/gdpr/gdpr.jsonl.gz',
-                'seeders/frameworks/dora/dora.jsonl.gz',
-            ])
-                ->get()
-                ->each(function (YnhFramework $framework) {
-                    $framework->is_deleted = true;
-                    $framework->save();
-                });
-
-            // Create shadow collections for some frameworks
-            Log::debug("[{$this->email}] Loading frameworks...");
-
-            $frameworks = \App\Models\YnhFramework::whereIn('file', [
-                'seeders/frameworks/anssi/anssi-guide-hygiene.jsonl.gz',
-                'seeders/frameworks/anssi/anssi-genai-security-recommendations-1.0.jsonl.gz',
-            ])->get();
-
-            Log::debug("[{$this->email}] {$frameworks->count()} frameworks loaded.");
-
-            $providers = [
-                'ANSSI' => 100,
-                'FR' => 110,
-                'EU' => 120,
-                'NIST' => 130,
-                'OWASP' => 140,
-                'NOREA' => 150,
-                'NCSC' => 160,
-            ];
-            $updated = [];
-
-            /** @var YnhFramework $framework */
-            foreach ($frameworks as $framework) {
-
-                $collection = $framework->collectionName();
-                $priority = $providers[$framework->provider];
-
-                if ($forceUpdate && !in_array($collection, $updated)) {
-
-                    Log::debug("[{$this->email}] Deleting collection {$collection}...");
-
-                    /** @var \App\Models\Collection $col */
-                    $col = Collection::where('name', $collection)
-                        ->where('is_deleted', false)
-                        ->first();
-
-                    if ($col) {
-                        $col->is_deleted = true;
-                        $col->save();
-                        (new DeleteEmbeddedChunks())->handle();
-                    }
-                    $updated[] = $collection;
-
-                    Log::debug("[{$this->email}] Collection {$collection} deleted.");
-                }
-                if (!$oldestTenantUser || $this->id === $oldestTenantUser->id) {
-                    Log::debug("[{$this->email}] Importing framework {$framework->name}...");
-                    $this->setupFrameworks($framework, $priority);
-                    Log::debug("[{$this->email}] Framework {$framework->name} imported.");
-                }
-            }
         } catch (\Exception $e) {
             Log::error("Error while initializing user {$this->email} : {$e->getMessage()}");
         }
@@ -348,34 +270,5 @@ class User extends WaveUser
                 'template' => $newPrompt
             ]);
         }
-    }
-
-    private function setupFrameworks(YnhFramework $framework, int $priority): void
-    {
-        $collection = $this->getOrCreateCollection($framework->collectionName(), $priority);
-        if ($collection) {
-            $path = Str::replace('.jsonl.gz', '.2.jsonl.gz', $framework->path());
-            $url = \App\Http\Controllers\CyberBuddyController::saveLocalFile($collection, $path);
-        }
-    }
-
-    private function getOrCreateCollection(string $collectionName, int $priority): ?Collection
-    {
-        /** @var \App\Models\Collection $collection */
-        $collection = Collection::where('name', $collectionName)
-            ->where('is_deleted', false)
-            ->first();
-
-        if (!$collection) {
-            if (!IsValidCollectionName::test($collectionName)) {
-                Log::error("Invalid collection name : {$collectionName}");
-                return null;
-            }
-            $collection = Collection::create([
-                'name' => $collectionName,
-                'priority' => max($priority, 0),
-            ]);
-        }
-        return $collection;
     }
 }

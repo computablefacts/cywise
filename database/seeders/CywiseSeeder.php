@@ -3,9 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\AppConfig;
+use App\Models\Collection;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\YnhFramework;
 use Database\Seeders\DbConfig\DbAppConfigInterface;
 use Illuminate;
 use Illuminate\Database\Seeder;
@@ -516,34 +518,40 @@ class CywiseSeeder extends Seeder
 
     private function setupUserPromptsAndFrameworks(): void
     {
-        // Setup the admin
-        $user = User::query()->where('email', config('towerify.admin.email'))->first();
-        $user->actAs();
-        $user->init(true);
-
-        // Setup other users
         \App\Models\Tenant::query()->chunkById(100, function ($tenants) {
             /** @var \App\Models\Tenant $tenant */
             foreach ($tenants as $tenant) {
-
-                $oldestInTenant = User::query()
-                    ->where('tenant_id', $tenant->id)
-                    ->orderBy('created_at')
-                    ->first();
-
-                if ($oldestInTenant) {
-                    $oldestInTenant->actAs();
-                    $oldestInTenant->init(true);
-                }
-
                 User::query()
                     ->where('tenant_id', $tenant->id)
-                    ->when($oldestInTenant, fn($query) => $query->where('id', '<>', $oldestInTenant->id))
                     ->chunkById(100, function ($users) {
                         /** @var User $user */
                         foreach ($users as $user) {
+
                             $user->actAs();
                             $user->init();
+
+                            // TODO : BEGIN REMOVE ASAP
+                            Log::debug("[{$user->email}] Detaching frameworks...");
+
+                            \App\Models\YnhFramework::whereIn('file', [
+                                'seeders/frameworks/nis2/annex-implementing-regulation-of-nis2-on-t-m.jsonl.gz',
+                                'seeders/frameworks/gdpr/gdpr.jsonl.gz',
+                                'seeders/frameworks/dora/dora.jsonl.gz',
+                                'seeders/frameworks/anssi/anssi-guide-hygiene.jsonl.gz',
+                                'seeders/frameworks/anssi/anssi-genai-security-recommendations-1.0.jsonl.gz',
+                            ])
+                                ->get()
+                                ->map(fn(YnhFramework $framework) => $framework->collection())
+                                ->filter(fn(?Collection $collection) => isset($collection))
+                                ->each(function (Collection $collection) use ($user) {
+                                    Log::debug("[{$user->email}] Marking collection {$collection->name} as deleted...");
+                                    $collection->is_deleted = true;
+                                    $collection->save();
+                                    Log::debug("[{$user->email}] Collection {$collection->name} marked as deleted.");
+                                });
+
+                            Log::debug("[{$user->email}] Frameworks detached.");
+                            // TODO : END REMOVE ASAP
                         }
                     });
             }
