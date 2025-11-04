@@ -296,8 +296,8 @@ class AssetsProcedure extends Procedure
         $asset = $params['asset'];
         $watch = is_bool($params['watch']) && $params['watch'];
         $trialId = $params['trial_id'] ?? 0;
-        /** @var User $user */
-        $user = Auth::user();
+
+        $user = $request->user();
         $obj = CreateAssetListener::execute($user, $asset, $watch, [], $trialId);
 
         if (!$obj) {
