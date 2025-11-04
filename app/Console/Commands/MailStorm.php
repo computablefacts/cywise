@@ -65,7 +65,6 @@ class MailStorm extends Command
             $blacklist = [];
         }
 
-        $smtp = new SmtpApiMailer($apikey);
         $subject = Str::trim(file_get_contents($subject));
         $body = Str::trim(file_get_contents($body));
 
@@ -81,10 +80,11 @@ class MailStorm extends Command
             ->map(fn(array $obj) => $obj['email'])
             ->filter(fn(string $email) => !in_array($email, $blacklist))
             ->unique()
-            ->each(function (string $email) use ($smtp, $from, $subject, $body) {
+            ->each(function (string $email) use ($apikey, $from, $subject, $body) {
 
                 $this->info("Sending email to {$email}...");
 
+                $smtp = new SmtpApiMailer($apikey);
                 $smtp->setFrom($from);
                 $smtp->setTo($email);
                 $smtp->setTimeout(30);
