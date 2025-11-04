@@ -84,7 +84,7 @@ class Cleanup implements ShouldQueue
                     ->where('is_deleted', false)
                     ->where('created_at', '<', now()->subDays(7))
                     ->get()
-                    ->filter(fn(Collection $collection) => $collection->files()->exists())
+                    ->filter(fn(Collection $collection) => !$collection->files()->exists())
                     ->each(function (Collection $collection) {
                         Log::debug("Marking collection {$collection->name} as deleted...");
                         $collection->is_deleted = true;
