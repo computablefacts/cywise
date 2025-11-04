@@ -101,6 +101,31 @@ class CyberBuddy extends AbstractAction
             return new FailedAnswer("The keywords are missing: {$answer}");
         }
 
+        // Extract similar questions from ANSSI's dataset
+        $anssi = [];
+
+        if (!empty($json['question_fr'] ?? '')) {
+
+            $embedding = EmbeddingsProvider::provide($json['question_fr'] ?? '')?->embedding() ?? [];
+
+            if (!empty($embedding)) {
+                $start = microtime(true);
+                $dir = FileVectorStore::unpack("anssi.zip");
+                $vectorStore = new FileVectorStore($dir, 5);
+                $anssi = array_map(function (array $vector) {
+                    /** @var Vector $vec */
+                    $vec = $vector['vector'];
+                    $question = $vec->text();
+                    $answer = preg_replace('/#+/', '', $vec->metadata('answer'));
+                    $similarity = $vector['similarity'];
+                    return "## Note 0\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** ANSSI\n**Score:** {$similarity}";
+                }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
+                $stop = microtime(true);
+                $nbResults = count($anssi);
+                Log::debug("[ANSSI] Searching ANSSI's dataset took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+            }
+        }
+
         // Extract similar questions from Rowden's Cybersecurity QAA dataset
         $rowden = [];
 
@@ -121,7 +146,7 @@ class CyberBuddy extends AbstractAction
                     $source = empty($source) ? 'n/a' : $source;
                     $similarity = $vector['similarity'];
                     return "## Note 0\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** {$source}\n**Score:** {$similarity}";
-                }, $vectorStore->search($embedding));
+                }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
                 $stop = microtime(true);
                 $nbResults = count($rowden);
                 Log::debug("[ROWDEN_QAA] Searching Rowden's Cybersecurity QAA took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
@@ -133,7 +158,7 @@ class CyberBuddy extends AbstractAction
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
         $prompt = PromptsProvider::provide('default_answer_question', [
             'LANGUAGE' => $json['lang'],
-            'NOTES' => $chunks . "\n\n" . implode("\n\n", $rowden),
+            'NOTES' => $chunks . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
             'MEMOS' => $memos,
             'QUESTION' => $json['lang'] === 'english' ?
                 $json['question_en'] :
