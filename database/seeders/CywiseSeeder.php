@@ -576,17 +576,24 @@ class CywiseSeeder extends Seeder
         foreach (glob($path . '/*.json') as $file) {
             Log::debug("Importing {$file}...");
             $json = json_decode(Illuminate\Support\Facades\File::get($file), true);
-            \App\Models\YnhFramework::updateOrCreate([
-                'name' => $json['name'],
-            ], [
-                'name' => $json['name'],
-                'description' => $json['description'],
-                'copyright' => \Illuminate\Support\Str::limit($json['copyright'], 187, '[...]'),
-                'version' => $json['version'],
-                'provider' => $json['provider'],
-                'locale' => $json['locale'],
-                'file' => $root . '/' . basename($file, '.json') . '.jsonl.gz',
-            ]);
+            if (Str::endsWith($file, 'anssi-guide-hygiene.json') ||
+                Str::endsWith($file, 'anssi-genai-security-recommendations-1.0.json')) {
+                \App\Models\YnhFramework::where('name', $json['name'])->delete();
+                Log::debug("{$file} skipped.");
+            } else {
+                \App\Models\YnhFramework::updateOrCreate([
+                    'name' => $json['name'],
+                ], [
+                    'name' => $json['name'],
+                    'description' => $json['description'],
+                    'copyright' => \Illuminate\Support\Str::limit($json['copyright'], 187, '[...]'),
+                    'version' => $json['version'],
+                    'provider' => $json['provider'],
+                    'locale' => $json['locale'],
+                    'file' => $root . '/' . basename($file, '.json') . '.jsonl.gz',
+                ]);
+                Log::debug("{$file} imported.");
+            }
         }
     }
 
