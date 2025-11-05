@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Procedures\SingleUser;
 
-use Tests\TestCase;
+use Tests\TestCaseWithDb;
 use Sajya\Server\Testing\ProceduralRequests;
 
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
 
-class AssetsDiscoverTest extends TestCase
+class AssetsDiscoverTest extends TestCaseWithDb
 {
     use ProceduralRequests;
 

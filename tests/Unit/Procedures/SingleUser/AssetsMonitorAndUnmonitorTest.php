@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Procedures\SingleUser;
 
-use Tests\TestCase;
+use Tests\TestCaseWithDb;
 use Sajya\Server\Testing\ProceduralRequests;
 
 use PHPUnit\Framework\Attributes\TestWith;
 use Tests\AssetsProcedureHelpers;
 
-class AssetsMonitorAndUnmonitorTest extends TestCase
+class AssetsMonitorAndUnmonitorTest extends TestCaseWithDb
 {
     use ProceduralRequests;
     use AssetsProcedureHelpers;

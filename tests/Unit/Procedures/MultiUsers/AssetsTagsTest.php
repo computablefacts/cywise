@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Procedures\MultiUsers;
 
-use Tests\TestCase;
 use Sajya\Server\Testing\ProceduralRequests;
 
 use Tests\AssetsProcedureHelpers;
+use Tests\TestCaseWithDb;
 
-class AssetsTagsTest extends TestCase
+class AssetsTagsTest extends TestCaseWithDb
 {
     use ProceduralRequests;
     use AssetsProcedureHelpers;

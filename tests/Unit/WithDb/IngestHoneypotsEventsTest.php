@@ -12,9 +12,9 @@ use App\Models\Honeypot;
 use App\Models\HoneypotEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Tests\TestCase;
+use Tests\TestCaseWithDbAndSeeders;
 
-class IngestHoneypotsEventsTest extends TestCase
+class IngestHoneypotsEventsTest extends TestCaseWithDbAndSeeders
 {
     protected function setUp(): void
     {

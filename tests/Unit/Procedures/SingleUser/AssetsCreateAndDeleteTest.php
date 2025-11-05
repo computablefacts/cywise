@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Procedures\SingleUser;
 
-use Tests\TestCase;
+use Tests\TestCaseWithDb;
 use Sajya\Server\Testing\ProceduralRequests;
 
 use App\Models\Asset;
 use PHPUnit\Framework\Attributes\TestWith;
 use Tests\AssetsProcedureHelpers;
 
-class AssetsCreateAndDeleteTest extends TestCase
+class AssetsCreateAndDeleteTest extends TestCaseWithDb
 {
     use ProceduralRequests;
     use AssetsProcedureHelpers;

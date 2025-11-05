@@ -5,9 +5,9 @@ namespace Tests\Unit\WithDb;
 use App\Models\Invitation;
 use App\Models\User;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\TestCase;
+use Tests\TestCaseWithDbAndSeeders;
 
-class InvitationTest extends TestCase
+class InvitationTest extends TestCaseWithDbAndSeeders
 {
     protected function setUp(): void
     {

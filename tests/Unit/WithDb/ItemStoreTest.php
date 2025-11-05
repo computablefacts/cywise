@@ -7,9 +7,9 @@ use App\Models\TimelineItem;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use Tests\TestCase;
+use Tests\TestCaseWithDbAndSeeders;
 
-class ItemStoreTest extends TestCase
+class ItemStoreTest extends TestCaseWithDbAndSeeders
 {
     protected function setUp(): void
     {

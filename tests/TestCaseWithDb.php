@@ -31,7 +31,7 @@ use Plannr\Laravel\FastRefreshDatabase\Traits\FastRefreshDatabase;
  *
  * See https://dwij.net/how-to-speed-up-laravel-unit-tests-using-schemadump/
  */
-abstract class TestCase extends BaseTestCase
+abstract class TestCaseWithDb extends BaseTestCase
 {
     use FastRefreshDatabase;
 

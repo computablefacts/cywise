@@ -21,9 +21,9 @@ use App\Models\Screenshot;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
-use Tests\TestCase;
+use Tests\TestCaseWithDbAndSeeders;
 
-class ScansTest extends TestCase
+class ScansTest extends TestCaseWithDbAndSeeders
 {
     protected function setUp(): void
     {

@@ -11,9 +11,17 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+pest()->extend(Tests\TestCaseWithDbAndSeeders::class)
     ->in('Feature');
+
+pest()->extend(Tests\TestCaseWithDb::class)
+    ->in('Unit/Procedures');
+
+pest()->extend(Tests\TestCaseWithDbAndSeeders::class)
+    ->in('Unit/WithDb');
+
+pest()->extend(Tests\TestCaseNoDb::class)
+    ->in('Unit/WithoutDb');
 
 /*
 |--------------------------------------------------------------------------

@@ -3,10 +3,10 @@
 namespace Tests\Unit\WithDb;
 
 use App\Http\Controllers\CyberBuddyController;
-use Tests\TestCase;
+use Tests\TestCaseWithDbAndSeeders;
 
 /** @deprecated */
-class CyberBuddyControllerTest extends TestCase
+class CyberBuddyControllerTest extends TestCaseWithDbAndSeeders
 {
     protected function setUp(): void
     {

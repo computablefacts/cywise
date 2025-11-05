@@ -8,9 +8,9 @@ use App\Jobs\TriggerDiscoveryShallow;
 use App\Models\Asset;
 use App\Models\Tenant;
 use App\Models\User;
-use Tests\TestCase;
+use Tests\TestCaseWithDbAndSeeders;
 
-class DiscoveryShallowTest extends TestCase
+class DiscoveryShallowTest extends TestCaseWithDbAndSeeders
 {
     protected function setUp(): void
     {
