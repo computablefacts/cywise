@@ -44,14 +44,14 @@ return [
     ],
     'telescope' => [
         'whitelist' => [
-            'usernames' => explode(',', env('TELESCOPE_WHITELIST_USERNAMES')),
-            'domains' => explode(',', env('TELESCOPE_WHITELIST_DOMAINS')),
+            'usernames' => explode(',', env('TELESCOPE_WHITELIST_USERNAMES', '')),
+            'domains' => explode(',', env('TELESCOPE_WHITELIST_DOMAINS', '')),
         ],
     ],
     'performa' => [
         'whitelist' => [
-            'usernames' => explode(',', env('PERFORMA_WHITELIST_USERNAMES', env('TELESCOPE_WHITELIST_USERNAMES'))),
-            'domains' => explode(',', env('PERFORMA_WHITELIST_DOMAINS', env('TELESCOPE_WHITELIST_DOMAINS'))),
+            'usernames' => explode(',', env('PERFORMA_WHITELIST_USERNAMES', env('TELESCOPE_WHITELIST_USERNAMES', ''))),
+            'domains' => explode(',', env('PERFORMA_WHITELIST_DOMAINS', env('TELESCOPE_WHITELIST_DOMAINS', ''))),
         ],
     ],
     'admin' => [
