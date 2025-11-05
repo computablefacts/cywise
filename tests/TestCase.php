@@ -8,11 +8,13 @@ use App\Models\Attacker;
 use App\Models\HiddenAlert;
 use App\Models\Honeypot;
 use App\Models\Port;
+use App\Models\Role;
 use App\Models\Scan;
 use App\Models\Screenshot;
 use App\Models\User;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Plannr\Laravel\FastRefreshDatabase\Traits\FastRefreshDatabase;
 
@@ -36,22 +38,24 @@ abstract class TestCase extends BaseTestCase
     use FastRefreshDatabase;
 
     protected User $user;
+    protected User $userTenant1;
+    protected User $userTenant2;
     protected string $token;
 
     protected function afterRefreshingDatabase()
     {
-        $cachedChecksum = $this->getCachedSeederChecksum();
-        $currentChecksum = $this->calculateSeederChecksum();
+//         $cachedChecksum = $this->getCachedSeederChecksum();
+//         $currentChecksum = $this->calculateSeederChecksum();
 
-        if ($cachedChecksum !== $currentChecksum) {
-            print "\nSeeding database...\n";
-//            $this->artisan('db:seed', ['class' => 'DatabaseSeeder']);
-//            $this->artisan('db:seed', ['class' => 'CywiseSeeder']);
-            shell_exec('php artisan db:seed --class=DatabaseSeeder');
-            shell_exec('php artisan db:seed --class=CywiseSeeder');
-            print "\nDatabase is seeded.\n";
-            $this->storeSeederChecksum($currentChecksum);
-        }
+//         if ($cachedChecksum !== $currentChecksum) {
+//             print "\nSeeding database...\n";
+// //            $this->artisan('db:seed', ['class' => 'DatabaseSeeder']);
+// //            $this->artisan('db:seed', ['class' => 'CywiseSeeder']);
+//             shell_exec('php artisan db:seed --class=DatabaseSeeder');
+//             shell_exec('php artisan db:seed --class=CywiseSeeder');
+//             print "\nDatabase is seeded.\n";
+//             $this->storeSeederChecksum($currentChecksum);
+//         }
     }
 
     protected function setUp(): void
@@ -63,10 +67,33 @@ abstract class TestCase extends BaseTestCase
             exit(1);
         }
 
-        $this->user = User::where('email', 'qa@computablefacts.com')->firstOrfail();
-        $this->token = $this->user->createToken('tests', [])->plainTextToken;
-        $this->user->am_api_token = $this->token;
-        $this->user->save();
+        // $this->user = User::where('email', 'qa@computablefacts.com')->firstOrfail();
+        // $this->token = $this->user->createToken('tests', [])->plainTextToken;
+        // $this->user->am_api_token = $this->token;
+        // $this->user->save();
+
+        Role::createRoles();
+
+        $this->userTenant1 = \App\Models\User::firstOrCreate(
+            ['email' => 'user@tenant1.com'],
+            [
+                'name' => 'User Tenant 1',
+                'email' => 'user@tenant1.com',
+                'password' => Hash::make('passwordTenant1'),
+                'verified' => true,
+            ]
+        );
+
+        $this->userTenant2 = \App\Models\User::firstOrCreate(
+            ['email' => 'user@tenant2.com'],
+            [
+                'name' => 'User Tenant 2',
+                'email' => 'user@tenant2.com',
+                'password' => Hash::make('passwordTenant2'),
+                'verified' => true,
+            ]
+        );
+
     }
 
     protected function tearDown(): void
