@@ -12,10 +12,8 @@ use App\Models\Role;
 use App\Models\Scan;
 use App\Models\Screenshot;
 use App\Models\User;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Plannr\Laravel\FastRefreshDatabase\Traits\FastRefreshDatabase;
 
 /**
@@ -37,26 +35,9 @@ abstract class TestCase extends BaseTestCase
 {
     use FastRefreshDatabase;
 
-    protected User $user;
     protected User $userTenant1;
     protected User $userTenant2;
     protected string $token;
-
-    protected function afterRefreshingDatabase()
-    {
-//         $cachedChecksum = $this->getCachedSeederChecksum();
-//         $currentChecksum = $this->calculateSeederChecksum();
-
-//         if ($cachedChecksum !== $currentChecksum) {
-//             print "\nSeeding database...\n";
-// //            $this->artisan('db:seed', ['class' => 'DatabaseSeeder']);
-// //            $this->artisan('db:seed', ['class' => 'CywiseSeeder']);
-//             shell_exec('php artisan db:seed --class=DatabaseSeeder');
-//             shell_exec('php artisan db:seed --class=CywiseSeeder');
-//             print "\nDatabase is seeded.\n";
-//             $this->storeSeederChecksum($currentChecksum);
-//         }
-    }
 
     protected function setUp(): void
     {
@@ -66,11 +47,6 @@ abstract class TestCase extends BaseTestCase
             echo("The environment is not testing. I quit. This would likely destroy data.\n");
             exit(1);
         }
-
-        // $this->user = User::where('email', 'qa@computablefacts.com')->firstOrfail();
-        // $this->token = $this->user->createToken('tests', [])->plainTextToken;
-        // $this->user->am_api_token = $this->token;
-        // $this->user->save();
 
         Role::createRoles();
 
@@ -109,27 +85,4 @@ abstract class TestCase extends BaseTestCase
         parent::tearDown();
     }
 
-    private function calculateSeederChecksum(): string
-    {
-        return rescue(fn() => md5_file(database_path('seeders/DatabaseSeeder.php')) . md5_file(database_path('seeders/CywiseSeeder.php')), '');
-    }
-
-    private function getCachedSeederChecksum(): ?string
-    {
-        return rescue(fn() => file_get_contents($this->getSeederChecksumFile()), null, false);
-    }
-
-    private function storeSeederChecksum(string $checksum): void
-    {
-        file_put_contents($this->getSeederChecksumFile(), $checksum);
-    }
-
-    private function getSeederChecksumFile(): string
-    {
-        $connection = $this->app[ConnectionInterface::class];
-
-        $databaseNameSlug = Str::slug($connection->getDatabaseName());
-
-        return storage_path("app/seeder-checksum_{$databaseNameSlug}.txt");
-    }
 }
