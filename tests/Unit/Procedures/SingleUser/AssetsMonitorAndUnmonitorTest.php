@@ -1,6 +1,5 @@
 <?php
 
-
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
 uses(\Tests\AssetsProcedureHelpers::class);
 

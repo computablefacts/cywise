@@ -6,7 +6,6 @@ use App\Helpers\TableStorage;
 use App\Models\User;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Event;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 test('storage type form string', function () {
     expect(TableStorage::StorageTypeFormString('s3'))->toEqual(StorageType::AWS_S3);
@@ -14,7 +13,7 @@ test('storage type form string', function () {
 });
 
 test('credentials from options s3', function () {
-    # Arrange
+    // Arrange
     $options = [
         'storage' => 's3',
         'region' => 'us-east-1',
@@ -24,10 +23,10 @@ test('credentials from options s3', function () {
         'output_folder' => 'output',
     ];
 
-    # Act
+    // Act
     $credentials = TableStorage::credentialsFromOptions($options);
 
-    # Assert
+    // Assert
     expect($credentials['storage'])->toEqual('s3');
     expect($credentials['region'])->toEqual('us-east-1');
     expect($credentials['access_key_id'])->toEqual('test_key');
@@ -37,7 +36,7 @@ test('credentials from options s3', function () {
 });
 
 test('credentials from options azure', function () {
-    # Arrange
+    // Arrange
     $options = [
         'storage' => 'azure',
         'connection_string' => 'test_connection_string',
@@ -45,10 +44,10 @@ test('credentials from options azure', function () {
         'output_folder' => 'output',
     ];
 
-    # Act
+    // Act
     $credentials = TableStorage::credentialsFromOptions($options);
 
-    # Assert
+    // Assert
     expect($credentials['storage'])->toEqual('azure');
     expect($credentials['connection_string'])->toEqual('test_connection_string');
     expect($credentials['input_folder'])->toEqual('input');
@@ -73,10 +72,10 @@ dataset('inDiskProvider', function () {
 });
 
 test('in disk', function (array $credentials) {
-    # Act
+    // Act
     $disk = TableStorage::inDisk($credentials);
 
-    # Assert
+    // Assert
     expect($disk)->toBeInstanceOf(FilesystemAdapter::class);
 })->with('inDiskProvider');
 
@@ -98,10 +97,10 @@ dataset('outDiskProvider', function () {
 });
 
 test('out disk', function (array $credentials) {
-    # Act
+    // Act
     $disk = TableStorage::outDisk($credentials);
 
-    # Assert
+    // Assert
     expect($disk)->toBeInstanceOf(FilesystemAdapter::class);
 })->with('outDiskProvider');
 
@@ -231,31 +230,31 @@ dataset('clickhouseTableFunctionOrEngineProvider', function () {
 });
 
 test('in clickhouse table function', function (array $credentials, string $tableName, string $suffix, string $expectedInFunction) {
-    # Act
+    // Act
     $result = TableStorage::inClickhouseTableFunction($credentials, $tableName);
 
-    # Assert
+    // Assert
     expect($result)->toEqual($expectedInFunction);
 })->with('clickhouseTableFunctionOrEngineProvider');
 
 test('out clickhouse table function', function (array $credentials, string $tableName, string $suffix, $unused1, $unused2, string $expectedOutFunction) {
-    # Act
+    // Act
     $result = TableStorage::outClickhouseTableFunction($credentials, $tableName, $suffix);
 
-    # Assert
+    // Assert
     expect($result)->toEqual($expectedOutFunction);
 })->with('clickhouseTableFunctionOrEngineProvider');
 
 test('out clickhouse table engine', function (array $credentials, string $tableName, string $suffix, $unused1, $unused2, $unused3, string $expectedOutEngine) {
-    # Act
+    // Act
     $result = TableStorage::outClickhouseTableEngine($credentials, $tableName, $suffix);
 
-    # Assert
+    // Assert
     expect($result)->toEqual($expectedOutEngine);
 })->with('clickhouseTableFunctionOrEngineProvider');
 
 test('dispatch import table', function () {
-    # Arrange
+    // Arrange
     $validated = [
         'storage' => 's3',
         'region' => 'us-east-1',
@@ -272,13 +271,13 @@ test('dispatch import table', function () {
         'updatable' => true,
         'description' => 'test description',
     ];
-    $user = new User();
+    $user = new User;
     Event::fake();
 
-    # Act
+    // Act
     $result = TableStorage::dispatchImportTable($validated, $user);
 
-    # Assert
+    // Assert
     expect($result)->toEqual(2);
     Event::assertDispatched(ImportTable::class, 2);
 });

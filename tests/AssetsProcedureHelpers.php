@@ -27,5 +27,4 @@ trait AssetsProcedureHelpers
 
         return $response->json('result.tag.id');
     }
-
 }

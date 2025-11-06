@@ -2,7 +2,6 @@
 
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
 
-
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
 
 test('assets discover', function () {
@@ -18,7 +17,7 @@ test('assets discover', function () {
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
         ->callProcedure('assets@discover', [
-            'domain' => 'example.com'
+            'domain' => 'example.com',
         ])
         ->assertJsonFragment([
             'result' => [

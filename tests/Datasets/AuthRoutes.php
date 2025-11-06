@@ -3,11 +3,11 @@
 dataset('authroutes', function () {
     return [
         '/',
-//        '/blog',
-//        '/blog/marketing',
-//        '/blog/marketing/best-ways-to-market-your-application',
+        // '/blog',
+        // '/blog/marketing',
+        // '/blog/marketing/best-ways-to-market-your-application',
         '/dashboard',
-//        '/profile/admin',
+        // '/profile/admin',
         '/notifications',
         '/settings/profile',
         '/settings/security',
@@ -23,10 +23,10 @@ dataset('authroutes', function () {
         '/admin/permissions',
         '/admin/permissions/create',
         '/admin/plans',
-//        '/admin/plans/1/edit',
+        // '/admin/plans/1/edit',
         '/admin/posts',
         '/admin/posts/5/edit',
-//        '/admin/media',
+        // '/admin/media',
         '/admin/pages',
         '/admin/pages/1/edit',
         '/admin/categories',
@@ -36,6 +36,6 @@ dataset('authroutes', function () {
         '/admin/themes',
         '/admin/plugins',
         '/admin/settings',
-        '/admin/settings/1/edit'
+        '/admin/settings/1/edit',
     ];
 });

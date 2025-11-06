@@ -3,9 +3,9 @@
 dataset('routes', function () {
     return [
         '/',
-//        '/blog',
-//        '/blog/marketing',
-//        '/blog/marketing/best-ways-to-market-your-application',
+        // '/blog',
+        // '/blog/marketing',
+        // '/blog/marketing/best-ways-to-market-your-application',
         '/pricing',
         '/changelog',
         '/changelog/3',
@@ -13,6 +13,6 @@ dataset('routes', function () {
         '/auth/register',
         '/auth/password/reset',
         '/about',
-//        '/profile/admin'
+        // '/profile/admin'
     ];
 });

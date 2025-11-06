@@ -36,15 +36,17 @@ abstract class TestCaseWithDb extends BaseTestCase
     use FastRefreshDatabase;
 
     protected User $userTenant1;
+
     protected User $userTenant2;
+
     protected string $token;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        if ('testing' !== app()->environment()) {
-            echo("The environment is not testing. I quit. This would likely destroy data.\n");
+        if (app()->environment() !== 'testing') {
+            echo "The environment is not testing. I quit. This would likely destroy data.\n";
             exit(1);
         }
 
@@ -84,5 +86,4 @@ abstract class TestCaseWithDb extends BaseTestCase
         Screenshot::whereNotNull('id')->delete();
         parent::tearDown();
     }
-
 }

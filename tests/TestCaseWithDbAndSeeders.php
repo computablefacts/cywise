@@ -36,6 +36,7 @@ abstract class TestCaseWithDbAndSeeders extends BaseTestCase
     use FastRefreshDatabase;
 
     protected User $user;
+
     protected string $token;
 
     protected function afterRefreshingDatabase()
@@ -44,12 +45,12 @@ abstract class TestCaseWithDbAndSeeders extends BaseTestCase
         $currentChecksum = $this->calculateSeederChecksum();
 
         if ($cachedChecksum !== $currentChecksum) {
-            print "\nSeeding database...\n";
-//            $this->artisan('db:seed', ['class' => 'DatabaseSeeder']);
-//            $this->artisan('db:seed', ['class' => 'CywiseSeeder']);
+            echo "\nSeeding database...\n";
+            // $this->artisan('db:seed', ['class' => 'DatabaseSeeder']);
             shell_exec('php artisan db:seed --class=DatabaseSeeder');
+            // this->artisan('db:seed', ['class' => 'CywiseSeeder']);
             shell_exec('php artisan db:seed --class=CywiseSeeder');
-            print "\nDatabase is seeded.\n";
+            echo "\nDatabase is seeded.\n";
             $this->storeSeederChecksum($currentChecksum);
         }
     }
@@ -58,8 +59,8 @@ abstract class TestCaseWithDbAndSeeders extends BaseTestCase
     {
         parent::setUp();
 
-        if ('testing' !== app()->environment()) {
-            echo("The environment is not testing. I quit. This would likely destroy data.\n");
+        if (app()->environment() !== 'testing') {
+            echo "The environment is not testing. I quit. This would likely destroy data.\n";
             exit(1);
         }
 
@@ -84,12 +85,12 @@ abstract class TestCaseWithDbAndSeeders extends BaseTestCase
 
     private function calculateSeederChecksum(): string
     {
-        return rescue(fn() => md5_file(database_path('seeders/DatabaseSeeder.php')) . md5_file(database_path('seeders/CywiseSeeder.php')), '');
+        return rescue(fn () => md5_file(database_path('seeders/DatabaseSeeder.php')).md5_file(database_path('seeders/CywiseSeeder.php')), '');
     }
 
     private function getCachedSeederChecksum(): ?string
     {
-        return rescue(fn() => file_get_contents($this->getSeederChecksumFile()), null, false);
+        return rescue(fn () => file_get_contents($this->getSeederChecksumFile()), null, false);
     }
 
     private function storeSeederChecksum(string $checksum): void
