@@ -34,7 +34,8 @@ test('create an asset and add atag', function ($asset) {
         ]);
 })->with([
     'Valid DNS' => ['www.example.com'],
-    'Valid IP' => ['93.184.215.14'],
+    'Valid IPv4' => ['93.184.215.14'],
+    'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1'],
     'Valid CIDR' => ['255.255.255.255/32'],
 ]);
 
@@ -62,11 +63,12 @@ test('remove tag', function ($asset) {
         ]);
 })->with([
     'Valid DNS' => ['www.example.com'],
-    'Valid IP' => ['93.184.215.14'],
+    'Valid IPv4' => ['93.184.215.14'],
+    'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1'],
     'Valid CIDR' => ['255.255.255.255/32'],
 ]);
 
-test('cannot remove anon existent tag', function () {
+test('cannot remove a non existent tag', function () {
     $this->actingAs($this->userTenant1);
 
     $assetId = $this->createAsset('www.example.com');

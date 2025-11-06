@@ -71,7 +71,8 @@ test('create and delete valid asset', function ($asset, $tld, $type) {
     ]);
 })->with([
     'Valid DNS' => ['www.example.com', 'example.com', 'DNS'],
-    'Valid IP' => ['93.184.215.14', null, 'IP'],
+    'Valid IPv4' => ['93.184.215.14', null, 'IP'],
+    'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1', null, 'IP'],
     'Valid CIDR' => ['255.255.255.255/32', null, 'RANGE'],
 ]);
 
@@ -157,6 +158,7 @@ test('cannot delete monitored asset', function ($asset, $tld, $type) {
         ]);
 })->with([
     'Valid DNS' => ['www.example.com', 'example.com', 'DNS'],
-    'Valid IP' => ['93.184.215.14', null, 'IP'],
+    'Valid IPv4' => ['93.184.215.14', null, 'IP'],
+    'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1', null, 'IP'],
     'Valid CIDR' => ['255.255.255.255/32', null, 'RANGE'],
 ]);

@@ -39,7 +39,8 @@ test('the monitoring begins', function ($asset) {
     ]);
 })->with([
     'Valid DNS' => ['www.example.com'],
-    'Valid IP' => ['93.184.215.14'],
+    'Valid IPv4' => ['93.184.215.14'],
+    'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1'],
     'Valid CIDR' => ['255.255.255.255/32'],
 ]);
 
@@ -106,7 +107,8 @@ test('the monitoring stops', function ($asset) {
     ]);
 })->with([
     'Valid DNS' => ['www.example.com'],
-    'Valid IP' => ['93.184.215.14'],
+    'Valid IPv4' => ['93.184.215.14'],
+    'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1'],
     'Valid CIDR' => ['255.255.255.255/32'],
 ]);
 
