@@ -101,6 +101,7 @@ test('invalid assets are not created', function ($asset) {
     'Not a valid domain' => ['www+example+com'],
     'Wrong IP address' => ['18.25.36.999'],
     'Localhost IPv4 address' => ['127.0.0.1'],
+    'Localhost IPv6 address' => ['::1'],
     'Wrong CIDR notation' => ['1.2.3.4/36'],
 ]);
 
