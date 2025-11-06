@@ -63,6 +63,7 @@
         "fakerphp/faker": "^1.9.1",
         "kitloong/laravel-migrations-generator": "^7.1",
         "laravel/dusk": "^8.0",
+        "laravel/pint": "^1.25",
         "laravel/telescope": "^5.9",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "6.4.0|^7.0|^8.1",
