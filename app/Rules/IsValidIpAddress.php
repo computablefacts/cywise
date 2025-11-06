@@ -9,7 +9,8 @@ class IsValidIpAddress implements ValidationRule
 {
     public static function test(?string $asset): bool
     {
-        return $asset && filter_var($asset, FILTER_VALIDATE_IP) !== false && $asset !== '127.0.0.1' && $asset !== '::1';
+        // See: https://www.php.net/manual/en/filter.constants.php#constant.filter-validate-ip
+        return $asset && filter_var($asset, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE) !== false;
     }
 
     /**
