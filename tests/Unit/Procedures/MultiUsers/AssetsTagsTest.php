@@ -1,59 +1,47 @@
 <?php
 
-namespace Tests\Unit\Procedures\MultiUsers;
+uses(\Sajya\Server\Testing\ProceduralRequests::class);
+uses(\Tests\AssetsProcedureHelpers::class);
 
-use Sajya\Server\Testing\ProceduralRequests;
+test('list tags depends on user', function () {
+    $this->actingAs($this->userTenant1);
+    $assetId = $this->createAsset('www.example.com');
+    $this->createTag($assetId, 'tag1');
+    $this->createTag($assetId, 'tag2');
 
-use Tests\AssetsProcedureHelpers;
-use Tests\TestCaseWithDb;
+    $this->actingAs($this->userTenant2);
+    $assetId = $this->createAsset('www.example2.com');
+    $this->createTag($assetId, 'tag3');
+    $this->createTag($assetId, 'tag4');
+    $this->createTag($assetId, 'tag5');
 
-class AssetsTagsTest extends TestCaseWithDb
-{
-    use ProceduralRequests;
-    use AssetsProcedureHelpers;
+    $this->actingAs($this->userTenant1);
+    $this
+        ->setRpcRoute('v2.private.rpc.endpoint')
+        ->callProcedure('assets@listTags')
+        ->assertExactJsonStructure([
+            'id',
+            'jsonrpc',
+            'result' => [
+                'tags',
+            ],
+        ])
+        ->assertJsonFragment([
+            'tags' => ['tag1', 'tag2'],
+        ]);
 
-    public function testListTagsDependsOnUser(): void
-    {
-        $this->actingAs($this->userTenant1);
-        $assetId = $this->createAsset('www.example.com');
-        $this->createTag($assetId, 'tag1');
-        $this->createTag($assetId, 'tag2');
-
-        $this->actingAs($this->userTenant2);
-        $assetId = $this->createAsset('www.example2.com');
-        $this->createTag($assetId, 'tag3');
-        $this->createTag($assetId, 'tag4');
-        $this->createTag($assetId, 'tag5');
-
-        $this->actingAs($this->userTenant1);
-        $this
-            ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('assets@listTags')
-            ->assertExactJsonStructure([
-                'id',
-                'jsonrpc',
-                'result' => [
-                    'tags',
-                ],
-            ])
-            ->assertJsonFragment([
-                'tags' => ['tag1', 'tag2'],
-            ]);
-
-        $this->actingAs($this->userTenant2);
-        $this
-            ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('assets@listTags')
-            ->assertExactJsonStructure([
-                'id',
-                'jsonrpc',
-                'result' => [
-                    'tags',
-                ],
-            ])
-            ->assertJsonFragment([
-                'tags' => ['tag3', 'tag4', 'tag5'],
-            ]);
-    }
-
-}
+    $this->actingAs($this->userTenant2);
+    $this
+        ->setRpcRoute('v2.private.rpc.endpoint')
+        ->callProcedure('assets@listTags')
+        ->assertExactJsonStructure([
+            'id',
+            'jsonrpc',
+            'result' => [
+                'tags',
+            ],
+        ])
+        ->assertJsonFragment([
+            'tags' => ['tag3', 'tag4', 'tag5'],
+        ]);
+});
