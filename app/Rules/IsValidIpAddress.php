@@ -9,7 +9,7 @@ class IsValidIpAddress implements ValidationRule
 {
     public static function test(?string $asset): bool
     {
-        return $asset && filter_var($asset, FILTER_VALIDATE_IP) !== false;
+        return $asset && filter_var($asset, FILTER_VALIDATE_IP) !== false && $asset !== '127.0.0.1';
     }
 
     /**
