@@ -36,7 +36,8 @@ test('create an asset and add atag', function ($asset) {
     'Valid DNS' => ['www.example.com'],
     'Valid IPv4' => ['93.184.215.14'],
     'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1'],
-    'Valid CIDR' => ['255.255.255.255/32'],
+    'Valid IPv4 CIDR' => ['157.54.9.25/28', null, 'RANGE'],
+    'Valid IPv6 CIDR' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1/122', null, 'RANGE'],
 ]);
 
 test('remove tag', function ($asset) {
@@ -65,7 +66,8 @@ test('remove tag', function ($asset) {
     'Valid DNS' => ['www.example.com'],
     'Valid IPv4' => ['93.184.215.14'],
     'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1'],
-    'Valid CIDR' => ['255.255.255.255/32'],
+    'Valid IPv4 CIDR' => ['157.54.9.25/28', null, 'RANGE'],
+    'Valid IPv6 CIDR' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1/122', null, 'RANGE'],
 ]);
 
 test('cannot remove a non existent tag', function () {

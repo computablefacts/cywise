@@ -73,7 +73,8 @@ test('create and delete valid asset', function ($asset, $tld, $type) {
     'Valid DNS' => ['www.example.com', 'example.com', 'DNS'],
     'Valid IPv4' => ['93.184.215.14', null, 'IP'],
     'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1', null, 'IP'],
-    'Valid CIDR' => ['255.255.255.255/32', null, 'RANGE'],
+    'Valid IPv4 CIDR' => ['157.54.9.25/28', null, 'RANGE'],
+    'Valid IPv6 CIDR' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1/122', null, 'RANGE'],
 ]);
 
 test('invalid assets are not created', function ($asset) {
@@ -98,6 +99,8 @@ test('invalid assets are not created', function ($asset) {
             'message' => "Invalid asset : $asset",
         ]);
 })->with([
+    'Reserved range IPv4' => ['169.254.0.0/24'],
+    'Reserved range IPv6' => ['FE80::/120'],
     'Just a string' => ['invalid_asset'],
     'Not a valid domain' => ['www+example+com'],
     'Wrong IP address' => ['18.25.36.999'],
@@ -160,5 +163,6 @@ test('cannot delete monitored asset', function ($asset, $tld, $type) {
     'Valid DNS' => ['www.example.com', 'example.com', 'DNS'],
     'Valid IPv4' => ['93.184.215.14', null, 'IP'],
     'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1', null, 'IP'],
-    'Valid CIDR' => ['255.255.255.255/32', null, 'RANGE'],
+    'Valid IPv4 CIDR' => ['157.54.9.25/28', null, 'RANGE'],
+    'Valid IPv6 CIDR' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1/122', null, 'RANGE'],
 ]);
