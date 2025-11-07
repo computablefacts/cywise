@@ -4,15 +4,15 @@ uses(\Sajya\Server\Testing\ProceduralRequests::class);
 
 test('list tags depends on user', function () {
     asTenant1User();
-    $assetId = createAsset('www.example.com');
-    createTag($assetId, 'tag1');
-    createTag($assetId, 'tag2');
+    $asset = createAsset('www.example.com');
+    createTag($asset, 'tag1');
+    createTag($asset, 'tag2');
 
     asTenant2User();
-    $assetId = createAsset('www.example2.com');
-    createTag($assetId, 'tag3');
-    createTag($assetId, 'tag4');
-    createTag($assetId, 'tag5');
+    $asset = createAsset('www.example2.com');
+    createTag($asset, 'tag3');
+    createTag($asset, 'tag4');
+    createTag($asset, 'tag5');
 
     asTenant1User()
         ->setRpcRoute('v2.private.rpc.endpoint')

@@ -1,25 +1,29 @@
 <?php
 
-function createAsset($asset, $watch = false): int
+use App\Models\Asset;
+use App\Models\AssetTag;
+
+function createAsset(string $assetAddress, bool $watch = false): Asset
 {
     $response = test()
         ->setRpcRoute('v2.private.rpc.endpoint')
         ->callProcedure('assets@create', [
-            'asset' => $asset,
+            'asset' => $assetAddress
+        ,
             'watch' => $watch,
         ]);
 
-    return $response->json('result.asset.uid');
+    return Asset::query()->find($response->json('result.asset.uid'));
 }
 
-function createTag($assetId, $tag): int
+function createTag(Asset $asset, string $tagLabel): AssetTag
 {
     $response = test()
         ->setRpcRoute('v2.private.rpc.endpoint')
         ->callProcedure('assets@tag', [
-            'asset_id' => $assetId,
-            'tag' => $tag,
+            'asset_id' => $asset->id,
+            'tag' => $tagLabel,
         ]);
 
-    return $response->json('result.tag.id');
+    return AssetTag::query()->find($response->json('result.tag.id'));
 }

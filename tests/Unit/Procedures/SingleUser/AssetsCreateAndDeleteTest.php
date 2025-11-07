@@ -141,16 +141,16 @@ test('cannot delete an unknown asset id', function () {
         ]);
 });
 
-test('cannot delete monitored asset', function ($asset, $tld, $type) {
+test('cannot delete monitored asset', function ($assetAddress, $tld, $type) {
     asTenant1User();
 
-    $assetId = createAsset($asset, true);
+    $asset = createAsset($assetAddress, true);
 
     // Delete
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
         ->callProcedure('assets@delete', [
-            'asset_id' => $assetId,
+            'asset_id' => $asset->id,
         ])
         ->assertExactJsonStructure([
             'id',

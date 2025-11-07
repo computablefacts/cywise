@@ -2,15 +2,15 @@
 
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
 
-test('the monitoring begins', function ($asset) {
+test('the monitoring begins', function ($assetAddress) {
     asTenant1User();
 
-    $assetId = createAsset($asset, false);
+    $asset = createAsset($assetAddress, false);
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
         ->callProcedure('assets@monitor', [
-            'asset_id' => $assetId,
+            'asset_id' => $asset->id,
         ])
         ->assertExactJsonStructure([
             'id',
@@ -27,13 +27,13 @@ test('the monitoring begins', function ($asset) {
             ],
         ])
         ->assertJsonFragment([
-            'asset' => $asset,
+            'asset' => $assetAddress,
             'status' => 'valid',
         ]);
 
     // Vérifier que l'actif a bien été mis à jour dans la base de données
     $this->assertDatabaseHas('am_assets', [
-        'asset' => $asset,
+        'asset' => $assetAddress,
         'is_monitored' => true,
     ]);
 })->with([
@@ -71,15 +71,15 @@ test('cannot start monitoring for an unknown asset id', function () {
         ]);
 });
 
-test('the monitoring stops', function ($asset) {
+test('the monitoring stops', function ($assetAddress) {
     asTenant1User();
 
-    $assetId = createAsset($asset, true);
+    $asset = createAsset($assetAddress, true);
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
         ->callProcedure('assets@unmonitor', [
-            'asset_id' => $assetId,
+            'asset_id' => $asset->id,
         ])
         ->assertExactJsonStructure([
             'id',
@@ -96,13 +96,13 @@ test('the monitoring stops', function ($asset) {
             ],
         ])
         ->assertJsonFragment([
-            'asset' => $asset,
+            'asset' => $assetAddress,
             'status' => 'invalid',
         ]);
 
     // Vérifier que l'actif a bien été mis à jour dans la base de données
     $this->assertDatabaseHas('am_assets', [
-        'asset' => $asset,
+        'asset' => $assetAddress,
         'is_monitored' => false,
     ]);
 })->with([
