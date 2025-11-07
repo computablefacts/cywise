@@ -40,6 +40,12 @@ test('create and delete valid asset', function ($asset, $tld, $type) {
         'asset' => $asset,
         'tld' => $tld,
         'type' => $type,
+        'discovery_id' => null,
+        'prev_scan_id' => null,
+        'cur_scan_id' => null,
+        'next_scan_id' => null,
+        'is_monitored' => false,
+        'created_by' => $this->userTenant1->id,
     ]);
 
     $assetId = $response->json('result.asset.uid');
