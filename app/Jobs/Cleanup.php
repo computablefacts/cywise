@@ -10,6 +10,7 @@ use App\Models\YnhFramework;
 use App\Models\YnhOsquery;
 use App\Models\YnhOsqueryLatestEvent;
 use App\Models\YnhOsqueryRule;
+use App\Models\YnhTrial;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,6 +35,13 @@ class Cleanup implements ShouldQueue
 
     public function handle()
     {
+        Log::debug("Cleaning up trials...");
+
+        YnhTrial::whereNull('created_by')
+            ->where('updated_at', '<', now()->subDays(10))
+            ->delete();
+
+        Log::debug("Trials cleaned up.");
         Log::debug("Removing events associated to disabled osquery rules...");
 
         // When a rule is disabled, cleanup the history
