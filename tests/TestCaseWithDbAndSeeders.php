@@ -46,10 +46,10 @@ abstract class TestCaseWithDbAndSeeders extends BaseTestCase
 
         if ($cachedChecksum !== $currentChecksum) {
             echo "\nSeeding database...\n";
-            // $this->artisan('db:seed', ['class' => 'DatabaseSeeder']);
-            shell_exec('php artisan db:seed --class=DatabaseSeeder');
-            // this->artisan('db:seed', ['class' => 'CywiseSeeder']);
-            shell_exec('php artisan db:seed --class=CywiseSeeder');
+            $this->artisan('db:seed', ['class' => 'DatabaseSeeder']);
+            // shell_exec('php artisan db:seed --class=DatabaseSeeder');
+            $this->artisan('db:seed', ['class' => 'CywiseSeeder']);
+            // shell_exec('php artisan db:seed --class=CywiseSeeder');
             echo "\nDatabase is seeded.\n";
             $this->storeSeederChecksum($currentChecksum);
         }
