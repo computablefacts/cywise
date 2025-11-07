@@ -99,3 +99,26 @@ test('cannot remove a non existent tag', function () {
             ],
         ]);
 });
+
+it('lists tags', function () {
+    $this->actingAs($this->userTenant1);
+    $assetId = $this->createAsset('www.example.com');
+    $this->createTag($assetId, 'tag1');
+    $this->createTag($assetId, 'tag2');
+
+    $this->actingAs($this->userTenant1);
+    $this
+        ->setRpcRoute('v2.private.rpc.endpoint')
+        ->callProcedure('assets@listTags')
+        ->assertExactJsonStructure([
+            'id',
+            'jsonrpc',
+            'result' => [
+                'tags',
+            ],
+        ])
+        ->assertJsonFragment([
+            'tags' => ['tag1', 'tag2'],
+        ]);
+
+});
