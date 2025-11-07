@@ -1,12 +1,11 @@
 <?php
 
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
-uses(\Tests\AssetsProcedureHelpers::class);
 
 test('create an asset and add atag', function ($asset) {
     $this->actingAs($this->userTenant1);
 
-    $assetId = $this->createAsset($asset);
+    $assetId = createAsset($asset);
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
@@ -43,8 +42,8 @@ test('create an asset and add atag', function ($asset) {
 test('remove tag', function ($asset) {
     $this->actingAs($this->userTenant1);
 
-    $assetId = $this->createAsset($asset);
-    $tagId = $this->createTag($assetId, 'tag1');
+    $assetId = createAsset($asset);
+    $tagId = createTag($assetId, 'tag1');
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
@@ -73,7 +72,7 @@ test('remove tag', function ($asset) {
 test('cannot remove a non existent tag', function () {
     $this->actingAs($this->userTenant1);
 
-    $assetId = $this->createAsset('www.example.com');
+    $assetId = createAsset('www.example.com');
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
@@ -102,9 +101,9 @@ test('cannot remove a non existent tag', function () {
 
 it('lists tags', function () {
     $this->actingAs($this->userTenant1);
-    $assetId = $this->createAsset('www.example.com');
-    $this->createTag($assetId, 'tag1');
-    $this->createTag($assetId, 'tag2');
+    $assetId = createAsset('www.example.com');
+    createTag($assetId, 'tag1');
+    createTag($assetId, 'tag2');
 
     $this->actingAs($this->userTenant1);
     $this

@@ -1,12 +1,11 @@
 <?php
 
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
-uses(\Tests\AssetsProcedureHelpers::class);
 
 test('the monitoring begins', function ($asset) {
     $this->actingAs($this->userTenant1);
 
-    $assetId = $this->createAsset($asset, false);
+    $assetId = createAsset($asset, false);
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
@@ -75,7 +74,7 @@ test('cannot start monitoring for an unknown asset id', function () {
 test('the monitoring stops', function ($asset) {
     $this->actingAs($this->userTenant1);
 
-    $assetId = $this->createAsset($asset, true);
+    $assetId = createAsset($asset, true);
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')

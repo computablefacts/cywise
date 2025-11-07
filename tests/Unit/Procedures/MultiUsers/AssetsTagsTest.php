@@ -1,19 +1,18 @@
 <?php
 
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
-uses(\Tests\AssetsProcedureHelpers::class);
 
 test('list tags depends on user', function () {
     $this->actingAs($this->userTenant1);
-    $assetId = $this->createAsset('www.example.com');
-    $this->createTag($assetId, 'tag1');
-    $this->createTag($assetId, 'tag2');
+    $assetId = createAsset('www.example.com');
+    createTag($assetId, 'tag1');
+    createTag($assetId, 'tag2');
 
     $this->actingAs($this->userTenant2);
-    $assetId = $this->createAsset('www.example2.com');
-    $this->createTag($assetId, 'tag3');
-    $this->createTag($assetId, 'tag4');
-    $this->createTag($assetId, 'tag5');
+    $assetId = createAsset('www.example2.com');
+    createTag($assetId, 'tag3');
+    createTag($assetId, 'tag4');
+    createTag($assetId, 'tag5');
 
     $this->actingAs($this->userTenant1);
     $this

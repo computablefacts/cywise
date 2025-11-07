@@ -1,7 +1,6 @@
 <?php
 
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
-uses(\Tests\AssetsProcedureHelpers::class);
 
 test('create and delete valid asset', function ($asset, $tld, $type) {
     $this->actingAs($this->userTenant1);
@@ -145,7 +144,7 @@ test('cannot delete an unknown asset id', function () {
 test('cannot delete monitored asset', function ($asset, $tld, $type) {
     $this->actingAs($this->userTenant1);
 
-    $assetId = $this->createAsset($asset, true);
+    $assetId = createAsset($asset, true);
 
     // Delete
     $this
