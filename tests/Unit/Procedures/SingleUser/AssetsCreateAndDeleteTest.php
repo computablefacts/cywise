@@ -3,7 +3,7 @@
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
 
 test('create and delete valid asset', function ($asset, $tld, $type) {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     // Create
     $response = $this
@@ -44,7 +44,7 @@ test('create and delete valid asset', function ($asset, $tld, $type) {
         'cur_scan_id' => null,
         'next_scan_id' => null,
         'is_monitored' => false,
-        'created_by' => $this->userTenant1->id,
+        'created_by' => tenant1UserId(),
     ]);
 
     $assetId = $response->json('result.asset.uid');
@@ -83,7 +83,7 @@ test('create and delete valid asset', function ($asset, $tld, $type) {
 ]);
 
 test('invalid assets are not created', function ($asset) {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
@@ -115,7 +115,7 @@ test('invalid assets are not created', function ($asset) {
 ]);
 
 test('cannot delete an unknown asset id', function () {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
@@ -142,7 +142,7 @@ test('cannot delete an unknown asset id', function () {
 });
 
 test('cannot delete monitored asset', function ($asset, $tld, $type) {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $assetId = createAsset($asset, true);
 

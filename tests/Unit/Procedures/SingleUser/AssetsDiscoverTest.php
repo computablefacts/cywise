@@ -12,7 +12,7 @@ test('assets discover', function () {
             'subdomains' => ['www1.example.com', 'www1.example.com' /* duplicate! */, 'www2.example.com'],
         ]);
 
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')

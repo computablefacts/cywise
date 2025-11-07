@@ -35,10 +35,6 @@ abstract class TestCaseWithDb extends BaseTestCase
 {
     use FastRefreshDatabase;
 
-    protected User $userTenant1;
-
-    protected User $userTenant2;
-
     protected string $token;
 
     protected function setUp(): void
@@ -49,29 +45,6 @@ abstract class TestCaseWithDb extends BaseTestCase
             echo "The environment is not testing. I quit. This would likely destroy data.\n";
             exit(1);
         }
-
-        Role::createRoles();
-
-        $this->userTenant1 = \App\Models\User::firstOrCreate(
-            ['email' => 'user@tenant1.com'],
-            [
-                'name' => 'User Tenant 1',
-                'email' => 'user@tenant1.com',
-                'password' => Hash::make('passwordTenant1'),
-                'verified' => true,
-            ]
-        );
-
-        $this->userTenant2 = \App\Models\User::firstOrCreate(
-            ['email' => 'user@tenant2.com'],
-            [
-                'name' => 'User Tenant 2',
-                'email' => 'user@tenant2.com',
-                'password' => Hash::make('passwordTenant2'),
-                'verified' => true,
-            ]
-        );
-
     }
 
     protected function tearDown(): void

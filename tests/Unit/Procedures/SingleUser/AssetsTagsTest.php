@@ -3,7 +3,7 @@
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
 
 test('create an asset and add atag', function ($asset) {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $assetId = createAsset($asset);
 
@@ -40,7 +40,7 @@ test('create an asset and add atag', function ($asset) {
 ]);
 
 test('remove tag', function ($asset) {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $assetId = createAsset($asset);
     $tagId = createTag($assetId, 'tag1');
@@ -70,7 +70,7 @@ test('remove tag', function ($asset) {
 ]);
 
 test('cannot remove a non existent tag', function () {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $assetId = createAsset('www.example.com');
 
@@ -100,12 +100,12 @@ test('cannot remove a non existent tag', function () {
 });
 
 it('lists tags', function () {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
     $assetId = createAsset('www.example.com');
     createTag($assetId, 'tag1');
     createTag($assetId, 'tag2');
 
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
         ->callProcedure('assets@listTags')

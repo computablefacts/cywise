@@ -3,7 +3,7 @@
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
 
 test('the monitoring begins', function ($asset) {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $assetId = createAsset($asset, false);
 
@@ -45,7 +45,7 @@ test('the monitoring begins', function ($asset) {
 ]);
 
 test('cannot start monitoring for an unknown asset id', function () {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
@@ -72,7 +72,7 @@ test('cannot start monitoring for an unknown asset id', function () {
 });
 
 test('the monitoring stops', function ($asset) {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $assetId = createAsset($asset, true);
 
@@ -114,7 +114,7 @@ test('the monitoring stops', function ($asset) {
 ]);
 
 test('cannot unmonitor an unknown asset id', function () {
-    $this->actingAs($this->userTenant1);
+    asTenant1User();
 
     $this
         ->setRpcRoute('v2.private.rpc.endpoint')
