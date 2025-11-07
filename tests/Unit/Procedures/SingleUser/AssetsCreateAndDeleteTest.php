@@ -141,7 +141,7 @@ test('cannot delete an unknown asset id', function () {
         ]);
 });
 
-test('cannot delete monitored asset', function ($assetAddress, $tld, $type) {
+test('cannot delete monitored asset', function ($assetAddress) {
     asTenant1User();
 
     $asset = createAsset($assetAddress, true);
@@ -165,9 +165,9 @@ test('cannot delete monitored asset', function ($assetAddress, $tld, $type) {
             'message' => 'Deletion not allowed, asset is monitored.',
         ]);
 })->with([
-    'Valid DNS' => ['www.example.com', 'example.com', 'DNS'],
-    'Valid IPv4' => ['93.184.215.14', null, 'IP'],
-    'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1', null, 'IP'],
-    'Valid IPv4 CIDR' => ['157.54.9.25/28', null, 'RANGE'],
-    'Valid IPv6 CIDR' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1/122', null, 'RANGE'],
+    'Valid DNS' => ['www.example.com'],
+    'Valid IPv4' => ['93.184.215.14'],
+    'Valid IPv6' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1'],
+    'Valid IPv4 CIDR' => ['157.54.9.25/28'],
+    'Valid IPv6 CIDR' => ['2001:bc8:701:1b:b283:feff:fed3:ebf1/122'],
 ]);
