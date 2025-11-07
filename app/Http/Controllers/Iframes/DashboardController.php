@@ -32,7 +32,7 @@ class DashboardController extends Controller
         $nbMedium = count($alerts['medium'] ?? []);
         $nbLow = count($alerts['low'] ?? []);
 
-        $leaks = TimelineController::fetchLeaks(\Auth::user())
+        $leaks = TimelineController::fetchLeaks($request->user())
             ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
             ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE)
             ->reverse()

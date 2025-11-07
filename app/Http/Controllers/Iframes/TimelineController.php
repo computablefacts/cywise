@@ -33,7 +33,11 @@ class TimelineController extends Controller
 
         if ($leaks->isEmpty()) {
 
-            $tlds = "'" . Asset::all()
+            $tlds = "'" . Asset::select('am_assets.*')
+                    ->join('users', 'users.id', '=', 'am_assets.created_by')
+                    ->when($user->tenant_id, fn($query, $tenantId) => $query->where('users.tenant_id', $tenantId))
+                    ->when($user->customer_id, fn($query, $customerId) => $query->where('users.customer_id', $customerId))
+                    ->get()
                     ->map(fn(Asset $asset) => $asset->tld())
                     ->filter(fn(?string $tld) => !empty($tld))
                     ->unique()
