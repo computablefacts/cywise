@@ -105,30 +105,34 @@ class Cleanup implements ShouldQueue
             Log::debug("Empty framework collections for user {$user->email} removed.");
             Log::debug("Removing vectors with missing references for user {$user->email}...");
 
-            Vector::cursor()->each(function (Vector $vector) {
+            Vector::query()
+                ->orderBy('id')
+                ->chunkById(50, function (\Illuminate\Support\Collection $vectors) {
+                    $vectors->each(function (Vector $vector) {
 
-                $hasCollection = true;
-                $hasFile = true;
-                $hasChunk = true;
+                        $hasCollection = true;
+                        $hasFile = true;
+                        $hasChunk = true;
 
-                if (!$vector->collection()?->exists()) {
-                    $vector->collection_id = null;
-                    $hasCollection = false;
-                }
-                if (!$vector->file()?->exists()) {
-                    $vector->file_id = null;
-                    $hasFile = false;
-                }
-                if (!$vector->chunk()?->exists()) {
-                    $vector->chunk_id = null;
-                    $hasChunk = false;
-                }
-                if (!$hasCollection && !$hasFile && !$hasChunk) {
-                    $vector->delete();
-                } else {
-                    $vector->save();
-                }
-            });
+                        if (!$vector->collection()?->exists()) {
+                            $vector->collection_id = null;
+                            $hasCollection = false;
+                        }
+                        if (!$vector->file()?->exists()) {
+                            $vector->file_id = null;
+                            $hasFile = false;
+                        }
+                        if (!$vector->chunk()?->exists()) {
+                            $vector->chunk_id = null;
+                            $hasChunk = false;
+                        }
+                        if (!$hasCollection && !$hasFile && !$hasChunk) {
+                            $vector->delete();
+                        } else {
+                            $vector->save();
+                        }
+                    });
+                });
 
             Log::debug("Vectors with missing references for user {$user->email} removed.");
             Log::debug("Purging conversations of user {$user->email} that are over 6 months old...");
