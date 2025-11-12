@@ -67,9 +67,9 @@ class TimelineController extends Controller
                         $obj = explode("\t", $line);
                         return [
                             'leak_date' => Str::before(Str::trim($obj[0]), ' '),
-                            'email' => Str::trim($obj[1]),
-                            'website' => Str::trim($obj[2]),
-                            'password' => self::maskPassword(Str::trim($obj[3])),
+                            'email' => Str::trim($obj[1] ?? ''),
+                            'website' => Str::trim($obj[2] ?? ''),
+                            'password' => self::maskPassword(Str::trim($obj[3] ?? '')),
                         ];
                     })
                     ->map(function (array $credentials) {
