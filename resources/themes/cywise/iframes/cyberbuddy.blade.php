@@ -60,9 +60,18 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
     font-weight: 600
   }
 
+  .tw-chat-disclaimer {
+    color: rgb(100, 116, 139);
+    font-size: 10px;
+    display: flex;
+    flex-direction: column;
+    margin: 0.5rem;
+  }
+
   .tw-chat-wrapper {
     align-items: center;
     padding: 1rem;
+    padding-top: 0;
     display: flex;
     width: 80%;
     margin: auto;
@@ -712,6 +721,9 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
       </div>
 
       <!-- INPUT FIELD -->
+      <p class="tw-chat-disclaimer text-center">
+        {{ __('Please ensure that you do not enter any sensitive or confidential information in your requests.') }}
+      </p>
       <div class="tw-chat-wrapper">
         <div class="tw-chat-footer">
           <input value="" type="text" placeholder="{{ __('Ask me anything!') }}" class="tw-chat-footer-input"/>
