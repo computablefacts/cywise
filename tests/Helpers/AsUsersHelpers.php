@@ -38,12 +38,12 @@ function asTenant2User(): TestCase
     return test()->actingAs($userTenant2);
 }
 
-function tenant1UserId(): int
+function tenant1User(): \App\Models\User
 {
-    return \App\Models\User::where('email', 'user@tenant1.com')->value('id');
+    return \App\Models\User::where('email', 'user@tenant1.com')->first();
 }
 
-function tenant2UserId(): int
+function tenant2User(): \App\Models\User
 {
-    return \App\Models\User::where('email', 'user@tenant2.com')->value('id');
+    return \App\Models\User::where('email', 'user@tenant2.com')->first();
 }

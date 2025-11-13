@@ -44,7 +44,7 @@ test('create and delete valid asset', function ($asset, $tld, $type) {
         'cur_scan_id' => null,
         'next_scan_id' => null,
         'is_monitored' => false,
-        'created_by' => tenant1UserId(),
+        'created_by' => tenant1User()->id,
     ]);
 
     $assetId = $response->json('result.asset.uid');
