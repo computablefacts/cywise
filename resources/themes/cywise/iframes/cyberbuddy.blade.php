@@ -896,6 +896,11 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
 
   const addUserDirective = (ts, directive) => {
 
+    const htmlEscape = (d) => d.replace(/[&<>"']/g, (match) => {
+      const escape = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'};
+      return escape[match];
+    });
+
     const formatTimestamp = (timestamp) => {
       const date = new Date(timestamp);
       const year = date.getFullYear();
@@ -926,7 +931,7 @@ $conversation = $conversation ?? \App\Models\Conversation::create([
               </svg>
           </div>
         </div>
-        <div class="tw-question-directive">${directive}</div>
+        <div class="tw-question-directive">${htmlEscape(directive)}</div>
       </div>
       <div class="tw-question-timestamp">${formatTimestamp(ts)}</div>
     `;
