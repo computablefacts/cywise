@@ -148,6 +148,13 @@ $user = \Auth::user();
             {{ __('CyberScribe') }}
           </x-app.sidebar-link>
           @endif
+          @if($user->canView('iframes.analyze'))
+          <x-app.sidebar-link href="{{ route('analyze') }}"
+                              icon="phosphor-chart-line"
+                              :active="Request::is('analyze')">
+            {{ __('Analyze (bêta)') }}
+          </x-app.sidebar-link>
+          @endif
           @if($user->canView('iframes.frameworks')
           || $user->canView('iframes.sca')
           || $user->canView('iframes.rules'))
