@@ -97,11 +97,26 @@
           }
           return obj;
         });
+
         console.log(data);
         if (!data || !data.length) {
           setError('Empty TSV file.');
           return;
         }
+
+        // Find uncorrelated attributes
+        const pvalues = [];
+        const outputValues = data.map(d => d['output']);
+
+        Object.keys(data[0]).filter(colName => colName !== 'output').forEach(colName => {
+          const values = data.map(d => d[colName]);
+          const pvalue = pValueLibrary(outputValues, values);
+          pvalues.push({column: colName, data: pvalue});
+        });
+
+        // If computations[][data][pvalue] < 0.05, the association is statistically significant
+        console.log(pvalues);
+
         buildCharts();
       } catch (err) {
         setError(err.message || 'Failed to parse TSV');
@@ -304,6 +319,222 @@
       }
     });
   }
+
+  /**
+   * A library to compute p-values for two arrays of the same length.
+   * Supports numeric-numeric, numeric-categorical, and categorical-categorical comparisons.
+   */
+  const pValueLibrary = (function () {
+
+    // Helper: Check if an array is numeric
+    function isNumericArray(arr) {
+      return arr.every(item => typeof item === 'number' && !isNaN(item));
+    }
+
+    // Helper: Check if an array is binary categorical (0/1)
+    function isBinaryCategorical(arr) {
+      const unique = [...new Set(arr)];
+      return unique.length === 2 && unique.every(val => val === 0 || val === 1);
+    }
+
+    // Helper: Check if an array is categorical (non-numeric)
+    function isCategoricalArray(arr) {
+      return !isNumericArray(arr);
+    }
+
+    // Helper: Pearson correlation for numeric-numeric
+    function pearsonCorrelation(x, y) {
+
+      const n = x.length;
+      let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+
+      for (let i = 0; i < n; i++) {
+        sumX += x[i];
+        sumY += y[i];
+        sumXY += x[i] * y[i];
+        sumX2 += x[i] * x[i];
+        sumY2 += y[i] * y[i];
+      }
+
+      const numerator = n * sumXY - sumX * sumY;
+      const denominatorX = Math.sqrt(n * sumX2 - sumX * sumX);
+      const denominatorY = Math.sqrt(n * sumY2 - sumY * sumY);
+
+      return numerator / (denominatorX * denominatorY);
+    }
+
+    // Helper: Point-biserial correlation for numeric-binary categorical
+    function pointBiserialCorrelation(numerical, binaryCat) {
+      return pearsonCorrelation(numerical, binaryCat);
+    }
+
+    // Helper: T-test p-value for Pearson/point-biserial correlation
+    function tTestPValue(r, n) {
+      const t = r * Math.sqrt((n - 2) / (1 - r * r));
+      const df = n - 2;
+      return 2 * (1 - studentTCDF(Math.abs(t), df));
+    }
+
+    // Helper: Approximate Student's t-distribution CDF
+    function studentTCDF(t, df) {
+      return 0.5 * (1 + Math.sign(t) * (1 - Math.exp(-df / 2) * Math.pow(1 + (t * t / df), -df / 2)));
+    }
+
+    // Helper: ANOVA F-test for numeric-multi-category
+    function anovaFTest(numerical, categorical) {
+
+      const groups = {};
+      const groupMeans = {};
+      const groupCounts = {};
+      let grandMean = 0;
+      let totalVariance = 0;
+      let betweenVariance = 0;
+      let withinVariance = 0;
+
+      // Group numerical values by category
+      for (let i = 0; i < numerical.length; i++) {
+        const cat = categorical[i];
+        if (!groups[cat]) {
+          groups[cat] = [];
+        }
+        groups[cat].push(numerical[i]);
+      }
+
+      // Calculate grand mean and total variance
+      const allValues = numerical;
+      grandMean = allValues.reduce((a, b) => a + b, 0) / allValues.length;
+      totalVariance = allValues.reduce((sum, x) => sum + Math.pow(x - grandMean, 2), 0) / allValues.length;
+
+      // Calculate between-group variance
+      for (const cat in groups) {
+        const group = groups[cat];
+        groupMeans[cat] = group.reduce((a, b) => a + b, 0) / group.length;
+        groupCounts[cat] = group.length;
+      }
+      for (const cat in groups) {
+        betweenVariance += groupCounts[cat] * Math.pow(groupMeans[cat] - grandMean, 2);
+      }
+
+      betweenVariance /= numerical.length;
+
+      // Calculate within-group variance
+      for (const cat in groups) {
+        const group = groups[cat];
+        const groupVariance = group.reduce((sum, x) => sum + Math.pow(x - groupMeans[cat], 2), 0) / group.length;
+        withinVariance += groupVariance * (group.length / numerical.length);
+      }
+
+      // F-statistic
+      const dfBetween = Object.keys(groups).length - 1;
+      const dfWithin = numerical.length - Object.keys(groups).length;
+      const F = betweenVariance / withinVariance;
+
+      // Approximate p-value for F-test
+      return {F, dfBetween, dfWithin};
+    }
+
+    // Helper: Approximate F-distribution p-value
+    function fDistributionPValue(F, df1, df2) {
+      return 1 - Math.exp(-F * df1 / df2); // Simplified approximation for demonstration
+    }
+
+    // Helper: Chi-square test for categorical-categorical
+    function chiSquareTest(cat1, cat2) {
+
+      const uniqueCat1 = [...new Set(cat1)];
+      const uniqueCat2 = [...new Set(cat2)];
+      const observed = [];
+
+      // Build observed contingency table
+      for (const c1 of uniqueCat1) {
+        const row = [];
+        for (const c2 of uniqueCat2) {
+          let count = 0;
+          for (let i = 0; i < cat1.length; i++) {
+            if (cat1[i] === c1 && cat2[i] === c2) {
+              count++;
+            }
+          }
+          row.push(count);
+        }
+        observed.push(row);
+      }
+
+      // Calculate row totals, column totals, and grand total
+      const rowTotals = observed.map(row => row.reduce((a, b) => a + b, 0));
+      const colTotals = observed[0].map((_, j) => observed.reduce((a, row) => a + row[j], 0));
+      const grandTotal = rowTotals.reduce((a, b) => a + b, 0);
+
+      // Calculate chi-square statistic
+      let chiSquare = 0;
+      for (let i = 0; i < observed.length; i++) {
+        for (let j = 0; j < observed[i].length; j++) {
+          const expected = (rowTotals[i] * colTotals[j]) / grandTotal;
+          chiSquare += Math.pow(observed[i][j] - expected, 2) / expected;
+        }
+      }
+
+      const df = (observed.length - 1) * (observed[0].length - 1);
+      return {chiSquare, df};
+    }
+
+    // Helper: Approximate chi-square p-value
+    function chiSquarePValue(chiSquare, df) {
+      return Math.exp(-0.5 * chiSquare); // Simplified approximation
+    }
+
+    // Main function: Compute p-value for two arrays
+    return function computePValue(arr1, arr2) {
+
+      if (arr1.length !== arr2.length) {
+        throw new Error("Arrays must be of the same length.");
+      }
+
+      const isArr1Numeric = isNumericArray(arr1);
+      const isArr2Numeric = isNumericArray(arr2);
+
+      // Numeric-Numeric: Pearson correlation
+      if (isArr1Numeric && isArr2Numeric) {
+        const r = pearsonCorrelation(arr1, arr2);
+        const pValue = tTestPValue(r, arr1.length);
+        return {test: "Pearson Correlation", r, pValue};
+      }
+      // Numeric-Binary Categorical: Point-biserial correlation
+      else if (isArr1Numeric && isBinaryCategorical(arr2)) {
+        const r = pointBiserialCorrelation(arr1, arr2);
+        const pValue = tTestPValue(r, arr1.length);
+        return {test: "Point-Biserial Correlation", r, pValue};
+      }
+      // Binary-Numeric Categorical: Point-biserial correlation
+      else if (isArr2Numeric && isBinaryCategorical(arr1)) {
+        const r = pointBiserialCorrelation(arr2, arr1);
+        const pValue = tTestPValue(r, arr2.length);
+        return {test: "Point-Biserial Correlation", r, pValue};
+      }
+      // Numeric-Multi-Category: ANOVA F-test
+      else if (isArr1Numeric && isCategoricalArray(arr2)) {
+        const {F, dfBetween, dfWithin} = anovaFTest(arr1, arr2);
+        const pValue = fDistributionPValue(F, dfBetween, dfWithin);
+        return {test: "ANOVA F-Test", F, dfBetween, dfWithin, pValue};
+      }
+      // Multi-Category-Numeric: ANOVA F-test
+      else if (isArr2Numeric && isCategoricalArray(arr1)) {
+        const {F, dfBetween, dfWithin} = anovaFTest(arr2, arr1);
+        const pValue = fDistributionPValue(F, dfBetween, dfWithin);
+        return {test: "ANOVA F-Test", F, dfBetween, dfWithin, pValue};
+      }
+      // Categorical-Categorical: Chi-square test
+      else if (isCategoricalArray(arr1) && isCategoricalArray(arr2)) {
+        const {chiSquare, df} = chiSquareTest(arr1, arr2);
+        const pValue = chiSquarePValue(chiSquare, df);
+        return {test: "Chi-Square Test", chiSquare, df, pValue};
+      }
+      // Unsupported case
+      else {
+        throw new Error("Unsupported combination of array types.");
+      }
+    };
+  })();
 
 </script>
 @endpush
