@@ -14,57 +14,75 @@
     cursor: pointer;
   }
 
+  /* Ensure only the charts area is scrollable on this page */
+
+  #parameters {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #charts {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
 </style>
 @endpush
 
 @section('content')
-<div class="d-grid gap-3 mb-3" style="grid-template-columns: 1fr 1fr;">
-  <div class="card mt-3">
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          <b>{{ __('Analyze (bêta)') }}</b>
+<div id="parameters">
+  <div class="d-grid gap-3 mb-3" style="grid-template-columns: 1fr 1fr;">
+    <div class="card mt-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <b>{{ __('Analyze (bêta)') }}</b>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <label class="block mb-2 font-medium">
+              {{ __('Upload a CSV file') }}
+            </label>
+            <input id="csvFile" type="file" accept=".csv" class="block w-full">
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            The file must contain only <strong>numerical</strong> et <strong>categorical</strong> columns. The file must
+            contain one special column named <strong>output</strong> with up to 5 categories. The
+            <strong>output</strong> column is the target variable to optimize.
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <span id="errors" class="hidden text-red-600"></span>
+          </div>
         </div>
       </div>
-      <div class="row mt-3">
-        <div class="col">
-          <label class="block mb-2 font-medium">
-            {{ __('Upload a CSV file') }}
-          </label>
-          <input id="csvFile" type="file" accept=".csv" class="block w-full">
+    </div>
+    <div id="output-card" class="card mt-3 hidden">
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <b>{{ __('Output') }}</b>
+          </div>
         </div>
-      </div>
-      <div class="row mt-3">
-        <div class="col">
-          The file must contain only <strong>numerical</strong> et <strong>categorical</strong> columns. The file must
-          contain one special column named <strong>output</strong> with up to 5 categories. The <strong>output</strong>
-          column is the target variable to optimize.
-        </div>
-      </div>
-      <div class="row mt-3">
-        <div class="col">
-          <span id="errors" class="hidden text-red-600"></span>
+        <div class="row mt-3">
+          <div class="col">
+            <div id="output-chart"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <div id="output-card" class="card mt-3 hidden">
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          <b>{{ __('Output') }}</b>
-        </div>
-      </div>
-      <div class="row mt-3">
-        <div class="col">
-          <div id="output-chart"></div>
-        </div>
-      </div>
-    </div>
+  <div id="charts" class="d-grid gap-3 mb-3" style="grid-template-columns: 1fr 1fr;">
+    <!-- Charts will be inserted here -->
   </div>
-</div>
-<div id="charts" class="d-grid gap-3 mt-3 mb-3" style="grid-template-columns: 1fr 1fr;">
-  <!-- Charts will be inserted here -->
 </div>
 @endsection
 
