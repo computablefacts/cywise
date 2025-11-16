@@ -185,9 +185,53 @@
 
     setError('');
 
-    // Explain the contribution of each feature in the output categories
-    const explainer = findExplanation(data);
-    console.log("explainer", explainer);
+    // Debounce to avoid recomputing too often while brushing/filtering
+    const debounce = (fn, wait = 150) => {
+      let t;
+      return function (...args) {
+        const ctx = this;
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(ctx, args), wait);
+      };
+    }
+
+    // Get filtered rows from Crossfilter (falls back to all)
+    const filteredData = () => {
+      try {
+        if (ndx && typeof ndx.allFiltered === 'function') {
+          return ndx.allFiltered();
+        }
+      } catch (e) {
+      }
+      try {
+        if (ndx && typeof ndx.all === 'function') {
+          return ndx.all();
+        }
+      } catch (e) {
+      }
+      return data || [];
+    }
+
+    // Recompute explainer based on current filters
+    const recomputeExplainer = () => {
+      const filtered = filteredData();
+      if (!filtered || !filtered.length) {
+        console.log('explainer: no data after filters');
+        return;
+      }
+      if (!Object.keys(filtered[0] || {}).includes('output')) {
+        return; // Safety: if output was removed somehow, skip
+      }
+      try {
+        console.log('filtered data', filtered);
+        const explainer = findExplanation(filtered);
+        console.log('explainer', explainer);
+      } catch (err) {
+        console.warn('Failed to recompute explainer:', err);
+      }
+    }
+
+    const scheduleRecomputeExplainer = debounce(recomputeExplainer, 200);
 
     // Create a row chart for output categories
     outputDim = ndx.dimension(d => d['output']);
@@ -203,6 +247,7 @@
       .label(d => d.key)
       .elasticX(true)
       .data(group => group.all().filter(d => d.value > 0));
+      outputChart.on('filtered.recompute', () => scheduleRecomputeExplainer());
       elOutputCard.classList.remove('hidden');
     }
 
@@ -254,6 +299,7 @@
         .gap(1)
         .x(d3.scaleLinear().domain(ext).nice())
         .renderHorizontalGridLines(true);
+        chart.on('filtered.recompute', () => scheduleRecomputeExplainer());
       } else {
         dimension = ndx.dimension(d => d[colName]);
         chart = new dc.RowChart(`#${chartId}`);
@@ -264,6 +310,7 @@
         .label(d => d.key)
         .elasticX(true)
         .data(group => group.all().filter(d => d.value > 0));
+        chart.on('filtered.recompute', () => scheduleRecomputeExplainer());
       }
 
       dimensions[colName] = dimension;
@@ -271,6 +318,7 @@
     });
 
     dc.renderAll();
+    scheduleRecomputeExplainer();
 
     // Deal with toolbar buttons inside cards
     elCharts.addEventListener('click', function (e) {
@@ -291,6 +339,7 @@
         console.log('reset');
         chart.filterAll();
         dc.redrawAll();
+        scheduleRecomputeExplainer();
       } else if (action === 'exclude') {
 
         // Remove column from dataset
@@ -299,10 +348,6 @@
           delete newObj[colName];
           return newObj;
         });
-
-        // Explain the contribution of each feature in the output categories
-        const explainer = findExplanation(data);
-        console.log("explainer", explainer);
 
         // Remove dimension and chart
         delete dimensions[colName];
@@ -314,6 +359,7 @@
         // Rebuild crossfilter with updated data
         ndx = cf(data);
         dc.renderAll();
+        scheduleRecomputeExplainer();
       }
     });
   }
