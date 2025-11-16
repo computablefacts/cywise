@@ -338,30 +338,19 @@
         return;
       }
 
-      // Build data rows by category
-      const categories = globalExplainer.categories || [];
-      const scoresGlobal = (globalExplainer && globalExplainer.scoresByCategory) || {};
-      const scoresSelection = (selectionExplainer && selectionExplainer.scoresByCategory) || {};
-      const rows = categories.map(cat => ({
-        key: cat,
-        selection: +((scoresSelection[cat] != null) ? scoresSelection[cat] : 0),
-        global: +((scoresGlobal[cat] != null) ? scoresGlobal[cat] : 0)
-      }));
-
       // Destroy previous chart instance if any
       if (outputChart && typeof outputChart.destroy === 'function') {
         outputChart.destroy();
       }
 
-      elOutputChart.innerHTML = '';
       const canvas = document.createElement('canvas');
-      canvas.id = 'output-chart-canvas';
+      elOutputChart.innerHTML = '';
       elOutputChart.appendChild(canvas);
       elOutputCard.classList.remove('hidden');
 
-      const labels = rows.map(r => r.key);
-      const dataGlobal = rows.map(r => Math.max(0, Math.min(1, r.global)));
-      const dataSelection = rows.map(r => Math.max(0, Math.min(1, r.selection)));
+      const labels = globalExplainer.categories || [];
+      const dataGlobal = labels.map(cat => (globalExplainer.data ?? []).filter(d => d['output'] === cat).length);
+      const dataSelection = labels.map(cat => (selectionExplainer.data ?? []).filter(d => d['output'] === cat).length);
       const ctx = canvas.getContext('2d');
 
       outputChart = new Chart(ctx, {
@@ -388,13 +377,16 @@
             legend: {display: false}, tooltip: {
               callbacks: {
                 label: (context) => {
-                  const v = context.parsed.y ?? context.parsed;
-                  const percent = formatNumber(Math.max(0, Math.min(1, v)) * 100) + '%';
-                  const count = context.dataset.label === 'Selection' ? filteredData().length : data.length;
-                  const cat = labels[context.dataIndex];
-                  const pvalue = context.dataset.label === 'Selection' && selectionExplainer?.pvalues?.[cat]
-                    ? `, p-value=${formatNumber(selectionExplainer.pvalues[cat])}` : '';
-                  return `${context.dataset.label}: ${percent} (${count} items${pvalue})`;
+                  if (context.dataset.label === 'Selection') {
+
+                    const cat = context.label;
+                    const pvalue = selectionExplainer?.pvalues?.[cat];
+
+                    if (pvalue != null) {
+                      return `${context.dataset.label}: ${context.raw || 0} items (p-value=${formatNumber(pvalue)})`;
+                    }
+                  }
+                  return `${context.dataset.label}: ${context.raw || 0} items`;
                 }
               }
             }
@@ -402,9 +394,7 @@
             x: {
               stacked: false, ticks: {autoSkip: false}
             }, y: {
-              beginAtZero: true, max: 1, ticks: {
-                callback: (value) => Math.round(value * 100) + '%',
-              }
+              beginAtZero: true, max: Math.max(...dataGlobal, ...dataSelection),
             }
           }
         }
@@ -511,7 +501,8 @@
 
         excluded.push(colName);
 
-        // Destroy dimension and chart
+        // Remove all filters and destroy dimension/chart
+        dimension.filterAll();
         delete dimensions[colName];
         charts[colName].svg().remove();
         delete charts[colName];
@@ -599,6 +590,7 @@
     });
 
     explainer.pvalues = pValuesByCategory;
+    explainer.data = data;
     return explainer;
   }
 
