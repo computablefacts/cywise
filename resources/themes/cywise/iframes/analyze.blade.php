@@ -285,20 +285,23 @@
       const dataGlobal = rows.map(r => Math.max(0, Math.min(1, r.global)));
       const dataSelection = rows.map(r => Math.max(0, Math.min(1, r.selection)));
       const ctx = canvas.getContext('2d');
-      const scoreToColor = (score) => {
-        if (score < 0.10) {
-          return 'red';
-        }
-        if (score < 0.30) {
-          return 'yellow';
-        }
-        return 'green';
-      }
 
       outputChart = new Chart(ctx, {
         type: 'bar', data: {
           labels, datasets: [{
-            label: 'Selection', data: dataSelection, backgroundColor: dataSelection.map(score => scoreToColor(score))
+            label: 'Selection', data: dataSelection, backgroundColor: dataSelection.map((_, i) => {
+              const p = selectionExplainer?.pvalues?.[labels[i]] || 0;
+              if (p < 0.01) { // très significatif
+                return 'darkgreen';
+              }
+              if (p < 0.05) { // significatif
+                return 'green';
+              }
+              if (p < 0.10) { // tendance
+                return 'orange';
+              }
+              return 'gray'; // non significatif
+            })
           }, {
             label: 'Global', data: dataGlobal, backgroundColor: 'rgb(49, 130, 189)'
           }]
