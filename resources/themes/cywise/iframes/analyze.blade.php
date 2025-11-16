@@ -155,6 +155,7 @@
   let outputDim = null; // crossfilter dimension for output
   let outputGroup = null; // crossfilter group for output
   let outputChart = null; // Chart.js instance for output
+  let ranges = {}; // map col. name to [min,max] for numeric charts
 
   const findColumnType = (values) => {
     const notNull = values.filter(v => v !== null && v !== undefined && v !== '');
@@ -217,6 +218,64 @@
         t = setTimeout(() => fn.apply(ctx, args), wait);
       };
     }
+
+    // Choose formatting based on magnitude
+    const formatNumber = (v) => {
+      if (v == null || isNaN(v)) {
+        return '';
+      }
+      const abs = Math.abs(v);
+      const opts = abs >= 1000 ? {maximumFractionDigits: 0} : {maximumFractionDigits: 4};
+      return Number(v).toLocaleString(undefined, opts);
+    };
+
+    const getBoundsFromFilter = (f) => {
+      if (!f) {
+        return null;
+      }
+      // If it's an array-like [min, max]
+      if (Array.isArray(f) && f.length >= 2 && [f[0], f[1]].every(x => typeof x === 'number')) {
+        return [f[0], f[1]];
+      }
+      // dc.js RangedFilter variants
+      const candidates = [['from', 'to'], ['lo', 'hi'], ['lowerBound', 'upperBound'], ['begin', 'end'], ['x0', 'x1']];
+      for (const [a, b] of candidates) {
+        if (typeof f === 'object' && f != null && typeof f[a] === 'number' && typeof f[b] === 'number') {
+          return [f[a], f[b]];
+        }
+      }
+      // Some versions expose .filter as function returning array
+      if (typeof f.filter === 'function') {
+        try {
+          const arr = f.filter();
+          if (Array.isArray(arr) && arr.length >= 2) {
+            return [arr[0], arr[1]];
+          }
+        } catch (e) {
+        }
+      }
+      return null;
+    };
+
+    const updateRangeDisplay = (colName) => {
+      const chart = charts[colName];
+      const ext = ranges[colName];
+      const el = document.getElementById('range_chart_' + colName.replace(/[^a-zA-Z0-9_]/g, '_'));
+      if (!chart || !ext || !el) {
+        return;
+      }
+      const filters = (typeof chart.filters === 'function') ? chart.filters() : [];
+      let bounds = null;
+      if (filters && filters.length) {
+        bounds = getBoundsFromFilter(filters[0]);
+      }
+      if (!bounds) {
+        bounds = ext;
+      }
+      const [min, max] = bounds;
+      el.textContent = formatNumber(min) + ' – ' + formatNumber(max);
+      el.style.display = '';
+    };
 
     // Get filtered rows from Crossfilter (falls back to all)
     const filteredData = () => {
@@ -329,11 +388,11 @@
               callbacks: {
                 label: (context) => {
                   const v = context.parsed.y ?? context.parsed;
-                  const percent = (Math.max(0, Math.min(1, v)) * 100).toFixed(2) + '%';
+                  const percent = formatNumber(Math.max(0, Math.min(1, v)) * 100) + '%';
                   const count = context.dataset.label === 'Selection' ? filteredData().length : data.length;
                   const cat = labels[context.dataIndex];
                   const pvalue = context.dataset.label === 'Selection' && selectionExplainer?.pvalues?.[cat]
-                    ? `, p-value=${selectionExplainer.pvalues[cat].toFixed(3)}` : '';
+                    ? `, p-value=${formatNumber(selectionExplainer.pvalues[cat])}` : '';
                   return `${context.dataset.label}: ${percent} (${count} items${pvalue})`;
                 }
               }
@@ -364,6 +423,7 @@
           <div class="row">
             <div class="col">
               <b>${colName}</b>
+              <div class="text-muted small" id="range_${chartId}" style="display:none"></div>
             </div>
             <div class="col-auto">
               <a data-action="reset" data-col="${colName}">
@@ -399,6 +459,11 @@
         .gap(1)
         .x(d3.scaleLinear().domain(ext).nice())
         .renderHorizontalGridLines(true);
+        ranges[colName] = ext;
+        // Update range text on render, redraw and filter changes
+        chart.on('postRender.updateRange', () => updateRangeDisplay(colName));
+        chart.on('postRedraw.updateRange', () => updateRangeDisplay(colName));
+        chart.on('filtered.updateRange', () => updateRangeDisplay(colName));
         chart.on('filtered.recompute', () => scheduleRecomputeExplainer());
       } else {
         dimension = ndx.dimension(d => d[colName]);
@@ -418,6 +483,7 @@
     });
 
     dc.renderAll();
+    Object.keys(ranges).forEach(col => updateRangeDisplay(col));
     scheduleRecomputeExplainer();
 
     // Deal with toolbar buttons inside cards
