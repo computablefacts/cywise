@@ -451,7 +451,6 @@
         .x(d3.scaleLinear().domain(ext).nice())
         .renderHorizontalGridLines(true);
         ranges[colName] = ext;
-        // Update range text on render, redraw and filter changes
         chart.on('postRender.updateRange', () => updateRangeDisplay(colName));
         chart.on('postRedraw.updateRange', () => updateRangeDisplay(colName));
         chart.on('filtered.updateRange', () => updateRangeDisplay(colName));
@@ -462,7 +461,7 @@
         chart._rowCssClass = 'dc-row'; // fix class conflict with FastBootstrap
         chart.dimension(dimension)
         .group(dimension.group())
-        .margins({top: 10, left: 0, right: 0, bottom: 20})
+        .margins({top: 10, left: 10, right: 10, bottom: 20})
         .label(d => d.key)
         .elasticX(true)
         .data(group => group.all().filter(d => d.value > 0));
