@@ -36,7 +36,9 @@
       </div>
       <div class="row mt-3">
         <div class="col">
-          {!! __('The file must contain one special column named <strong>output</strong> with up to 5 categories.') !!}
+          The file must contain only <strong>numerical</strong> et <strong>categorical</strong> columns. The file must
+          contain one special column named <strong>output</strong> with up to 5 categories. The <strong>output</strong>
+          column is the target variable to optimize.
         </div>
       </div>
       <div class="row mt-3">
@@ -69,6 +71,7 @@
 @include('theme::iframes._crossfilter')
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
 <script>
 
   /* Load the CSV file and build charts */
@@ -133,7 +136,7 @@
   let output = []; // categories for the "output" column
   let outputDim = null; // crossfilter dimension for output
   let outputGroup = null; // crossfilter group for output
-  let outputChart = null; // dc.js chart for output
+  let outputChart = null; // Chart.js instance for output
 
   const findColumnType = (values) => {
     const notNull = values.filter(v => v !== null && v !== undefined && v !== '');
@@ -141,8 +144,10 @@
       return 'categorical';
     }
     if (notNull.every(v => typeof v === 'number' && !isNaN(v))) {
+      console.log('findColumnType', values, 'number');
       return 'numeric';
     }
+    console.log('findColumnType', values, 'categorical');
     return 'categorical';
   }
 
@@ -212,11 +217,13 @@
       return data || [];
     }
 
-    // Recompute explainer based on current filters
+    // Recompute explainer based on current filters and update output chart
     const recomputeExplainer = () => {
       const filtered = filteredData();
       if (!filtered || !filtered.length) {
         console.log('explainer: no data after filters');
+        selectionExplainer = null;
+        updateChartExplainer();
         return;
       }
       if (!Object.keys(filtered[0] || {}).includes('output')) {
@@ -224,8 +231,9 @@
       }
       try {
         console.log('filtered data', filtered);
-        const explainer = findExplanation(filtered);
-        console.log('explainer', explainer);
+        selectionExplainer = findExplanation(filtered);
+        console.log('selection explainer', selectionExplainer);
+        updateChartExplainer();
       } catch (err) {
         console.warn('Failed to recompute explainer:', err);
       }
@@ -233,22 +241,90 @@
 
     const scheduleRecomputeExplainer = debounce(recomputeExplainer, 200);
 
-    // Create a row chart for output categories
-    outputDim = ndx.dimension(d => d['output']);
-    outputGroup = outputDim.group();
+    // Prepare output explainer chart (two bars per category: selection vs whole dataset)
+    // Compute global explainer once (based on full dataset, not crossfilter selection)
+    let globalExplainer = null;
+    let selectionExplainer = null;
 
-    if (elOutputChart) {
-      outputChart = new dc.RowChart('#output-chart');
-      outputChart._rowCssClass = 'dc-row'; // fix class conflict with FastBootstrap
-      outputChart
-      .dimension(outputDim)
-      .group(outputGroup)
-      .margins({top: 0, left: 0, right: 0, bottom: 20})
-      .label(d => d.key)
-      .elasticX(true)
-      .data(group => group.all().filter(d => d.value > 0));
-      outputChart.on('filtered.recompute', () => scheduleRecomputeExplainer());
+    try {
+      globalExplainer = findExplanation(data);
+    } catch (e) {
+      console.warn('Failed to compute global explainer:', e);
+    }
+
+    const updateChartExplainer = () => {
+      if (!elOutputChart) {
+        return;
+      }
+      if (!globalExplainer) {
+        return;
+      }
+
+      // Build data rows by category
+      const categories = globalExplainer.categories || [];
+      const scoresGlobal = (globalExplainer && globalExplainer.scoresByCategory) || {};
+      const scoresSelection = (selectionExplainer && selectionExplainer.scoresByCategory) || {};
+      const rows = categories.map(cat => ({
+        key: cat,
+        selection: +((scoresSelection[cat] != null) ? scoresSelection[cat] : 0),
+        global: +((scoresGlobal[cat] != null) ? scoresGlobal[cat] : 0)
+      }));
+
+      // Destroy previous chart instance if any
+      if (outputChart && typeof outputChart.destroy === 'function') {
+        outputChart.destroy();
+      }
+
+      elOutputChart.innerHTML = '';
+      const canvas = document.createElement('canvas');
+      canvas.id = 'output-chart-canvas';
+      elOutputChart.appendChild(canvas);
       elOutputCard.classList.remove('hidden');
+
+      const labels = rows.map(r => r.key);
+      const dataGlobal = rows.map(r => Math.max(0, Math.min(1, r.global)));
+      const dataSelection = rows.map(r => Math.max(0, Math.min(1, r.selection)));
+      const ctx = canvas.getContext('2d');
+      const scoreToColor = (score) => {
+        if (score < 0.10) {
+          return 'red';
+        }
+        if (score < 0.30) {
+          return 'yellow';
+        }
+        return 'green';
+      }
+
+      outputChart = new Chart(ctx, {
+        type: 'bar', data: {
+          labels, datasets: [{
+            label: 'Selection', data: dataSelection, backgroundColor: dataSelection.map(score => scoreToColor(score))
+          }, {
+            label: 'Global', data: dataGlobal, backgroundColor: 'rgb(49, 130, 189)'
+          }]
+        }, options: {
+          responsive: true, maintainAspectRatio: false, plugins: {
+            legend: {display: false}, tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const v = context.parsed.y ?? context.parsed;
+                  const percent = (Math.max(0, Math.min(1, v)) * 100).toFixed(2) + '%';
+                  const count = context.dataset.label === 'Selection' ? filteredData().length : data.length;
+                  return `${context.dataset.label}: ${percent} (${count} items)`;
+                }
+              }
+            }
+          }, scales: {
+            x: {
+              stacked: false, ticks: {autoSkip: false}
+            }, y: {
+              beginAtZero: true, max: 1, ticks: {
+                callback: (value) => Math.round(value * 100) + '%',
+              }
+            }
+          }
+        }
+      });
     }
 
     // Insert charts in the DOM for each column except the "output" column
