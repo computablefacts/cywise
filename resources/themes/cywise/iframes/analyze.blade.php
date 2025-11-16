@@ -444,6 +444,13 @@
 
         chart.root().node().closest('.card').remove(); // remove the card containing the chart
 
+        // Update the global explainer based on the new dataset
+        try {
+          globalExplainer = findExplanation(data);
+        } catch (e) {
+          console.warn('Failed to compute global explainer:', e);
+        }
+
         // Rebuild crossfilter with updated data
         ndx = cf(data);
 
