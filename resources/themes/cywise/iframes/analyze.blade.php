@@ -230,7 +230,7 @@
         return; // Safety: if output was removed somehow, skip
       }
       try {
-        console.log('filtered data', filtered);
+        // console.log('filtered data', filtered);
         selectionExplainer = findExplanation(filtered);
         console.log('selection explainer', selectionExplainer);
         updateChartExplainer();
@@ -474,6 +474,28 @@
 
   const findExplanation = (data) => {
 
+    // Mélange in-place (Fisher–Yates)
+    function shuffleInPlace(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+      }
+      return arr;
+    }
+
+    // Comptage p-value (proportion de scores permutés >= score observé)
+    function computePValue(observed, permScores) {
+      let countGE = 0;
+      for (let i = 0; i < permScores.length; i++) {
+        if (permScores[i] >= observed) {
+          countGE++;
+        }
+      }
+      return (countGE + 1) / (permScores.length + 1);
+    }
+
     /**
      * Heuristique pour déterminer le nombre de bins à utiliser pour discrétiser des variables continues.
      *
@@ -495,7 +517,30 @@
     const features = Object.keys(data[0] || {}).filter(colName => colName !== 'output');
     const y = data.map(d => d['output']);
     const X = data.map(d => features.map(colName => d[colName]));
-    return featureExplainer(y, X, features, {bins: findOptimalNumberOfBins(y.length)});
+    const options = {bins: findOptimalNumberOfBins(y.length)};
+    const explainer = featureExplainer(y, X, features, options);
+    const yCopy = y.slice();
+    const scoresByCategoryPermutated = {};
+    explainer.categories.forEach(cat => scoresByCategoryPermutated[cat] = []);
+
+    for (let b = 0; b < 100 /* arbitrary value */; b++) {
+      shuffleInPlace(yCopy);
+      const permExplainer = featureExplainer(yCopy, X, features, options);
+      const permScores = permExplainer.scoresByCategory || {};
+      explainer.categories.forEach(
+        cat => scoresByCategoryPermutated[cat].push(+(permScores[cat] != null ? permScores[cat] : 0)));
+    }
+
+    const pValuesByCategory = {};
+
+    explainer.categories.forEach(cat => {
+      const observedScored = +(explainer.scoresByCategory[cat] != null ? explainer.scoresByCategory[cat] : 0);
+      const permutatedScores = scoresByCategoryPermutated[cat];
+      pValuesByCategory[cat] = computePValue(observedScored, permutatedScores);
+    });
+
+    explainer.pvalues = pValuesByCategory;
+    return explainer;
   }
 
   /**
