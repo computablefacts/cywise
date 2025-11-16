@@ -418,6 +418,18 @@
         scheduleRecomputeExplainer();
       } else if (action === 'exclude') {
 
+        // Store current filters before updating crossfilter
+        const currentFilters = {};
+
+        Object.entries(charts).forEach(([col, chart]) => {
+          if (col !== colName) {
+            const filters = chart.filters();
+            if (filters && filters.length) {
+              currentFilters[col] = filters;
+            }
+          }
+        });
+
         // Remove column from dataset
         data = data.map(d => {
           const newObj = {...d};
@@ -425,7 +437,7 @@
           return newObj;
         });
 
-        // Remove dimension and chart
+        // Destroy dimension and chart
         delete dimensions[colName];
         charts[colName].svg().remove();
         delete charts[colName];
@@ -434,6 +446,19 @@
 
         // Rebuild crossfilter with updated data
         ndx = cf(data);
+
+        // Restore dimensions and charts
+        Object.entries(charts).forEach(([col, chart]) => {
+          if (col !== colName) {
+            const dim = ndx.dimension(d => d[col]);
+            dimensions[col] = dim;
+            chart.dimension(dim);
+            if (currentFilters[col]) { // Reapply stored filters
+              chart.filter(currentFilters[col]);
+            }
+          }
+        });
+
         dc.renderAll();
         scheduleRecomputeExplainer();
       }
