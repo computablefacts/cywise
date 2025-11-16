@@ -310,7 +310,10 @@
                   const v = context.parsed.y ?? context.parsed;
                   const percent = (Math.max(0, Math.min(1, v)) * 100).toFixed(2) + '%';
                   const count = context.dataset.label === 'Selection' ? filteredData().length : data.length;
-                  return `${context.dataset.label}: ${percent} (${count} items)`;
+                  const cat = labels[context.dataIndex];
+                  const pvalue = context.dataset.label === 'Selection' && selectionExplainer?.pvalues?.[cat]
+                    ? `, p-value=${selectionExplainer.pvalues[cat].toFixed(3)}` : '';
+                  return `${context.dataset.label}: ${percent} (${count} items${pvalue})`;
                 }
               }
             }
