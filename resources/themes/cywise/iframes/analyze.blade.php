@@ -101,7 +101,7 @@
           return obj;
         });
 
-        console.log(data);
+        // console.log(data);
 
         if (!data || !data.length) {
           setError('Empty TSV file.');
@@ -144,10 +144,10 @@
       return 'categorical';
     }
     if (notNull.every(v => typeof v === 'number' && !isNaN(v))) {
-      console.log('findColumnType', values, 'number');
+      // console.log('findColumnType', values, 'number');
       return 'numeric';
     }
-    console.log('findColumnType', values, 'categorical');
+    // console.log('findColumnType', values, 'categorical');
     return 'categorical';
   }
 
@@ -221,7 +221,7 @@
     const recomputeExplainer = () => {
       const filtered = filteredData();
       if (!filtered || !filtered.length) {
-        console.log('explainer: no data after filters');
+        // console.log('explainer: no data after filters');
         selectionExplainer = null;
         updateChartExplainer();
         return;
@@ -409,10 +409,10 @@
       const dimension = dimensions[colName];
       const chart = charts[colName];
 
-      console.log(action, dimension, chart);
+      // console.log(action, dimension, chart);
 
       if (action === 'reset') {
-        console.log('reset');
+        // console.log('reset');
         chart.filterAll();
         dc.redrawAll();
         scheduleRecomputeExplainer();
@@ -657,10 +657,10 @@
     const nbBins = options.bins || 8;
     const n = y.length;
 
-    console.log("featureExplainer.y", y);
-    console.log("featureExplainer.featureMatrix", featureMatrix);
-    console.log("featureExplainer.featureNames", featureNames);
-    console.log("featureExplainer.options", options);
+    // console.log("featureExplainer.y", y);
+    // console.log("featureExplainer.featureMatrix", featureMatrix);
+    // console.log("featureExplainer.featureNames", featureNames);
+    // console.log("featureExplainer.options", options);
 
     if (!Array.isArray(featureMatrix) || featureMatrix.length !== n) {
       const msg = "featureMatrix doit être un tableau de longueur n (n = y.length)";
@@ -682,8 +682,8 @@
     const featNames = featureNames && featureNames.length === d ? featureNames.slice() : Array.from({length: d},
       (_, j) => "f" + j);
 
-    console.log("featureExplainer.categories", categories);
-    console.log("featureExplainer.featNames", featNames);
+    // console.log("featureExplainer.categories", categories);
+    // console.log("featureExplainer.featNames", featNames);
 
     // Prépare les colonnes de features
     const columns = [];
@@ -704,7 +704,7 @@
       }
     }
 
-    console.log("featureExplainer.columns", columns);
+    // console.log("featureExplainer.columns", columns);
 
     const scoresByFeature = {};
 
@@ -712,12 +712,12 @@
       scoresByFeature[featNames[j]] = {};
     }
 
-    console.log("featureExplainer.scores", scoresByFeature);
+    // console.log("featureExplainer.scores", scoresByFeature);
 
     const groupOfFeatures = buildGroupOfFeatures(columns);
     const scoresByCategory = {};
 
-    console.log("featureExplainer.groupOfFeatures", groupOfFeatures);
+    // console.log("featureExplainer.groupOfFeatures", groupOfFeatures);
 
     // Pour chaque catégorie, calculer Y_k binaire et MI avec chaque feature
     for (let cIdx = 0; cIdx < categories.length; cIdx++) {
@@ -731,23 +731,23 @@
       if (hY === 0) {
         for (let j = 0; j < d; j++) {
           scoresByFeature[featNames[j]][cat] = 0;
-          console.log("featureExplainer.scoresByFeature[" + featNames[j] + "][" + cat + "]", 0);
+          // console.log("featureExplainer.scoresByFeature[" + featNames[j] + "][" + cat + "]", 0);
         }
         scoresByCategory[cat] = 0;
-        console.log("featureExplainer.scoresByCategory[" + cat + "]", 0);
+        // console.log("featureExplainer.scoresByCategory[" + cat + "]", 0);
         continue;
       }
 
       const mii = mutualInformation(groupOfFeatures, yBin);
       scoresByCategory[cat] = mii / hY;
-      console.log("featureExplainer.scoresByCategory[" + cat + "]", scoresByCategory[cat]);
+      // console.log("featureExplainer.scoresByCategory[" + cat + "]", scoresByCategory[cat]);
 
       for (let j = 0; j < d; j++) {
         const xCol = columns[j];
         const mi = mutualInformation(xCol, yBin);
         const normalized = mi / hY; // dans [0,1] si tout se passe bien
         scoresByFeature[featNames[j]][cat] = normalized;
-        console.log("featureExplainer.scoresByFeature[" + featNames[j] + "][" + cat + "]", normalized);
+        // console.log("featureExplainer.scoresByFeature[" + featNames[j] + "][" + cat + "]", normalized);
       }
     }
     return {
