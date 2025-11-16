@@ -156,6 +156,7 @@
   let outputGroup = null; // crossfilter group for output
   let outputChart = null; // Chart.js instance for output
   let ranges = {}; // map col. name to [min,max] for numeric charts
+  let excluded = []; // excluded dimensions
 
   const findColumnType = (values) => {
     const notNull = values.filter(v => v !== null && v !== undefined && v !== '');
@@ -307,7 +308,7 @@
         return; // Safety: if output was removed somehow, skip
       }
       try {
-        // console.log('filtered data', filtered);
+        console.log('filtered data', filtered);
         selectionExplainer = findExplanation(filtered);
         console.log('selection explainer', selectionExplainer);
         updateChartExplainer();
@@ -508,24 +509,7 @@
         scheduleRecomputeExplainer();
       } else if (action === 'exclude') {
 
-        // Store current filters before updating crossfilter
-        const currentFilters = {};
-
-        Object.entries(charts).forEach(([col, chart]) => {
-          if (col !== colName) {
-            const filters = chart.filters();
-            if (filters && filters.length) {
-              currentFilters[col] = filters;
-            }
-          }
-        });
-
-        // Remove column from dataset
-        data = data.map(d => {
-          const newObj = {...d};
-          delete newObj[colName];
-          return newObj;
-        });
+        excluded.push(colName);
 
         // Destroy dimension and chart
         delete dimensions[colName];
@@ -541,22 +525,7 @@
           console.warn('Failed to compute global explainer:', e);
         }
 
-        // Rebuild crossfilter with updated data
-        ndx = cf(data);
-
-        // Restore dimensions and charts
-        Object.entries(charts).forEach(([col, chart]) => {
-          if (col !== colName) {
-            const dim = ndx.dimension(d => d[col]);
-            dimensions[col] = dim;
-            chart.dimension(dim);
-            if (currentFilters[col]) { // Reapply stored filters
-              chart.filter(currentFilters[col]);
-            }
-          }
-        });
-
-        dc.renderAll();
+        dc.redrawAll();
         scheduleRecomputeExplainer();
       }
     });
@@ -604,7 +573,7 @@
       return 32;
     }
 
-    const features = Object.keys(data[0] || {}).filter(colName => colName !== 'output');
+    const features = Object.keys(data[0] || {}).filter(colName => colName !== 'output' && !excluded.includes(colName));
     const y = data.map(d => d['output']);
     const X = data.map(d => features.map(colName => d[colName]));
     const options = {bins: findOptimalNumberOfBins(y.length)};
