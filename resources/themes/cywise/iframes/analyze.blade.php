@@ -99,25 +99,14 @@
         });
 
         console.log(data);
+
         if (!data || !data.length) {
           setError('Empty TSV file.');
           return;
         }
 
-        // Find uncorrelated attributes
-        const pvalues = [];
-        const outputValues = data.map(d => d['output']);
-
-        Object.keys(data[0]).filter(colName => colName !== 'output').forEach(colName => {
-          const values = data.map(d => d[colName]);
-          const pvalue = pValueLibrary(outputValues, values);
-          pvalues.push({column: colName, data: pvalue});
-        });
-
-        // If computations[][data][pvalue] < 0.05, the association is statistically significant
-        console.log(pvalues);
-
         buildCharts();
+
       } catch (err) {
         setError(err.message || 'Failed to parse TSV');
       }
@@ -180,20 +169,25 @@
     }
 
     ndx = cf(data);
-
     const columns = Object.keys(data[0] || {});
+
     if (!columns.includes('output')) {
       setError('The CSV file must contain an "output" column.');
       return;
     }
 
-    const outputValues = Array.from(new Set(data.map(d => d.output))).filter(v => v !== '');
+    const outputValues = Array.from(new Set(data.map(d => d['output']))).filter(v => v !== '');
+
     if (outputValues.length > 5) {
       setError('The "output" column must have 5 or fewer categories. Found: ' + outputValues.length);
       return;
     }
 
     setError('');
+
+    // Explain the contribution of each feature in the output categories
+    const explainer = findExplanation(data);
+    console.log("explainer", explainer);
 
     // Create a row chart for output categories
     outputDim = ndx.dimension(d => d['output']);
@@ -213,7 +207,7 @@
     }
 
     // Insert charts in the DOM for each column except the "output" column
-    columns.filter(colName => colName !== 'output').forEach((colName, idx) => {
+    columns.filter(colName => colName !== 'output').forEach((colName) => {
 
       const values = data.map(d => d[colName]);
       const type = findColumnType(values);
@@ -306,6 +300,10 @@
           return newObj;
         });
 
+        // Explain the contribution of each feature in the output categories
+        const explainer = findExplanation(data);
+        console.log("explainer", explainer);
+
         // Remove dimension and chart
         delete dimensions[colName];
         charts[colName].svg().remove();
@@ -320,221 +318,320 @@
     });
   }
 
+  const findExplanation = (data) => {
+
+    /**
+     * Heuristique pour déterminer le nombre de bins à utiliser pour discrétiser des variables continues.
+     *
+     * - Trop peu de bins: les valeurs sont trop regroupées, la relation avec la sortie est écrasée
+     *   -> sous‑estimation de l’information mutuelle.
+     * - Trop de bins: beaucoup de bins avec peu d’observations
+     *   -> estimation très bruitée, parfois sur‑estimation locale ou MI instable.
+     */
+    const findOptimalNumberOfBins = (n) => {
+      if (n < 1000) {
+        return 8;
+      }
+      if (1000 <= n && n < 10000) {
+        return 16;
+      }
+      return 32;
+    }
+
+    const features = Object.keys(data[0] || {}).filter(colName => colName !== 'output');
+    const y = data.map(d => d['output']);
+    const X = data.map(d => features.map(colName => d[colName]));
+    return featureExplainer(y, X, features, {bins: findOptimalNumberOfBins(y.length)});
+  }
+
   /**
-   * A library to compute p-values for two arrays of the same length.
-   * Supports numeric-numeric, numeric-categorical, and categorical-categorical comparisons.
+   * Calcule, pour chaque catégorie de y, à quel point chaque feature l'explique.
+   *
+   * @param {Array<any>} y - labels de sortie (catégoriels)
+   * @param {Array<Array<any>>} featureMatrix - matrice n x d (n samples, d features)
+   * @param {Array<string>} [featureNames] - noms des features
+   * @param {Object} [options]
+   * @param {number} [options.numericThreshold=0.8] - ratio min de valeurs numériques pour considérer une feature comme numérique
+   * @param {number} [options.bins=8] - nb de bins pour discrétiser les features numériques
+   *
+   * @returns {Object} { categories, featureNames, scores }
    */
-  const pValueLibrary = (function () {
+  const featureExplainer = (y, featureMatrix, featureNames, options = {}) => {
 
-    // Helper: Check if an array is numeric
-    function isNumericArray(arr) {
-      return arr.every(item => typeof item === 'number' && !isNaN(item));
+    function unique(array) {
+      return Array.from(new Set(array));
     }
 
-    // Helper: Check if an array is binary categorical (0/1)
-    function isBinaryCategorical(arr) {
-      const unique = [...new Set(arr)];
-      return unique.length === 2 && unique.every(val => val === 0 || val === 1);
-    }
+    // Calcule distribution de probas (Map valeur -> p)
+    function probabilityDistribution(values) {
 
-    // Helper: Check if an array is categorical (non-numeric)
-    function isCategoricalArray(arr) {
-      return !isNumericArray(arr);
-    }
-
-    // Helper: Pearson correlation for numeric-numeric
-    function pearsonCorrelation(x, y) {
-
-      const n = x.length;
-      let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+      const counts = new Map();
+      const n = values.length;
 
       for (let i = 0; i < n; i++) {
-        sumX += x[i];
-        sumY += y[i];
-        sumXY += x[i] * y[i];
-        sumX2 += x[i] * x[i];
-        sumY2 += y[i] * y[i];
+        const v = values[i];
+        counts.set(v, (counts.get(v) || 0) + 1);
       }
 
-      const numerator = n * sumXY - sumX * sumY;
-      const denominatorX = Math.sqrt(n * sumX2 - sumX * sumX);
-      const denominatorY = Math.sqrt(n * sumY2 - sumY * sumY);
+      const dist = new Map();
+      counts.forEach((count, v) => dist.set(v, count / n));
 
-      return numerator / (denominatorX * denominatorY);
+      return dist;
     }
 
-    // Helper: Point-biserial correlation for numeric-binary categorical
-    function pointBiserialCorrelation(numerical, binaryCat) {
-      return pearsonCorrelation(numerical, binaryCat);
-    }
-
-    // Helper: T-test p-value for Pearson/point-biserial correlation
-    function tTestPValue(r, n) {
-      const t = r * Math.sqrt((n - 2) / (1 - r * r));
-      const df = n - 2;
-      return 2 * (1 - studentTCDF(Math.abs(t), df));
-    }
-
-    // Helper: Approximate Student's t-distribution CDF
-    function studentTCDF(t, df) {
-      return 0.5 * (1 + Math.sign(t) * (1 - Math.exp(-df / 2) * Math.pow(1 + (t * t / df), -df / 2)));
-    }
-
-    // Helper: ANOVA F-test for numeric-multi-category
-    function anovaFTest(numerical, categorical) {
-
-      const groups = {};
-      const groupMeans = {};
-      const groupCounts = {};
-      let grandMean = 0;
-      let totalVariance = 0;
-      let betweenVariance = 0;
-      let withinVariance = 0;
-
-      // Group numerical values by category
-      for (let i = 0; i < numerical.length; i++) {
-        const cat = categorical[i];
-        if (!groups[cat]) {
-          groups[cat] = [];
+    // Entropie discrète en bits
+    function entropyFromDistribution(dist) {
+      let h = 0;
+      dist.forEach(p => {
+        if (p > 0) {
+          h -= p * Math.log2(p);
         }
-        groups[cat].push(numerical[i]);
-      }
-
-      // Calculate grand mean and total variance
-      const allValues = numerical;
-      grandMean = allValues.reduce((a, b) => a + b, 0) / allValues.length;
-      totalVariance = allValues.reduce((sum, x) => sum + Math.pow(x - grandMean, 2), 0) / allValues.length;
-
-      // Calculate between-group variance
-      for (const cat in groups) {
-        const group = groups[cat];
-        groupMeans[cat] = group.reduce((a, b) => a + b, 0) / group.length;
-        groupCounts[cat] = group.length;
-      }
-      for (const cat in groups) {
-        betweenVariance += groupCounts[cat] * Math.pow(groupMeans[cat] - grandMean, 2);
-      }
-
-      betweenVariance /= numerical.length;
-
-      // Calculate within-group variance
-      for (const cat in groups) {
-        const group = groups[cat];
-        const groupVariance = group.reduce((sum, x) => sum + Math.pow(x - groupMeans[cat], 2), 0) / group.length;
-        withinVariance += groupVariance * (group.length / numerical.length);
-      }
-
-      // F-statistic
-      const dfBetween = Object.keys(groups).length - 1;
-      const dfWithin = numerical.length - Object.keys(groups).length;
-      const F = betweenVariance / withinVariance;
-
-      // Approximate p-value for F-test
-      return {F, dfBetween, dfWithin};
+      });
+      return h;
     }
 
-    // Helper: Approximate F-distribution p-value
-    function fDistributionPValue(F, df1, df2) {
-      return 1 - Math.exp(-F * df1 / df2); // Simplified approximation for demonstration
+    // Entropie empirique H(X)
+    function entropy(values) {
+      return entropyFromDistribution(probabilityDistribution(values));
     }
 
-    // Helper: Chi-square test for categorical-categorical
-    function chiSquareTest(cat1, cat2) {
+    // Joint distribution de deux vecteurs de même taille
+    function jointDistribution(x, y) {
+      if (x.length !== y.length) {
+        const msg = "jointDistribution: x et y doivent avoir la même taille";
+        console.error(msg);
+        throw new Error(msg);
+      }
 
-      const uniqueCat1 = [...new Set(cat1)];
-      const uniqueCat2 = [...new Set(cat2)];
-      const observed = [];
+      const n = x.length;
+      const counts = new Map(); // key = xVal + "||" + yVal
 
-      // Build observed contingency table
-      for (const c1 of uniqueCat1) {
-        const row = [];
-        for (const c2 of uniqueCat2) {
-          let count = 0;
-          for (let i = 0; i < cat1.length; i++) {
-            if (cat1[i] === c1 && cat2[i] === c2) {
-              count++;
-            }
-          }
-          row.push(count);
+      for (let i = 0; i < n; i++) {
+        const key = x[i] + "||" + y[i];
+        counts.set(key, (counts.get(key) || 0) + 1);
+      }
+
+      const dist = new Map();
+      counts.forEach((count, key) => dist.set(key, count / n));
+
+      return dist;
+    }
+
+    // Info mutuelle I(X;Y) en bits, empirique
+    function mutualInformation(x, y) {
+      if (x.length !== y.length) {
+        const msg = "mutualInformation: x et y doivent avoir la même taille";
+        console.error(msg);
+        throw new Error(msg);
+      }
+
+      const n = x.length;
+      const px = probabilityDistribution(x);
+      const py = probabilityDistribution(y);
+      const pxy = jointDistribution(x, y);
+      let mi = 0;
+
+      pxy.forEach((pXY, key) => {
+
+        const [vx, vy] = key.split("||");
+        const pX = px.get(vx);
+        const pY = py.get(vy);
+
+        if (pX > 0 && pY > 0 && pXY > 0) {
+          mi += pXY * Math.log2(pXY / (pX * pY));
         }
-        observed.push(row);
+      });
+      return mi;
+    }
+
+    // Discrétisation d'une feature numérique en nbBins classes
+    function binNumericFeature(values, nbBins) {
+
+      const n = values.length;
+      const numeric = [];
+
+      for (let i = 0; i < n; i++) {
+        const v = values[i];
+        const num = (v === null || v === undefined || v === "" || isNaN(Number(v))) ? NaN : Number(v);
+        numeric.push(num);
       }
 
-      // Calculate row totals, column totals, and grand total
-      const rowTotals = observed.map(row => row.reduce((a, b) => a + b, 0));
-      const colTotals = observed[0].map((_, j) => observed.reduce((a, row) => a + row[j], 0));
-      const grandTotal = rowTotals.reduce((a, b) => a + b, 0);
+      const filtered = numeric.filter(v => !isNaN(v));
 
-      // Calculate chi-square statistic
-      let chiSquare = 0;
-      for (let i = 0; i < observed.length; i++) {
-        for (let j = 0; j < observed[i].length; j++) {
-          const expected = (rowTotals[i] * colTotals[j]) / grandTotal;
-          chiSquare += Math.pow(observed[i][j] - expected, 2) / expected;
+      if (filtered.length === 0) { // si tout est NaN, on retourne une feature constante
+        return values.map(_ => "NA");
+      }
+
+      const min = Math.min.apply(null, filtered);
+      const max = Math.max.apply(null, filtered);
+
+      if (min === max) { // feature constante
+        return values.map(_ => "const");
+      }
+
+      const binWidth = (max - min) / nbBins;
+      const bins = new Array(n);
+
+      for (let i = 0; i < n; i++) {
+        const v = numeric[i];
+        if (isNaN(v)) {
+          bins[i] = "NA";
+        } else {
+          let binIndex = Math.floor((v - min) / binWidth);
+          if (binIndex >= nbBins) {
+            binIndex = nbBins - 1;
+          } // pour max
+          bins[i] = "b" + binIndex;
         }
       }
-
-      const df = (observed.length - 1) * (observed[0].length - 1);
-      return {chiSquare, df};
+      return bins;
     }
 
-    // Helper: Approximate chi-square p-value
-    function chiSquarePValue(chiSquare, df) {
-      return Math.exp(-0.5 * chiSquare); // Simplified approximation
+    // Transforme y en vecteur binaire (string "1"/"0") pour une catégorie donnée
+    function binaryOutcomeForCategory(y, category) {
+
+      const n = y.length;
+      const out = new Array(n);
+
+      for (let i = 0; i < n; i++) {
+        out[i] = (y[i] === category) ? "1" : "0";
+      }
+      return out;
     }
 
-    // Main function: Compute p-value for two arrays
-    return function computePValue(arr1, arr2) {
+    // Détermine si une feature est numérique (heuristique simple)
+    function isMostlyNumeric(values, thresholdRatio) {
 
-      if (arr1.length !== arr2.length) {
-        throw new Error("Arrays must be of the same length.");
+      const n = values.length;
+      let numericCount = 0;
+
+      for (let i = 0; i < n; i++) {
+        const v = values[i];
+        if (v !== null && v !== undefined && v !== "" && !isNaN(Number(v))) {
+          numericCount++;
+        }
+      }
+      return (numericCount / n) >= thresholdRatio;
+    }
+
+    // Construit une "feature composée" pour un groupe d'indices de colonnes
+    function buildGroupOfFeatures(discretizedColumns) {
+
+      const n = discretizedColumns[0].length;
+      const group = new Array(n);
+
+      for (let i = 0; i < n; i++) {
+        const parts = [];
+        for (let j = 0; j < discretizedColumns.length; j++) {
+          parts.push(discretizedColumns[j][i]);
+        }
+        group[i] = parts.join("##");
+      }
+      return group;
+    }
+
+    options = options || {};
+    const numericThreshold = options.numericThreshold || 0.8;
+    const nbBins = options.bins || 8;
+    const n = y.length;
+
+    console.log("featureExplainer.y", y);
+    console.log("featureExplainer.featureMatrix", featureMatrix);
+    console.log("featureExplainer.featureNames", featureNames);
+    console.log("featureExplainer.options", options);
+
+    if (!Array.isArray(featureMatrix) || featureMatrix.length !== n) {
+      const msg = "featureMatrix doit être un tableau de longueur n (n = y.length)";
+      console.error(msg);
+      throw new Error(msg);
+    }
+
+    const d = featureMatrix[0].length;
+
+    for (let i = 0; i < n; i++) {
+      if (!Array.isArray(featureMatrix[i]) || featureMatrix[i].length !== d) {
+        const msg = "Toutes les lignes de featureMatrix doivent avoir la même longueur";
+        console.error(msg);
+        throw new Error(msg);
+      }
+    }
+
+    const categories = unique(y);
+    const featNames = featureNames && featureNames.length === d ? featureNames.slice() : Array.from({length: d},
+      (_, j) => "f" + j);
+
+    console.log("featureExplainer.categories", categories);
+    console.log("featureExplainer.featNames", featNames);
+
+    // Prépare les colonnes de features
+    const columns = [];
+
+    for (let j = 0; j < d; j++) {
+
+      const col = new Array(n);
+
+      for (let i = 0; i < n; i++) {
+        col[i] = featureMatrix[i][j];
       }
 
-      const isArr1Numeric = isNumericArray(arr1);
-      const isArr2Numeric = isNumericArray(arr2);
+      // Discrétisation si numérique
+      if (isMostlyNumeric(col, numericThreshold)) {
+        columns.push(binNumericFeature(col, nbBins));
+      } else { // on convertit tout en string pour uniformiser
+        columns.push(col.map(v => String(v)));
+      }
+    }
 
-      // Numeric-Numeric: Pearson correlation
-      if (isArr1Numeric && isArr2Numeric) {
-        const r = pearsonCorrelation(arr1, arr2);
-        const pValue = tTestPValue(r, arr1.length);
-        return {test: "Pearson Correlation", r, pValue};
+    console.log("featureExplainer.columns", columns);
+
+    const scoresByFeature = {};
+
+    for (let j = 0; j < d; j++) {
+      scoresByFeature[featNames[j]] = {};
+    }
+
+    console.log("featureExplainer.scores", scoresByFeature);
+
+    const groupOfFeatures = buildGroupOfFeatures(columns);
+    const scoresByCategory = {};
+
+    console.log("featureExplainer.groupOfFeatures", groupOfFeatures);
+
+    // Pour chaque catégorie, calculer Y_k binaire et MI avec chaque feature
+    for (let cIdx = 0; cIdx < categories.length; cIdx++) {
+
+      const cat = categories[cIdx];
+      const yBin = binaryOutcomeForCategory(y, cat);
+      const hY = entropy(yBin);
+
+      // Si H(Y_k) = 0, la catégorie est soit toujours présente soit jamais présente
+      // -> pas d'incertitude, donc impossible de mesurer une "explication"
+      if (hY === 0) {
+        for (let j = 0; j < d; j++) {
+          scoresByFeature[featNames[j]][cat] = 0;
+          console.log("featureExplainer.scoresByFeature[" + featNames[j] + "][" + cat + "]", 0);
+        }
+        scoresByCategory[cat] = 0;
+        console.log("featureExplainer.scoresByCategory[" + cat + "]", 0);
+        continue;
       }
-      // Numeric-Binary Categorical: Point-biserial correlation
-      else if (isArr1Numeric && isBinaryCategorical(arr2)) {
-        const r = pointBiserialCorrelation(arr1, arr2);
-        const pValue = tTestPValue(r, arr1.length);
-        return {test: "Point-Biserial Correlation", r, pValue};
+
+      const mii = mutualInformation(groupOfFeatures, yBin);
+      scoresByCategory[cat] = mii / hY;
+      console.log("featureExplainer.scoresByCategory[" + cat + "]", scoresByCategory[cat]);
+
+      for (let j = 0; j < d; j++) {
+        const xCol = columns[j];
+        const mi = mutualInformation(xCol, yBin);
+        const normalized = mi / hY; // dans [0,1] si tout se passe bien
+        scoresByFeature[featNames[j]][cat] = normalized;
+        console.log("featureExplainer.scoresByFeature[" + featNames[j] + "][" + cat + "]", normalized);
       }
-      // Binary-Numeric Categorical: Point-biserial correlation
-      else if (isArr2Numeric && isBinaryCategorical(arr1)) {
-        const r = pointBiserialCorrelation(arr2, arr1);
-        const pValue = tTestPValue(r, arr2.length);
-        return {test: "Point-Biserial Correlation", r, pValue};
-      }
-      // Numeric-Multi-Category: ANOVA F-test
-      else if (isArr1Numeric && isCategoricalArray(arr2)) {
-        const {F, dfBetween, dfWithin} = anovaFTest(arr1, arr2);
-        const pValue = fDistributionPValue(F, dfBetween, dfWithin);
-        return {test: "ANOVA F-Test", F, dfBetween, dfWithin, pValue};
-      }
-      // Multi-Category-Numeric: ANOVA F-test
-      else if (isArr2Numeric && isCategoricalArray(arr1)) {
-        const {F, dfBetween, dfWithin} = anovaFTest(arr2, arr1);
-        const pValue = fDistributionPValue(F, dfBetween, dfWithin);
-        return {test: "ANOVA F-Test", F, dfBetween, dfWithin, pValue};
-      }
-      // Categorical-Categorical: Chi-square test
-      else if (isCategoricalArray(arr1) && isCategoricalArray(arr2)) {
-        const {chiSquare, df} = chiSquareTest(arr1, arr2);
-        const pValue = chiSquarePValue(chiSquare, df);
-        return {test: "Chi-Square Test", chiSquare, df, pValue};
-      }
-      // Unsupported case
-      else {
-        throw new Error("Unsupported combination of array types.");
-      }
+    }
+    return {
+      categories, features: featNames, scoresByFeature, scoresByCategory
     };
-  })();
+  }
 
 </script>
 @endpush
