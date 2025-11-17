@@ -40,7 +40,7 @@
       <div class="card-body">
         <div class="row">
           <div class="col">
-            <b>{{ __('Optimize (bêta)') }}</b>
+            <b>{{ __('Explore (bêta)') }}</b>
           </div>
         </div>
         <div class="row mt-3">
