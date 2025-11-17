@@ -160,6 +160,11 @@
     if (notNull.length === 0) {
       return 'categorical';
     }
+    // Detect datetime columns (Date instances)
+    if (notNull.every(v => v instanceof Date && !isNaN(v))) {
+      // console.log('findColumnType', values, 'datetime');
+      return 'datetime';
+    }
     if (notNull.every(v => typeof v === 'number' && !isNaN(v))) {
       // console.log('findColumnType', values, 'number');
       return 'numeric';
@@ -215,10 +220,16 @@
       };
     }
 
-    // Choose formatting based on magnitude
+    // Choose formatting based on value type
     const formatNumber = (v) => {
       if (v == null || isNaN(v)) {
+        if (v instanceof Date) { // For Date objects, isNaN(Date) returns false, so handle below
+          return v.toLocaleString();
+        }
         return '';
+      }
+      if (v instanceof Date) {
+        return v.toLocaleString();
       }
       const abs = Math.abs(v);
       const opts = abs >= 1000 ? {maximumFractionDigits: 0} : {maximumFractionDigits: 4};
@@ -230,13 +241,15 @@
         return null;
       }
       // If it's an array-like [min, max]
-      if (Array.isArray(f) && f.length >= 2 && [f[0], f[1]].every(x => typeof x === 'number')) {
+      if (Array.isArray(f) && f.length >= 2 && ([f[0], f[1]].every(x => typeof x === 'number') || [f[0], f[1]].every(
+        x => x instanceof Date))) {
         return [f[0], f[1]];
       }
       // dc.js RangedFilter variants
       const candidates = [['from', 'to'], ['lo', 'hi'], ['lowerBound', 'upperBound'], ['begin', 'end'], ['x0', 'x1']];
       for (const [a, b] of candidates) {
-        if (typeof f === 'object' && f != null && typeof f[a] === 'number' && typeof f[b] === 'number') {
+        if (typeof f === 'object' && f != null && ((typeof f[a] === 'number' && typeof f[b] === 'number') || (f[a]
+          instanceof Date && f[b] instanceof Date))) {
           return [f[a], f[b]];
         }
       }
@@ -397,9 +410,27 @@
         .group(dimension.group())
         .margins({top: 10, left: 30, right: 30, bottom: 20})
         .elasticY(true)
+        .x(d3.scaleLinear().domain(ext).nice())
+        .renderHorizontalGridLines(true);
+        ranges[colName] = ext;
+        chart.on('postRender.updateRange', () => updateRangeDisplay(colName));
+        chart.on('postRedraw.updateRange', () => updateRangeDisplay(colName));
+        chart.on('filtered.updateRange', () => updateRangeDisplay(colName));
+        chart.on('filtered.recompute', () => scheduleRecomputeExplainer());
+      } else if (type === 'datetime') {
+        const ext = d3.extent(values.filter(v => v instanceof Date && !isNaN(v)));
+        dimension = ndx.dimension(d => d[colName]);
+        chart = new dc.BarChart(`#${chartId}`);
+        const day = d3.timeDay;
+        chart.dimension(dimension)
+        .group(dimension.group(d => day(d)))
+        .margins({top: 10, left: 30, right: 30, bottom: 20})
+        .elasticY(true)
         .centerBar(true)
         .gap(1)
-        .x(d3.scaleLinear().domain(ext).nice())
+        .x(d3.scaleTime().domain(ext))
+        .round(day.round)
+        .xUnits(d3.timeDays)
         .renderHorizontalGridLines(true);
         ranges[colName] = ext;
         chart.on('postRender.updateRange', () => updateRangeDisplay(colName));
