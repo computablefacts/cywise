@@ -151,12 +151,9 @@
   let dimensions = {}; // map col. name to crossfilter dimension
   let charts = {}; // map col. name to chart instance
   let data = []; // raw data from CSV file
-  let output = []; // categories for the "output" column
-  let outputDim = null; // crossfilter dimension for output
-  let outputGroup = null; // crossfilter group for output
   let outputChart = null; // Chart.js instance for output
   let ranges = {}; // map col. name to [min,max] for numeric charts
-  let excluded = []; // excluded dimensions
+  let excluded = []; // excluded dimensions i.e. col. names
 
   const findColumnType = (values) => {
     const notNull = values.filter(v => v !== null && v !== undefined && v !== '');
@@ -176,8 +173,6 @@
     elCharts.innerHTML = '';
     charts = {};
     dimensions = {};
-    outputDim = null;
-    outputGroup = null;
     outputChart = null;
 
     if (elOutputCard) {
@@ -230,7 +225,7 @@
       return Number(v).toLocaleString(undefined, opts);
     };
 
-    const getBoundsFromFilter = (f) => {
+    const crossfilterRange = (f) => {
       if (!f) {
         return null;
       }
@@ -256,7 +251,7 @@
         }
       }
       return null;
-    };
+    }
 
     const updateRangeDisplay = (colName) => {
       const chart = charts[colName];
@@ -268,15 +263,15 @@
       const filters = (typeof chart.filters === 'function') ? chart.filters() : [];
       let bounds = null;
       if (filters && filters.length) {
-        bounds = getBoundsFromFilter(filters[0]);
+        bounds = crossfilterRange(filters[0]);
       }
       if (!bounds) {
         bounds = ext;
       }
       const [min, max] = bounds;
-      el.textContent = formatNumber(min) + ' – ' + formatNumber(max);
+      el.textContent = 'Range: ' + formatNumber(min) + ' – ' + formatNumber(max);
       el.style.display = '';
-    };
+    }
 
     // Get filtered rows from Crossfilter (falls back to all)
     const filteredData = () => {
@@ -295,46 +290,21 @@
       return data || [];
     }
 
-    // Recompute explainer based on current filters and update output chart
+    // Recompute explainer based on current filters
     const recomputeExplainer = () => {
       const filtered = filteredData();
       if (!filtered || !filtered.length) {
-        // console.log('explainer: no data after filters');
-        selectionExplainer = null;
-        updateChartExplainer();
-        return;
-      }
-      if (!Object.keys(filtered[0] || {}).includes('output')) {
-        return; // Safety: if output was removed somehow, skip
-      }
-      try {
-        console.log('filtered data', filtered);
-        selectionExplainer = findExplanation(filtered);
-        console.log('selection explainer', selectionExplainer);
-        updateChartExplainer();
-      } catch (err) {
-        console.warn('Failed to recompute explainer:', err);
+        updateChartExplainer(data);
+      } else {
+        updateChartExplainer(data, filtered);
       }
     }
 
     const scheduleRecomputeExplainer = debounce(recomputeExplainer, 200);
 
     // Prepare output explainer chart (two bars per category: selection vs whole dataset)
-    // Compute global explainer once (based on full dataset, not crossfilter selection)
-    let globalExplainer = null;
-    let selectionExplainer = null;
-
-    try {
-      globalExplainer = findExplanation(data);
-    } catch (e) {
-      console.warn('Failed to compute global explainer:', e);
-    }
-
-    const updateChartExplainer = () => {
+    const updateChartExplainer = (all, filtered = null) => {
       if (!elOutputChart) {
-        return;
-      }
-      if (!globalExplainer) {
         return;
       }
 
@@ -348,27 +318,15 @@
       elOutputChart.appendChild(canvas);
       elOutputCard.classList.remove('hidden');
 
-      const labels = globalExplainer.categories || [];
-      const dataGlobal = labels.map(cat => (globalExplainer.data ?? []).filter(d => d['output'] === cat).length);
-      const dataSelection = labels.map(cat => (selectionExplainer.data ?? []).filter(d => d['output'] === cat).length);
+      const features = Array.from(new Set(data.map(d => d['output']))).filter(v => v !== '');
+      const dataGlobal = features.map(cat => all.filter(d => d['output'] === cat).length);
+      const dataSelection = features.map(cat => (filtered ?? all).filter(d => d['output'] === cat).length);
       const ctx = canvas.getContext('2d');
 
       outputChart = new Chart(ctx, {
         type: 'bar', data: {
-          labels, datasets: [{
-            label: 'Selection', data: dataSelection, backgroundColor: dataSelection.map((_, i) => {
-              const p = selectionExplainer?.pvalues?.[labels[i]] || 0;
-              if (p < 0.01) { // très significatif
-                return 'darkgreen';
-              }
-              if (p < 0.05) { // significatif
-                return 'green';
-              }
-              if (p < 0.10) { // tendance
-                return 'orange';
-              }
-              return 'gray'; // non significatif
-            })
+          labels: features, datasets: [{
+            label: 'Selection', data: dataSelection, backgroundColor: 'gray',
           }, {
             label: 'Global', data: dataGlobal, backgroundColor: 'rgb(49, 130, 189)'
           }]
@@ -377,15 +335,6 @@
             legend: {display: false}, tooltip: {
               callbacks: {
                 label: (context) => {
-                  if (context.dataset.label === 'Selection') {
-
-                    const cat = context.label;
-                    const pvalue = selectionExplainer?.pvalues?.[cat];
-
-                    if (pvalue != null) {
-                      return `${context.dataset.label}: ${context.raw || 0} items (p-value=${formatNumber(pvalue)})`;
-                    }
-                  }
                   return `${context.dataset.label}: ${context.raw || 0} items`;
                 }
               }
@@ -414,7 +363,9 @@
           <div class="row">
             <div class="col">
               <b>${colName}</b>
-              <div class="text-muted small" id="range_${chartId}" style="display:none"></div>
+              <div class="text-muted small">
+                <span id="range_${chartId}" style="display:none"></span>
+              </div>
             </div>
             <div class="col-auto">
               <a data-action="reset" data-col="${colName}">
@@ -506,380 +457,14 @@
         charts[colName].svg().remove();
         delete charts[colName];
 
-        chart.root().node().closest('.card').remove(); // remove the card containing the chart
+        // Remove the card containing the chart
+        chart.root().node().closest('.card').remove();
 
-        // Update the global explainer based on the new dataset
-        try {
-          globalExplainer = findExplanation(data);
-        } catch (e) {
-          console.warn('Failed to compute global explainer:', e);
-        }
-
+        // Update the other charts
         dc.redrawAll();
         scheduleRecomputeExplainer();
       }
     });
-  }
-
-  const findExplanation = (data) => {
-
-    // Mélange in-place (Fisher–Yates)
-    function shuffleInPlace(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        const tmp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = tmp;
-      }
-      return arr;
-    }
-
-    // Comptage p-value (proportion de scores permutés >= score observé)
-    function computePValue(observed, permScores) {
-      let countGE = 0;
-      for (let i = 0; i < permScores.length; i++) {
-        if (permScores[i] >= observed) {
-          countGE++;
-        }
-      }
-      return (countGE + 1) / (permScores.length + 1);
-    }
-
-    /**
-     * Heuristique pour déterminer le nombre de bins à utiliser pour discrétiser des variables continues.
-     *
-     * - Trop peu de bins: les valeurs sont trop regroupées, la relation avec la sortie est écrasée
-     *   -> sous‑estimation de l’information mutuelle.
-     * - Trop de bins: beaucoup de bins avec peu d’observations
-     *   -> estimation très bruitée, parfois sur‑estimation locale ou MI instable.
-     */
-    const findOptimalNumberOfBins = (n) => {
-      if (n < 1000) {
-        return 8;
-      }
-      if (1000 <= n && n < 10000) {
-        return 16;
-      }
-      return 32;
-    }
-
-    const features = Object.keys(data[0] || {}).filter(colName => colName !== 'output' && !excluded.includes(colName));
-    const y = data.map(d => d['output']);
-    const X = data.map(d => features.map(colName => d[colName]));
-    const options = {bins: findOptimalNumberOfBins(y.length)};
-    const explainer = featureExplainer(y, X, features, options);
-    const yCopy = y.slice();
-    const scoresByCategoryPermutated = {};
-    explainer.categories.forEach(cat => scoresByCategoryPermutated[cat] = []);
-
-    for (let b = 0; b < 100 /* arbitrary value */; b++) {
-      shuffleInPlace(yCopy);
-      const permExplainer = featureExplainer(yCopy, X, features, options);
-      const permScores = permExplainer.scoresByCategory || {};
-      explainer.categories.forEach(
-        cat => scoresByCategoryPermutated[cat].push(+(permScores[cat] != null ? permScores[cat] : 0)));
-    }
-
-    const pValuesByCategory = {};
-
-    explainer.categories.forEach(cat => {
-      const observedScored = +(explainer.scoresByCategory[cat] != null ? explainer.scoresByCategory[cat] : 0);
-      const permutatedScores = scoresByCategoryPermutated[cat];
-      pValuesByCategory[cat] = computePValue(observedScored, permutatedScores);
-    });
-
-    explainer.pvalues = pValuesByCategory;
-    explainer.data = data;
-    return explainer;
-  }
-
-  /**
-   * Calcule, pour chaque catégorie de y, à quel point chaque feature l'explique.
-   *
-   * @param {Array<any>} y - labels de sortie (catégoriels)
-   * @param {Array<Array<any>>} featureMatrix - matrice n x d (n samples, d features)
-   * @param {Array<string>} [featureNames] - noms des features
-   * @param {Object} [options]
-   * @param {number} [options.numericThreshold=0.8] - ratio min de valeurs numériques pour considérer une feature comme numérique
-   * @param {number} [options.bins=8] - nb de bins pour discrétiser les features numériques
-   *
-   * @returns {Object} { categories, featureNames, scores }
-   */
-  const featureExplainer = (y, featureMatrix, featureNames, options = {}) => {
-
-    function unique(array) {
-      return Array.from(new Set(array));
-    }
-
-    // Calcule distribution de probas (Map valeur -> p)
-    function probabilityDistribution(values) {
-
-      const counts = new Map();
-      const n = values.length;
-
-      for (let i = 0; i < n; i++) {
-        const v = values[i];
-        counts.set(v, (counts.get(v) || 0) + 1);
-      }
-
-      const dist = new Map();
-      counts.forEach((count, v) => dist.set(v, count / n));
-
-      return dist;
-    }
-
-    // Entropie discrète en bits
-    function entropyFromDistribution(dist) {
-      let h = 0;
-      dist.forEach(p => {
-        if (p > 0) {
-          h -= p * Math.log2(p);
-        }
-      });
-      return h;
-    }
-
-    // Entropie empirique H(X)
-    function entropy(values) {
-      return entropyFromDistribution(probabilityDistribution(values));
-    }
-
-    // Joint distribution de deux vecteurs de même taille
-    function jointDistribution(x, y) {
-      if (x.length !== y.length) {
-        const msg = "jointDistribution: x et y doivent avoir la même taille";
-        console.error(msg);
-        throw new Error(msg);
-      }
-
-      const n = x.length;
-      const counts = new Map(); // key = xVal + "||" + yVal
-
-      for (let i = 0; i < n; i++) {
-        const key = x[i] + "||" + y[i];
-        counts.set(key, (counts.get(key) || 0) + 1);
-      }
-
-      const dist = new Map();
-      counts.forEach((count, key) => dist.set(key, count / n));
-
-      return dist;
-    }
-
-    // Info mutuelle I(X;Y) en bits, empirique
-    function mutualInformation(x, y) {
-      if (x.length !== y.length) {
-        const msg = "mutualInformation: x et y doivent avoir la même taille";
-        console.error(msg);
-        throw new Error(msg);
-      }
-
-      const n = x.length;
-      const px = probabilityDistribution(x);
-      const py = probabilityDistribution(y);
-      const pxy = jointDistribution(x, y);
-      let mi = 0;
-
-      pxy.forEach((pXY, key) => {
-
-        const [vx, vy] = key.split("||");
-        const pX = px.get(vx);
-        const pY = py.get(vy);
-
-        if (pX > 0 && pY > 0 && pXY > 0) {
-          mi += pXY * Math.log2(pXY / (pX * pY));
-        }
-      });
-      return mi;
-    }
-
-    // Discrétisation d'une feature numérique en nbBins classes
-    function binNumericFeature(values, nbBins) {
-
-      const n = values.length;
-      const numeric = [];
-
-      for (let i = 0; i < n; i++) {
-        const v = values[i];
-        const num = (v === null || v === undefined || v === "" || isNaN(Number(v))) ? NaN : Number(v);
-        numeric.push(num);
-      }
-
-      const filtered = numeric.filter(v => !isNaN(v));
-
-      if (filtered.length === 0) { // si tout est NaN, on retourne une feature constante
-        return values.map(_ => "NA");
-      }
-
-      const min = Math.min.apply(null, filtered);
-      const max = Math.max.apply(null, filtered);
-
-      if (min === max) { // feature constante
-        return values.map(_ => "const");
-      }
-
-      const binWidth = (max - min) / nbBins;
-      const bins = new Array(n);
-
-      for (let i = 0; i < n; i++) {
-        const v = numeric[i];
-        if (isNaN(v)) {
-          bins[i] = "NA";
-        } else {
-          let binIndex = Math.floor((v - min) / binWidth);
-          if (binIndex >= nbBins) {
-            binIndex = nbBins - 1;
-          } // pour max
-          bins[i] = "b" + binIndex;
-        }
-      }
-      return bins;
-    }
-
-    // Transforme y en vecteur binaire (string "1"/"0") pour une catégorie donnée
-    function binaryOutcomeForCategory(y, category) {
-
-      const n = y.length;
-      const out = new Array(n);
-
-      for (let i = 0; i < n; i++) {
-        out[i] = (y[i] === category) ? "1" : "0";
-      }
-      return out;
-    }
-
-    // Détermine si une feature est numérique (heuristique simple)
-    function isMostlyNumeric(values, thresholdRatio) {
-
-      const n = values.length;
-      let numericCount = 0;
-
-      for (let i = 0; i < n; i++) {
-        const v = values[i];
-        if (v !== null && v !== undefined && v !== "" && !isNaN(Number(v))) {
-          numericCount++;
-        }
-      }
-      return (numericCount / n) >= thresholdRatio;
-    }
-
-    // Construit une "feature composée" pour un groupe d'indices de colonnes
-    function buildGroupOfFeatures(discretizedColumns) {
-
-      const n = discretizedColumns[0].length;
-      const group = new Array(n);
-
-      for (let i = 0; i < n; i++) {
-        const parts = [];
-        for (let j = 0; j < discretizedColumns.length; j++) {
-          parts.push(discretizedColumns[j][i]);
-        }
-        group[i] = parts.join("##");
-      }
-      return group;
-    }
-
-    options = options || {};
-    const numericThreshold = options.numericThreshold || 0.8;
-    const nbBins = options.bins || 8;
-    const n = y.length;
-
-    // console.log("featureExplainer.y", y);
-    // console.log("featureExplainer.featureMatrix", featureMatrix);
-    // console.log("featureExplainer.featureNames", featureNames);
-    // console.log("featureExplainer.options", options);
-
-    if (!Array.isArray(featureMatrix) || featureMatrix.length !== n) {
-      const msg = "featureMatrix doit être un tableau de longueur n (n = y.length)";
-      console.error(msg);
-      throw new Error(msg);
-    }
-
-    const d = featureMatrix[0].length;
-
-    for (let i = 0; i < n; i++) {
-      if (!Array.isArray(featureMatrix[i]) || featureMatrix[i].length !== d) {
-        const msg = "Toutes les lignes de featureMatrix doivent avoir la même longueur";
-        console.error(msg);
-        throw new Error(msg);
-      }
-    }
-
-    const categories = unique(y);
-    const featNames = featureNames && featureNames.length === d ? featureNames.slice() : Array.from({length: d},
-      (_, j) => "f" + j);
-
-    // console.log("featureExplainer.categories", categories);
-    // console.log("featureExplainer.featNames", featNames);
-
-    // Prépare les colonnes de features
-    const columns = [];
-
-    for (let j = 0; j < d; j++) {
-
-      const col = new Array(n);
-
-      for (let i = 0; i < n; i++) {
-        col[i] = featureMatrix[i][j];
-      }
-
-      // Discrétisation si numérique
-      if (isMostlyNumeric(col, numericThreshold)) {
-        columns.push(binNumericFeature(col, nbBins));
-      } else { // on convertit tout en string pour uniformiser
-        columns.push(col.map(v => String(v)));
-      }
-    }
-
-    // console.log("featureExplainer.columns", columns);
-
-    const scoresByFeature = {};
-
-    for (let j = 0; j < d; j++) {
-      scoresByFeature[featNames[j]] = {};
-    }
-
-    // console.log("featureExplainer.scores", scoresByFeature);
-
-    const groupOfFeatures = buildGroupOfFeatures(columns);
-    const scoresByCategory = {};
-
-    // console.log("featureExplainer.groupOfFeatures", groupOfFeatures);
-
-    // Pour chaque catégorie, calculer Y_k binaire et MI avec chaque feature
-    for (let cIdx = 0; cIdx < categories.length; cIdx++) {
-
-      const cat = categories[cIdx];
-      const yBin = binaryOutcomeForCategory(y, cat);
-      const hY = entropy(yBin);
-
-      // Si H(Y_k) = 0, la catégorie est soit toujours présente soit jamais présente
-      // -> pas d'incertitude, donc impossible de mesurer une "explication"
-      if (hY === 0) {
-        for (let j = 0; j < d; j++) {
-          scoresByFeature[featNames[j]][cat] = 0;
-          // console.log("featureExplainer.scoresByFeature[" + featNames[j] + "][" + cat + "]", 0);
-        }
-        scoresByCategory[cat] = 0;
-        // console.log("featureExplainer.scoresByCategory[" + cat + "]", 0);
-        continue;
-      }
-
-      const mii = mutualInformation(groupOfFeatures, yBin);
-      scoresByCategory[cat] = mii / hY;
-      // console.log("featureExplainer.scoresByCategory[" + cat + "]", scoresByCategory[cat]);
-
-      for (let j = 0; j < d; j++) {
-        const xCol = columns[j];
-        const mi = mutualInformation(xCol, yBin);
-        const normalized = mi / hY; // dans [0,1] si tout se passe bien
-        scoresByFeature[featNames[j]][cat] = normalized;
-        // console.log("featureExplainer.scoresByFeature[" + featNames[j] + "][" + cat + "]", normalized);
-      }
-    }
-    return {
-      categories, features: featNames, scoresByFeature, scoresByCategory
-    };
   }
 
 </script>
