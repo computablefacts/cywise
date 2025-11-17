@@ -20,14 +20,14 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: d-none;
   }
 
   #charts {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: d-none;
   }
 
 </style>
@@ -60,12 +60,27 @@
         </div>
         <div class="row mt-3">
           <div class="col">
-            <span id="errors" class="hidden text-red-600"></span>
+            <span id="errors" class="d-none text-red-600"></span>
+          </div>
+        </div>
+        <div id="output-categories-section" class="row mt-3 d-none">
+          <div class="col">
+            <label class="block mb-2 font-medium">
+              <b>
+                {{ __('Output Categories') }} :
+              </b>
+            </label>
+            <div id="output-categories" class="d-flex flex-column gap-1"></div>
+            <div class="mt-2">
+              <button id="output-categories-button" type="button" class="btn btn-sm btn-primary">
+                {{ __('Optimize!') }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div id="output-card" class="card mt-3 hidden">
+    <div id="output-card" class="card mt-3 d-none">
       <div class="card-body">
         <div class="row">
           <div class="col">
@@ -97,6 +112,12 @@
   elFileInput.addEventListener('change', function () {
     const file = this.files[0];
     if (!file) {
+      if (elOutputCategoriesSection) {
+        elOutputCategoriesSection.classList.add('d-none');
+      }
+      if (elOutputCategories) {
+        elOutputCategories.innerHTML = '';
+      }
       return;
     }
     const reader = new FileReader();
@@ -130,6 +151,12 @@
 
       } catch (err) {
         setError(err.message || 'Failed to parse TSV');
+        if (elOutputCategoriesSection) {
+          elOutputCategoriesSection.classList.add('d-none');
+        }
+        if (elOutputCategories) {
+          elOutputCategories.innerHTML = '';
+        }
       }
     };
     reader.readAsText(file);
@@ -139,13 +166,16 @@
   const elErrors = document.getElementById('errors');
   const setError = (msg) => {
     elErrors.textContent = msg || '';
-    elErrors.classList.toggle('hidden', !msg);
+    elErrors.classList.toggle('d-none', !msg);
   }
 
   /** Display charts */
   const elCharts = document.getElementById('charts');
   const elOutputCard = document.getElementById('output-card');
   const elOutputChart = document.getElementById('output-chart');
+  const elOutputCategoriesSection = document.getElementById('output-categories-section');
+  const elOutputCategories = document.getElementById('output-categories');
+  const elOutputCategoriesButton = document.getElementById('output-categories-button');
 
   let ndx = null;
   let dimensions = {}; // map col. name to crossfilter dimension
@@ -181,10 +211,18 @@
     outputChart = null;
 
     if (elOutputCard) {
-      elOutputCard.classList.add('hidden');
+      elOutputCard.classList.add('d-none');
       if (elOutputChart) {
         elOutputChart.innerHTML = '';
       }
+    }
+
+    // Reset output categories
+    if (elOutputCategoriesSection) {
+      elOutputCategoriesSection.classList.add('d-none');
+    }
+    if (elOutputCategories) {
+      elOutputCategories.innerHTML = '';
     }
 
     const cf = window.crossfilter || window.crossfilter2;
@@ -209,6 +247,49 @@
     }
 
     setError('');
+
+    // Render output categories radio group (sorted ASC, select first)
+    const sortAsc = (a, b) => {
+      const an = typeof a === 'number';
+      const bn = typeof b === 'number';
+      if (an && bn) {
+        return a - b;
+      }
+      return String(a).localeCompare(String(b), undefined, {numeric: true, sensitivity: 'base'});
+    }
+
+    const categoriesSorted = [...outputValues].sort(sortAsc);
+
+    if (elOutputCategories && elOutputCategoriesSection) {
+      elOutputCategories.innerHTML = '';
+      categoriesSorted.forEach((cat, idx) => {
+        const id = 'out-cat-' + String(cat).replace(/[^a-zA-Z0-9_\-]/g, '_');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'form-check';
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.className = 'form-check-input';
+        input.name = 'output-category';
+        input.value = String(cat);
+        input.id = id;
+        if (idx === 0) {
+          input.checked = true;
+        }
+        const label = document.createElement('label');
+        label.className = 'form-check-label';
+        label.setAttribute('for', id);
+        label.textContent = String(cat);
+        wrapper.appendChild(input);
+        wrapper.appendChild(label);
+        elOutputCategories.appendChild(wrapper);
+      });
+      elOutputCategoriesSection.classList.remove('d-none');
+    }
+    if (elOutputCategoriesButton) {
+      elOutputCategoriesButton.onclick = () => {
+        // TODO
+      };
+    }
 
     // Debounce to avoid recomputing too often while brushing/filtering
     const debounce = (fn, wait = 150) => {
@@ -329,7 +410,7 @@
       const canvas = document.createElement('canvas');
       elOutputChart.innerHTML = '';
       elOutputChart.appendChild(canvas);
-      elOutputCard.classList.remove('hidden');
+      elOutputCard.classList.remove('d-none');
 
       const features = Array.from(new Set(data.map(d => d['output']))).filter(v => v !== '');
       const dataGlobal = features.map(cat => all.filter(d => d['output'] === cat).length);
