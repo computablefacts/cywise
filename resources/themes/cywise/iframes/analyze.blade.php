@@ -20,14 +20,14 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: d-none;
+    overflow: hidden;
   }
 
   #charts {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
-    overflow-x: d-none;
+    overflow-x: hidden;
   }
 
 </style>
@@ -76,6 +76,11 @@
                 {{ __('Optimize!') }}
               </button>
             </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <div id="results"></div>
           </div>
         </div>
       </div>
@@ -287,7 +292,270 @@
     }
     if (elOutputCategoriesButton) {
       elOutputCategoriesButton.onclick = () => {
-        // TODO
+
+        const selected = (document.querySelector('input[name="output-category"]:checked') || {}).value;
+        if (!selected) {
+          return;
+        }
+
+        console.log('Optimize for category:', selected);
+
+        const filtered = filteredData();
+        if (!filtered.length) {
+          return;
+        }
+
+        console.log('filtered:', filtered);
+
+        const labels = Object.keys(filtered[0]).filter(col => col !== 'output' && !excluded.includes(col));
+
+        console.log('Labels:', labels);
+
+        // Fonction pour discrétiser un attribut numérique
+        const discretize = (data, column, bins = 3) => {
+
+          const values = data.map(d => d[column]).sort((a, b) => a - b);
+          const min = values[0];
+          const max = values[values.length - 1];
+          const step = (max - min) / bins;
+          const thresholds = Array.from({length: bins - 1}, (_, i) => min + step * (i + 1));
+
+          // Stocker les seuils pour reconversion
+          const binThresholds = {
+            thresholds: thresholds, min: min, max: max,
+          };
+
+          // Discrétiser les données
+          const discretized = data.map(d => {
+            for (let i = 0; i < thresholds.length; i++) {
+              if (d[column] <= thresholds[i]) {
+                return {bin: `${column}_bin_${i}`, value: d[column]};
+              }
+            }
+            return {bin: `${column}_bin_${bins - 1}`, value: d[column]};
+          });
+
+          return {discretized, binThresholds};
+        }
+
+        const bins = {};
+        const thresholds = {};
+
+        // Ne discrétiser que les colonnes numériques; laisser passer les catégorielles/date telles quelles
+        labels.forEach(col => {
+          const colType = findColumnType(filtered.map(d => d[col]));
+          if (colType === 'numeric') {
+            const {discretized, binThresholds} = discretize(filtered, col);
+            bins[col] = discretized;
+            thresholds[col] = binThresholds; // utile pour reconversion intervalle
+          } else {
+            // Catégorielle ou datetime: pas de discrétisation, on conserve la valeur brute comme "bin"
+            bins[col] = filtered.map(d => ({bin: d[col], value: d[col]}));
+            thresholds[col] = null; // pas de seuils disponibles
+          }
+        });
+
+        console.log('Bins:', bins);
+        console.log('Thresholds:', thresholds);
+
+        const features = filtered.map((d, idx) => {
+          const feature = {};
+          Object.keys(d).filter(col => labels.includes(col)).forEach(col => {
+            feature[col] = bins[col][idx];
+          });
+          return feature;
+        });
+        const target = filtered.map(d => d['output']);
+
+        console.log('Features:', features);
+        console.log('Target:', target);
+
+        // Fonction pour calculer l'entropie
+        const entropy = (targets) => {
+          const counts = {};
+          targets.forEach(t => counts[t] = (counts[t] || 0) + 1);
+          return Object.values(counts).reduce((sum, count) => {
+            const p = count / targets.length;
+            return sum - p * Math.log2(p);
+          }, 0);
+        }
+
+        // Fonction pour trouver la meilleure division
+        const findBestSplit = (features, target) => {
+
+          let bestGain = -Infinity;
+          let bestFeature = null;
+          let bestBin = null;
+
+          // Parcourir chaque feature discrétisée (catégorielle)
+          const featureNames = Object.keys(features[0] || {});
+
+          for (const feature of featureNames) {
+
+            // Extraire l'ensemble des bins (chaînes), pas les objets de référence
+            const binsSet = new Set(
+              features.map(f => (f[feature] && f[feature].bin) ? f[feature].bin : undefined).filter(
+                v => v !== undefined));
+
+            for (const bin of binsSet) {
+
+              const left = [];
+              const right = [];
+
+              features.forEach((f, i) => {
+                if ((f[feature] && f[feature].bin) === bin) {
+                  left.push(target[i]);
+                } else {
+                  right.push(target[i]);
+                }
+              });
+
+              if (left.length === 0 || right.length === 0) {
+                continue; // Split non informatif
+              }
+
+              const gain = entropy(target) - (left.length / target.length) * entropy(left) - (right.length
+                / target.length) * entropy(right);
+
+              if (gain > bestGain) {
+                bestGain = gain;
+                bestFeature = feature;
+                bestBin = bin;
+              }
+            }
+          }
+          return {feature: bestFeature, bin: bestBin, gain: bestGain};
+        }
+
+        // Fonction pour construire l'arbre de décision
+        const buildTree = (features, target) => {
+
+          // Si tous les exemples ont la même classe, retourner cette classe
+          if (new Set(target).size === 1) {
+            return {decision: target[0]};
+          }
+
+          // jeux vides -> feuille neutre
+          if (!features || !features.length || !target || !target.length) {
+            return {decision: null};
+          }
+
+          // Sinon, trouver la meilleure division
+          const {feature, bin, gain} = findBestSplit(features, target);
+
+          // Aucun split utile trouvé -> feuille avec classe majoritaire
+          if (!feature || !bin || !(gain > 0)) {
+            const counts = {};
+            target.forEach(t => counts[t] = (counts[t] || 0) + 1);
+            return {decision: Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]};
+          }
+
+          // Diviser les données
+          const leftFeatures = [];
+          const leftTarget = [];
+          const rightFeatures = [];
+          const rightTarget = [];
+
+          features.forEach((f, i) => {
+            if ((f[feature] && f[feature].bin) === bin) {
+              leftFeatures.push(f);
+              leftTarget.push(target[i]);
+            } else {
+              rightFeatures.push(f);
+              rightTarget.push(target[i]);
+            }
+          });
+
+          // Si une des branches est vide (sécurité), retourner la classe majoritaire
+          if (leftTarget.length === 0 || rightTarget.length === 0) {
+            const counts = {};
+            target.forEach(t => counts[t] = (counts[t] || 0) + 1);
+            return {decision: Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]};
+          }
+
+          // Construire les sous-arbres
+          return {
+            feature,
+            value: {bin},
+            trueBranch: buildTree(leftFeatures, leftTarget),
+            falseBranch: buildTree(rightFeatures, rightTarget),
+          };
+        }
+
+        // Fonction pour reconvertir les bins en intervalles
+        const binToInterval = (bin, thresholds) => {
+
+          // Reconstruire le nom de colonne depuis le bin si non présent dans thresholds
+          const column = (bin && typeof bin === 'string') ? bin.split('_bin_')[0] : 'col';
+          const bins = (thresholds && Array.isArray(thresholds.thresholds)) ? thresholds.thresholds : [];
+          const binIndex = parseInt(String(bin).split("_bin_")[1]);
+
+          if (!Number.isFinite(binIndex) || bins.length === 0) {
+            return `${column} ∈ ${bin}`; // fallback
+          }
+          if (binIndex === 0) {
+            return `${column} <= ${Number(bins[0]).toFixed(2)}`;
+          } else if (binIndex < bins.length) {
+            return `${Number(bins[binIndex - 1]).toFixed(2)} < ${column} <= ${Number(bins[binIndex]).toFixed(2)}`;
+          } else {
+            return `${column} > ${Number(bins[bins.length - 1]).toFixed(2)}`;
+          }
+        }
+
+        // Fonction pour extraire les règles pour une classe donnée
+        const extractRulesForClass = (tree, targetClass, path = [], rules = []) => {
+          if (!tree) {
+            return rules;
+          }
+
+          // Détecter une feuille par la présence de la propriété 'decision' (et non sa vérité)
+          if (Object.prototype.hasOwnProperty.call(tree, 'decision')) {
+            if (tree.decision === targetClass) {
+              const converted = path.map(item => { // Reconvertir les bins en intervalles
+                if (item.includes("_bin_")) {
+                  // Supporte " = " et " != "
+                  let op = ' = ';
+                  if (item.includes(' != ')) {
+                    op = ' != ';
+                  }
+                  const [feature, bin] = item.split(op);
+                  const interval = binToInterval(bin, thresholds[feature]);
+                  return op.trim() === '!=' ? `NON(${interval})` : interval;
+                }
+                return item;
+              });
+              rules.push(converted);
+            }
+            return rules;
+          }
+
+          const newPathTrue = [...path, `${tree.feature} = ${tree.value && tree.value.bin ? tree.value.bin : ''}`];
+          const newPathFalse = [...path, `${tree.feature} != ${tree.value && tree.value.bin ? tree.value.bin : ''}`];
+
+          if (tree.trueBranch) {
+            extractRulesForClass(tree.trueBranch, targetClass, newPathTrue, rules);
+          }
+          if (tree.falseBranch) {
+            extractRulesForClass(tree.falseBranch, targetClass, newPathFalse, rules);
+          }
+          return rules;
+        }
+
+        const decisionTree = buildTree(features, target);
+
+        console.log('Decision Tree:', decisionTree);
+
+        const rules = extractRulesForClass(decisionTree, selected);
+
+        console.log('Rules:', rules);
+
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = `
+          <div><b>Règles pour maximiser ${selected} :</b></div><br>
+          <pre>${rules.map((rule, i) => `Règle ${i + 1} : ${rule.join(" ET ")}`).join("\n")}</pre>
+        `;
+
+        console.log(resultsDiv);
       };
     }
 
