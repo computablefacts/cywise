@@ -53,9 +53,9 @@
         </div>
         <div class="row mt-3">
           <div class="col">
-            The file must contain only <strong>numerical</strong> and <strong>categorical</strong> columns. The file
-            must contain one special column named <strong>output</strong> with up to 5 categories. The
-            <strong>output</strong> column is the target variable to optimize.
+            The file must contain only columns with <strong>numerical</strong>, <strong>categorical</strong> and
+            <strong>timestamp</strong> data. The file must contain one special column named <strong>output</strong>
+            with up to 5 categories. The <strong>output</strong> column is the target variable to optimize.
           </div>
         </div>
         <div class="row mt-3">
