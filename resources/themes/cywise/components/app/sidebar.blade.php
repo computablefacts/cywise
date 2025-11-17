@@ -152,7 +152,7 @@ $user = \Auth::user();
           <x-app.sidebar-link href="{{ route('analyze') }}"
                               icon="phosphor-chart-line"
                               :active="Request::is('analyze')">
-            {{ __('Analyze (bêta)') }}
+            {{ __('Optimize (bêta)') }}
           </x-app.sidebar-link>
           @endif
           @if($user->canView('iframes.frameworks')
