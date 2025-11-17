@@ -3,9 +3,8 @@
 namespace App\Jobs;
 
 use App\AgentSquad\Providers\PromptsProvider;
-use App\Http\Controllers\Iframes\CyberBuddyController;
+use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Procedures\TheCyberBriefProcedure;
-use App\Http\Requests\ConverseRequest;
 use App\Http\Requests\JsonRpcRequest;
 use App\Listeners\EndVulnsScanListener;
 use App\Models\Collection;
@@ -230,14 +229,14 @@ class ProcessIncomingEmails implements ShouldQueue
         Log::debug("body={$body}");
 
         // Call CyberBuddy
-        $request = new ConverseRequest([
+        $request = new JsonRpcRequest([
             'thread_id' => $threadId,
             'directive' => $body,
         ]);
-        $response = (new CyberBuddyController())->converse($request, true);
-        $json = json_decode($response->content(), true);
+        $request->setUserResolver(fn() => $user);
+        $response = (new CyberBuddyProcedure())->ask($request);
         $subject = $message->getSubject()->toString();
-        $body = $json['answer']['html'] ?? '';
+        $body = $response['html'] ?? '';
 
         EndVulnsScanListener::sendEmail(
             self::SENDER_CYBERBUDDY,
