@@ -67,7 +67,7 @@
           <div class="col">
             <label class="block mb-2 font-medium">
               <b>
-                {{ __('Output Categories') }} :
+                {{ __('Category to optimize under selected constraints') }} :
               </b>
             </label>
             <div id="output-categories" class="d-flex flex-column gap-1"></div>
@@ -510,16 +510,25 @@
 
           // Détecter une feuille par la présence de la propriété 'decision' (et non sa vérité)
           if (Object.prototype.hasOwnProperty.call(tree, 'decision')) {
-            if (tree.decision === targetClass) {
-              const converted = path.map(item => { // Reconvertir les bins en intervalles
-                if (item.includes("_bin_")) {
+
+            // Normaliser la comparaison pour éviter les mismatches de type (ex: nombre vs texte)
+            if (String(tree.decision) === String(targetClass)) {
+              const converted = (path.length ? path : ["(toujours vrai)"]).map(item => { // Reconvertir les bins en intervalles
+                if (typeof item === 'string' && item.includes("_bin_")) {
+
                   // Supporte " = " et " != "
                   let op = ' = ';
+                 
                   if (item.includes(' != ')) {
                     op = ' != ';
                   }
-                  const [feature, bin] = item.split(op);
+
+                  // Séparer sur le premier opérateur trouvé pour éviter des splits multiples
+                  const idx = item.indexOf(op);
+                  const feature = idx >= 0 ? item.slice(0, idx) : '';
+                  const bin = idx >= 0 ? item.slice(idx + op.length) : '';
                   const interval = binToInterval(bin, thresholds[feature]);
+
                   return op.trim() === '!=' ? `NON(${interval})` : interval;
                 }
                 return item;
@@ -529,8 +538,10 @@
             return rules;
           }
 
-          const newPathTrue = [...path, `${tree.feature} = ${tree.value && tree.value.bin ? tree.value.bin : ''}`];
-          const newPathFalse = [...path, `${tree.feature} != ${tree.value && tree.value.bin ? tree.value.bin : ''}`];
+          // Éviter d'ajouter des conditions vides dans le chemin si le bin est manquant
+          const hasBin = !!(tree.value && tree.value.bin);
+          const newPathTrue = hasBin ? [...path, `${tree.feature} = ${tree.value.bin}`] : [...path];
+          const newPathFalse = hasBin ? [...path, `${tree.feature} != ${tree.value.bin}`] : [...path];
 
           if (tree.trueBranch) {
             extractRulesForClass(tree.trueBranch, targetClass, newPathTrue, rules);
@@ -550,12 +561,41 @@
         console.log('Rules:', rules);
 
         const resultsDiv = document.getElementById("results");
-        resultsDiv.innerHTML = `
-          <div><b>Règles pour maximiser ${selected} :</b></div><br>
-          <pre>${rules.map((rule, i) => `Règle ${i + 1} : ${rule.join(" ET ")}`).join("\n")}</pre>
-        `;
 
-        console.log(resultsDiv);
+        if (rules.length === 0) {
+          resultsDiv.innerHTML = `
+            <div><b>No rule found!</b></div>
+          `;
+        } else {
+          let showRules = false;
+
+          resultsDiv.innerHTML = `
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div><b>${rules.length} rules found!</b></div>
+              <a href="#" id="toggle-rules">(${showRules ? 'hide' : 'show'} rules)</a>
+            </div>
+            <pre
+              id="rules"
+              class="mb-0 ${showRules ? '' : 'd-none'}"
+              style="max-height: 200px; overflow-y: auto">${rules.map(
+            (rule, i) => `Règle ${i + 1} : ${rule.join(" ET ")}`).join("\n")}</pre>
+          `;
+
+          document.getElementById('toggle-rules').addEventListener('click', () => {
+
+            showRules = !showRules;
+
+            const elRules = document.getElementById('rules');
+            const elBtn = document.getElementById('toggle-rules');
+
+            if (showRules) {
+              elRules.classList.remove('d-none');
+            } else {
+              elRules.classList.add('d-none');
+            }
+            elBtn.textContent = `(${showRules ? 'hide' : 'show'} rules)`;
+          });
+        }
       };
     }
 
