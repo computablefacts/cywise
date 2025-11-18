@@ -310,7 +310,7 @@
         <form method="get" action="{{ route('iframes.assets') }}" class="row g-2 align-items-end">
           <div class="col-sm-3">
             <label for="tld" class="form-label">
-              {{ __('TLD') }}
+              {{ __('Domain') }}
             </label>
             <input type="text"
                    id="tld"
