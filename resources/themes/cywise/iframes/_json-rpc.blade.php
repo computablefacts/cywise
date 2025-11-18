@@ -157,6 +157,14 @@
     executeJsonRpcApiCall('assets@restartScan', {asset_id: assetId}, onSuccess);
   }
 
+  function tagAssetApiCall(assetId, tag, onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('assets@tag', {asset_id: assetId, tag: tag}, onSuccess, onError);
+  }
+
+  function untagAssetApiCall(assetId, tagId, onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('assets@untag', {asset_id: assetId, tag_id: tagId}, onSuccess, onError);
+  }
+
   function askCyberBuddyApiCall(threadId, directive, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
     executeJsonRpcApiCall('cyberbuddy@ask', {thread_id: threadId, directive: directive}, onSuccess,
       (response) => toaster.toastError(response.message), onFinally);

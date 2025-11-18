@@ -504,6 +504,96 @@
   const restartScan = (assetId) => restartAssetScanApiCall(assetId,
     () => toaster.toastSuccess("{{ __('The scan has been restarted.') }}"));
 
+  /* ASSETS TAGGING */
+
+  const addTagToAsset = (assetId) => {
+
+    const input = document.getElementById(`tag-input-${assetId}`);
+    if (!input) {
+      return;
+    }
+
+    const value = (input.value || '').trim();
+    if (value.length === 0) {
+      return;
+    }
+
+    tagAssetApiCall(assetId, value, (response) => {
+
+      input.value = '';
+
+      if (!response || !response.tag) {
+        return;
+      }
+
+      const tag = response.tag; // {id, tag}
+
+      // If already present, do nothing
+      if (document.getElementById(`tag-${tag.id}`)) {
+        toaster.toastSuccess("{{ __('Tag already present.') }}");
+        return;
+      }
+
+      const list = document.getElementById(`tags-${assetId}`);
+      if (!list) {
+        return;
+      }
+
+      const wrapper = document.createElement('span');
+      wrapper.id = `tag-${tag.id}`;
+      wrapper.className = 'lozenge new d-inline-flex align-items-center';
+
+      const label = document.createElement('span');
+      label.textContent = tag.tag;
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.title = "{{ __('Remove tag') }}";
+      btn.className = 'bp4-button bp4-minimal border-0 bg-transparent cursor-pointer';
+      btn.style.minHeight = '15px';
+      btn.style.maxWidth = '15px';
+
+      btn.onclick = () => removeTagFromAsset(String(assetId), String(tag.id));
+
+      const icon = document.createElement('span');
+      icon.className = 'bp4-icon bp4-icon-cross';
+      btn.appendChild(icon);
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(btn);
+      list.appendChild(wrapper);
+
+      if (toaster) {
+        toaster.toastSuccess("{{ __('Tag added.') }}");
+      }
+      toggleTagInput(assetId);
+    });
+  }
+
+  const removeTagFromAsset = (assetId, tagId) => {
+    untagAssetApiCall(assetId, tagId, (response) => {
+      const elTag = document.getElementById(`tag-${tagId}`);
+      if (elTag) {
+        elTag.remove();
+      }
+      if (toaster) {
+        const msg = response && response.msg ? response.msg : "{{ __('Tag removed.') }}";
+        toaster.toastSuccess(msg);
+      }
+      toggleTagInput(assetId);
+    });
+  }
+
+  const toggleTagInput = (assetId) => {
+    const elTags = document.getElementById(`tags-${assetId}`);
+    const elAddTag = document.getElementById(`add-tag-${assetId}`);
+    if (elTags && elAddTag && elTags.childElementCount <= 5) {
+      elAddTag.classList.remove('d-none');
+    } else {
+      elAddTag.classList.add('d-none');
+    }
+  };
+
 </script>
 @endpush
 
