@@ -146,10 +146,24 @@ class TimelineController extends Controller
             'level' => ['nullable', 'string', 'in:low,medium,high'],
             'server_id' => ['nullable', 'integer', 'exists:ynh_servers,id'],
             'asset_id' => ['nullable', 'integer', 'exists:am_assets,id'],
+            'tld' => ['nullable', 'string'],
+            'tags' => ['nullable', 'string'], // comma-separated list
         ]);
         $objects = last(explode('/', trim($request->path(), '/')));
         $items = match ($objects) {
-            'assets' => $this->assets($params['status'] ?? null, $params['asset_id'] ?? null),
+            'assets' => $this->assets(
+                $params['status'] ?? null,
+                $params['asset_id'] ?? null,
+                $params['tld'] ?? null,
+                isset($params['tags']) && $params['tags'] !== ''
+                    ? collect(explode(',', $params['tags']))
+                    ->map(fn($t) => Str::trim($t))
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->all()
+                    : null
+            ),
             'conversations' => $this->conversations(),
             'events' => $this->events($params['server_id'] ?? null),
             'ioc' => $this->iocs(10, $params['server_id'] ?? null, $params['level'] ?? null),
@@ -225,18 +239,27 @@ class TimelineController extends Controller
             });
     }
 
-    private function assets(?string $status = null, ?int $assetId = null): array
+    private function assets(?string $status = null, ?int $assetId = null, ?string $tld = null, ?array $tags = null): array
     {
+        // Helper to apply shared filters
+        $filter = function ($query) use ($assetId, $tld, $tags) {
+            return $query
+                ->when($assetId, fn($q, $assetId) => $q->where('id', $assetId))
+                ->when($tld, fn($q, $tld) => $q->where('tld', Str::lower($tld)))
+                ->when($tags && count($tags) > 0, function ($q) use ($tags) {
+                    $q->whereHas('tags', function ($sub) use ($tags) {
+                        $sub->whereIn('tag', $tags);
+                    });
+                });
+        };
         return [
-            'nb_monitored' => Asset::query()
+            'nb_monitored' => $filter(Asset::query())
                 ->where('is_monitored', true)
-                ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
                 ->count(),
-            'nb_monitorable' => Asset::query()
+            'nb_monitorable' => $filter(Asset::query())
                 ->where('is_monitored', false)
-                ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
                 ->count(),
-            'items' => Asset::query()
+            'items' => $filter(Asset::query())
                 ->when($status, function ($query, $status) {
                     if ($status === 'monitorable') {
                         $query->where('is_monitored', false);
@@ -244,7 +267,6 @@ class TimelineController extends Controller
                         $query->where('is_monitored', true);
                     }
                 })
-                ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
                 ->get()
                 ->map(function (Asset $asset) {
 

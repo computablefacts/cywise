@@ -15,7 +15,7 @@
               <b>{{ $nb_monitored + $nb_monitorable }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.assets') }}" class="link">
+              <a href="{{ route('iframes.assets', request()->only(['tld','tags'])) }}" class="link">
                 {{ __('Assets') }}
               </a>
             </div>
@@ -40,7 +40,9 @@
               <b>{{ $nb_monitored }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.assets', [ 'status' => 'monitored' ]) }}" class="link">
+              <a
+                href="{{ route('iframes.assets', array_merge(['status' => 'monitored'], request()->only(['tld','tags']))) }}"
+                class="link">
                 {{ __('Assets Monitored') }}
               </a>
             </div>
@@ -65,7 +67,9 @@
               <b>{{ $nb_monitorable }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.assets', [ 'status' => 'monitorable' ]) }}" class="link">
+              <a
+                href="{{ route('iframes.assets', array_merge(['status' => 'monitorable'], request()->only(['tld','tags']))) }}"
+                class="link">
                 {{ __('Assets Monitorable') }}
               </a>
             </div>
