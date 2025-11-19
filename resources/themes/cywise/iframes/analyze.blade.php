@@ -63,19 +63,11 @@
             <span id="errors" class="d-none text-red-600"></span>
           </div>
         </div>
-        <div id="output-categories-section" class="row mt-3 d-none">
+        <div class="row mt-3 d-none">
           <div class="col">
-            <label class="block mb-2 font-medium">
-              <b>
-                {{ __('Category to optimize under selected constraints') }} :
-              </b>
-            </label>
-            <div id="output-categories" class="d-flex flex-column gap-1"></div>
-            <div class="mt-2">
-              <button id="output-categories-button" type="button" class="btn btn-sm btn-primary">
-                {{ __('Optimize!') }}
-              </button>
-            </div>
+            <button id="optimize-button" type="button" class="btn btn-sm btn-primary w-100">
+              {{ __('Optimize!') }}
+            </button>
           </div>
         </div>
         <div class="row mt-3">
@@ -117,13 +109,17 @@
   elFileInput.addEventListener('change', function () {
     const file = this.files[0];
     if (!file) {
-      if (elOutputCategoriesSection) {
-        elOutputCategoriesSection.classList.add('d-none');
-      }
-      if (elOutputCategories) {
-        elOutputCategories.innerHTML = '';
-      }
       return;
+    }
+    const resultsDiv = document.getElementById('results');
+    if (resultsDiv) {
+      resultsDiv.innerHTML = '';
+    }
+    if (elOptimizeBtn) {
+      const row = elOptimizeBtn.closest('.row');
+      if (row) {
+        row.classList.add('d-none');
+      }
     }
     const reader = new FileReader();
     reader.onload = function (e) {
@@ -145,8 +141,6 @@
           return obj;
         });
 
-        // console.log(data);
-
         if (!data || !data.length) {
           setError('Empty TSV file.');
           return;
@@ -156,12 +150,6 @@
 
       } catch (err) {
         setError(err.message || 'Failed to parse TSV');
-        if (elOutputCategoriesSection) {
-          elOutputCategoriesSection.classList.add('d-none');
-        }
-        if (elOutputCategories) {
-          elOutputCategories.innerHTML = '';
-        }
       }
     };
     reader.readAsText(file);
@@ -178,9 +166,7 @@
   const elCharts = document.getElementById('charts');
   const elOutputCard = document.getElementById('output-card');
   const elOutputChart = document.getElementById('output-chart');
-  const elOutputCategoriesSection = document.getElementById('output-categories-section');
-  const elOutputCategories = document.getElementById('output-categories');
-  const elOutputCategoriesButton = document.getElementById('output-categories-button');
+  const elOptimizeBtn = document.getElementById('optimize-button');
 
   let ndx = null;
   let dimensions = {}; // map col. name to crossfilter dimension
@@ -197,14 +183,11 @@
     }
     // Detect datetime columns (Date instances)
     if (notNull.every(v => v instanceof Date && !isNaN(v))) {
-      // console.log('findColumnType', values, 'datetime');
       return 'datetime';
     }
     if (notNull.every(v => typeof v === 'number' && !isNaN(v))) {
-      // console.log('findColumnType', values, 'number');
       return 'numeric';
     }
-    // console.log('findColumnType', values, 'categorical');
     return 'categorical';
   }
 
@@ -220,14 +203,6 @@
       if (elOutputChart) {
         elOutputChart.innerHTML = '';
       }
-    }
-
-    // Reset output categories
-    if (elOutputCategoriesSection) {
-      elOutputCategoriesSection.classList.add('d-none');
-    }
-    if (elOutputCategories) {
-      elOutputCategories.innerHTML = '';
     }
 
     const cf = window.crossfilter || window.crossfilter2;
@@ -253,63 +228,22 @@
 
     setError('');
 
-    // Render output categories radio group (sorted ASC, select first)
-    const sortAsc = (a, b) => {
-      const an = typeof a === 'number';
-      const bn = typeof b === 'number';
-      if (an && bn) {
-        return a - b;
+    if (elOptimizeBtn) {
+      const row = elOptimizeBtn.closest('.row');
+      if (row) {
+        row.classList.remove('d-none');
       }
-      return String(a).localeCompare(String(b), undefined, {numeric: true, sensitivity: 'base'});
     }
-
-    const categoriesSorted = [...outputValues].sort(sortAsc);
-
-    if (elOutputCategories && elOutputCategoriesSection) {
-      elOutputCategories.innerHTML = '';
-      categoriesSorted.forEach((cat, idx) => {
-        const id = 'out-cat-' + String(cat).replace(/[^a-zA-Z0-9_\-]/g, '_');
-        const wrapper = document.createElement('div');
-        wrapper.className = 'form-check';
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.className = 'form-check-input';
-        input.name = 'output-category';
-        input.value = String(cat);
-        input.id = id;
-        if (idx === 0) {
-          input.checked = true;
-        }
-        const label = document.createElement('label');
-        label.className = 'form-check-label';
-        label.setAttribute('for', id);
-        label.textContent = String(cat);
-        wrapper.appendChild(input);
-        wrapper.appendChild(label);
-        elOutputCategories.appendChild(wrapper);
-      });
-      elOutputCategoriesSection.classList.remove('d-none');
-    }
-    if (elOutputCategoriesButton) {
-      elOutputCategoriesButton.onclick = () => {
-
-        const selected = (document.querySelector('input[name="output-category"]:checked') || {}).value;
-        if (!selected) {
-          return;
-        }
-
-        console.log('Optimize for category:', selected);
+    if (elOptimizeBtn) {
+      elOptimizeBtn.onclick = () => {
 
         const filtered = filteredData();
+
         if (!filtered.length) {
           return;
         }
 
-        console.log('filtered:', filtered);
-
         const labels = Object.keys(filtered[0]).filter(col => col !== 'output' && !excluded.includes(col));
-
-        console.log('Labels:', labels);
 
         // Fonction pour discrétiser un attribut numérique
         const discretize = (data, column, bins = 3) => {
@@ -355,9 +289,6 @@
           }
         });
 
-        console.log('Bins:', bins);
-        console.log('Thresholds:', thresholds);
-
         const features = filtered.map((d, idx) => {
           const feature = {};
           Object.keys(d).filter(col => labels.includes(col)).forEach(col => {
@@ -366,9 +297,6 @@
           return feature;
         });
         const target = filtered.map(d => d['output']);
-
-        console.log('Features:', features);
-        console.log('Target:', target);
 
         // Fonction pour calculer l'entropie
         const entropy = (targets) => {
@@ -595,67 +523,74 @@
           });
         }
 
+        // Construire les règles pour toutes les catégories de sortie
         const decisionTree = buildTree(features, target);
-
-        console.log('Decision Tree:', decisionTree);
-
-        const rules = extractRulesForClass(decisionTree, selected);
-        const ruleCounts = rules.map(path => {
-
-          let count = 0;
-
-          for (let i = 0; i < features.length; i++) {
-            if (matchesPath(features[i], path)) {
-              count++;
+        const categories = Array.from(new Set(target)).filter(v => v !== '');
+        const resultsByCategory = categories.map((cat) => {
+          const rules = extractRulesForClass(decisionTree, cat);
+          const ruleCounts = rules.map(path => {
+            let count = 0;
+            for (let i = 0; i < features.length; i++) {
+              if (matchesPath(features[i], path)) {
+                count++;
+              }
             }
-          }
-          return count;
+            return count;
+          });
+          const sortedRules = rules
+          .map((path, i) => ({path, n: ruleCounts[i] || 0}))
+          .filter(item => item.n > 0) // Ne garder que les règles ayant au moins un match
+          .sort((a, b) => b.n - a.n);
+          return {cat, sortedRules};
         });
 
-        // Associer chaque règle à son compteur et trier par n décroissant
-        const sortedRules = rules
-        .map((path, i) => ({path, n: ruleCounts[i] || 0}))
-        .sort((a, b) => b.n - a.n);
+        const elResults = document.getElementById("results");
 
-        console.log('Rules:', sortedRules);
-
-        const resultsDiv = document.getElementById("results");
-
-        if (rules.length === 0) {
-          resultsDiv.innerHTML = `
+        if (!resultsByCategory.length || resultsByCategory.every(rc => rc.sortedRules.length === 0)) {
+          elResults.innerHTML = `
             <div><b>No rule found!</b></div>
           `;
         } else {
-          let showRules = false;
 
-          resultsDiv.innerHTML = `
-            <div class="d-flex align-items-center gap-2 mb-2">
-              <div><b>${rules.length} rules found!</b></div>
-              <a href="#" id="toggle-rules">(${showRules ? 'hide' : 'show'} rules)</a>
-            </div>
-            <pre
-              id="rules"
-              class="mb-0 ${showRules ? '' : 'd-none'}"
-              style="max-height: 200px; overflow-y: auto">${sortedRules.map((item, i) => {
-            const pretty = prettifiesPath(item.path);
-            const n = item.n ?? 0;
-            return `Règle ${i + 1} (n=${n}) : ${pretty.join(" ET ")}`;
-          }).join("\n")}</pre>
-          `;
+          const html = resultsByCategory.map((rc, idx) => {
+            const show = false;
+            const rulesHtml = rc.sortedRules.map((item, i) => {
+              const pretty = prettifiesPath(item.path);
+              const n = item.n ?? 0;
+              return `Règle ${i + 1} (n=${n}) : ${pretty.join(" ET ")}`;
+            }).join("\n");
+            const toggleId = `toggle-rules-${idx}`;
+            const preId = `rules-${idx}`;
 
-          document.getElementById('toggle-rules').addEventListener('click', () => {
+            return `
+              <div class="mb-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <div><b>Catégorie "${String(rc.cat)}" — ${rc.sortedRules.length} règle(s)</b></div>
+                  <a href="#" id="${toggleId}">(${show ? 'hide' : 'show'} rules)</a>
+                </div>
+                <pre id="${preId}" class="mb-0 ${show ? ''
+              : 'd-none'}" style="max-height: 200px; overflow-y: auto">${rulesHtml}</pre>
+              </div>
+            `;
+          }).join('');
 
-            showRules = !showRules;
-
-            const elRules = document.getElementById('rules');
-            const elBtn = document.getElementById('toggle-rules');
-
-            if (showRules) {
-              elRules.classList.remove('d-none');
-            } else {
-              elRules.classList.add('d-none');
+          elResults.innerHTML = html;
+          resultsByCategory.forEach((rc, idx) => {
+            const elToggle = document.getElementById(`toggle-rules-${idx}`);
+            const elPre = document.getElementById(`rules-${idx}`);
+            if (elToggle && elPre) {
+              let show = false;
+              elToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                show = !show;
+                if (show) {
+                  elPre.classList.remove('d-none');
+                } else {
+                  elPre.classList.add('d-none');
+                }
+                elToggle.textContent = `(${show ? 'hide' : 'show'} rules)`;
+              });
             }
-            elBtn.textContent = `(${showRules ? 'hide' : 'show'} rules)`;
           });
         }
       };
@@ -922,10 +857,7 @@
       const dimension = dimensions[colName];
       const chart = charts[colName];
 
-      // console.log(action, dimension, chart);
-
       if (action === 'reset') {
-        // console.log('reset');
         chart.filterAll();
         dc.redrawAll();
         scheduleRecomputeExplainer();
