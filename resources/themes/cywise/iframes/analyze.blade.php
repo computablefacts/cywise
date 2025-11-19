@@ -60,9 +60,14 @@
         </div>
         <div class="row mt-3 d-none">
           <div class="col">
-            <button id="optimize-button" type="button" class="btn btn-sm btn-primary w-100">
-              {{ __('Optimize!') }}
-            </button>
+            <div class="d-flex gap-2">
+              <button id="optimize-button" type="button" class="btn btn-sm btn-primary w-100">
+                {{ __('Optimize!') }}
+              </button>
+              <button id="reset-optimize-button" type="button" class="btn btn-sm btn-secondary">
+                {{ __('Reset') }}
+              </button>
+            </div>
           </div>
         </div>
         <div class="row mt-3">
@@ -155,6 +160,7 @@
   const elOutputCard = document.getElementById('output-card');
   const elOutputChart = document.getElementById('output-chart');
   const elOptimizeBtn = document.getElementById('optimize-button');
+  const elResetOptimizeBtn = document.getElementById('reset-optimize-button');
 
   let ndx = null;
   let dimensions = {}; // map col. name to crossfilter dimension
@@ -449,7 +455,7 @@
         // Vérifie si un enregistrement de features satisfait un chemin (ensemble de conditions)
         const matchesPath = (featureRow, path) => {
           if (!path || path.length === 0) {
-            return true; // chemin toujours vrai
+            return true;
           }
           for (const cond of path) {
             if (typeof cond !== 'string') {
@@ -532,9 +538,7 @@
         const elResults = document.getElementById("results");
 
         if (!resultsByCategory.length || resultsByCategory.every(rc => rc.sortedRules.length === 0)) {
-          elResults.innerHTML = `
-            <div><b>No rule found!</b></div>
-          `;
+          elResults.innerHTML = `<div><b>No rule found!</b></div>`;
         } else {
 
           const html = resultsByCategory.map((rc, idx) => {
@@ -577,8 +581,20 @@
               });
             }
           });
+
+          const sumNByCat = {};
+
+          resultsByCategory.forEach(rc => {
+            sumNByCat[rc.cat] = (rc.sortedRules || []).reduce((acc, it) => acc + (it.n || 0), 0);
+          });
+
+          updateChartExplainer(data, filtered, sumNByCat);
         }
       };
+    }
+
+    if (elResetOptimizeBtn) {
+      elResetOptimizeBtn.onclick = () => scheduleRecomputeExplainer();
     }
 
     // Debounce to avoid recomputing too often while brushing/filtering
@@ -659,40 +675,34 @@
 
     // Get filtered rows from Crossfilter (falls back to all)
     const filteredData = () => {
-      try {
-        if (ndx && typeof ndx.allFiltered === 'function') {
-          return ndx.allFiltered();
-        }
-      } catch (e) {
+      if (ndx && typeof ndx.allFiltered === 'function') {
+        return ndx.allFiltered();
       }
-      try {
-        if (ndx && typeof ndx.all === 'function') {
-          return ndx.all();
-        }
-      } catch (e) {
+      if (ndx && typeof ndx.all === 'function') {
+        return ndx.all();
       }
       return data || [];
     }
 
     // Recompute explainer based on current filters
-    const recomputeExplainer = () => {
+    const scheduleRecomputeExplainer = debounce(() => {
+      const elResults = document.getElementById('results');
+      if (elResults) {
+        elResults.innerHTML = '';
+      }
       const filtered = filteredData();
       if (!filtered || !filtered.length) {
         updateChartExplainer(data);
       } else {
         updateChartExplainer(data, filtered);
       }
-    }
-
-    const scheduleRecomputeExplainer = debounce(recomputeExplainer, 200);
+    }, 200);
 
     // Prepare output explainer chart (two bars per category: selection vs whole dataset)
-    const updateChartExplainer = (all, filtered = null) => {
+    const updateChartExplainer = (all, filtered = null, selectionOverrideByCat = null) => {
       if (!elOutputChart) {
         return;
       }
-
-      // Destroy previous chart instance if any
       if (outputChart && typeof outputChart.destroy === 'function') {
         outputChart.destroy();
       }
@@ -704,13 +714,37 @@
 
       const features = Array.from(new Set(data.map(d => d['output']))).filter(v => v !== '');
       const dataGlobal = features.map(cat => all.filter(d => d['output'] === cat).length);
-      const dataSelection = features.map(cat => (filtered ?? all).filter(d => d['output'] === cat).length);
+      const dataSelectionDefault = features.map(cat => (filtered ?? all).filter(d => d['output'] === cat).length);
+      const dataSelection = selectionOverrideByCat ? features.map(cat => Number(selectionOverrideByCat[cat] || 0))
+        : dataSelectionDefault;
+
+      let selectionColors = 'gray';
+
+      if (selectionOverrideByCat) {
+        selectionColors = dataSelection.map((v, i) => {
+          const base = dataSelectionDefault[i] || 0;
+          if (!(base > 0)) {
+            return 'gray';
+          }
+          const diffPct = Math.abs(v - base) / base;
+          if (diffPct >= 0.66) {
+            return '#e53935';
+          }
+          if (diffPct >= 0.33) {
+            return '#fdd835';
+          }
+          if (diffPct > 0) {
+            return '#43a047';
+          }
+          return 'gray';
+        });
+      }
       const ctx = canvas.getContext('2d');
 
       outputChart = new Chart(ctx, {
         type: 'bar', data: {
           labels: features, datasets: [{
-            label: 'Selection', data: dataSelection, backgroundColor: 'gray',
+            label: 'Selection', data: dataSelection, backgroundColor: selectionColors,
           }, {
             label: 'Global', data: dataGlobal, backgroundColor: 'rgb(49, 130, 189)'
           }]
