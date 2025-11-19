@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@main
       - name: Installing PHP
-        uses: shivammathur/setup-php@verbose
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: mbstring, json, sqlite3
