@@ -15,11 +15,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@main
       - name: Installing PHP
-        uses: shivammathur/setup-php@main
+        uses: shivammathur/setup-php@verbose
         with:
           php-version: ${{ matrix.php }}
           extensions: mbstring, json, sqlite3
           tools: composer:v2
+        env:
+          update: true # Update to the latest patch of PHP versions.
       - name: Shutting down MySQL
         run: sudo service mysql stop
       - name: Installing MariaDb
