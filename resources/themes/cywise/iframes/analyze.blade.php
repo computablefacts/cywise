@@ -778,11 +778,20 @@
               callbacks: {
                 label: (context) => {
                   const value = Number(context.raw || 0);
-                  const idx = (context && typeof context.dataIndex === 'number') ? context.dataIndex : 0;
-                  const total = Number((Array.isArray(dataGlobal) && dataGlobal[idx] != null) ? dataGlobal[idx] : 0);
-                  const pct = total > 0 ? (value / total) * 100 : 0;
-                  const pctStr = total > 0 ? ` (${pct.toFixed(1)}%)` : '';
                   const itemsLabel = `${value} item${value === 1 ? '' : 's'}`;
+                  let pctStr = '';
+                  // Compute percent from the same basis used for coloring bars
+                  // Coloring logic compares selectionOverrideByCat (if provided) to dataSelectionDefault
+                  const isSelection = context && context.dataset && context.dataset.label === 'Selection';
+                  const idx = (context && typeof context.dataIndex === 'number') ? context.dataIndex : 0;
+                  if (isSelection && selectionOverrideByCat) {
+                    const base = Number((Array.isArray(dataSelectionDefault) && dataSelectionDefault[idx] != null)
+                      ? dataSelectionDefault[idx] : 0);
+                    if (base > 0) {
+                      const pct = Math.abs(value - base) / base * 100; // same metric as color thresholds
+                      pctStr = ` (diff=${pct.toFixed(1)}%)`;
+                    }
+                  }
                   return `${context.dataset.label}: ${itemsLabel}${pctStr}`;
                 }
               }
