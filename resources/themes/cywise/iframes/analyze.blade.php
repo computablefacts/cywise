@@ -502,38 +502,19 @@
           }
         }
 
-        // Fonction pour extraire les règles pour une classe donnée
+        // Fonction pour extraire les chemins (règles brutes) menant à une classe donnée
+        // Retourne un tableau de chemins, chaque chemin étant un tableau de chaînes de conditions
+        // ex: ["colA = colA_bin_1", "colB != colB_bin_0", ...]
         const extractRulesForClass = (tree, targetClass, path = [], rules = []) => {
           if (!tree) {
             return rules;
           }
 
-          // Détecter une feuille par la présence de la propriété 'decision' (et non sa vérité)
+          // Feuille détectée si propriété 'decision' présente
           if (Object.prototype.hasOwnProperty.call(tree, 'decision')) {
-
-            // Normaliser la comparaison pour éviter les mismatches de type (ex: nombre vs texte)
             if (String(tree.decision) === String(targetClass)) {
-              const converted = (path.length ? path : ["(toujours vrai)"]).map(item => { // Reconvertir les bins en intervalles
-                if (typeof item === 'string' && item.includes("_bin_")) {
-
-                  // Supporte " = " et " != "
-                  let op = ' = ';
-                 
-                  if (item.includes(' != ')) {
-                    op = ' != ';
-                  }
-
-                  // Séparer sur le premier opérateur trouvé pour éviter des splits multiples
-                  const idx = item.indexOf(op);
-                  const feature = idx >= 0 ? item.slice(0, idx) : '';
-                  const bin = idx >= 0 ? item.slice(idx + op.length) : '';
-                  const interval = binToInterval(bin, thresholds[feature]);
-
-                  return op.trim() === '!=' ? `NON(${interval})` : interval;
-                }
-                return item;
-              });
-              rules.push(converted);
+              // Conserver la version brute du chemin (sans conversion pretty) pour permettre le filtrage
+              rules.push(path.length ? [...path] : []);
             }
             return rules;
           }
@@ -552,13 +533,91 @@
           return rules;
         }
 
+        // Vérifie si un enregistrement de features satisfait un chemin (ensemble de conditions)
+        const matchesPath = (featureRow, path) => {
+          if (!path || path.length === 0) {
+            return true; // chemin toujours vrai
+          }
+          for (const cond of path) {
+            if (typeof cond !== 'string') {
+              continue;
+            }
+
+            // Priorité à " != " (pour ne pas confondre le ! dans les noms)
+            let op = ' != ';
+            let idx = cond.indexOf(op);
+
+            if (idx === -1) {
+              op = ' = ';
+              idx = cond.indexOf(op);
+            }
+
+            const feature = idx >= 0 ? cond.slice(0, idx) : '';
+            const bin = idx >= 0 ? cond.slice(idx + op.length) : '';
+            const val = featureRow && featureRow[feature] ? featureRow[feature].bin : undefined;
+
+            if (op.trim() === '!=') {
+              if (val === bin) {
+                return false;
+              }
+            } else {
+              if (val !== bin) {
+                return false;
+              }
+            }
+          }
+          return true;
+        }
+
+        // Conversion "jolie" d'un chemin brut vers un texte lisible avec intervalles
+        const prettifiesPath = (path) => {
+          if (!path || path.length === 0) {
+            return ["(toujours vrai)"];
+          }
+          return path.map(item => {
+            if (typeof item === 'string' && item.includes('_bin_')) {
+
+              // Déterminer l'opérateur présent
+              let op = ' = ';
+
+              if (item.includes(' != ')) {
+                op = ' != ';
+              }
+
+              const idx = item.indexOf(op);
+              const feature = idx >= 0 ? item.slice(0, idx) : '';
+              const bin = idx >= 0 ? item.slice(idx + op.length) : '';
+              const interval = binToInterval(bin, thresholds[feature]);
+
+              return op.trim() === '!=' ? `NON(${interval})` : interval;
+            }
+            return item;
+          });
+        }
+
         const decisionTree = buildTree(features, target);
 
         console.log('Decision Tree:', decisionTree);
 
         const rules = extractRulesForClass(decisionTree, selected);
+        const ruleCounts = rules.map(path => {
 
-        console.log('Rules:', rules);
+          let count = 0;
+
+          for (let i = 0; i < features.length; i++) {
+            if (matchesPath(features[i], path)) {
+              count++;
+            }
+          }
+          return count;
+        });
+
+        // Associer chaque règle à son compteur et trier par n décroissant
+        const sortedRules = rules
+        .map((path, i) => ({path, n: ruleCounts[i] || 0}))
+        .sort((a, b) => b.n - a.n);
+
+        console.log('Rules:', sortedRules);
 
         const resultsDiv = document.getElementById("results");
 
@@ -577,8 +636,11 @@
             <pre
               id="rules"
               class="mb-0 ${showRules ? '' : 'd-none'}"
-              style="max-height: 200px; overflow-y: auto">${rules.map(
-            (rule, i) => `Règle ${i + 1} : ${rule.join(" ET ")}`).join("\n")}</pre>
+              style="max-height: 200px; overflow-y: auto">${sortedRules.map((item, i) => {
+            const pretty = prettifiesPath(item.path);
+            const n = item.n ?? 0;
+            return `Règle ${i + 1} (n=${n}) : ${pretty.join(" ET ")}`;
+          }).join("\n")}</pre>
           `;
 
           document.getElementById('toggle-rules').addEventListener('click', () => {
