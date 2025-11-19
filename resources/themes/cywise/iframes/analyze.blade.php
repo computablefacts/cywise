@@ -169,6 +169,7 @@
   let outputChart = null; // Chart.js instance for output
   let ranges = {}; // map col. name to [min,max] for numeric charts
   let excluded = []; // excluded dimensions i.e. col. names
+  let hiddenFeatureCards = new Set(); // track hidden feature cards
 
   const findColumnType = (values) => {
     const notNull = values.filter(v => v !== null && v !== undefined && v !== '');
@@ -516,6 +517,34 @@
 
         // Construire les règles pour toutes les catégories de sortie
         const decisionTree = buildTree(features, target);
+
+        // Extraire les features utilisées dans l'arbre
+        const used = new Set();
+        const collectUsed = (node) => {
+          if (!node || typeof node !== 'object') {
+            return;
+          }
+          if (node.feature) {
+            used.add(node.feature);
+          }
+          collectUsed(node.trueBranch);
+          collectUsed(node.falseBranch);
+        };
+
+        collectUsed(decisionTree);
+        const unused = labels.filter(n => !used.has(n));
+
+        // Masquer les graphiques correspondants
+        hiddenFeatureCards.clear();
+
+        unused.forEach(col => {
+          const card = elCharts && elCharts.querySelector(`.feature-card[data-col="${CSS.escape(col)}"]`);
+          if (card && !card.classList.contains('d-none')) {
+            card.classList.add('d-none');
+            hiddenFeatureCards.add(col);
+          }
+        });
+
         const categories = Array.from(new Set(target)).filter(v => v !== '');
         const resultsByCategory = categories.map((cat) => {
           const rules = extractRulesForClass(decisionTree, cat);
@@ -562,10 +591,18 @@
         const elResults = document.getElementById("results");
 
         if (!resultsByCategory.length || resultsByCategory.every(rc => rc.sortedRules.length === 0)) {
-          elResults.innerHTML = `<div><b>No rule found!</b></div>`;
+          elResults.innerHTML = `${droppedHtml}<div><b>No rule found!</b></div>`;
         } else {
 
-          const html = resultsByCategory.map((rc, idx) => {
+          const headerDropped = `
+            <div class="mb-3">
+              <div class="mb-2"><b>{{ __('Dropped features') }}</b></div>
+              ${(unused && unused.length) ? unused.map(
+              name => `<span class="lozenge new me-1">${name}</span>`).join('')
+            : '<span class="text-muted">None.</span>'}
+            </div>`;
+
+          const htmlRules = resultsByCategory.map((rc, idx) => {
             const show = false;
             const rulesHtml = rc.sortedRules.map((item, i) => {
               const pretty = prettifiesPath(item.path);
@@ -578,7 +615,7 @@
             return `
               <div class="mb-3">
                 <div class="d-flex align-items-center gap-2 mb-2">
-                  <div><b>Catégorie "${String(rc.cat)}" — ${rc.sortedRules.length} règle(s)</b></div>
+                  <div><b>Category "${String(rc.cat)}" — ${rc.sortedRules.length} rule(s)</b></div>
                   <a href="#" id="${toggleId}">(${show ? 'hide' : 'show'} rules)</a>
                 </div>
                 <pre id="${preId}" class="mb-0 ${show ? ''
@@ -587,7 +624,7 @@
             `;
           }).join('');
 
-          elResults.innerHTML = html;
+          elResults.innerHTML = headerDropped + htmlRules;
           resultsByCategory.forEach((rc, idx) => {
             const elToggle = document.getElementById(`toggle-rules-${idx}`);
             const elPre = document.getElementById(`rules-${idx}`);
@@ -618,7 +655,13 @@
     }
 
     if (elResetOptimizeBtn) {
-      elResetOptimizeBtn.onclick = () => scheduleRecomputeExplainer();
+      elResetOptimizeBtn.onclick = () => {
+        if (elCharts) {
+          elCharts.querySelectorAll('.feature-card.d-none').forEach(card => card.classList.remove('d-none'));
+        }
+        hiddenFeatureCards.clear();
+        scheduleRecomputeExplainer();
+      };
     }
 
     // Debounce to avoid recomputing too often while brushing/filtering
@@ -814,7 +857,8 @@
       const type = findColumnType(values);
       const chartId = 'chart_' + colName.replace(/[^a-zA-Z0-9_]/g, '_');
       const elCard = document.createElement('div');
-      elCard.className = 'card p-0';
+      elCard.className = 'card p-0 feature-card';
+      elCard.setAttribute('data-col', colName);
       elCard.innerHTML = `
         <div class="card-body p-3">
           <div class="row">
