@@ -777,7 +777,13 @@
             legend: {display: false}, tooltip: {
               callbacks: {
                 label: (context) => {
-                  return `${context.dataset.label}: ${context.raw || 0} items`;
+                  const value = Number(context.raw || 0);
+                  const idx = (context && typeof context.dataIndex === 'number') ? context.dataIndex : 0;
+                  const total = Number((Array.isArray(dataGlobal) && dataGlobal[idx] != null) ? dataGlobal[idx] : 0);
+                  const pct = total > 0 ? (value / total) * 100 : 0;
+                  const pctStr = total > 0 ? ` (${pct.toFixed(1)}%)` : '';
+                  const itemsLabel = `${value} item${value === 1 ? '' : 's'}`;
+                  return `${context.dataset.label}: ${itemsLabel}${pctStr}`;
                 }
               }
             }
