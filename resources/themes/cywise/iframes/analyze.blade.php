@@ -58,11 +58,6 @@
             with up to 5 categories. The <strong>output</strong> column is the target variable to optimize.
           </div>
         </div>
-        <div class="row mt-3">
-          <div class="col">
-            <span id="errors" class="d-none text-red-600"></span>
-          </div>
-        </div>
         <div class="row mt-3 d-none">
           <div class="col">
             <button id="optimize-button" type="button" class="btn btn-sm btn-primary w-100">
@@ -142,25 +137,18 @@
         });
 
         if (!data || !data.length) {
-          setError('Empty TSV file.');
+          toaster.toastError('Empty TSV file.');
           return;
         }
 
         buildCharts();
 
       } catch (err) {
-        setError(err.message || 'Failed to parse TSV');
+        toaster.toastError(err.message || 'Failed to parse TSV');
       }
     };
     reader.readAsText(file);
   });
-
-  /** Display errors */
-  const elErrors = document.getElementById('errors');
-  const setError = (msg) => {
-    elErrors.textContent = msg || '';
-    elErrors.classList.toggle('d-none', !msg);
-  }
 
   /** Display charts */
   const elCharts = document.getElementById('charts');
@@ -207,7 +195,7 @@
 
     const cf = window.crossfilter || window.crossfilter2;
     if (!cf) {
-      setError('Crossfilter library failed to load. Please check your network connection and try again.');
+      toaster.toastError('Crossfilter library failed to load. Please check your network connection and try again.');
       return;
     }
 
@@ -215,19 +203,16 @@
     const columns = Object.keys(data[0] || {});
 
     if (!columns.includes('output')) {
-      setError('The CSV file must contain an "output" column.');
+      toaster.toastError('The CSV file must contain an "output" column.');
       return;
     }
 
     const outputValues = Array.from(new Set(data.map(d => d['output']))).filter(v => v !== '');
 
     if (outputValues.length > 5) {
-      setError('The "output" column must have 5 or fewer categories. Found: ' + outputValues.length);
+      toaster.toastError('The "output" column must have 5 or fewer categories. Found: ' + outputValues.length);
       return;
     }
-
-    setError('');
-
     if (elOptimizeBtn) {
       const row = elOptimizeBtn.closest('.row');
       if (row) {
