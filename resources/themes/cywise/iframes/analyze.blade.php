@@ -519,19 +519,43 @@
         const categories = Array.from(new Set(target)).filter(v => v !== '');
         const resultsByCategory = categories.map((cat) => {
           const rules = extractRulesForClass(decisionTree, cat);
-          const ruleCounts = rules.map(path => {
-            let count = 0;
+
+          // Pour chaque règle, calculer l'ensemble des index de lignes qui correspondent
+          const ruleMatchSets = rules.map(path => {
+            const idxs = new Set();
             for (let i = 0; i < features.length; i++) {
-              if (matchesPath(features[i], path)) {
-                count++;
+              // ATTENTION: on ne compte que les lignes dont la sortie (target)
+              // correspond à la catégorie courante, afin d'éviter de sur-compter
+              // des lignes d'autres catégories qui satisfont aussi le chemin.
+              if (matchesPath(features[i], path) && String(target[i]) === String(cat)) {
+                idxs.add(i);
               }
             }
-            return count;
+            return idxs;
           });
-          const sortedRules = rules
-          .map((path, i) => ({path, n: ruleCounts[i] || 0}))
-          .filter(item => item.n > 0) // Ne garder que les règles ayant au moins un match
-          .sort((a, b) => b.n - a.n);
+
+          // Trier les règles par nombre de correspondances décroissant pour un affichage pertinent
+          const sorted = rules
+          .map((path, i) => ({path, set: ruleMatchSets[i], rawCount: ruleMatchSets[i].size}))
+          .filter(item => (item.rawCount || 0) > 0)
+          .sort((a, b) => b.rawCount - a.rawCount);
+
+          // Dédupliquer: n = nombre de lignes couvertes UNIQUEMENT par cette règle
+          // en excluant celles déjà couvertes par les règles précédentes (dans l'ordre trié)
+          const covered = new Set();
+          const sortedRules = sorted.map(item => {
+            let uniqueCount = 0;
+            for (const idx of item.set) {
+              if (!covered.has(idx)) {
+                uniqueCount++;
+              }
+            }
+            for (const idx of item.set) {
+              covered.add(idx);
+            }
+            return {path: item.path, n: uniqueCount};
+          }).filter(item => item.n > 0);
+
           return {cat, sortedRules};
         });
 
