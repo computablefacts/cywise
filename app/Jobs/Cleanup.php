@@ -116,8 +116,6 @@ class Cleanup implements ShouldQueue
                         $hasFile = true;
                         $hasChunk = true;
 
-                        Log::debug("Checking vector {$vector->id}...");
-
                         if (!$vector->collection()?->exists()) {
                             $vector->collection_id = null;
                             $hasCollection = false;
