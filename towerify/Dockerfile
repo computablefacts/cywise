@@ -163,7 +163,7 @@ elif [[ "$role" = "queue" ]]; then
     while [[ true ]]
     do
       echo "Running the queue..."
-      (cd /var/www/html && php artisan queue:work --memory 1024 --queue=$queue_name --stop-when-empty --verbose --tries=3 --timeout=90)
+      (cd /var/www/html && php artisan queue:work --memory 3072 --queue=$queue_name --stop-when-empty --verbose --tries=3 --timeout=90)
       echo "Queue empty... wait some seconds..."
       sleep 13
     done
