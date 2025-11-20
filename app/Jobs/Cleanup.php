@@ -107,8 +107,17 @@ class Cleanup implements ShouldQueue
 
             Vector::query()
                 ->where('created_by', $user->id)
+                ->where(function ($query) {
+                    $query->where(function ($q) {
+                        $q->whereNotNull('collection_id')->whereDoesntHave('collection');
+                    })->orWhere(function ($q) {
+                        $q->whereNotNull('file_id')->whereDoesntHave('file');
+                    })->orWhere(function ($q) {
+                        $q->whereNotNull('chunk_id')->whereDoesntHave('chunk');
+                    });
+                })
                 ->orderBy('id')
-                ->chunkById(25, function (\Illuminate\Support\Collection $vectors) {
+                ->chunkById(50, function (\Illuminate\Support\Collection $vectors) {
                     Log::debug("Processing chunk of {$vectors->count()} vectors...");
                     $vectors->each(function (Vector $vector) {
 
