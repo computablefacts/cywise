@@ -114,8 +114,13 @@ class EndVulnsScanListener extends AbstractListener
               {$msgLow}
               {$msgLeaks}
             </ul>
-            <p>Je te propose d'effectuer les correctifs suivants :</p>
-            {$answer}
+        ";
+
+        if (!empty($answer)) {
+            $beforeCta .= "<p>Je te propose d'effectuer les correctifs suivants :</p>{$answer}";
+        }
+        
+        $beforeCta .= "
             <p>Pour retourner à la liste de tes domaines, cliques <a href='{$onboarding}' target='_blank'>ici</a>.</p>
             <p>Pour découvrir comment corriger tes vulnérabilités et renforcer la sécurité de ton infrastructure, finalise ton inscription à Cywise :</p>
         ";
