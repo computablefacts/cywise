@@ -107,7 +107,7 @@ class Cleanup implements ShouldQueue
 
             Vector::query()
                 ->orderBy('id')
-                ->chunkById(50, function (\Illuminate\Support\Collection $vectors) {
+                ->chunkById(25, function (\Illuminate\Support\Collection $vectors) {
                     $vectors->each(function (Vector $vector) {
 
                         $hasCollection = true;
