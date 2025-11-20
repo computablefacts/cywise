@@ -237,6 +237,8 @@ class ProcessIncomingEmails implements ShouldQueue
         $response = (new CyberBuddyProcedure())->ask($request);
         $subject = $message->getSubject()->toString();
         $body = $response['html'] ?? '';
+        $body = Str::before($body, '<br><br><b>Sources :</b>'); // remove sources
+        $body = preg_replace("/\[((\d+,?)+)]/", "", $body); // remove references
 
         EndVulnsScanListener::sendEmail(
             self::SENDER_CYBERBUDDY,

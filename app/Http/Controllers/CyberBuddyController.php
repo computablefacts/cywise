@@ -290,8 +290,8 @@ class CyberBuddyController extends Controller
         $prompt = $params['prompt'];
         $answer = (new CyberBuddy())->execute($request->user(), Str::random(10), [], "{$collection}:{$prompt}");
         if ($answer->success()) {
-            $answer = Str::before($answer->markdown(), '<br><br><b>Sources :</b>');
-            return preg_replace("/\[((\d+,?)+)]/", "", $answer);
+            $answer = Str::before($answer->markdown(), '<br><br><b>Sources :</b>'); // remove sources
+            return preg_replace("/\[((\d+,?)+)]/", "", $answer); // remove references
         }
         return 'Une erreur s\'est produite. Veuillez réessayer ultérieurement.';
     }
