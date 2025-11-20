@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->job(new Cleanup())->everyThreeMinutes();
+        $schedule->job(new Cleanup())->everyFifteenMinutes();
         $schedule->job(new PullServersInfos())->everyThreeHours();
         $schedule->job(new DownloadDebianSecurityBugTracker())->daily();
         $schedule->command('telescope:prune --hours=48')->daily();
