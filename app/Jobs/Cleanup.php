@@ -106,32 +106,42 @@ class Cleanup implements ShouldQueue
             Log::debug("Removing vectors with missing references for user {$user->email}...");
 
             Vector::query()
+                ->where('created_by', $user->id)
                 ->orderBy('id')
                 ->chunkById(25, function (\Illuminate\Support\Collection $vectors) {
+                    Log::debug("Processing chunk of {$vectors->count()} vectors...");
                     $vectors->each(function (Vector $vector) {
 
                         $hasCollection = true;
                         $hasFile = true;
                         $hasChunk = true;
 
+                        Log::debug("Checking vector {$vector->id}...");
+
                         if (!$vector->collection()?->exists()) {
                             $vector->collection_id = null;
                             $hasCollection = false;
+                            Log::debug("Vector {$vector->id} has no collection.");
                         }
                         if (!$vector->file()?->exists()) {
                             $vector->file_id = null;
                             $hasFile = false;
+                            Log::debug("Vector {$vector->id} has no file.");
                         }
                         if (!$vector->chunk()?->exists()) {
                             $vector->chunk_id = null;
                             $hasChunk = false;
+                            Log::debug("Vector {$vector->id} has no chunk.");
                         }
                         if (!$hasCollection && !$hasFile && !$hasChunk) {
                             $vector->delete();
+                            Log::debug("Vector {$vector->id} removed.");
                         } else {
                             $vector->save();
+                            Log::debug("Vector {$vector->id} updated.");
                         }
                     });
+                    Log::debug("Chunk of {$vectors->count()} vectors processed.");
                 });
 
             Log::debug("Vectors with missing references for user {$user->email} removed.");
