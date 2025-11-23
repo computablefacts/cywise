@@ -42,9 +42,12 @@ class Kernel extends ConsoleKernel
         // CyberBuddy
         $schedule->job(new EmbedChunks())->everyMinute();
         $schedule->job(new DeleteEmbeddedChunks())->everyMinute();
-        $schedule->job(new ProcessIncomingEmails())->everyMinute();
         $schedule->job(new UpdateTables())->everyMinute();
         $schedule->job(new RunScheduledTasks())->everyMinute();
+
+        if (app()->environment('production')) {
+            $schedule->job(new ProcessIncomingEmails())->everyMinute();
+        }
 
         // Health check - please let this at the end
         $schedule->command(DispatchQueueCheckJobsCommand::class)->everyMinute();
