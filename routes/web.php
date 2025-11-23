@@ -15,8 +15,8 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\ChunksController;
 use App\Http\Controllers\Iframes\AnalyzeController;
+use App\Http\Controllers\Iframes\ChunksController;
 use App\Http\Controllers\Iframes\CollectionsController;
 use App\Http\Controllers\Iframes\CyberBuddyController;
 use App\Http\Controllers\Iframes\CyberScribeController;
@@ -38,10 +38,8 @@ use App\Http\Controllers\Iframes\UsersInvitationController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
-use App\Listeners\EndVulnsScanListener;
 use App\Mail\MailCoachPerformaRequested;
 use App\Models\YnhServer;
-use App\Models\YnhTrial;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -464,10 +462,10 @@ Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialI
                 RebuildPackagesList::sink();
             } elseif ($job === 'rebuild_latest_events_cache') {
                 RebuildLatestEventsCache::sink();
-            } elseif ($job === 'resend_trial_email') {
-                /** @var YnhTrial $trial */
-                $trial = YnhTrial::findOrFail($trialId);
-                EndVulnsScanListener::sendEmailReport($trial);
+            } elseif ($job === 'send_audit_report') {
+                $user = \App\Models\User::where('email', config('towerify.admin.email'))->firstOrFail();
+                $event = new \App\Events\SendAuditReport($user, false);
+                (new \App\Listeners\SendAuditReportListener())->handle($event);
             }
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
