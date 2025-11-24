@@ -38,6 +38,11 @@ class SendAuditReportListener extends AbstractListener
         }
 
         $assets = Asset::all();
+
+        if ($assets->isEmpty()) {
+            return;
+        }
+
         $summary = $this->buildSummary($user, $assets);
         $leaks = $this->buildSectionLeaks($user);
         $vulns = $this->buildSectionVulns($assets);
