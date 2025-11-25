@@ -100,7 +100,7 @@ class CyberBuddyProcedure extends Procedure
 
             // TODO : create one agent for each framework
 
-            if ($user->isCywiseAdmin() && !app()->environment('local')) {
+            if ($user->isCywiseAdmin()) {
                 $output = FileVectorStore::unpack("labour_lawyer." . config('app.env') . ".zip.enc");
                 $orchestrator->registerAgent(new LabourLawyerConclusionsWriter($output));
             }

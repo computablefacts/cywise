@@ -11,9 +11,7 @@ use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Vectors\AbstractVectorStore;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
-use App\Enums\RoleEnum;
 use App\Models\User;
-use Illuminate\Support\Str;
 
 class LabourLawyerConclusionsWriter extends AbstractAction
 {
@@ -57,126 +55,56 @@ class LabourLawyerConclusionsWriter extends AbstractAction
 
     public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
-        $messages[] = [
-            'role' => RoleEnum::USER->value,
-            'content' => "
-                Tu es un avocat en droit social. Tu défends l'employeur et non le salarié. 
-                Voici ta tâche :
-                - Extrait des données d'entrée du cas présent les contestations et demandes de la partie adverse en écrivant une contestation ou demande par ligne préfixée par 'd:'
-                - Extrait des données d'entrée du cas présent les faits en écrivant un fait par ligne préfixée par 'f:'
-                - N'écrit rien d'autre dans ta réponse que les contestations, les demandes et les faits.
+        // Build a table of contents from the context
+        $tocs = \File::get("{$this->dir}/tocs.txt");
+        $prompt = "
+            En te basant sur les exemples (entre [TOCS] et [/TOCS]) de tables des matières (entre [TOC] et [/TOC]) propose moi une table des matières pour le contexte (entre [CTX] et [/CTX]) ci-dessous.
+            Renvoie uniquement la table des matières sans commentaires additionnels.
+            
+            [CTX]{$input}[/CTX]
+            {$tocs}
+        ";
+        $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 30 * 60);
 
-                Voici un premier exemple de données d'entrée entre [IN] et [/IN] : 
-                
-                [IN]
-                je dois rédiger des conclusions sur un salarié ayant été licencié pour inaptitude après un avis médical 
-                rendu par le médecin du travail ; l'inaptitude est d'origine non professionnelle ; il conteste son 
-                licenciement en précisant que la recherche de reclassement n'a pas été effectuée correctement dans le 
-                Groupe dont fait partie l'entreprise qui l'emploie ; il demande des dommages et intérêts pour 
-                licenciement sans cause réelle et sérieuse de 9 mois de salaire ; il a une ancienneté de 10 ans
-                [/IN]
-                
-                Voici un exemple de sortie attendue pour ce premier exemple entre [OUT] et [/OUT] :
-                
-                [OUT]
-                d:Sur l'origine non professionnelle de l'inaptitude
-                d:Sur le bien fondé du licenciement pour inaptitude professionnelle
-                d:Sur la prétendue violation de l'obligation de reclassement
-                d:Sur la demande de requalification du licenciement en licenciement sans cause réelle et sérieuse
-                d:Sur la demande de dommages et intérêts de 9 mois de salaire
-                f:le salarié a été licencié pour inaptitude après un avis médical rendu par le médecin du travail
-                f:l'inaptitude du salarié est d'origine non professionnelle
-                f:le salarié a une ancienneté de 10 ans
-                [/OUT]
-                
-                Voici un second exemple de données d'entrée entre [IN] et [/IN] : 
-                
-                [IN]
-                je dois rédiger des conclusions sur un salarié ayant été licencié pour inaptitude après un avis médical 
-                rendu par le médecin du travail ; l'inaptitude est d'origine professionnelle ; il conteste son licenciement 
-                en précisant que le harcèlement dont il se dit victime serait à l'origine de son inaptitude ; il ajoute 
-                par ailleurs que la société n'aurait pas consulté le CSE, ce qu'elle avait l'obligation de faire ; il 
-                demande  des dommages et intérêts pour licenciement sans cause réelle et sérieuse, à hauteur de 9 mois 
-                de salaire alors qu'il a 4 ans d'ancienneté, ainsi que des dommages et intérêts pour réparer le harcèlement 
-                à hauteur de 6 mois de salaire ;
-                [/IN]
-                
-                Voici un exemple de sortie attendue pour ce second exemple entre [OUT] et [/OUT] :
-                
-                [OUT]
-                d:Sur l'origine professionnelle de l'inaptitude
-                d:Sur le harcèlement allégué par Mr. A
-                d:Sur l'obligation de l'entreprise de consulter le CSE
-                d:Sur la demande de requalification du licenciement en licenciement sans cause réelle et sérieuse
-                d:Sur la demande de dommages et intérêts pour licenciement nul
-                d:Sur la demande de dommages et intérêts de 9 mois de salaire pour licenciement sans cause réelle et sérieuse
-                d:Sur la demande de dommages et intérêts de 6 mois de salaire pour harcèlement
-                f:le salarié a été licencié pour inaptitude après un avis médical rendu par le médecin du travail
-                f:l'inaptitude du salarié est d'origine professionnelle
-                f:le salarié a une ancienneté de 4 ans
-                [/OUT]
-                
-                Voici les données d'entrée du cas présent : {$input}
-            ",
-        ];
-        $answer = LlmsProvider::provide($messages, 'google/gemini-2.5-flash', 120);
-        array_pop($messages);
+        // Find similar arguments in the historical data and generate a list of arguments for each entry of the table of contents
+        $vector = EmbeddingsProvider::provide($input);
+        $sections = array_unique(array_map(function (array $vector) {
 
-        $pretentions = [];
-        $faits = [];
+            /** @var Vector $vec */
+            $vec = $vector['vector'];
+            /** @var array $metadata */
+            $metadata = $vec->jsonSerialize()['metadata'];
 
-        foreach (explode("\n", $answer) as $line) {
-            $line = trim($line);
-            if (str_starts_with($line, 'd:')) {
-                $pretentions[] = substr($line, 2);
-            } elseif (str_starts_with($line, 'f:')) {
-                $faits[] = substr($line, 2);
-            }
-        }
+            $text = '';
 
-        $conclusions = collect($pretentions)
-            ->concat($faits)
-            ->map(function (string $pretention) {
+            foreach ($metadata as $section => $subsections) {
 
-                $vector = EmbeddingsProvider::provide($pretention);
-                $vectors = $this->vectorStore->search($vector->embedding());
-                $pretentions = array_map(function (array $vector) {
-                    /** @var Vector $vec */
-                    $vec = $vector['vector'];
-                    $vector['file'] = $vec->metadata('file');
-                    $vector['pretention'] = $vec->metadata('pretention');
-                    $vector['majeure'] = $vec->metadata('majeure');
-                    $vector['mineure'] = $vec->metadata('mineure');
-                    $vector['conclusion'] = $vec->metadata('conclusion');
-                    unset($vector['vector']);
-                    return $vector;
-                }, $vectors);
-                $pretentions = array_filter($pretentions, fn(array $vector) => $vector['similarity'] >= 0.6);
+                $text .= "{$section}\n\n";
 
-                if (empty($pretentions)) {
-                    \Log::error("No similar pretention found for: {$pretention}");
-                    return [];
+                foreach ($subsections as $subsection => $lines) {
+                    $text .= ("{$subsection}\n\n" . implode("\n", $lines) . "\n\n");
                 }
-                return head($pretentions);
-            })
-            ->filter(fn(array $p) => !empty($p))
-            ->map(function (array $p) {
+            }
+            return $text;
+        }, $this->vectorStore->search($vector->embedding())));
+        $arguments = "[ARGS]\n" . implode("\n", array_map(fn(string $section) => "[ARG]\n{$section}\n[/ARG]", $sections)) . "\n[/ARGS]";
+        $prompt = "
+            En te basant sur les exemples (entre [ARGS] et [/ARGS]) d'argumentaires propose pour chaque entrée de la table des matières (entre [TOC] et [/TOC]) un argumentaire tenant compte du contexte (entre [CTX] et [/CTX]) ci-dessous.
+            Lorsque tu réutilises un argument, vérifie que les faits du contexte suffisent pour rendre celui-ci opérant.
+            N'invente pas de textes de lois ni de jurisprudences.
+            Renvoie uniquement la table des matières augmentée de ton argumentaire détaillé.
 
-                $pretention = Str::upper($p['pretention'] ?? '');
-                $majeure = $p['majeure'] ?? '';
-                $mineure = $p['mineure'] ?? '';
-                $conclusion = $p['conclusion'] ?? '';
+            [CTX]{$input}[/CTX]
+            [TOC]{$answer}[/TOC]
+            {$arguments}
+        ";
+        $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 30 * 60);
+        $answer = collect(explode("\n", $answer))
+            ->map(fn(string $line) => "{$line}\n")
+            ->values()
+            ->join("\n");
 
-                return "# {$pretention}\n\n## En droit\n\n{$majeure}\n\n## Au cas présent\n\n{$mineure}\n\n## Conclusion\n\n{$conclusion}";
-            })
-            ->unique()
-            ->join("\n\n");
-
-        $prompt = file_get_contents(app_path('Console/Commands/prompt_write_conclusions.txt'));
-        $prompt = Str::replace('{PRETENTIONS}', $conclusions, $prompt);
-        $prompt = Str::replace('{AU_CAS_PRESENT}', "- " . implode("\n- ", $faits), $prompt);
-        // \Log::debug($prompt);
-        $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 2 * 60);
+        \Log::debug($answer);
 
         if (!empty($answer)) {
             return new SuccessfulAnswer($answer, [], true);

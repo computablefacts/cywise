@@ -5,11 +5,9 @@ namespace App\Console\Commands;
 use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Vectors\FileVectorStore;
-use App\AgentSquad\Vectors\Vector;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Symfony\Component\DomCrawler\Crawler;
 
 class PrepareLegalDocuments extends Command
 {
@@ -42,65 +40,6 @@ class PrepareLegalDocuments extends Command
         } else {
             throw new \Exception('Invalid input path : ' . $in);
         }
-
-        $vectors = new FileVectorStore($out);
-
-        foreach (glob("{$out}/*.json", GLOB_BRACE) as $file) {
-            if (!is_file($file)) {
-                continue;
-            }
-            if (Str::endsWith($file, '_final.json')) {
-                continue;
-            }
-
-            $doc = json_decode(file_get_contents($file), true);
-
-            if (!isset($doc)) {
-                $this->warn("Invalid JSON in file {$file}");
-                continue;
-            }
-
-            $kb = $doc['kb'] ?? [];
-            $newKb = [];
-
-            foreach ($kb as $item) {
-
-                $pretention = Str::upper($item['pretention'] ?? '');
-                $majeure = $item['majeure'] ?? '';
-                $mineure = $item['mineure'] ?? '';
-                $conclusion = $item['conclusion'] ?? '';
-
-                if (!empty($pretention) && empty($item['arguments_clefs']) && empty($item['embedding'])) {
-                    $prompt = "Voici une prétention dans des conclusions juridiques :\n\n# Prétention\n\n{$pretention}\n\n# Majeure\n\n{$majeure}\n\n# Mineure\n\n{$mineure}\n\n# Conclusion\n\n{$conclusion}\n\nSynthétise en un court paragraphe les arguments clefs utilisés.";
-                    $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 30 * 60);
-                    $this->info("\n{$pretention}\n\n{$answer}");
-                    $item['arguments_clefs'] = "{$pretention}\n\n{$answer}";
-                    $item['embedding'] = EmbeddingsProvider::provide($item['arguments_clefs'])->embedding();
-                }
-                $newKb[] = $item;
-            }
-
-            $doc['kb'] = $newKb;
-            $doc['filename'] = basename($file);
-
-            file_put_contents(Str::replace('.json', '_final.json', $file), json_encode($doc, JSON_PRETTY_PRINT));
-
-            $embeddings = array_map(
-                fn(array $pretention) => new Vector(
-                    $pretention['arguments_clefs'],
-                    $pretention['embedding'],
-                    [
-                        'file' => $doc['filename'],
-                        'pretention' => $pretention['pretention'] ?? '',
-                        'majeure' => $pretention['majeure'] ?? '',
-                        'mineure' => $pretention['mineure'] ?? '',
-                        'conclusion' => $pretention['conclusion'] ?? '',
-                    ]
-                ),
-                array_filter($doc['kb'], fn(array $item) => isset($item['embedding']))
-            );
-            $vectors->addVectors($embeddings);
-        }
     }
 
     private function processDirectory(string $dir, string $output): void
@@ -122,170 +61,147 @@ class PrepareLegalDocuments extends Command
         }
     }
 
-    private function processFile(string $file, string $output): array
+    private function processFile(string $file, string $output): void
     {
         if (!Str::endsWith($file, '.docx') && !Str::endsWith($file, '.doc')) {
             Log::warning("Skipping file $file : not a .doc or .docx file.");
-            return [];
+            return;
         }
 
         $filename = Str::slug(basename($file));
+        $rtf = "{$output}/{$filename}.rtf";
         $html = "{$output}/{$filename}.html";
-        $json = "{$output}/{$filename}.json";
-        $doc = [];
+        $txt = "{$output}/{$filename}.txt";
+        $toc = "{$output}/{$filename}_toc.txt";
+        $facts = "{$output}/{$filename}_facts.txt";
 
-        if (file_exists($json)) {
-            return json_decode(file_get_contents($json), true);
+        if (!file_exists($rtf)) {
+            $this->info("Converting {$filename} to RTF...");
+            shell_exec("unoconv -f rtf -o \"{$rtf}\" \"{$file}\"");
+            $this->info("File converted to RTF.");
+        }
+        if (!file_exists($rtf)) {
+            $this->warn("Skipping file {$filename} : no RTF file.");
+            return;
         }
         if (!file_exists($html)) {
-            $this->info("Converting {$filename} to HTML...");
-            shell_exec("unoconv -o \"{$html}\" \"{$file}\"");
+            $this->info("Converting {$rtf} to HTML...");
+            shell_exec("unrtf \"{$rtf}\" >\"{$html}\"");
             $this->info("File converted to HTML.");
         }
         if (!file_exists($html)) {
             $this->warn("Skipping file {$filename} : no HTML file.");
-            return [];
+            return;
+        }
+        if (!file_exists($txt)) {
+            $this->info("Converting {$html} to TXT...");
+            shell_exec("lynx --dump \"{$html}\" >\"{$txt}\"");
+            $this->info("File converted to TXT.");
+        }
+        if (!file_exists($txt)) {
+            $this->warn("Skipping file {$filename} : no TXT file.");
+            return;
+        }
+        if (!file_exists($toc)) {
+            $this->info("Extracting table of contents from {$txt}...");
+            $content = \File::get($txt);
+            $answer = LlmsProvider::provide("
+                Extrait de ce document en français tous les titres de sections et de sous-sections. 
+                Remplace les noms de personnes par 'XXX', les noms de sociétés par 'YYY' et les noms de rues, de boulevards, d'avenues et de villes par 'ZZZ'.
+                
+                {$content}
+            ", 'google/gemini-2.5-flash', 30 * 60);
+            $sections = collect(explode("\n", $answer))
+                ->filter(fn(string $line) => !empty($line))
+                // ->filter(fn(string $line) => Str::startsWith(Str::trim($line), '* '))
+                ->values()
+                ->join("\n");
+            \File::put($toc, $sections);
+            $this->info("Table of contents extracted.");
+        }
+        if (!file_exists($toc)) {
+            $this->warn("Skipping file {$filename} : no TOC file.");
+            return;
+        }
+        if (!file_exists($facts)) {
+            $this->info("Extracting facts from {$txt}...");
+            $content = \File::get($txt);
+            $answer = LlmsProvider::provide("
+                Extrait les faits, les textes de lois ainsi que la jurisprudence utilisée pour chaque demande de la partie adverse du document de conclusions juridiques entre [CONCL] et [/CONCL]. 
+                Remplace les noms de personnes par 'XXX', les noms de sociétés par 'YYY' et les noms de rues, de boulevards, d'avenues et de ville par 'ZZZ'.
+                Formate la sortie sous forme d'un fichier markdown où :
+                - Chaque titre de section est une demande de la partie adverse
+                - Chaque section est divisée en quatre sous-sections :
+                  - Une section de titre 'Conclusion' explicitant ce que cherche à prouver l'auteur des conclusions dans cette section, i.e. l'argument principal.
+                  - Une section de titre 'Loi de passage' explicitant les liens sous-entendus ou explicites entre la conclusion et les faits.
+                  - Une section de titre 'En droit' listant les textes de lois et la jurisprudence utilisés. Résume l'esprit du texte en une phrase.
+                  - Une section de titre 'Au cas présent' listant les faits.
+                
+                [CONCL]
+                {$content}
+                [/CONCL]
+            ", 'google/gemini-2.5-flash', 30 * 60);
+            \File::put($facts, $answer);
+            $this->info("Facts extracted.");
+        }
+        if (!file_exists($facts)) {
+            $this->warn("Skipping file {$filename} : no FACTS file.");
+            return;
         }
 
-        $crawler = new Crawler(file_get_contents($html));
+        $content = \File::get($facts);
+        $lines = explode("\n", $content);
+        $sections = [];
+        $title = null;
+        $subtitle = null;
+        $section = [];
 
-        foreach ($crawler as $domElement) {
-            $doc = array_merge($doc, $this->parse($domElement));
+        foreach ($lines as $line) {
+
+            $line = Str::trim($line);
+
+            if (Str::StartsWith($line, '# ')) {
+                if (!empty($title)) {
+                    $sections[$title] = $section;
+                }
+                $title = $line;
+                $subtitle = null;
+                $section = [];
+            } else if (Str::StartsWith($line, '## Conclusion')) {
+                $subtitle = $line;
+                $section[$subtitle] = [];
+            } else if (Str::StartsWith($line, '## Loi de passage')) {
+                $subtitle = $line;
+                $section[$subtitle] = [];
+            } else if (Str::StartsWith($line, '## En droit')) {
+                $subtitle = $line;
+                $section[$subtitle] = [];
+            } else if (Str::StartsWith($line, '## Au cas présent')) {
+                $subtitle = $line;
+                $section[$subtitle] = [];
+            } else if (!empty($line)) {
+                $section[$subtitle][] = $line;
+            }
+        }
+        if (!empty($title)) {
+            $sections[$title] = $section;
         }
 
-        $result = [];
+        // Log::debug($sections);
 
-        foreach ($doc as $cur) {
+        $vectors = new FileVectorStore($output);
 
-            $key = key($cur);
-            $value = current($cur);
+        foreach ($sections as $section => $subsections) {
 
-            if (empty($result) || $key === 's' || $key === 'ss' || $key === 'c') {
-                $result[] = $cur;
-            } else {
+            $vector = EmbeddingsProvider::provide($section, [$section => $subsections]);
+            $vectors->addVector($vector);
 
-                $last = $result[count($result) - 1];
-                $lastKey = key($last);
-                $lastValue = current($last);
-
-                if ($key === $lastKey) {
-                    $result[count($result) - 1] = [$key => array_merge($lastValue, $value)];
-                } else {
-                    $result[] = $cur;
+            foreach ($subsections as $subsection => $lines) {
+                foreach ($lines as $line) {
+                    $vector = EmbeddingsProvider::provide($line, [$section => $subsections]);
+                    $vectors->addVector($vector);
                 }
             }
         }
-
-        $blocks = $this->blocks($result);
-        $kb = $this->knowledgeBase(implode("\n\n", $blocks));
-        $doc = [
-            'kb' => $kb,
-            'doc' => $result,
-        ];
-
-        file_put_contents($json, json_encode($doc, JSON_PRETTY_PRINT));
-        shell_exec("find \"{$output}\" -type f ! -name \"*.json\" -delete");
-
-        return $doc;
-    }
-
-    private function knowledgeBase(string $conclusions): array
-    {
-        $prompt = \Illuminate\Support\Facades\File::get(base_path("/app/Console/Commands/prompt_structure_conclusions.txt"));
-        $prompt = Str::replace('{CONCLUSIONS}', $conclusions, $prompt);
-        // Log::debug($prompt);
-        $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 30 * 60);
-        // Log::debug($answer);
-        $matches = null;
-        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
-        $answer = '[' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), ']'), '[') . ']'; //  deal with "]<｜end▁of▁sentence｜>"
-        $json = json_decode($answer, true) ?? [];
-        Log::debug($json);
-        return $json;
-    }
-
-    private function blocks(array $doc): array
-    {
-        $block = '';
-        $blocks = [];
-
-        foreach ($doc as $cur) {
-
-            $key = key($cur);
-            $value = current($cur);
-
-            if ($key === 'p') {
-                $block .= implode("\n\n", $value) . "\n\n";
-            } else if ($key === 'c') {
-                $block .= "> " . implode("\n> ", $value) . "\n\n";
-            } else if ($key === 'ss') {
-                $block .= "## " . Str::upper(implode(" ", $value)) . "\n\n";
-            } else if (empty($block)) {
-                $block .= "# " . Str::upper(implode(" ", $value)) . "\n\n";
-            } else {
-                $blocks[] = $block;
-                $block = "# " . Str::upper(implode(" ", $value)) . "\n\n";
-            }
-        }
-        if (!empty($block)) {
-            $blocks[] = $block;
-        }
-        return $blocks;
-    }
-
-    private function parse(\DOMNode $node): array
-    {
-        $text = [];
-        $citation = [];
-        /** @var \DOMNode $childNode */
-        foreach ($node->childNodes as $childNode) {
-            if ($childNode->nodeName === 'p') {
-
-                $paragraph = $this->trim($childNode->nodeValue);
-                $hasLeftMargin = false;
-
-                if ($childNode instanceof \DOMElement && $childNode->hasAttribute('style')) {
-                    $style = $childNode->getAttribute('style');
-                    preg_match('/margin-left:\s*([^;]+)/', $style, $matches);
-                    $hasLeftMargin = !empty($matches[1]);
-                }
-                if (preg_match('/^\s*en\s+droit/i', $paragraph, $matches)) {
-                    $text[] = ['ss' => [$paragraph]];
-                } else if (preg_match('/^\s*au\s+cas\s+pr/i', $paragraph, $matches)) {
-                    $text[] = ['ss' => [$paragraph]];
-                } else if (Str::startsWith($paragraph, ['I.', 'II.', 'III.', 'IV.', 'V.', 'VI.', 'VII.', 'VIII.', 'IX.', 'X.',])) {
-                    if (Str::startsWith(Str::after($paragraph, '.'), ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])) { // subsection
-                        $text[] = ['ss' => [$paragraph]];
-                    } else { // section
-                        $text[] = ['s' => [$paragraph]];
-                    }
-                } else if (Str::startsWith($paragraph, '«') && Str::contains($paragraph, '»')) { // citation on a single line
-                    $text[] = ['c' => [$paragraph]];
-                } else if (Str::startsWith($paragraph, '«') && !Str::contains($paragraph, '»')) { // citation begins
-                    $citation[] = $paragraph;
-                } else if (!empty($citation)) { // we are building a multilines citation
-                    $citation[] = $paragraph;
-                    if (Str::contains($paragraph, '»') && !Str::contains($paragraph, '«')) { // citation ends
-                        $text[] = ['c' => $citation];
-                        $citation = [];
-                    } elseif (!$hasLeftMargin) { // fail gracefully: citation with missing ending
-                        $text[] = ['c' => $citation];
-                        $citation = [];
-                    }
-                } else if (!empty($paragraph)) {
-                    $text[] = ['p' => [$paragraph]];
-                }
-            } else if (!empty($citation)) { // enumeration in citation
-                $citation = array_merge($citation, array_merge(...array_map(fn($item) => $item['p'], $this->parse($childNode))));
-            } else {
-                $text = array_merge($text, $this->parse($childNode));
-            }
-        }
-        return $text;
-    }
-
-    private function trim(string $str): string
-    {
-        return Str::trim(preg_replace(['/\t+/', '/\n/'], [' ', ' '], $str));
     }
 }
