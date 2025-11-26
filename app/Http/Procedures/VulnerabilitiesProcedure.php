@@ -18,6 +18,8 @@ class VulnerabilitiesProcedure extends Procedure
         params: [
             "asset_id" => "The asset id (optional).",
             "level" => "The vulnerabilities criticality level (optional).",
+            "tld" => "The underlying asset TLD to match (optional).",
+            "tags" => "The underlying list of assets tags to match (optional).",
         ],
         result: [
             "high" => "A list of vulnerabilities with critical severity.",
@@ -30,11 +32,21 @@ class VulnerabilitiesProcedure extends Procedure
         $params = $request->validate([
             'asset_id' => 'nullable|integer|exists:am_assets,id',
             'level' => 'nullable|string|min:3|max:6|in:high,medium,low',
+            'tld' => 'nullable|string',
+            'tags' => 'nullable|array|min:1|max:10',
+            'tags.*' => 'string',
         ]);
 
         $assetId = $params['asset_id'] ?? null;
+        $tld = $params['tld'] ?? null;
+        $tags = $params['tags'] ?? null;
         $alerts = Asset::where('is_monitored', true)
             ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
+            ->when($tld, fn($query, $domain) => $query->where('tld', $tld))
+            ->when($tags, fn($query, $domain) => $query
+                ->join('am_assets_tags', 'am_assets_tags.asset_id', '=', 'am_assets.id')
+                ->whereIn('am_assets_tags.tag', $tags)
+            )
             ->get()
             ->flatMap(function (Asset $asset) use ($params) {
                 if (($params['level'] ?? '') === 'high') {
