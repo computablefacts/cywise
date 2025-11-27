@@ -182,7 +182,7 @@
   {
     "name": "curl_exfiltration",
     "description": "Curl exfiltration.",
-    "query": "SELECT * FROM processes WHERE name = 'curl' AND cmdline LIKE '%POST%' ",
+    "query": "SELECT * FROM processes WHERE name = 'curl' AND cmdline LIKE '%POST%' AND cmdline NOT LIKE '%logparser%app.cywise.io%';",
     "version": "1.4.5",
     "interval": 30,
     "snapshot": 0,
@@ -192,7 +192,7 @@
     "attck": "TA0010",
     "is_ioc": 1,
     "score": 30,
-    "comments": "The curl command line tool has been used to POST data to a server, this might indicate data exfiltration."
+    "comments": "The curl command line tool has been used to POST data to a server, this might indicate data exfiltration. Autorize logparser usage to reduce false positives."
   },
   {
     "name": "curl_file_download",
@@ -332,7 +332,7 @@
   {
     "name": "hidden_files",
     "description": "Lists hidden files in relevant path.",
-    "query": "SELECT hash.sha1, fi.path, fi.filename, datetime(fi.btime, 'unixepoch', 'UTC') AS btime, datetime(fi.atime, 'unixepoch', 'UTC') AS atime, datetime(fi.ctime, 'unixepoch', 'UTC') AS ctime, datetime(fi.mtime, 'unixepoch', 'UTC') AS mtime FROM hash JOIN file fi USING (path) WHERE ((fi.path LIKE '/home/%%/.%') OR (fi.path LIKE '/root/.%')) AND type='regular';",
+    "query": "SELECT hash.sha1, fi.path, fi.filename, datetime(fi.btime, 'unixepoch', 'UTC') AS btime, datetime(fi.atime, 'unixepoch', 'UTC') AS atime, datetime(fi.ctime, 'unixepoch', 'UTC') AS ctime, datetime(fi.mtime, 'unixepoch', 'UTC') AS mtime FROM hash JOIN file fi USING (path) WHERE ((fi.path LIKE '/home/%%/.%') OR (fi.path LIKE '/root/.%')) AND type='regular' AND fi.filename NOT IN ('.wget-hsts','.bash_history','.bashrc','.profile','.viminfo','.bash_logout','.htaccess','.mysql_history','.selected_editor','.sudo_as_admin_successful','.lesshst','.python_history','.ovhrc','.s3cfg');",
     "version": "1.4.5",
     "interval": 300,
     "snapshot": 0,
@@ -342,7 +342,7 @@
     "attck": null,
     "is_ioc": 1,
     "score": 20,
-    "comments": "New hidden file discovered, this might indicate that an attacker is trying to hide some tools."
+    "comments": "New hidden file discovered, this might indicate that an attacker is trying to hide some tools. Here is the whitelist: '.wget-hsts','.bash_history','.profile','.viminfo','.bash_logout','.htaccess','.mysql_history','.selected_editor' (too much false positive otherwise)"
   },
   {
     "name": "homebrew_packages",
@@ -437,7 +437,7 @@
   {
     "name": "last",
     "description": "Retrieves the list of the latest logins with PID, username and timestamp. Useful for intrusion detection and incident response. Verify assumptions of what accounts should be accessing what systems and identify machines accessed during a compromise.",
-    "query": "SELECT * FROM last;",
+    "query": "SELECT * FROM last WHERE type_name <> 'dead-process';",
     "version": "1.4.5",
     "interval": 30,
     "snapshot": 0,
@@ -452,7 +452,7 @@
   {
     "name": "ld_preload_snapshot",
     "description": "Any processes that run with an LD_PRELOAD environment variable.",
-    "query": "SELECT process_envs.pid, process_envs.key, process_envs.value, processes.name, processes.path, processes.cmdline, processes.cwd FROM process_envs JOIN processes USING (pid) WHERE KEY = 'LD_PRELOAD';",
+    "query": "SELECT process_envs.pid, process_envs.key, process_envs.value, processes.name, processes.path, processes.cmdline, processes.cwd FROM process_envs JOIN processes USING (pid) WHERE KEY = 'LD_PRELOAD' AND value NOT LIKE '%libproxychains4.so%' AND value NOT LIKE '%libmozsandbox.so%';",
     "version": "1.4.5",
     "interval": 300,
     "snapshot": 1,
@@ -462,7 +462,7 @@
     "attck": "T1136,T1574/006",
     "is_ioc": 1,
     "score": 60,
-    "comments": "A process has run with LD_PRELOAD environment variable, this is often the sign that an attacker is trying to override normal behaviour by compromised version of function loaded via LD_PRELOAD."
+    "comments": "A process has run with LD_PRELOAD environment variable, this is often the sign that an attacker is trying to override normal behaviour by compromised version of function loaded via LD_PRELOAD. (whitelist 'libproxychains4.so' and 'libmozsandbox.so' to reduce false positive)"
   },
   {
     "name": "listening_ports",
@@ -886,8 +886,8 @@
   },
   {
     "name": "scheduled_tasks",
-    "description": "Retrieves all the scheduled tasks in the target Windows system. Helps you identify malware that uses this persistence mechanism to launch at a given interval.",
-    "query": "SELECT * FROM scheduled_tasks;",
+    "description": "Retrieves all scheduled tasks on the target Windows system and filters out known safe Microsoft tasks, as well as safe Cywise tasks. Only unexpected or suspicious tasks are returned, helping detect malware that uses scheduled tasks for persistence.",
+    "query": "SELECT * FROM scheduled_tasks WHERE task_name NOT IN ('AD RMS Rights Policy Template Management (Automated)','PcaPatchDbTask','Data Integrity Check And Scan','Device','Property Definition Sync','ScanForUpdates','MapsUpdateTask','SpeechModelDownloadTask','Schedule Scan','USO_UxBroker','HiveUploadTask','Microsoft Compatibility Appraiser','RefreshCache','PerformRemediation','QueueReporting','WakeUpAndScanForUpdates','Collection','Background Synchronization','Scheduled Start','Refresh Group Policy Cache','Device Install Group Policy','ExploitGuard MDM policy Refresh','ReconcileFeatures','Report policies','SDN Diagnostics Task','Get-LocalAdminCheck','Get-Uptime','SvcRestartTask','MicrosoftEdgeUpdateTaskMachineUA','Storage Tiers Optimization') AND NOT (task_name = 'SystemTask' AND task_path = '\\\\Microsoft\\\\Windows\\\\CertificateServicesClient\\\\SystemTask') AND NOT (task_name = 'performa-satellite' AND task_path LIKE '%\\\\Cywise\\\\performa\\\\performa-satellite-win-x64.exe --hostname%');",
     "version": "1.4.5",
     "interval": 30,
     "snapshot": 0,
@@ -897,7 +897,7 @@
     "attck": "T1053/003",
     "is_ioc": 1,
     "score": 30,
-    "comments": "A new scheduled task has been detected, this is often used by hacker to provide persistence."
+    "comments": "A new scheduled task has been detected, this is often used by hacker to provide persistence. Now excludes known safe Microsoft tasks, Cywise's 'performa-satellite' task, and the built-in SystemTask. Any remaining scheduled task may indicate malware persistence or unauthorized software."
   },
   {
     "name": "scp_secure_copy",
@@ -917,7 +917,7 @@
   {
     "name": "services",
     "description": "Lists all installed Windows services and their relevant data. Helps you identify malware that uses this persistence mechanism to launch at a given interval.",
-    "query": "SELECT * FROM services;",
+    "query": "SELECT * FROM services WHERE name NOT IN ('wmiApSrv','BITS','WPDBusEnum','wuauserv','TrustedInstaller','NetSetupSvc','sppsvc','AppXSvc','camsvc','wlidsvc','WdiSystemHost');",
     "version": "1.4.5",
     "interval": 300,
     "snapshot": 0,
@@ -927,7 +927,7 @@
     "attck": "T1543/002",
     "is_ioc": 1,
     "score": 30,
-    "comments": "A new service has been added, this might indicate that an attacker has added it to provide persistence."
+    "comments": "A new service has been added, this might indicate that an attacker has added it to provide persistence. Whitelist common services to reduce false positives ('wmiApSrv','BITS','WPDBusEnum','wuauserv','TrustedInstaller','NetSetupSvc','sppsvc','AppXSvc','camsvc','wlidsvc','WdiSystemHost')"
   },
   {
     "name": "shell_check",
@@ -992,7 +992,7 @@
   {
     "name": "startup_items",
     "description": "Retrieves the list of systemd services. Helps you identify malware that uses this persistence mechanism to launch at a given interval.",
-    "query": "SELECT * FROM startup_items;",
+    "query": "SELECT * FROM startup_items WHERE name NOT IN ('motd-news.service','fwupd.service','apt-daily.service','apt-daily-upgrade.service','fwupd-refresh.service','update-notifier-download.service') AND name NOT LIKE '%docker%' AND name NOT LIKE '%-devices-%' ;",
     "version": "1.4.5",
     "interval": 300,
     "snapshot": 0,
@@ -1082,7 +1082,7 @@
   {
     "name": "systemd",
     "description": "Lists all installed Linux services and their relevant data. Helps you identify malware that uses this persistence mechanism to launch at a given interval.",
-    "query": "SELECT * FROM systemd_units;",
+    "query": "SELECT * FROM systemd_units WHERE id NOT LIKE  '%docker%' AND id NOT LIKE  'sys-subsystem%' AND id NOT LIKE  'sys-device%' AND id NOT LIKE  'apt-%' AND id NOT LIKE  'session-%' AND id NOT LIKE  'motd-news%' AND id NOT LIKE  'fwupd%' AND id NOT LIKE  'run-user%' AND id NOT LIKE  'user-%' AND id NOT LIKE  'user@%';",
     "version": "1.4.5",
     "interval": 300,
     "snapshot": 0,
@@ -1092,7 +1092,7 @@
     "attck": "T1543/002",
     "is_ioc": 1,
     "score": 20,
-    "comments": "A new entry has been added to the list of startup items, this might indicate that an attacker has added it to provide persistence."
+    "comments": "A new entry has been added to the list of startup items, this might indicate that an attacker has added it to provide persistence.Added whitelist for common services to reduce false positives."
   },
   {
     "name": "tar_archive_created",
