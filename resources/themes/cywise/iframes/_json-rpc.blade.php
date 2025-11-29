@@ -341,6 +341,22 @@
     }, onSuccess);
   }
 
+  function deleteOssecRuleApiCall(ruleId) {
+    executeJsonRpcApiCall('sca@delete', {rule_id: ruleId});
+  }
+
+  function createOssecRuleApiCall(name, description, rationale, remediation, platform, rule,
+    onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('sca@create', {
+      name: name,
+      description: description,
+      rationale: rationale,
+      remediation: remediation,
+      platform: platform,
+      rule: rule,
+    }, onSuccess);
+  }
+
   function listRolesAndPermissionsApiCall(onSuccess, onFinally) {
     executeJsonRpcApiCall('roles@list', {}, onSuccess, onErrorDefault, onFinally);
   }
