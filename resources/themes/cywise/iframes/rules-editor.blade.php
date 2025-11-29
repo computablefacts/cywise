@@ -105,7 +105,7 @@
   const editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/sql");
-  editor.setValue('{{ $rule->query }}');
+  editor.setValue(@json($rule->query ?? ''));
 
   const btnDelete = document.querySelector('#delete-rule');
   const btnCreate = document.querySelector('#create-rule');
