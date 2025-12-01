@@ -14,7 +14,7 @@ use Sajya\Server\Procedure;
 
 class OssecRulesProcedure extends Procedure
 {
-    public static string $name = 'sca';
+    public static string $name = 'ossec';
 
     #[RpcMethod(
         description: "Create a single OSSEC rule.",
@@ -40,13 +40,15 @@ class OssecRulesProcedure extends Procedure
             'rule' => 'required|string|min:1|max:5000',
         ]);
 
+        /** @var string $title */
+        $title = $params['name'];
         /** @var string $platform */
         $platform = $params['platform'];
         $requirements = OssecRulesParser::parse($params['rule']);
 
         /** @var YnhOssecPolicy $policy */
         $policy = YnhOssecPolicy::updateOrCreate([
-            'uid' => 'cywise' . ($user->isCywiseAdmin() ? '_0_' : "_{$user->tenant_id}_") . $platform,
+            'uid' => $this->buildPolicyUid($user, $platform),
         ], [
             'name' => $platform,
             'description' => $user->isCywiseAdmin() ? "Policies for Cywise and platform {$platform}." : "Policies for tenant {$user->tenant_id} and platform {$platform}.",
@@ -55,13 +57,8 @@ class OssecRulesProcedure extends Procedure
         ]);
 
         /** @var ?YnhOssecCheck $check */
-        $check = YnhOssecCheck::where('title', $params['name'])
+        $check = YnhOssecCheck::where('title', $title)
             ->where('ynh_ossec_policy_id', $policy->id)
-            ->where(function ($query) use ($user) {
-                if (!$user->isCywiseAdmin()) {
-                    $query->whereIn('created_by', User::where('tenant_id', $user->tenant_id)->pluck('id'));
-                }
-            })
             ->first();
 
         if ($check) {
@@ -75,7 +72,7 @@ class OssecRulesProcedure extends Procedure
             $check = YnhOssecCheck::create([
                 'ynh_ossec_policy_id' => $policy->id,
                 'uid' => YnhOssecCheck::max('uid') + 1,
-                'title' => $params['name'],
+                'title' => $title,
                 'description' => $params['description'],
                 'rationale' => $params['rationale'],
                 'remediation' => $params['remediation'],
@@ -109,15 +106,12 @@ class OssecRulesProcedure extends Procedure
         $params = $request->validate([
             'rule_id' => 'required|integer|exists:ynh_ossec_checks,id',
         ]);
-
         $user = $request->user();
 
-        YnhOssecCheck::where('id', $params['rule_id'])
-            ->where(function ($query) use ($user) {
-                if (!$user->isCywiseAdmin()) {
-                    $query->whereIn('created_by', User::where('tenant_id', $user->tenant_id)->pluck('id'));
-                }
-            })
+        YnhOssecCheck::select('ynh_ossec_checks.*')
+            ->where('ynh_ossec_checks.id', $params['rule_id'])
+            ->join('ynh_ossec_policies', 'ynh_ossec_policies.id', '=', 'ynh_ossec_checks.ynh_ossec_policy_id')
+            ->whereLike('ynh_ossec_policies.uid', $this->buildPolicyUid($user) . "%")
             ->delete();
 
         return [
@@ -125,4 +119,27 @@ class OssecRulesProcedure extends Procedure
         ];
     }
 
+    #[RpcMethod(
+        description: "List the OSSEC rules.",
+        params: [],
+        result: [
+            "rules" => "The list of OSSEC rules.",
+        ]
+    )]
+    public function list(JsonRpcRequest $request): array
+    {
+        $user = $request->user();
+        return [
+            'rules' => YnhOssecCheck::select('ynh_ossec_checks.*')
+                ->join('ynh_ossec_policies', 'ynh_ossec_policies.id', '=', 'ynh_ossec_checks.ynh_ossec_policy_id')
+                ->whereLike('ynh_ossec_policies.uid', $this->buildPolicyUid($user) . "%")
+                ->get()
+                ->sortBy(fn(YnhOssecCheck $rule) => $rule->title, SORT_NATURAL | SORT_FLAG_CASE),
+        ];
+    }
+
+    private function buildPolicyUid(User $user, ?string $platform = null): string
+    {
+        return 'cywise' . ($user->isCywiseAdmin() ? '_0_' : "_{$user->tenant_id}_") . ($platform ?? '');
+    }
 }

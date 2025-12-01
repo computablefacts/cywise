@@ -12,7 +12,7 @@ use Sajya\Server\Procedure;
 
 class OsqueryRulesProcedure extends Procedure
 {
-    public static string $name = 'rules';
+    public static string $name = 'osquery';
 
     #[RpcMethod(
         description: "Create a single Osquery rule.",

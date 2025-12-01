@@ -324,12 +324,12 @@
   }
 
   function deleteOsqueryRuleApiCall(ruleId) {
-    executeJsonRpcApiCall('rules@delete', {rule_id: ruleId});
+    executeJsonRpcApiCall('osquery@delete', {rule_id: ruleId});
   }
 
   function createOsqueryRuleApiCall(name, description, category, platform, interval, is_ioc, score, query,
     onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('rules@create', {
+    executeJsonRpcApiCall('osquery@create', {
       name: name,
       description: description,
       category: category,
@@ -342,12 +342,12 @@
   }
 
   function deleteOssecRuleApiCall(ruleId) {
-    executeJsonRpcApiCall('sca@delete', {rule_id: ruleId});
+    executeJsonRpcApiCall('ossec@delete', {rule_id: ruleId});
   }
 
   function createOssecRuleApiCall(name, description, rationale, remediation, platform, rule,
     onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('sca@create', {
+    executeJsonRpcApiCall('ossec@create', {
       name: name,
       description: description,
       rationale: rationale,
