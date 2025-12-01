@@ -35,7 +35,7 @@ class Kernel extends ConsoleKernel
         // AdversaryMeter
         $schedule->job(new TriggerScan())->everyMinute();
         $schedule->job(new TriggerDiscoveryShallow())->daily();
-        $schedule->job(new TriggerSendAuditReport())->dailyAt('6:45');
+        $schedule->job(new TriggerSendAuditReport())->weeklyOn(1 /* monday */, '6:45');
         // $schedule->job(new TriggerDiscoveryDeep())->weekly();
 
         // CyberBuddy
