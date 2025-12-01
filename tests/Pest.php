@@ -15,6 +15,9 @@ pest()->extend(Tests\TestCaseWithDbAndSeeders::class)
     ->in('Feature');
 
 pest()->extend(Tests\TestCaseWithDb::class)
+    ->in('Unit/Factories');
+
+pest()->extend(Tests\TestCaseWithDb::class)
     ->in('Unit/Procedures');
 
 pest()->extend(Tests\TestCaseWithDbAndSeeders::class)
