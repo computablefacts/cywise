@@ -282,9 +282,9 @@
     <td class="ellipsis" title="{{ $vuln->asset()?->asset }}">
       <span style="color:#f8b502;font-weight:bolder">{{ $vuln->asset()?->asset }}</span>
     </td>
-    <td>{{ $vuln->port()?->ip }}</td>
-    <td>{{ $vuln->port()?->port }}</td>
-    <td>{{ $vuln->port()?->protocol }}</td>
+    <td>{{ $vuln->port?->ip }}</td>
+    <td>{{ $vuln->port?->port }}</td>
+    <td>{{ $vuln->port?->protocol }}</td>
     <td>
       @if($vuln->cve_id)
       <a href="https://nvd.nist.gov/vuln/detail/{{$vuln->cve_id}}" target="_blank">{{ $vuln->cve_id }}</a>
@@ -338,9 +338,9 @@
     <td class="ellipsis" title="{{ $vuln->asset()?->asset }}">
       <span style="color:#f8b502;font-weight:bolder">{{ $vuln->asset()?->asset }}</span>
     </td>
-    <td>{{ $vuln->port()?->ip }}</td>
-    <td>{{ $vuln->port()?->port }}</td>
-    <td>{{ $vuln->port()?->protocol }}</td>
+    <td>{{ $vuln->port?->ip }}</td>
+    <td>{{ $vuln->port?->port }}</td>
+    <td>{{ $vuln->port?->protocol }}</td>
     <td>
       @if($vuln->cve_id)
       <a href="https://nvd.nist.gov/vuln/detail/{{$vuln->cve_id}}" target="_blank">{{ $vuln->cve_id }}</a>
@@ -394,9 +394,9 @@
     <td class="ellipsis" title="{{ $vuln->asset()?->asset }}">
       <span style="color:#f8b502;font-weight:bolder">{{ $vuln->asset()?->asset }}</span>
     </td>
-    <td>{{ $vuln->port()?->ip }}</td>
-    <td>{{ $vuln->port()?->port }}</td>
-    <td>{{ $vuln->port()?->protocol }}</td>
+    <td>{{ $vuln->port?->ip }}</td>
+    <td>{{ $vuln->port?->port }}</td>
+    <td>{{ $vuln->port?->protocol }}</td>
     <td>
       @if($vuln->cve_id)
       <a href="https://nvd.nist.gov/vuln/detail/{{$vuln->cve_id}}" target="_blank">{{ $vuln->cve_id }}</a>

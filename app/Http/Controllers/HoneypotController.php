@@ -25,7 +25,7 @@ class HoneypotController extends Controller
                         return [
                             'alert' => $alert,
                             'asset' => $asset,
-                            'port' => $alert->port(),
+                            'port' => $alert->port,
                             'events' => $alert->cve_id ? $alert->events($attackerId)->get()->toArray() : [],
                         ];
                     });

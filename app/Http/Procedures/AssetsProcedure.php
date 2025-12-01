@@ -173,7 +173,7 @@ class AssetsProcedure extends Procedure
             ->get()
             ->map(function (Alert $alert) use ($asset) {
 
-                $port = $alert->port();
+                $port = $alert->port;
 
                 return [
                     'id' => $alert->id,
@@ -729,7 +729,7 @@ class AssetsProcedure extends Procedure
 
         $vulnerabilities = $assets
             ->flatMap(fn(Asset $asset) => $asset->alerts()->get()->map(function (Alert $alert) use ($asset) {
-                $port = $alert->port();
+                $port = $alert->port;
                 return [
                     'id' => $alert->id,
                     'asset' => $asset->asset,

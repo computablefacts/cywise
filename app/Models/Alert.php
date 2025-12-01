@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int id
@@ -60,9 +61,9 @@ class Alert extends Model
             ->first();
     }
 
-    public function port(): Port
+    public function port(): BelongsTo
     {
-        return Port::find($this->port_id);
+        return $this->belongsTo(Port::class);
     }
 
     public function events(?int $attackerId = null): Builder

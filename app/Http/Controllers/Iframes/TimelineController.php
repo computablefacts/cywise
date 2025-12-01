@@ -617,7 +617,7 @@ class TimelineController extends Controller
                 $date = Str::before($timestamp, ' ');
                 $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
                 $asset = $alert->asset();
-                $port = $alert->port();
+                $port = $alert->port;
 
                 if ($alert->isHigh()) {
                     $txtColor = "white";

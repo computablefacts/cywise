@@ -285,8 +285,8 @@ class SendAuditReportListener extends AbstractListener
                 return "
                     <h3>{$alert->title} {$level}</h3>
                     <p><b>Actif concerné.</b> L'actif concerné est {$alert->asset()?->asset} pointant vers le serveur 
-                    {$alert->port()?->ip}. Le port {$alert->port()?->port} de ce serveur est ouvert et expose un service 
-                    {$alert->port()?->service} ({$alert->port()?->product}).</p>
+                    {$alert->port?->ip}. Le port {$alert->port?->port} de ce serveur est ouvert et expose un service 
+                    {$alert->port?->service} ({$alert->port?->product}).</p>
                     <p><b>Description détaillée.</b> {$vulnerability}</p>
                     <p><b>Correctif à appliquer.</b> {$remediation}</p>
                     {$cve}

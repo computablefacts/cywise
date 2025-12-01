@@ -136,8 +136,8 @@ class ListVulnerabilities extends AbstractAction
 ### {$alert->title} {$level}
 
 **Actif concerné.** L'actif concerné est {$alert->asset()?->asset} pointant vers le serveur 
-{$alert->port()?->ip}. Le port {$alert->port()?->port} de ce serveur est ouvert et expose un service 
-{$alert->port()?->service} ({$alert->port()?->product}).
+{$alert->port?->ip}. Le port {$alert->port?->port} de ce serveur est ouvert et expose un service 
+{$alert->port?->service} ({$alert->port?->product}).
 
 **Description détaillée.** {$vulnerability}
 
