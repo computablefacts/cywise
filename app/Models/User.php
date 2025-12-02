@@ -55,6 +55,7 @@ class User extends WaveUser
         'tenant_id',
         'am_api_token',
         'superset_id',
+        'gets_audit_report',
     ];
 
     /**

@@ -7,6 +7,7 @@ use App\AgentSquad\Actions\LabourLawyerConclusionsWriter;
 use App\AgentSquad\Actions\ListAssets;
 use App\AgentSquad\Actions\ListVulnerabilities;
 use App\AgentSquad\Actions\ManageAssets;
+use App\AgentSquad\Actions\ToggleUserGetsAuditReport;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Orchestrator;
 use App\AgentSquad\Providers\LlmsProvider;
@@ -97,6 +98,7 @@ class CyberBuddyProcedure extends Procedure
             $orchestrator->registerAgent(new ManageAssets());
             $orchestrator->registerAgent(new ListAssets());
             $orchestrator->registerAgent(new ListVulnerabilities());
+            $orchestrator->registerAgent(new ToggleUserGetsAuditReport());
 
             // TODO : create one agent for each framework
 
