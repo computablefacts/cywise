@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
  * This trait scopes a query using the `user_id` field of the model it is added to.
  *
  * @property ?int user_id
+ * @deprecated
  */
 trait HasTenant2
 {
