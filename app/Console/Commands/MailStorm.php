@@ -60,6 +60,7 @@ class MailStorm extends Command
             $blacklist = collect(explode("\n", file_get_contents($blacklist)))
                 ->map(fn(string $email) => Str::lower(Str::trim($email)))
                 ->filter(fn(string $email) => !empty($email))
+                ->unique()
                 ->toArray();
         } else {
             $blacklist = [];
@@ -73,10 +74,10 @@ class MailStorm extends Command
                 $parts = explode("\t", Str::trim($line));
                 return [
                     'email' => Str::lower(Str::trim($parts[0] ?? '')),
-                    'sending_date' => isset($parts[1]) ? Carbon::createFromFormat('Y-m-d', $parts[1]) : null
+                    'sending_date' => isset($parts[1]) ? Carbon::createFromFormat('Y-m-d', $parts[1])->startOfDay() : null
                 ];
             })
-            ->filter(fn(array $obj) => !empty($obj['email']) && $obj['sending_date'] instanceof Carbon && $obj['sending_date']->isSameDay(Carbon::now()))
+            ->filter(fn(array $obj) => !empty($obj['email']) && $obj['sending_date'] instanceof Carbon && $obj['sending_date']->isSameDay(Carbon::now()->startOfDay()))
             ->map(fn(array $obj) => $obj['email'])
             ->filter(fn(string $email) => !in_array($email, $blacklist))
             ->unique()
