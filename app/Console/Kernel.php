@@ -44,7 +44,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new UpdateTables())->everyMinute();
         // $schedule->job(new RunScheduledTasks())->everyMinute();
 
-        if (app()->environment('production')) {
+        if (app()->environment('prod')) {
             $schedule->job(new ProcessIncomingEmails())->everyMinute();
         }
 
