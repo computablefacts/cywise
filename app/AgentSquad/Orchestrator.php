@@ -55,15 +55,14 @@ class Orchestrator
             }
             return $this->processInput($user, $threadId, $messages, $input);
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return new FailedAnswer("Sorry, an error occurred: {$e->getMessage()}");
+            return new FailedAnswer(__("Sorry, an error occurred: :msg", ['msg' => $e->getMessage()]));
         }
     }
 
     private function processCommand(User $user, string $threadId, array $messages, string $command): AbstractAnswer
     {
         if (!isset($this->commands[$command])) {
-            return new FailedAnswer("Sorry, I did not find your command: {$command}");
+            return new FailedAnswer(__("Sorry, I did not find your command: :cmd", ['cmd' => $command]));
         }
         return $this->commands[$command]->execute($user, $threadId, $messages, $command);
     }
@@ -158,16 +157,16 @@ class Orchestrator
             }
         }
         if (empty($json)) {
-            return new FailedAnswer("Invalid JSON response: {$answer}", $chainOfThought);
+            return new FailedAnswer(__("Invalid JSON response: :answer", ['answer' => $answer]), $chainOfThought);
         }
         if (!isset($json['thought'])) {
-            return new FailedAnswer("The thought is missing: {$answer}", $chainOfThought);
+            return new FailedAnswer(__("The thought is missing: :answer", ['answer' => $answer]), $chainOfThought);
         }
         if (!isset($json['action_name'])) {
-            return new FailedAnswer("The action name is missing: {$answer}", $chainOfThought);
+            return new FailedAnswer(__("The action name is missing: :answer", ['answer' => $answer]), $chainOfThought);
         }
         if (!isset($json['action_input'])) {
-            return new FailedAnswer("The action input is missing: {$answer}", $chainOfThought);
+            return new FailedAnswer(__("The action input is missing: :answer", ['answer' => $answer]), $chainOfThought);
         }
         if ($json['action_name'] === 'respond_to_user') {
             $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'Responding to the user.');
@@ -179,7 +178,7 @@ class Orchestrator
         }
         if (!isset($this->agents[$json['action_name']])) {
             $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An unknown action was requested. Returning to the user.');
-            return new FailedAnswer("The action is unknown: {$answer}", $chainOfThought);
+            return new FailedAnswer(__("The action is unknown: :answer", ['answer' => $answer]), $chainOfThought);
         }
 
         $answer = $this->agents[$json['action_name']]->execute($user, $threadId, $messages, $json['action_input']);

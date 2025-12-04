@@ -109,6 +109,6 @@ class LabourLawyerConclusionsWriter extends AbstractAction
         if (!empty($answer)) {
             return new SuccessfulAnswer($answer, [], true);
         }
-        return new FailedAnswer("Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse.");
+        return new FailedAnswer(__("Désolé ! Je n'ai pas trouvé de conclusions sur lesquelles me baser pour rédiger une réponse."));
     }
 }

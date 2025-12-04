@@ -89,16 +89,16 @@ class CyberBuddy extends AbstractAction
         $json = json_decode($answer, true);
 
         if (!$json) {
-            return new FailedAnswer("The answer is not a valid JSON: {$answer}");
+            return new FailedAnswer(__("The answer is not a valid JSON: {$answer}"));
         }
         if (($json['lang'] ?? '') !== 'french' && ($json['lang'] ?? '') !== 'english') {
-            return new FailedAnswer("The language is unknown: {$answer}");
+            return new FailedAnswer(__("The language is unknown: {$answer}"));
         }
         if (empty($json['question_en'] ?? '') && empty($json['question_fr'] ?? '')) {
-            return new FailedAnswer("The questions are missing: {$answer}");
+            return new FailedAnswer(__("The questions are missing: {$answer}"));
         }
         if (empty($json['keywords_en'] ?? []) && empty($json['keywords_fr'] ?? [])) {
-            return new FailedAnswer("The keywords are missing: {$answer}");
+            return new FailedAnswer(__("The keywords are missing: {$answer}"));
         }
 
         // Extract similar questions from ANSSI's dataset

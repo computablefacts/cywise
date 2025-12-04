@@ -58,7 +58,7 @@ class ManageAssets extends AbstractAction
         $asset = Str::trim(Str::after($input, ':'));
 
         if (!IsValidAsset::test($asset)) {
-            return new FailedAnswer("Invalid asset. Please provide a valid domain or IP address.");
+            return new FailedAnswer(__("Invalid asset. Please provide a valid domain or IP address."));
         }
 
         /** @var Asset $azzet */
@@ -66,7 +66,7 @@ class ManageAssets extends AbstractAction
 
         if ($action === 'add') {
             if ($azzet) {
-                return new FailedAnswer("Asset {$asset} already exists.");
+                return new FailedAnswer(__("Asset :asset already exists.", ['asset' => $asset]));
             }
             $request = new JsonRpcRequest(['asset' => $asset, 'watch' => false]);
             $request->setUserResolver(fn() => $user);
@@ -74,7 +74,7 @@ class ManageAssets extends AbstractAction
             return new SuccessfulAnswer("Asset {$asset} added successfully.");
         }
         if (!$azzet) {
-            return new FailedAnswer("Asset {$asset} does not exist.");
+            return new FailedAnswer(__("Asset :asset does not exist.", ['asset' => $asset]));
         }
 
         $procedure = new AssetsProcedure();
@@ -96,8 +96,8 @@ class ManageAssets extends AbstractAction
                 return new SuccessfulAnswer("Asset {$asset} unmonitored successfully.");
             }
         } catch (\Exception $e) {
-            return new FailedAnswer("Action {$action} failed when applied to asset {$asset}:\n\n{$e->getMessage()}");
+            return new FailedAnswer(__("Action :action failed when applied to asset :asset:\n\n:msg", ['action' => $action, 'asset' => $asset, 'msg' => $e->getMessage()]));
         }
-        return new FailedAnswer("Invalid action. Please use add, remove, monitor, or unmonitor.");
+        return new FailedAnswer(__("Invalid action. Please use add, remove, monitor, or unmonitor."));
     }
 }

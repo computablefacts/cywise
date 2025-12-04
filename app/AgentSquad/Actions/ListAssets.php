@@ -61,13 +61,13 @@ class ListAssets extends AbstractAction
         $category = Str::trim(Str::afterLast($input, ':'));
 
         if ($action !== 'list') {
-            return new FailedAnswer("Invalid action. Please use list.");
+            return new FailedAnswer(__("Invalid action. Please use list."));
         }
         if (!in_array($status, ['monitored', 'monitorable', 'any'])) {
-            return new FailedAnswer("Invalid status. Please use monitored, monitorable, or any.");
+            return new FailedAnswer(__("Invalid status. Please use monitored, monitorable, or any."));
         }
         if (!in_array($category, ['domain', 'ip', 'any'])) {
-            return new FailedAnswer("Invalid category. Please use domain, ip, or any.");
+            return new FailedAnswer(__("Invalid category. Please use domain, ip, or any."));
         }
 
         $procedure = new AssetsProcedure();
@@ -110,7 +110,7 @@ class ListAssets extends AbstractAction
 
             return new SuccessfulAnswer("{$preamble}\n\n{$list}");
         } catch (\Exception $e) {
-            return new FailedAnswer("Action {$action} failed when applied to assets of category {$category} and status {$status}:\n\n{$e->getMessage()}");
+            return new FailedAnswer(__("Action :action failed when applied to assets of category :category and status :status:\n\n:msg", ['action' => $action, 'category' => $category, 'status' => $status, 'msg' => $e->getMessage()]));
         }
     }
 }

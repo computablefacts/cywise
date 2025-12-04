@@ -19,7 +19,6 @@ use App\Models\Conversation;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -109,8 +108,7 @@ class CyberBuddyProcedure extends Procedure
 
             $answer = $orchestrator->run($user, $threadId, $messages, $question);
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            $answer = new FailedAnswer("Sorry, an error occurred: {$e->getMessage()}");
+            $answer = new FailedAnswer(__("Sorry, an error occurred: :msg", ['msg' => $e->getMessage()]));
         }
 
         // Update the conversation

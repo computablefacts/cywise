@@ -55,10 +55,10 @@ class ToggleUserGetsAuditReport extends AbstractAction
             ->unique();
 
         if (!in_array($action, ['enable', 'disable'])) {
-            return new FailedAnswer("Invalid action. Please use enable or disable.");
+            return new FailedAnswer(__("Invalid action. Please use enable or disable."));
         }
         if ($emails->isEmpty()) {
-            return new FailedAnswer("Invalid emails. Please use 'me' for yourself, 'all' for all users or a comma-separated list of email addresses.");
+            return new FailedAnswer(__("Invalid emails. Please use 'me' for yourself, 'all' for all users or a comma-separated list of email addresses."));
         }
 
         $enable = $action === 'enable';
