@@ -600,7 +600,7 @@ class CywiseSeeder extends Seeder
     private function mitreAttckMatrix(): array
     {
         // https://github.com/bgenev/impulse-xdr/blob/main/managerd/main/helpers/data/mitre_matrix.json
-        $path = database_path('seeders/mitre_matrix.json');
+        $path = database_path('seeders/misc/mitre_matrix.json');
         $json = Illuminate\Support\Facades\File::get($path);
         return json_decode($json, true);
     }
@@ -614,7 +614,7 @@ class CywiseSeeder extends Seeder
         // - https://github.com/osquery/osquery/blob/master/packs/osquery-monitoring.conf
         // - https://github.com/osquery/osquery/blob/master/packs/ossec-rootkit.conf
         // - https://github.com/osquery/osquery/blob/master/packs/vuln-management.conf
-        $path = database_path('seeders/osquery.json');
+        $path = database_path('seeders/misc/osquery.json');
         $json = Illuminate\Support\Facades\File::get($path);
         return json_decode($json, true);
     }
