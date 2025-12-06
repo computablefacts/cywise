@@ -3,11 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\AppConfig;
-use App\Models\Collection;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\YnhFramework;
 use Database\Seeders\DbConfig\DbAppConfigInterface;
 use Illuminate;
 use Illuminate\Database\Seeder;
@@ -34,9 +32,8 @@ class CywiseSeeder extends Seeder
         $this->setupCywiseAdmin();
         $this->setupOssecRules();
         $this->setupOsqueryRules();
-        $this->fillMissingOsqueryUids();
-        $this->setupFrameworks();
-        $this->setupUserPromptsAndFrameworks();
+        $this->setupCyberFrameworks();
+        $this->updateAccountsData();
     }
 
     private function setupConfig(): void
@@ -505,18 +502,7 @@ class CywiseSeeder extends Seeder
         }
     }
 
-    private function fillMissingOsqueryUids(): void
-    {
-        \App\Models\YnhOsquery::whereNull('columns_uid')
-            ->chunk(1000, function (\Illuminate\Support\Collection $osquery) {
-                $osquery->each(function (\App\Models\YnhOsquery $osquery) {
-                    $osquery->columns_uid = \App\Models\YnhOsquery::computeColumnsUid($osquery->columns);
-                    $osquery->save();
-                });
-            });
-    }
-
-    private function setupUserPromptsAndFrameworks(): void
+    private function updateAccountsData(): void
     {
         \App\Models\Tenant::query()->chunkById(100, function ($tenants) {
             /** @var \App\Models\Tenant $tenant */
@@ -526,39 +512,15 @@ class CywiseSeeder extends Seeder
                     ->chunkById(100, function ($users) {
                         /** @var User $user */
                         foreach ($users as $user) {
-
                             $user->actAs();
                             $user->init();
-
-                            // TODO : BEGIN REMOVE ASAP
-                            Log::debug("[{$user->email}] Detaching frameworks...");
-
-                            \App\Models\YnhFramework::whereIn('file', [
-                                'seeders/frameworks/nis2/annex-implementing-regulation-of-nis2-on-t-m.jsonl.gz',
-                                'seeders/frameworks/gdpr/gdpr.jsonl.gz',
-                                'seeders/frameworks/dora/dora.jsonl.gz',
-                                'seeders/frameworks/anssi/anssi-guide-hygiene.jsonl.gz',
-                                'seeders/frameworks/anssi/anssi-genai-security-recommendations-1.0.jsonl.gz',
-                            ])
-                                ->get()
-                                ->map(fn(YnhFramework $framework) => $framework->collection())
-                                ->filter(fn(?Collection $collection) => isset($collection))
-                                ->each(function (Collection $collection) use ($user) {
-                                    Log::debug("[{$user->email}] Marking collection {$collection->name} as deleted...");
-                                    $collection->is_deleted = true;
-                                    $collection->save();
-                                    Log::debug("[{$user->email}] Collection {$collection->name} marked as deleted.");
-                                });
-
-                            Log::debug("[{$user->email}] Frameworks detached.");
-                            // TODO : END REMOVE ASAP
                         }
                     });
             }
         });
     }
 
-    private function setupFrameworks(): void
+    private function setupCyberFrameworks(): void
     {
         $this->importFramework('seeders/frameworks/anssi');
         $this->importFramework('seeders/frameworks/dora');
