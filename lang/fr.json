@@ -171,6 +171,7 @@
   "Rationale": "Rationnel",
   "References": "Références",
   "Remediation": "Remédiation",
+  "Report :status for :email": "Rapport :status pour :email",
   "Sorry, an error occurred: :msg": "Désolé, une erreur s'est produite : :msg",
   "Sorry, I did not find your command: :cmd": "Désolé, je n'ai pas trouvé votre commande : :cmd",
   "Remove tag": "Supprimer l'étiquette",

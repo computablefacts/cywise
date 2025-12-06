@@ -12,9 +12,10 @@ class UsersProcedure extends Procedure
     public static string $name = 'users';
 
     #[RpcMethod(
-        description: "Toggle the envoy of the daily email report to a given user.",
+        description: "Toggle the envoy of the weekly email report to a given user.",
         params: [
             "user_id" => "The user id.",
+            "gets_audit_report" => "Whether the user wants to receive the weekly email report (optional)."
         ],
         result: [
             "msg" => "A success message.",
@@ -24,6 +25,7 @@ class UsersProcedure extends Procedure
     {
         $params = $request->validate([
             'user_id' => 'required|integer|exists:users,id',
+            'gets_audit_report' => 'nullable|boolean',
         ]);
 
         /** @var User $loggedInUser */
@@ -40,7 +42,7 @@ class UsersProcedure extends Procedure
             throw new \Exception("This user does not belong to your tenant.");
         }
 
-        $user->gets_audit_report = !$user->gets_audit_report;
+        $user->gets_audit_report = $params['gets_audit_report'] ?? !$user->gets_audit_report;
         $user->save();
 
         return [

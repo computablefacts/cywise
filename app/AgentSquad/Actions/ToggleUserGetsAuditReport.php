@@ -6,7 +6,10 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
+use App\Http\Procedures\UsersProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class ToggleUserGetsAuditReport extends AbstractAction
@@ -18,10 +21,9 @@ class ToggleUserGetsAuditReport extends AbstractAction
             "function" => [
                 "name" => "toggle_user_gets_audit_report",
                 "description" => "
-                    Active/désactive (toggle) le flag gets_audit_report pour un ou plusieurs utilisateurs.
-                    Fournir une liste d'emails d'utilisateurs séparés par des virgules.
-                    Seuls les utilisateurs du même tenant que l'utilisateur courant peuvent être modifiés.
-                    Exemples d'input:
+                    Toggle the gets_audit_report flag for one or more users.
+                    The action (such as enable or disable) must come first, followed by a colon and then a comma-separated list of email addresses.
+                    For example:
                     - if the request is 'envoie une copie du rapport à alice@example.com', the input should be 'enable:alice@example.com'
                     - if the request is 'arrête d'envoyer des emails à alice@example.com et bob@example.com', the input should be 'disable:alice@example.com,bob@example.com'
                     - if the request is 'arrête de m'envoyer des emails', the input should be 'disable:me'
@@ -35,7 +37,7 @@ class ToggleUserGetsAuditReport extends AbstractAction
                     "properties" => [
                         "input" => [
                             "type" => "string",
-                            "description" => "Liste séparée par des virgules d'emails d'utilisateur.",
+                            "description" => "The action to perform followed by a comma-separated list of email addresses, using the format: 'action:email1,email2,email3'.",
                         ],
                     ],
                     "required" => ["input"],
@@ -61,30 +63,28 @@ class ToggleUserGetsAuditReport extends AbstractAction
             return new FailedAnswer(__("Invalid emails. Please use 'me' for yourself, 'all' for all users or a comma-separated list of email addresses."));
         }
 
-        $enable = $action === 'enable';
-        $status = $enable ? 'enabled' : 'disabled';
-        $msg = $emails->map(function (string $email) use ($user, $action, $enable, $status) {
+        $getsAuditReport = $action === 'enable';
+        $msg = $emails->flatMap(function (string $email) use ($user, $getsAuditReport) {
 
-            if ($email === 'me') {
-                $user->gets_audit_report = $enable;
-                $user->save();
-                return "Report {$status} for yourself";
-            }
-            if ($email === 'all') {
-                User::where('tenant_id', $user->tenant_id)->update(['gets_audit_report' => $enable]);
-                return "Report {$status} for all users";
-            }
+            /** @var Builder $query */
+            $query = User::query()->where('tenant_id', $user->tenant_id);
 
-            $u = User::where('email', $email)
-                ->where('tenant_id', $user->tenant_id)
-                ->first();
-
-            if ($u) {
-                $u->gets_audit_report = $enable;
-                $u->save();
-                return "Report {$status} for {$email}";
+            if ($email !== 'all') {
+                if ($email === 'me') {
+                    $query = $query->where('id', $user->id);
+                } else {
+                    $query = $query->where('email', $email);
+                }
             }
-            return "{$email} not found";
+            return $query->get()->map(function (User $u) use ($user, $getsAuditReport) {
+                $request = new JsonRpcRequest([
+                    'user_id' => $u->id,
+                    'gets_audit_report' => $getsAuditReport,
+                ]);
+                $request->setUserResolver(fn() => $user);
+                (new UsersProcedure())->toggleGetsAuditReport($request);
+                return __("Report :status for :email", ['status' => $getsAuditReport ? 'enabled' : 'disabled', 'email' => $u->email]);
+            });
         })->join("</li><li>");
         return new SuccessfulAnswer("<p>Update completed for:</p><ul><li>{$msg}</li></ul>", [], true);
     }
