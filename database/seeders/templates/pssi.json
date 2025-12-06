@@ -1,0 +1,474 @@
+[
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Objet de la politique"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quel est le principal objectif stratégique de cette PSSI pour notre organisation (par exemple, conformité réglementaire, protection de la propriété intellectuelle, maintien de la continuité des activités) ?",
+        "Quels sont les enjeux spécifiques en matière de sécurité des systèmes d'information qui motivent la création de cette politique dans notre contexte ?",
+        "Comment cette PSSI s'aligne-t-elle avec les objectifs commerciaux globaux de notre organisation ?",
+        "Quels sont les résultats concrets attendus de la mise en œuvre de cette PSSI ?"
+      ],
+      "answers": [],
+      "template": "La présente Politique de Sécurité des Systèmes d'Information (PSSI) a pour **objet de définir clairement le but de la politique** .\n\nElle constitue un **document essentiel pour toute organisation soucieuse de protéger ses données et ses systèmes** .\n\nEn substance, cette politique **reflète la vision stratégique de la direction en matière de sécurité des systèmes d'information (SSI) et de gestion des risques SSI**.\n\nElle **définit les règles et les procédures à suivre pour assurer la sécurité de l'information** au sein de l'organisation .\n\nPlus précisément, cette PSSI vise à **établir un cadre clair et précis pour la sécurité de toutes les données et systèmes informatiques de l'entreprise**.\n\nSon but principal est de **protéger les actifs numériques de l'entreprise et de renforcer sa résilience face aux risques**, en **définissant les principes généraux de sécurité que votre organisation choisit d'adopter** .\n\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Champ d'application"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels sont les systèmes d'information spécifiques (applications, infrastructures, réseaux) qui sont inclus dans le champ d'application de cette PSSI ?",
+        "Quels types de données (par exemple, données clients, données financières, données de santé) sont couverts par cette politique ?",
+        "Quelles catégories de personnel (employés, stagiaires, prestataires, partenaires) sont soumises à cette PSSI ?",
+        "Y a-t-il des exclusions spécifiques au champ d'application de cette PSSI ? Si oui, lesquelles ?",
+        "Comment cette PSSI interagit-elle avec d'autres politiques ou réglementations internes et externes qui pourraient également s'appliquer à notre organisation ?"
+      ],
+      "answers": [],
+      "template": "Le **champ d'application de cette politique délimite précisément le périmètre de la PSSI**, en spécifiant les **systèmes, les données et les personnes concernées**.\n\nIl **identifie les actifs, matériels et immatériels ainsi que les ressources humaines prenant parti à la politique** .\n\nCette politique s'applique à **l'ensemble du périmètre d'information** de l'organisation, incluant potentiellement **les équipements (ordinateurs, serveurs, smartphones, tablettes, imprimantes, équipements réseau, objets connectés), les logiciels et les données**.\n\nIl concerne l'ensemble des personnes travaillant **dans l'organisation** et peut également concerner **les prestataires**.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Définitions"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels sont les termes techniques spécifiques à votre organisation ou à votre secteur d'activité qui devraient être définis dans cette section ?",
+        "Existe-t-il des acronymes ou des abréviations couramment utilisés dans votre contexte SSI qui nécessitent une définition ?",
+        "Quelles sont les références (normes, glossaires internes ou externes) qui pourraient être utilisées pour établir ces définitions ?"
+      ],
+      "answers": [],
+      "template": "Afin d'assurer une compréhension uniforme et d'**éviter toute ambiguïté**, cette section **explique les termes techniques utilisés dans la politique**.\n\nElle fournit des **définitions pour les termes clés utilisés dans le document**, notamment ceux relatifs à la sécurité des systèmes d'information [1, 5].\n\nCes définitions permettent d'établir un **lexique commun** pour tous les acteurs concernés par la PSSI, qu'ils soient **la direction, le DSI, les utilisateurs**, ou d'autres **parties prenantes**.\n\nCette clarté terminologique est essentielle pour la bonne interprétation et l'application des **règles de sécurité** énoncées dans cette politique.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Politique de l'organisation en matière de sécurité des systèmes d'information"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Comment la direction communique-t-elle son engagement envers la sécurité des systèmes d'information au sein de l'organisation ?",
+        "Quels sont les principaux objectifs de sécurité de votre organisation à court et à long terme ?",
+        "Comment cette politique s'articule-t-elle avec les autres politiques et directives de l'organisation ?",
+        "Quels sont les indicateurs clés qui permettront de mesurer l'efficacité de cette politique ?"
+      ],
+      "answers": [],
+      "template": "La présente Politique de Sécurité des Systèmes d'Information (PSSI) **établit la volonté de l'organisation en matière de sécurité de ses systèmes d'information**. Elle constitue un **document fondamental qui reflète la vision stratégique de la direction** concernant la sécurité des systèmes d'information (SSI) et la gestion des risques SSI. **La validation de cette PSSI par la direction générale témoigne de la reconnaissance officielle accordée à la sécurité de notre système d'information et de son engagement envers celle-ci**. Cette politique a pour but de **protéger nos données sensibles**, telles que les informations clients, les données financières et la propriété intellectuelle, et de **prévenir les cyberattaques** par la mise en place de mesures de sécurité adaptées. La PSSI **définit un cadre unique de référence pour toutes les questions de sécurité des systèmes d'information** au sein de notre organisation. Cette politique **sera régulièrement révisée** pour s'adapter à l'évolution du contexte, des processus, du système d'information, du personnel, de l'organisation et des risques.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Responsabilités"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels sont les rôles et responsabilités spécifiques des différentes parties prenantes en matière de gestion des risques de sécurité des systèmes d'information ?",
+        "Qui est responsable de la mise en œuvre des mesures de sécurité au sein de chaque département ou unité ?",
+        "Existe-t-il un comité de pilotage de la SSI ou d'autres instances de gouvernance de la sécurité au sein de notre organisation ? Quelles sont leurs responsabilités ?",
+        "Quelles sont les conséquences en cas de non-respect des règles et responsabilités définies dans cette PSSI pour les différentes catégories d'acteurs ?"
+      ],
+      "answers": [],
+      "template": "La sécurité des systèmes d'information est l'affaire de tous au sein de de notre organisation. La **direction** a la **responsabilité de valider et de soutenir la mise en œuvre de cette PSSI**, reconnaissant officiellement l'importance de la sécurité de l'information. Le **Responsable de la Sécurité des Systèmes d'Information (RSSI)**, désigné à cet effet, est **responsable de l'élaboration, de la mise à jour, de l'organisation de la mise en œuvre et du suivi de l'application de cette PSSI**. Il **conseille et soutient la direction** dans la définition du programme de sécurité. Les **administrateurs des systèmes d'information participent activement à la protection du système**, assurent la sécurité des ressources qu'ils gèrent et suivent les règles de sécurité de la PSSI. Les **utilisateurs** ont la **responsabilité de respecter les règles de sécurité** des outils mis à leur disposition et des données qu'ils manipulent, en se conformant notamment à la charte informatique. Chaque **responsable de service doit communiquer cette politique** et s'assurer que les exigences en matière de sécurité de l'information sont respectées au sein de son service.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Principes de sécurité"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Comment ces principes de sécurité sont-ils traduits en mesures de sécurité concrètes au sein de votre organisation ?",
+        "Quels sont les critères utilisés pour évaluer et prioriser les risques en fonction de leur impact potentiel sur la confidentialité, l'intégrité et la disponibilité de vos informations et systèmes ?",
+        "Comment ces principes sont-ils communiqués et intégrés dans la culture de sécurité de l'organisation auprès de tous les employés et partenaires ?",
+        "Existe-t-il des principes de sécurité supplémentaires spécifiques à votre secteur d'activité ou à vos besoins organisationnels ?"
+      ],
+      "answers": [],
+      "template": "Cette Politique de Sécurité des Systèmes d'Information est guidée par les **principes fondamentaux de sécurité** suivants:\n\n*   **Confidentialité :** S'assurer que **seules les personnes autorisées ont accès aux informations**. Cela implique la mise en œuvre de mesures pour protéger les données contre la divulgation non autorisée.\n*   **Intégrité :** Garantir l'**exactitude et la complétude des informations** et prévenir toute modification non autorisée. Des mécanismes seront mis en place pour assurer que les données ne sont pas altérées de manière inappropriée.\n*   **Disponibilité :** Assurer que les **informations et les systèmes sont accessibles aux utilisateurs autorisés** lorsqu'ils en ont besoin. Des mesures de continuité d'activité et de reprise après sinistre seront définies pour maintenir la disponibilité des services essentiels.\n\nCes principes constituent le socle de toutes les décisions et actions en matière de sécurité au sein de [Nom de l'organisation].\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Processus d'évaluation des risques"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels types d'actifs (données, systèmes, services, etc.) sont considérés comme critiques ou sensibles dans votre organisation ?",
+        "À quelle fréquence est réalisée l'évaluation des risques, et quels événements déclenchent une réévaluation ?",
+        "Quels sont les acteurs impliqués dans le processus d'évaluation des risques (ex. : RSSI, DSI, direction, métiers) ?"
+      ],
+      "answers": [],
+      "template": "L'évaluation des risques constitue une étape essentielle de la démarche de sécurité de l'information. Elle vise à identifier, analyser et hiérarchiser les menaces potentielles pesant sur les actifs sensibles de l'organisation. Ce processus repose sur une approche structurée permettant de prendre en compte la vraisemblance de survenance des événements redoutés et l'impact potentiel sur les activités. L'évaluation est réalisée de manière périodique, ou à la suite de changements significatifs (techniques, organisationnels ou réglementaires), afin d'assurer une vision actualisée des risques. Les résultats de cette analyse servent de fondement à la définition des mesures de sécurité appropriées, proportionnées et en cohérence avec les objectifs de l'organisation. L'implication des parties prenantes (métiers, techniques, direction) est indispensable pour garantir la pertinence et l'efficacité du processus.\n\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Traitement des risques"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quelles sont les stratégies de traitement de risque privilégiées par l'organisation (réduction, transfert, acceptation, évitement) ?",
+        "Qui est responsable de la validation et du suivi des décisions de traitement des risques ?",
+        "Les décisions de traitement sont-elles systématiquement formalisées dans un document (plan de traitement des risques, registre, outil de GRC, etc.) ?"
+      ],
+      "answers": [],
+      "template": "Le traitement des risques vise à définir et mettre en œuvre des mesures adaptées pour réduire les risques identifiés à un niveau acceptable par l'organisation. Plusieurs stratégies peuvent être envisagées selon le contexte : réduction du risque par des mesures de sécurité, transfert du risque (par exemple via une assurance), acceptation du risque lorsqu'il est jugé maîtrisable, ou encore évitement en supprimant la cause du risque. Le choix de la stratégie repose sur une analyse coût/bénéfice, tenant compte des enjeux métiers, des exigences légales et des contraintes opérationnelles. Chaque décision de traitement est formalisée, tracée, et validée par les parties prenantes concernées, afin de garantir une gestion cohérente et responsable des risques.\n\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Plan de continuité d'activité (PCA)"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels sont les éléments clés qui devraient être inclus dans un Plan de Continuité d'Activité (PCA) pour assurer le maintien des opérations critiques en cas de perturbation? (processus métiers considérés comme critiques qui doivent être couverts en priorité par le PCA )",
+        "À quelle fréquence le PCA est-il testé et mis à jour ?",
+        "Qui est chargé de l'activation, du pilotage et de la communication en cas de déclenchement du PCA ?"
+      ],
+      "answers": [],
+      "template": "Le Plan de Continuité d'Activité (PCA) a pour objectif d'assurer le maintien ou la reprise rapide des activités critiques en cas d'incident majeur affectant les ressources de l'organisation (catastrophe naturelle, cyberattaque, panne matérielle, etc.). Il repose sur une analyse d'impact (BIA) permettant d'identifier les processus vitaux, les délais de reprise admissibles, et les ressources nécessaires à leur fonctionnement. Le PCA comprend des procédures documentées, des responsabilités définies, ainsi que des moyens techniques et organisationnels adaptés. Il est régulièrement testé, mis à jour, et communiqué aux parties prenantes concernées afin de garantir son efficacité en situation réelle.\n\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Accès aux locaux"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels types de locaux sont considérés comme sensibles ou techniques au sein de l'organisation ?",
+        "Quels moyens de contrôle physique sont en place pour restreindre l'accès à ces locaux ?",
+        "Quelles procédures sont prévues pour l'habilitation, la traçabilité et la supervision des accès à ces zones ?"
+      ],
+      "answers": [],
+      "template": "L'accès aux locaux sensibles, tels que les salles serveurs, les espaces techniques ou les zones contenant des données critiques, fait l'objet de mesures de contrôle strictes. Seules les personnes autorisées, identifiées et habilitées, peuvent y accéder, selon des modalités définies par l'organisation. Des dispositifs de sécurité physique (badges, serrures électroniques, vidéosurveillance, etc.) sont mis en place pour restreindre et tracer les accès. Toute intervention dans ces locaux est consignée, et des contrôles réguliers sont effectués pour garantir la conformité aux procédures. Ces règles visent à prévenir les intrusions, les manipulations non autorisées et les risques de compromission physique des actifs informationnels.\n\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Protection des équipements"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels types d'équipements sont concernés par les mesures de protection (postes de travail, serveurs, terminaux mobiles, etc.) ?",
+        "Quelles protections physiques et logiques sont mises en place pour sécuriser ces équipements ?",
+        "Existe-t-il des procédures spécifiques pour la gestion du cycle de vie des équipements (installation, maintenance, retrait) ?"
+      ],
+      "answers": [],
+      "template": "Les équipements informatiques de l'organisation, qu'ils soient fixes ou mobiles, font l'objet de mesures de protection visant à garantir leur intégrité, leur disponibilité et la confidentialité des données qu'ils traitent. Ces mesures incluent la sécurisation physique (verrouillage des postes, ancrage des serveurs, locaux sécurisés), la protection contre les surtensions et les incendies, ainsi que des dispositifs de sécurité logique (antivirus, chiffrement, pare-feu local). Les équipements mobiles, en particulier, doivent être protégés contre les risques de perte ou de vol, et peuvent faire l'objet de restrictions d'usage. Un inventaire des équipements est maintenu à jour, et des procédures de maintenance et de recyclage sécurisé sont mises en œuvre.\n\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Gestion des supports amovibles"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels types de supports amovibles sont autorisés ou interdits dans l'organisation ?",
+        "Quelles mesures de sécurité (chiffrement, antivirus, contrôle d'accès) s'appliquent à l'usage des supports amovibles ?",
+        "Existe-t-il une procédure de déclaration en cas de perte, de vol ou d'utilisation non autorisée d'un support amovible ?"
+      ],
+      "answers": [],
+      "template": "Les supports amovibles (clés USB, disques durs externes, CD/DVD, cartes mémoire, etc.) représentent un vecteur potentiel de fuite de données ou de propagation de logiciels malveillants. Leur utilisation est donc encadrée par des règles strictes au sein de l'organisation. Seuls les supports autorisés, chiffrés si nécessaire, peuvent être utilisés, et leur accès est soumis à des contrôles adaptés. Le transfert de données sensibles sur ces supports est limité, justifié, et soumis à validation préalable. Des outils de détection et de blocage peuvent être mis en place sur les postes de travail pour prévenir les usages non conformes. Toute perte ou incident lié à un support amovible doit être signalé immédiatement.\n\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Gestion des identités et des accès (IAM)"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quelle est la méthode d'authentification principale utilisée au sein de l'organisation (par exemple, mots de passe, cartes à puce, biométrie) ?",
+        "Quelles procédures sont en place pour la gestion du cycle de vie des comptes utilisateurs (création, modification, suppression) ?",
+        "Quels mécanismes d'authentification sont utilisés pour les accès aux systèmes et aux données sensibles ? (MFA)",
+        "À quelle fréquence les droits d'accès sont-ils revus, et par qui ?",
+        "Disposez-vous d'un système d'authentification centralisé (par exemple, Active Directory, LDAP) ?",
+        "Quelle est la politique de l'organisation concernant la complexité et la fréquence de changement des mots de passe ?",
+        "Comment sont gérés les accès des nouveaux employés et des prestataires ?",
+        "Quelle est la procédure de révocation des accès lors du départ d'un employé ou de la fin d'une prestation ?",
+        "Y a-t-il des restrictions ou des directives spécifiques concernant l'utilisation de comptes génériques ou partagés ?",
+        "Quels sont les outils de journalisation utilisés pour suivre les tentatives d'authentification et les accès aux ressources ? Quelle est la durée de conservation de ces logs ?"
+      ],
+      "answers": [],
+      "template": "La gestion des identités et des accès (IAM) vise à garantir que chaque utilisateur dispose des droits nécessaires et suffisants pour exercer ses fonctions, sans excès de privilèges. Toute création, modification ou suppression de comptes est encadrée par un processus formalisé, incluant une validation par les responsables hiérarchiques ou métiers. Les droits d'accès sont attribués selon le principe du moindre privilège et revus périodiquement pour s'assurer de leur adéquation. Les comptes inactifs ou orphelins sont identifiés et supprimés dans les meilleurs délais. L'authentification est renforcée pour les accès sensibles, notamment via des mécanismes à facteurs multiples (MFA). Une traçabilité des accès est assurée pour permettre la détection des usages anormaux ou frauduleux.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Sécurité des réseaux"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels mécanismes de segmentation réseau sont en place pour isoler les zones sensibles ?",
+        "Quels types de VPN et méthodes d'authentification sont utilisés pour l'accès distant ?",
+        "Quels outils ou services sont utilisés pour surveiller, analyser et filtrer le trafic réseau ?"
+      ],
+      "answers": [],
+      "template": "La sécurité des réseaux vise à protéger les communications internes et externes de l'organisation contre les accès non autorisés, les interceptions, et les attaques. Des mécanismes de segmentation réseau (comme les VLANs) sont mis en place pour isoler les environnements sensibles. L'accès à distance est encadré par l'utilisation de VPNs sécurisés, assortis de mécanismes d'authentification renforcée. Le trafic réseau est filtré à l'aide de pare-feux, de listes de contrôle d'accès (ACL), et de systèmes de détection ou de prévention d'intrusions (IDS/IPS). Une surveillance continue est assurée pour détecter les comportements anormaux, les tentatives d'intrusion ou les incidents. Les règles de filtrage et les configurations réseau sont revues régulièrement pour s'adapter à l'évolution des menaces.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Sécurité des systèmes d'exploitation"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels sont les systèmes d'exploitation utilisés au sein de l'organisation (serveurs et postes de travail) et leurs versions ?",
+        "Quelles sont les procédures de mise à jour des systèmes d'exploitation (fréquence, validation des correctifs) ?",
+        "Quelle est la procédure de mise à jour des systèmes d'exploitation (fréquence, validation des correctifs) ?",
+        "Quel est l'antivirus/anti-malware utilisé et comment est-il déployé et mis à jour ?",
+        "Les pare-feux locaux (firewalls hôtes) sont-ils activés sur les systèmes ? Quelles sont leurs règles de configuration par défaut ?",
+        "Existe-t-il des standards ou des guides de durcissement pour les systèmes d'exploitation ?",
+        "Comment sont gérés les comptes utilisateurs locaux (création, suppression, gestion des droits) ?",
+        "Quelle est la politique concernant la complexité et l'expiration des mots de passe locaux ?",
+        "Les événements de sécurité des systèmes d'exploitation sont-ils journalisés de manière centralisée ? Quels types d'événements sont suivis ?",
+        "Existe-t-il des procédures de sauvegarde et de restauration spécifiques pour les configurations des systèmes d'exploitation ?",
+        "Comment sont gérés les accès administrateur aux systèmes d'exploitation ?"
+      ],
+      "answers": [],
+      "template": "Les systèmes d'exploitation utilisés au sein de l'organisation doivent être configurés, maintenus et surveillés de manière à garantir un niveau de sécurité conforme aux bonnes pratiques. Cela inclut l'application régulière des correctifs de sécurité, la désactivation des services inutiles, le durcissement des configurations selon des référentiels reconnus (CIS, ANSSI, etc.), et l'utilisation de comptes à privilèges uniquement lorsque cela est strictement nécessaire. Des solutions de sécurité complémentaires (antivirus, EDR, journaux de sécurité) sont déployées pour détecter et prévenir les compromissions. Les accès aux systèmes sont contrôlés, tracés, et soumis à authentification renforcée pour les opérations sensibles. Un processus de supervision permet d'identifier rapidement les vulnérabilités et d'y remédier efficacement.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Sécurité des applications"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quel est le cycle de vie de développement logiciel (SDLC) utilisé au sein de l'organisation ? La sécurité est-elle intégrée à chaque étape ?",
+        "Quelles sont les pratiques de développement sécurisé mises en œuvre (par exemple, revues de code axées sur la sécurité, utilisation de listes de vulnérabilités courantes comme OWASP Top 10) ?",
+        "Quelles sont les procédures de test de sécurité des applications avant leur mise en production (tests fonctionnels, tests de performance, tests de sécurité) ? Des tests d'intrusion sont-ils réalisés ?",
+        "Quelles pratiques de développement sécurisé sont mises en place (revue de code, tests, outils automatisés, etc.) ?",
+        "Comment sont gérés les composants tiers (bibliothèques, dépendances, frameworks) dans les applications ?",
+        "Quelles mesures de protection sont appliquées aux données sensibles traitées par les applications ?"
+      ],
+      "answers": [],
+      "template": "La sécurité des applications repose sur la mise en œuvre de bonnes pratiques tout au long de leur cycle de vie, depuis leur conception jusqu'à leur mise en production et leur maintenance. Les applications développées ou utilisées par l'organisation doivent être conçues selon les principes de sécurité dès la phase de développement (security by design), et faire l'objet de tests réguliers (revues de code, scans de vulnérabilités, tests d'intrusion). Les composants tiers (bibliothèques, frameworks) sont évalués et mis à jour pour éviter les failles connues. Les accès aux applications sont contrôlés, journalisés et protégés par des mécanismes d'authentification adaptés. Une attention particulière est portée à la protection des données sensibles manipulées par les applications, notamment par le chiffrement et le cloisonnement."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Sécurité des données"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels types de données sont considérés comme sensibles et comment sont-elles classifiées ?",
+        "Quelles mesures techniques sont mises en œuvre pour protéger les données (chiffrement, sauvegarde, contrôle d'accès, etc.) ?",
+        "Quelles obligations réglementaires s'appliquent aux données traitées par l'organisation et comment sont-elles prises en compte ?",
+        "Existe-t-il un plan de reprise d'activité (PRA) et est-il régulièrement testé pour la restauration des données ?",
+        "Des outils ou des politiques de prévention de la perte de données (DLP) sont-ils en place ?",
+        "Comment sont gérées la suppression et la destruction sécurisées des données et des supports de stockage en fin de vie ?",
+        "Des audits réguliers sont-ils effectués pour vérifier la conformité avec la politique de sécurité des données ?"
+      ],
+      "answers": [],
+      "template": "La sécurité des données vise à assurer leur confidentialité, leur intégrité, leur disponibilité et leur traçabilité, tout au long de leur cycle de vie. Les données sensibles, qu'elles soient personnelles, financières, stratégiques ou techniques, font l'objet de mesures de protection adaptées à leur niveau de criticité. Ces mesures incluent le chiffrement, les contrôles d'accès, la journalisation des actions, ainsi que des mécanismes de sauvegarde et de restauration. La classification des données permet de déterminer les niveaux de protection requis. Toute opération de traitement ou de transfert de données fait l'objet d'une analyse de risques et doit respecter les obligations réglementaires applicables (ex. : RGPD). La sensibilisation des utilisateurs et le contrôle des usages complètent le dispositif de sécurité.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Détection des incidents"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels outils et technologies sont utilisés pour détecter les incidents de sécurité ?",
+        "Comment sont traitées les alertes ou suspicions d'incidents une fois détectées ?",
+        "Qui est responsable de la surveillance et de l'analyse des événements de sécurité au sein de l'organisation ?",
+        "Les utilisateurs sont-ils formés pour reconnaître et signaler les incidents de sécurité ?"
+      ],
+      "answers": [],
+      "template": "La détection des incidents de sécurité repose sur un ensemble de dispositifs techniques et organisationnels visant à identifier rapidement toute activité anormale ou malveillante sur les systèmes d'information. Des outils de supervision, de journalisation (logs), d'analyse comportementale ou de détection d'intrusions (IDS/IPS, EDR, SIEM) sont déployés pour surveiller les événements critiques. Les alertes générées sont analysées et traitées selon des procédures définies, permettant une réaction rapide et adaptée. Une attention particulière est portée à la pertinence des règles de détection et à l'actualisation des sources de menace (threat intelligence). Les utilisateurs sont également encouragés à signaler toute situation suspecte ou comportement inhabituel.\n\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Gestion des incidents"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quel est le protocole de notification d'un incident de sécurité au sein de votre organisation [6, 17]? Qui doit être informé et dans quel délai [17]?",
+        "Décrivez brièvement les étapes de la procédure d'analyse d'un incident de sécurité [6, 17, 19]. Un référent incident SSI est-il désigné [18]?",
+        "Quelles sont les mesures de résolution typiquement mises en œuvre en cas d'incident (par exemple, restauration de sauvegardes, correction de vulnérabilités) [6, 17]?",
+        "Existe-t-il des procédures spécifiques de confinement pour différents types d'incidents [6, 17]?",
+        "Comment sont réalisés les bilans post-incident et comment les enseignements sont-ils intégrés dans vos processus [6, 17, 19]? Une fiche de traitement est-elle établie [19]?",
+        "Existe-t-il un processus de gestion des incidents formalisé [7, 19]?",
+        "Quelles sont les étapes prévues dans le processus de gestion des incidents (détection, qualification, réponse, retour d'expérience) ?",
+        "Qui est responsable de la coordination et du traitement des incidents de sécurité ?",
+        "Existe-t-il une procédure de communication en cas d'incident majeur, notamment vers les autorités ou les parties prenantes externes ?"
+      ],
+      "answers": [],
+      "template": "La gestion des incidents de sécurité vise à assurer une réponse rapide, coordonnée et efficace face à tout événement compromettant la confidentialité, l'intégrité ou la disponibilité des systèmes d'information. L'organisation dispose de procédures formalisées permettant de qualifier les incidents, d'en évaluer l'impact, de mettre en œuvre les mesures de remédiation nécessaires et d'en assurer la traçabilité. Un dispositif d'escalade est prévu pour alerter les personnes compétentes selon la gravité de l'incident. Des comptes-rendus d'incident sont systématiquement établis afin d'en tirer les enseignements et d'améliorer les dispositifs de prévention. La communication interne et externe, notamment en cas d'obligations réglementaires, est encadrée et pilotée par les acteurs désignés.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Objectifs de la sensibilisation"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Comment la sensibilisation des utilisateurs est-elle organisée au sein de votre organisation?",
+        "Quels sont les indicateurs utilisés pour mesurer l'efficacité des actions de sensibilisation?",
+        "Des actions spécifiques de sensibilisation aux risques liés au traitement des données personnelles sont-elles mises en œuvre?"
+      ],
+      "answers": [],
+      "template": "La sensibilisation des utilisateurs est primordiale pour expliquer l'**importance de la sécurité des systèmes d'information** au sein de l'organisation . Elle vise à rendre le personnel **conscient des risques** liés à la sécurité informatique et des **moyens de s'en prémunir**, ainsi que de l'**organisation mise en place pour la SSI** . Un objectif clé est d'aider chacun à **prendre conscience de ses responsabilités** en matière de sécurité et de participer activement à l'**amélioration de la culture de sécurité globale** [1, 2]. La diffusion de la **Politique de Sécurité des Systèmes d'Information (PSSI)** elle-même constitue un **outil de sensibilisation efficace** . Il est également essentiel de **sensibiliser toute personne amenée à participer au traitement de données à caractère personnel** aux principes de protection de ce type de données et d'informer l'ensemble du personnel du GHT SLS de la **collecte de traces de tout accès à des données personnelles** et de la possibilité de contrôles a posteriori [1, 3]. Conduire un projet PSSI, c'est avant tout faire naître ou renforcer une **culture de sécurité** . La démarche proposée dans le guide assure la cohérence des objectifs de sécurité de l'organisme et contribue à la sensibilisation et l'implication des personnels .\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Thèmes et fréquence des formations"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels thèmes de sécurité sont abordés dans les formations destinées aux collaborateurs ?",
+        "À quelle fréquence ces formations sont-elles dispensées aux différents profils de l'organisation ?",
+        "Quels formats (présentiel, e-learning, ateliers, etc.) sont utilisés pour délivrer ces formations et campagnes de sensibilisation ?"
+      ],
+      "answers": [],
+      "template": "La sensibilisation et la formation à la sécurité de l'information sont essentielles pour renforcer la posture de sécurité de l'organisation. Des sessions régulières sont organisées afin d'informer les collaborateurs sur les bonnes pratiques, les risques courants (phishing, ingénierie sociale, gestion des mots de passe, etc.), les procédures internes, ainsi que les obligations légales et réglementaires en vigueur. Les contenus sont adaptés aux différents profils (utilisateurs, administrateurs, direction) et peuvent prendre la forme de formations en présentiel, e-learning ou exercices pratiques. La fréquence des formations est définie en fonction des besoins, avec un minimum annuel pour l'ensemble du personnel. Des campagnes de sensibilisation ponctuelles peuvent également être menées en réponse à des menaces émergentes.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Revue de la politique"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "À quelle fréquence la PSSI est-elle révisée et dans quels cas exceptionnels une révision peut-elle être déclenchée ?",
+        "Qui est responsable de la revue, de la validation et de la mise à jour de la politique ?",
+        "Comment les mises à jour de la politique sont-elles communiquées aux collaborateurs ?"
+      ],
+      "answers": [],
+      "template": "La politique de sécurité des systèmes d'information (PSSI) fait l'objet d'une revue régulière afin de s'assurer de sa pertinence, de sa conformité aux évolutions réglementaires, technologiques et organisationnelles, ainsi que de son adéquation aux risques identifiés. Cette revue est réalisée selon une périodicité définie, ou à l'occasion d'événements majeurs (incident de sécurité, changement structurel, audit, etc.). Les modifications proposées sont validées par les instances compétentes, puis communiquées aux parties prenantes concernées. Ce processus garantit une amélioration continue de la gouvernance de la sécurité et permet d'adapter les mesures aux nouveaux enjeux.\n[/EXEMPLE]"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Processus d'amélioration"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels types de sources (incidents, audits, retours d'expérience, etc.) alimentent le processus d'amélioration ?",
+        "Qui est chargé de piloter ce processus et de suivre la mise en œuvre des actions correctives ?",
+        "Quels outils ou indicateurs sont utilisés pour mesurer l'efficacité du dispositif de sécurité et orienter les évolutions ?"
+      ],
+      "answers": [],
+      "template": "Le processus d'amélioration continue de la sécurité des systèmes d'information repose sur l'analyse régulière des retours d'expérience, des incidents, des audits et des évolutions du contexte de l'organisation. Il vise à identifier les faiblesses du dispositif existant, à proposer des mesures correctives ou préventives, et à suivre leur mise en œuvre. Des indicateurs de performance et des tableaux de bord peuvent être utilisés pour évaluer l'efficacité des actions engagées. Ce processus est piloté par les acteurs de la gouvernance SSI et implique l'ensemble des parties prenantes concernées. Il permet d'ajuster la stratégie de sécurité en fonction des menaces émergentes, des nouvelles technologies et des exigences réglementaires.\n[/EXEMPLE]"
+    }
+  }
+]
