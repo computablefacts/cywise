@@ -5,9 +5,12 @@ namespace App\Http\Procedures;
 use App\AgentSquad\Actions\CyberBuddy;
 use App\AgentSquad\Actions\LabourLawyerConclusionsWriter;
 use App\AgentSquad\Actions\ListAssets;
+use App\AgentSquad\Actions\ListScheduledTasks;
 use App\AgentSquad\Actions\ListVulnerabilities;
 use App\AgentSquad\Actions\ManageAssets;
+use App\AgentSquad\Actions\ScheduleTask;
 use App\AgentSquad\Actions\ToggleUserGetsAuditReport;
+use App\AgentSquad\Actions\UnscheduleTask;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Orchestrator;
 use App\AgentSquad\Providers\LlmsProvider;
@@ -98,6 +101,9 @@ class CyberBuddyProcedure extends Procedure
             $orchestrator->registerAgent(new ListAssets());
             $orchestrator->registerAgent(new ListVulnerabilities());
             $orchestrator->registerAgent(new ToggleUserGetsAuditReport());
+            $orchestrator->registerAgent(new ScheduleTask());
+            $orchestrator->registerAgent(new UnscheduleTask());
+            $orchestrator->registerAgent(new ListScheduledTasks());
 
             // TODO : create one agent for each framework
 
