@@ -481,12 +481,6 @@ Route::post('/llm1', '\App\Http\Controllers\CyberBuddyController@llm1')->middlew
 
 Route::post('/llm2', '\App\Http\Controllers\CyberBuddyController@llm2')->middleware('auth');
 
-Route::get('/templates', '\App\Http\Controllers\CyberBuddyController@templates')->middleware('auth');
-
-Route::post('/templates', '\App\Http\Controllers\CyberBuddyController@saveTemplate')->middleware('auth');
-
-Route::delete('/templates/{id}', '\App\Http\Controllers\CyberBuddyController@deleteTemplate')->middleware('auth');
-
 Route::get('/files/stream/{secret}', '\App\Http\Controllers\CyberBuddyController@streamFile');
 
 Route::get('/files/download/{secret}', '\App\Http\Controllers\CyberBuddyController@downloadFile');

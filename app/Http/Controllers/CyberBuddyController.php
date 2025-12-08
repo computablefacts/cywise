@@ -7,8 +7,6 @@ use App\AgentSquad\Providers\LlmsProvider;
 use App\Events\IngestFile;
 use App\Models\Chunk;
 use App\Models\File;
-use App\Models\Template;
-use App\Models\User;
 use App\Rules\IsValidCollectionName;
 use App\Rules\IsValidFileType;
 use Illuminate\Http\Request;
@@ -204,78 +202,6 @@ class CyberBuddyController extends Controller
     private static function storageFileName(File $file): string
     {
         return "{$file->id}_{$file->name_normalized}.{$file->extension}";
-    }
-
-    public function templates()
-    {
-        return Template::where('readonly', true)
-            ->orderBy('name', 'asc')
-            ->get()
-            ->concat(
-                Template::where('readonly', false)
-                    ->where('created_by', Auth::user()->id)
-                    ->orderBy('name', 'asc')
-                    ->get()
-            )
-            ->map(function (Template $template) {
-                return [
-                    'id' => $template->id,
-                    'name' => $template->name,
-                    'template' => $template->template,
-                    'type' => $template->readonly ? 'template' : 'draft',
-                    'user' => User::find($template->created_by)->name,
-                ];
-            });
-    }
-
-    public function saveTemplate(Request $request)
-    {
-        // TODO : validate request
-        $id = $request->integer('id', 0);
-        $name = $request->string('name', '');
-        $blocks = $request->input('template', []);
-        $model = $request->boolean('is_model', false);
-
-        if (isset($blocks) && count($blocks) > 0) {
-            if ($id === 0) {
-                $template = Template::create([
-                    'name' => Str::replace('v', '', $name),
-                    'template' => $blocks,
-                    'readonly' => $model,
-                ]);
-            } else {
-                $template = Template::where('id', $id)->where('readonly', false)->first();
-                $version = ($template && Str::contains($template->name, 'v') ? (int)Str::afterLast($template->name, 'v') : 0) + 1;
-                if ($template) {
-                    $template->name = Str::beforeLast($template->name, 'v') . "v{$version}";
-                    $template->template = $blocks;
-                    $template->save();
-                } else {
-                    $userId = Auth::user()->id;
-                    $template = Template::create([
-                        'name' => "{$name} u{$userId}v1",
-                        'template' => $blocks,
-                        'readonly' => false,
-                    ]);
-                }
-            }
-            return [
-                'id' => $template->id,
-                'name' => $template->name,
-                'template' => $template->template,
-                'type' => $template->readonly ? 'template' : 'draft',
-                'user' => User::find($template->created_by)->name,
-            ];
-        }
-        return [];
-    }
-
-    public function deleteTemplate(int $id)
-    {
-        Template::where('id', $id)->where('readonly', false)->delete();
-        return response()->json([
-            'success' => __('The template has been deleted!'),
-        ]);
     }
 
     public function llm1(Request $request)

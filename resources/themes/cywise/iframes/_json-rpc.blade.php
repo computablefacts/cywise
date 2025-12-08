@@ -178,23 +178,34 @@
   }
 
   function askCyberBuddyApiCall(threadId, directive, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
-    executeJsonRpcApiCall('cyberbuddy@ask', {thread_id: threadId, directive: directive}, onSuccess,
-      (response) => toaster.toastError(response.message), onFinally);
+    executeJsonRpcApiCall('cyberbuddy@ask', {thread_id: threadId, directive: directive}, onSuccess, onErrorDefault,
+      onFinally);
   }
 
-  function deleteConversationApiCall(conversationId, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
-    executeJsonRpcApiCall('cyberbuddy@delete', {conversation_id: conversationId}, onSuccess,
-      (response) => toaster.toastError(response.message), onFinally);
+  function deleteConversationApiCall(conversationId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberbuddy@delete', {conversation_id: conversationId}, onSuccess);
   }
 
-  function loadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
-    executeJsonRpcApiCall('frameworks@load', {framework_id: frameworkId}, onSuccess,
-      (response) => toaster.toastError(response.message), onFinally);
+  function loadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('frameworks@load', {framework_id: frameworkId}, onSuccess);
   }
 
-  function unloadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
-    executeJsonRpcApiCall('frameworks@unload', {framework_id: frameworkId}, onSuccess,
-      (response) => toaster.toastError(response.message), onFinally);
+  function unloadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('frameworks@unload', {framework_id: frameworkId}, onSuccess);
+  }
+
+  function listTemplatesApiCall(onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberscribe@listTemplates', {}, onSuccess);
+  }
+
+  function deleteTemplateApiCall(templateId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberscribe@deleteTemplate', {template_id: templateId}, onSuccess);
+  }
+
+  function saveTemplateApiCall(templateId, isModel, name, blocks, onSuccess = onSuccessDefault,
+    onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('cyberscribe@saveTemplate',
+      {template_id: templateId, is_model: isModel, name: name, blocks: blocks}, onSuccess, onErrorDefault, onFinally);
   }
 
   function listTablesApiCall(onSuccess = onSuccessDefault) {
