@@ -6,14 +6,13 @@ use App\AgentSquad\Providers\PromptsProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Procedures\TheCyberBriefProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Listeners\EndVulnsScanListener;
+use App\Mail\MailCoachSimpleEmail;
 use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\File;
 use App\Models\TimelineItem;
 use App\Models\User;
 use App\Rules\IsValidCollectionName;
-use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -240,28 +239,12 @@ class ProcessIncomingEmails implements ShouldQueue
         $body = Str::before($body, '<br><br><b>Sources :</b>'); // remove sources
         $body = preg_replace("/\[((\d+,?)+)]/", "", $body); // remove references
 
-        EndVulnsScanListener::sendEmail(
-            self::SENDER_CYBERBUDDY,
-            $user->email,
+        MailCoachSimpleEmail::sendEmail(
             "Re: {$subject}",
             "CyberBuddy vous répond !",
-            "
-                {$body}
-                <p>Pour importer tes propres documents et profiter pleinement des capacités de CyberBuddy, ton assistant Cyber, finalise ton inscription à Cywise :</p>
-            ",
-            route('password.reset', [
-                'token' => app(PasswordBroker::class)->createToken($user),
-                'email' => $user->email,
-                'reason' => 'Finalisez votre inscription en créant un mot de passe',
-                'action' => 'Créer mon mot de passe',
-            ]),
-            "je me connecte à Cywise",
-            "
-              <p>Je reste à ta disposition pour toute question ou assistance supplémentaire. Merci encore pour ta confiance en Cywise !</p>
-              <p>Bien à toi,</p>
-              <p>CyberBuddy</p>
-              <span style='color:white'>thread_id={$threadId}</span>
-            ",
+            $body,
+            $user->email,
+            self::SENDER_CYBERBUDDY
         );
 
         if (!$message->move('CyberBuddy')) {

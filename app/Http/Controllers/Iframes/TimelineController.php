@@ -155,21 +155,33 @@ class TimelineController extends Controller
                 $params['status'] ?? null,
                 $params['asset_id'] ?? null,
                 $params['tld'] ?? null,
-                isset($params['tags']) && $params['tags'] !== ''
-                    ? collect(explode(',', $params['tags']))
-                    ->map(fn($t) => Str::trim($t))
-                    ->filter()
-                    ->unique()
-                    ->values()
-                    ->all()
-                    : null
+                !empty($params['tags']) ?
+                    collect(explode(',', $params['tags']))
+                        ->map(fn(string $tag) => Str::trim($tag))
+                        ->filter(fn(string $tag) => !empty($tag))
+                        ->unique()
+                        ->values()
+                        ->all() :
+                    null
             ),
             'conversations' => $this->conversations(),
             'events' => $this->events($params['server_id'] ?? null),
             'ioc' => $this->iocs(10, $params['server_id'] ?? null, $params['level'] ?? null),
             'leaks' => $this->leaks(),
             'notes-and-memos' => $this->notesAndMemos(),
-            'vulnerabilities' => $this->vulnerabilities($params['level'] ?? null, $params['asset_id'] ?? null),
+            'vulnerabilities' => $this->vulnerabilities(
+                $params['level'] ?? null,
+                $params['asset_id'] ?? null,
+                $params['tld'] ?? null,
+                !empty($params['tags']) ?
+                    collect(explode(',', $params['tags']))
+                        ->map(fn(string $tag) => Str::trim($tag))
+                        ->filter(fn(string $tag) => !empty($tag))
+                        ->unique()
+                        ->values()
+                        ->all() :
+                    null
+            ),
             default => [],
         };
         return view('theme::iframes.timeline', [
@@ -572,9 +584,9 @@ class TimelineController extends Controller
         ];
     }
 
-    private function vulnerabilities(?string $level = null, ?int $assetId = null): array
+    private function vulnerabilities(?string $level = null, ?int $assetId = null, ?string $tld = null, ?array $tags = null): array
     {
-        $alerts = $this->alerts($assetId);
+        $alerts = $this->alerts($assetId, $tld, $tags);
         $nbHigh = 0;
         $nbMedium = 0;
         $nbLow = 0;
@@ -664,9 +676,13 @@ class TimelineController extends Controller
         ];
     }
 
-    private function alerts(?int $assetId = null): Collection
+    private function alerts(?int $assetId = null, ?string $tld = null, ?array $tags = null): Collection
     {
-        $request = new JsonRpcRequest(['asset_id' => $assetId]);
+        $request = new JsonRpcRequest([
+            'asset_id' => $assetId,
+            'tld' => $tld,
+            'tags' => $tags,
+        ]);
         $request->setUserResolver(fn() => Auth::user());
         $alerts = (new VulnerabilitiesProcedure())->list($request);
         return $alerts['high']->concat($alerts['medium'])->concat($alerts['low']);

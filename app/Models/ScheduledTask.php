@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon updated_at
  * @property ?string name
  * @property string cron
+ * @property string condition
  * @property string task
  * @property ?Carbon prev_run_date
  * @property ?Carbon next_run_date
@@ -28,6 +29,7 @@ class ScheduledTask extends Model
     protected $fillable = [
         'name',
         'cron',
+        'condition',
         'task',
         'prev_run_date',
         'next_run_date',

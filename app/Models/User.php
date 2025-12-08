@@ -55,6 +55,7 @@ class User extends WaveUser
         'tenant_id',
         'am_api_token',
         'superset_id',
+        'gets_audit_report',
     ];
 
     /**
@@ -190,7 +191,6 @@ class User extends WaveUser
     public function init(): void
     {
         try {
-            // Set the user's prompts
             Log::debug("[{$this->email}] Updating user's prompts...");
 
             $this->setupPrompts('default_answer_question', 'seeders/prompts/default_answer_question.txt');
@@ -204,8 +204,12 @@ class User extends WaveUser
             $this->setupPrompts('default_summarize', 'seeders/prompts/default_summarize.txt');
 
             Log::debug("[{$this->email}] User's prompts updated.");
+            Log::debug("[{$this->email}] Updating user's templates...");
 
-            // TODO : create CyberScribe's templates
+            $this->setupTemplates();
+
+            Log::debug("[{$this->email}] User's templates updated.");
+
             // TODO : create user's private collection privcol*
 
         } catch (\Exception $e) {
@@ -270,5 +274,35 @@ class User extends WaveUser
                 'template' => $newPrompt
             ]);
         }
+    }
+
+    private function setupTemplates(): void
+    {
+        $template = Template::updateOrCreate([
+            'name' => 'charte-informatique.json',
+            'created_by' => $this->id,
+        ], [
+            'template' => $this->templateCharteInformatique(),
+            'readonly' => true,
+        ]);
+        $template = Template::updateOrCreate([
+            'name' => 'pssi.json',
+            'created_by' => $this->id,
+        ], [
+            'template' => $this->templatePssi(),
+            'readonly' => true,
+        ]);
+    }
+
+    private function templateCharteInformatique(): array
+    {
+        $path = database_path('seeders/templates/charte-informatique.json');
+        return json_decode(File::get($path), true);
+    }
+
+    private function templatePssi(): array
+    {
+        $path = database_path('seeders/templates/pssi.json');
+        return json_decode(File::get($path), true);
     }
 }

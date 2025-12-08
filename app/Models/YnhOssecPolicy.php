@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OsqueryPlatformEnum;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +39,27 @@ class YnhOssecPolicy extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function platform(): ?OsqueryPlatformEnum
+    {
+        if (Str::startsWith($this->uid, 'cywise_')) {
+            $platform = Str::afterLast($this->uid, '_');
+            return empty($platform) ? null : OsqueryPlatformEnum::tryFrom($platform);
+        }
+        if ($this->isWindows()) {
+            return OsqueryPlatformEnum::WINDOWS;
+        }
+        if ($this->isDebian()) {
+            return OsqueryPlatformEnum::LINUX;
+        }
+        if ($this->isUbuntu()) {
+            return OsqueryPlatformEnum::UBUNTU;
+        }
+        if ($this->isCentOs()) {
+            return OsqueryPlatformEnum::CENTOS;
+        }
+        return null;
+    }
 
     public function checks(): HasMany
     {

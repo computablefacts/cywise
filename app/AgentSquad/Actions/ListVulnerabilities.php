@@ -61,10 +61,10 @@ class ListVulnerabilities extends AbstractAction
         $asset = Str::trim(Str::afterLast($input, ':'));
 
         if ($action !== 'list') {
-            return new FailedAnswer("Invalid action. Please use list.");
+            return new FailedAnswer(__("Invalid action. Please use list."));
         }
         if (!in_array($level, ['high', 'medium', 'low', 'any'])) {
-            return new FailedAnswer("Invalid status. Please use high, medium, low, or any.");
+            return new FailedAnswer(__("Invalid status. Please use high, medium, low, or any."));
         }
 
         $procedure = new VulnerabilitiesProcedure();
@@ -76,10 +76,10 @@ class ListVulnerabilities extends AbstractAction
             /** @var Asset $azzet */
             $azzet = Asset::where('asset', $asset)->first();
             if (!$azzet) {
-                return new FailedAnswer("Asset {$asset} not found.");
+                return new FailedAnswer(__("Asset :asset not found.", ['asset' => $asset]));
             }
             if (!$azzet->is_monitored) {
-                return new FailedAnswer("Asset {$asset} is not monitored.");
+                return new FailedAnswer(__("Asset :asset is not monitored.", ['asset' => $asset]));
             }
             if ($level === 'any') {
                 $request = new JsonRpcRequest(['asset_id' => $azzet->id]);
@@ -148,7 +148,7 @@ class ListVulnerabilities extends AbstractAction
             })->join("\n\n");
             return new SuccessfulAnswer("{$preamble}\n\n{$vulnerabilities}");
         } catch (\Exception $e) {
-            return new FailedAnswer("Action {$action} failed when applied to criticality level {$level} and asset {$asset}:\n\n{$e->getMessage()}");
+            return new FailedAnswer(__("Action :action failed when applied to criticality level :level and asset :asset:\n\n:msg", ['action' => $action, 'level' => $level, 'asset' => $asset, 'msg' => $e->getMessage()]));
         }
     }
 }

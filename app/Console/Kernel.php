@@ -8,6 +8,7 @@ use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Jobs\EmbedChunks;
 use App\Jobs\ProcessIncomingEmails;
 use App\Jobs\PullServersInfos;
+use App\Jobs\RunScheduledTasks;
 use App\Jobs\TriggerDiscoveryShallow;
 use App\Jobs\TriggerScan;
 use App\Jobs\TriggerSendAuditReport;
@@ -35,16 +36,16 @@ class Kernel extends ConsoleKernel
         // AdversaryMeter
         $schedule->job(new TriggerScan())->everyMinute();
         $schedule->job(new TriggerDiscoveryShallow())->daily();
-        $schedule->job(new TriggerSendAuditReport())->dailyAt('6:45');
+        $schedule->job(new TriggerSendAuditReport())->weeklyOn(1 /* monday */, '6:45');
         // $schedule->job(new TriggerDiscoveryDeep())->weekly();
 
         // CyberBuddy
         $schedule->job(new EmbedChunks())->everyMinute();
         $schedule->job(new DeleteEmbeddedChunks())->everyMinute();
         $schedule->job(new UpdateTables())->everyMinute();
-        // $schedule->job(new RunScheduledTasks())->everyMinute();
+        $schedule->job(new RunScheduledTasks())->everyMinute();
 
-        if (app()->environment('production')) {
+        if (app()->environment('prod')) {
             $schedule->job(new ProcessIncomingEmails())->everyMinute();
         }
 

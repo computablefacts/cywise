@@ -27,6 +27,12 @@
 @endpush
 
 @section('content')
+@include('theme::iframes._agent')
+<div class="px-3 pt-3" style="text-align: right;">
+  <a href="{{ route('iframes.sca-editor') }}">
+    {{ __('+ new') }}
+  </a>
+</div>
 <div class="card mt-3">
   <div class="card-body">
     <div class="row">
@@ -122,7 +128,15 @@
   <div class="card-header pb-0">
     <div class="row mt-2">
       <div class="col">
-        <h6>{{ $check->title }}</h6>
+        <h6>
+          @if(isset($check->created_by) || \Auth::user()?->isCywiseAdmin())
+          <a href="{{ route('iframes.sca-editor', ['check_id' => $check->id]) }}">
+            {{ $check->title }}
+          </a>
+          @else
+          {{ $check->title }}
+          @endif
+        </h6>
       </div>
       <div class="col col-auto">
         @foreach($check->frameworks() as $f)
