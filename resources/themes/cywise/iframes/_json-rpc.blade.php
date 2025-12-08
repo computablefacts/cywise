@@ -169,6 +169,14 @@
     executeJsonRpcApiCall('assets@listTags', {}, onSuccess, onError);
   }
 
+  function listAllGroupsApiCall(onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('assets@listGroups', {}, onSuccess, onError);
+  }
+
+  function degroupApiCall(group, onSuccess = onSuccessDefault, onError = onErrorDefault, onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('assets@degroup', {group: group}, onSuccess, onError, onFinally);
+  }
+
   function askCyberBuddyApiCall(threadId, directive, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
     executeJsonRpcApiCall('cyberbuddy@ask', {thread_id: threadId, directive: directive}, onSuccess,
       (response) => toaster.toastError(response.message), onFinally);

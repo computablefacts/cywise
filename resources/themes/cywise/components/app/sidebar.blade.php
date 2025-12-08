@@ -244,6 +244,7 @@ $user = \Auth::user();
           </x-app.sidebar-dropdown>
           @endif
           @if($user->canView('iframes.users')
+          || $user->canView('iframes.shares')
           || $user->canView('iframes.roles-and-permissions')
           || $user->canView('iframes.traces'))
           <x-app.sidebar-dropdown text="{{ __('Administration') }}"
@@ -252,9 +253,17 @@ $user = \Auth::user();
                                   :active="false"
                                   :open="(
                           Request::is('users') ||
+                          Request::is('shares') ||
                           Request::is('roles-and-permissions') ||
                           Request::is('traces')
                         ) ? '1' : '0'">
+            @if($user->canView('iframes.shares'))
+            <x-app.sidebar-link href="{{ route('shares') }}"
+                                icon="phosphor-share-network"
+                                :active="Request::is('shares')">
+              {{ __('Shares') }}
+            </x-app.sidebar-link>
+            @endif
             @if($user->canView('iframes.users'))
             <x-app.sidebar-link href="{{ route('users') }}"
                                 icon="phosphor-users"

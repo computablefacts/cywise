@@ -30,6 +30,7 @@ use App\Http\Controllers\Iframes\RulesController;
 use App\Http\Controllers\Iframes\RulesEditorController;
 use App\Http\Controllers\Iframes\ScaController;
 use App\Http\Controllers\Iframes\ScaEditorController;
+use App\Http\Controllers\Iframes\SharesController;
 use App\Http\Controllers\Iframes\TableController;
 use App\Http\Controllers\Iframes\TablesController;
 use App\Http\Controllers\Iframes\TimelineController;
@@ -522,6 +523,7 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/rules/edit', [RulesEditorController::class, '__invoke'])->name('rules-editor');
     Route::get('/sca', [ScaController::class, '__invoke'])->name('sca');
     Route::get('/sca/edit', [ScaEditorController::class, '__invoke'])->name('sca-editor');
+    Route::get('/shares', [SharesController::class, '__invoke'])->name('shares');
     Route::get('/table', [TableController::class, '__invoke'])->name('table');
     Route::get('/tables', [TablesController::class, '__invoke'])->name('tables');
     Route::get('/traces', [TracesController::class, '__invoke'])->name('traces');
