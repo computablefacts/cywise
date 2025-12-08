@@ -187,6 +187,16 @@
       (response) => toaster.toastError(response.message), onFinally);
   }
 
+  function loadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('frameworks@load', {framework_id: frameworkId}, onSuccess,
+      (response) => toaster.toastError(response.message), onFinally);
+  }
+
+  function unloadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('frameworks@unload', {framework_id: frameworkId}, onSuccess,
+      (response) => toaster.toastError(response.message), onFinally);
+  }
+
   function listTablesApiCall(onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('tables@list', {}, onSuccess);
   }

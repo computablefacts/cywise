@@ -495,10 +495,6 @@ Route::post('/files/one', '\App\Http\Controllers\CyberBuddyController@uploadOneF
 
 Route::post('/files/many', '\App\Http\Controllers\CyberBuddyController@uploadManyFiles')->middleware('auth:sanctum');
 
-Route::delete('/frameworks/{id}', '\App\Http\Controllers\CyberBuddyController@unloadFramework')->middleware('auth');
-
-Route::post('/frameworks/{id}', '\App\Http\Controllers\CyberBuddyController@loadFramework')->middleware('auth');
-
 Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class])->prefix('iframes')->name('iframes.')->group(function () {
     Route::get('/analyze', [AnalyzeController::class, '__invoke'])->name('analyze');
     Route::get('/assets', [TimelineController::class, '__invoke'])->name('assets');
