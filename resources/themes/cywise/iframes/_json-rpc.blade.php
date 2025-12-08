@@ -182,6 +182,11 @@
       (response) => toaster.toastError(response.message), onFinally);
   }
 
+  function deleteConversationApiCall(conversationId, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('cyberbuddy@delete', {conversation_id: conversationId}, onSuccess,
+      (response) => toaster.toastError(response.message), onFinally);
+  }
+
   function listTablesApiCall(onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('tables@list', {}, onSuccess);
   }

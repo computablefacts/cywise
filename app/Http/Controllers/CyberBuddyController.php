@@ -6,7 +6,6 @@ use App\AgentSquad\Actions\CyberBuddy;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\Events\IngestFile;
 use App\Models\Chunk;
-use App\Models\Conversation;
 use App\Models\File;
 use App\Models\Template;
 use App\Models\User;
@@ -578,14 +577,6 @@ class CyberBuddyController extends Controller
             'urls_success' => $successes,
             'filenames_error' => $errors,
         ], 500);
-    }
-
-    public function deleteConversation(int $id)
-    {
-        Conversation::where('id', $id)->delete();
-        return response()->json([
-            'success' => __('The conversation has been deleted!'),
-        ]);
     }
 
     private function storagePath(\App\Models\Collection $collection, File $file): string
