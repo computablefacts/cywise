@@ -587,9 +587,10 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Group together assets sharing a given tag.",
+        description: "Group together assets sharing given tags.",
         params: [
-            "tag" => "The tag.",
+            "tags" => "An array of tags.",
+            "hash" => "An optional hash for the group.",
         ],
         result: [
             "group" => "The group object.",
@@ -598,13 +599,26 @@ class AssetsProcedure extends Procedure
     public function group(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'tag' => 'required|string|exists:am_assets_tags,tag',
+            'tags' => 'required|array|min:1',
+            'tags.*' => 'required|string|exists:am_assets_tags,tag',
+            'hash' => 'nullable|string|max:191',
         ]);
+
+        $hash = $params['hash'] ?? Str::random(32);
+        $tags = $params['tags'];
+
+        foreach ($tags as $tag) {
+            AssetTagHash::create([
+                'tag' => $tag,
+                'hash' => $hash,
+            ]);
+        }
+
         return [
-            'group' => AssetTagHash::create([
-                'tag' => $params['tag'],
-                'hash' => Str::random(32),
-            ]),
+            'group' => [
+                'hash' => $hash,
+                'tags' => $tags,
+            ],
         ];
     }
 
@@ -623,9 +637,7 @@ class AssetsProcedure extends Procedure
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
         ]);
 
-        /** @var AssetTagHash $group */
-        $group = AssetTagHash::query()->where('hash', '=', $params['group'])->firstOrFail();
-        $group->delete();
+        AssetTagHash::query()->where('hash', '=', $params['group'])->delete();
 
         return [
             'msg' => "The group {$params['group']} has been disbanded!",
@@ -641,8 +653,20 @@ class AssetsProcedure extends Procedure
     )]
     public function listGroups(JsonRpcRequest $request): array
     {
+        $groups = AssetTagHash::all()
+            ->groupBy('hash')
+            ->map(function ($items, $hash) {
+                return [
+                    'hash' => $hash,
+                    'tags' => $items->pluck('tag')->toArray(),
+                    'views' => $items->sum('views'),
+                ];
+            })
+            ->values()
+            ->toArray();
+
         return [
-            'groups' => AssetTagHash::all()->toArray(),
+            'groups' => $groups,
         ];
     }
 
@@ -660,10 +684,17 @@ class AssetsProcedure extends Procedure
         $params = $request->validate([
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
         ]);
+        
+        $items = AssetTagHash::query()
+            ->where('hash', '=', $params['group'])
+            ->get();
+        
         return [
-            'group' => AssetTagHash::query()
-                ->where('hash', '=', $params['group'])
-                ->firstOrFail(),
+            'group' => [
+                'hash' => $params['group'],
+                'tags' => $items->pluck('tag')->toArray(),
+                'views' => $items->sum('views'),
+            ],
         ];
     }
 
@@ -688,6 +719,7 @@ class AssetsProcedure extends Procedure
         $group->update();
 
         $assets = Asset::select('am_assets.*')
+            ->distinct()
             ->where('am_assets.is_monitored', true)
             ->join('am_assets_tags', 'am_assets_tags.asset_id', '=', 'am_assets.id')
             ->join('am_assets_tags_hashes', 'am_assets_tags_hashes.tag', '=', 'am_assets_tags.tag')
