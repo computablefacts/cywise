@@ -455,6 +455,7 @@
     <span class="bp4-icon bp4-icon-arrow-up"></span>
   </button>
 </div>
+@include('theme::iframes.timeline._share-modal')
 @endsection
 
 @push('scripts')

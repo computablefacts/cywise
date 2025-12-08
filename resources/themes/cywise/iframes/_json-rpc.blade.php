@@ -39,25 +39,25 @@
         'Authorization': 'Bearer {{ Auth::user()->sentinelApiToken() }}',
       }
     })
-    .then(response => {
-      if (response.data && response.data.error && onError) {
-        onError(response.data.error);
-      } else if (response.data && response.data.result && onSuccess) {
-        onSuccess(response.data.result);
-      } else {
-        console.log(response);
-      }
-    })
-    .catch(error => {
-      if (toaster) {
-        toaster.toastAxiosError(error);
-      }
-    })
-    .finally(() => {
-      if (onFinally) {
-        onFinally();
-      }
-    });
+      .then(response => {
+        if (response.data && response.data.error && onError) {
+          onError(response.data.error);
+        } else if (response.data && response.data.result && onSuccess) {
+          onSuccess(response.data.result);
+        } else {
+          console.log(response);
+        }
+      })
+      .catch(error => {
+        if (toaster) {
+          toaster.toastAxiosError(error);
+        }
+      })
+      .finally(() => {
+        if (onFinally) {
+          onFinally();
+        }
+      });
   }
 
   function createInvitationsApiCall(users, onFinally = onFinallyDefault) {
@@ -163,6 +163,10 @@
 
   function untagAssetApiCall(assetId, tagId, onSuccess = onSuccessDefault, onError = onErrorDefault) {
     executeJsonRpcApiCall('assets@untag', {asset_id: assetId, tag_id: tagId}, onSuccess, onError);
+  }
+
+  function listAllTagsApiCall(onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('assets@listTags', {}, onSuccess, onError);
   }
 
   function askCyberBuddyApiCall(threadId, directive, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
