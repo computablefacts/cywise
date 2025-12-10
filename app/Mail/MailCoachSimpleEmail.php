@@ -42,6 +42,11 @@ class MailCoachSimpleEmail extends Mailable
         $this->emailFrom = $from ?? config('towerify.freshdesk.from_email');
     }
 
+    public function __get($name)
+    {
+        return $this->$name;
+    }
+
     /**
      * Build the message.
      *

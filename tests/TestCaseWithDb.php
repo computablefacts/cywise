@@ -4,6 +4,8 @@ namespace Tests;
 
 use App\Models\Alert;
 use App\Models\Asset;
+use App\Models\AssetTag;
+use App\Models\AssetTagHash;
 use App\Models\Attacker;
 use App\Models\HiddenAlert;
 use App\Models\Honeypot;
@@ -49,14 +51,17 @@ abstract class TestCaseWithDb extends BaseTestCase
 
     protected function tearDown(): void
     {
-        Alert::whereNotNull('id')->delete();
-        Asset::whereNotNull('id')->delete();
-        Attacker::whereNotNull('id')->delete();
-        HiddenAlert::whereNotNull('id')->delete();
-        Honeypot::whereNotNull('id')->delete();
-        Port::whereNotNull('id')->delete();
-        Scan::whereNotNull('id')->delete();
-        Screenshot::whereNotNull('id')->delete();
+        // Alert::whereNotNull('id')->delete();
+        // Asset::whereNotNull('id')->delete();
+        // AssetTag::whereNotNull('id')->delete();
+        // AssetTagHash::whereNotNull('id')->delete();
+        // Attacker::whereNotNull('id')->delete();
+        // HiddenAlert::whereNotNull('id')->delete();
+        // Honeypot::whereNotNull('id')->delete();
+        // Port::whereNotNull('id')->delete();
+        // Scan::whereNotNull('id')->delete();
+        // Screenshot::whereNotNull('id')->delete();
+        // User::whereNotNull('id')->delete();
         parent::tearDown();
     }
 }

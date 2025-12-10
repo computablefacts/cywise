@@ -11,7 +11,7 @@
 |
 */
 
-pest()->extend(Tests\TestCaseWithDbAndSeeders::class)
+pest()->extend(Tests\TestCaseWithDb::class)
     ->in('Feature');
 
 pest()->extend(Tests\TestCaseWithDb::class)

@@ -1,14 +1,30 @@
 <?php
 
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\Hash;
 
 function asTenant1User(): TestCase
 {
+    return test()->actingAs(tenant1User());
+}
+
+function asTenant1User2(): TestCase
+{
+    return test()->actingAs(tenant1User2());
+}
+
+function asTenant2User(): TestCase
+{
+    return test()->actingAs(tenant2User());
+}
+
+function tenant1User(): User
+{
     Role::createRoles();
 
-    $userTenant1 = \App\Models\User::firstOrCreate(
+    return User::firstOrCreate(
         ['email' => 'user@tenant1.com'],
         [
             'name' => 'User Tenant 1',
@@ -17,15 +33,29 @@ function asTenant1User(): TestCase
             'verified' => true,
         ]
     );
-
-    return test()->actingAs($userTenant1);
 }
 
-function asTenant2User(): TestCase
+function tenant1User2(): User
 {
     Role::createRoles();
 
-    $userTenant2 = \App\Models\User::firstOrCreate(
+    return User::firstOrCreate(
+        ['email' => 'user@tenant1.com'],
+        [
+            'name' => 'User2 Tenant 1',
+            'email' => 'user2@tenant1.com',
+            'password' => Hash::make('passwordTenant1'),
+            'verified' => true,
+            'tenant_id' => tenant1User()->tenant_id,
+        ]
+    );
+}
+
+function tenant2User(): User
+{
+    Role::createRoles();
+
+    return User::firstOrCreate(
         ['email' => 'user@tenant2.com'],
         [
             'name' => 'User Tenant 2',
@@ -34,16 +64,4 @@ function asTenant2User(): TestCase
             'verified' => true,
         ]
     );
-
-    return test()->actingAs($userTenant2);
-}
-
-function tenant1User(): \App\Models\User
-{
-    return \App\Models\User::where('email', 'user@tenant1.com')->first();
-}
-
-function tenant2User(): \App\Models\User
-{
-    return \App\Models\User::where('email', 'user@tenant2.com')->first();
 }
