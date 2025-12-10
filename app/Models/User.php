@@ -297,12 +297,12 @@ class User extends WaveUser
     private function templateCharteInformatique(): array
     {
         $path = database_path('seeders/templates/charte-informatique.json');
-        return json_decode(File::get($path), true);
+        return json_decode(Str::trim(\File::get($path)), true);
     }
 
     private function templatePssi(): array
     {
         $path = database_path('seeders/templates/pssi.json');
-        return json_decode(File::get($path), true);
+        return json_decode(Str::trim(\File::get($path)), true);
     }
 }

@@ -142,29 +142,13 @@
   const load = (id, event) => {
     event.preventDefault();
     event.stopPropagation();
-    axios.post(`/frameworks/${id}`, {}).then(function (response) {
-      if (response.data.success) {
-        toaster.toastSuccess(response.data.success);
-      } else if (response.data.error) {
-        toaster.toastError(response.data.error);
-      } else {
-        console.log(response.data);
-      }
-    }).catch(error => toaster.toastAxiosError(error));
+    loadFrameworkApiCall(id, response => toaster.toastSuccess(response.msg));
   };
 
   const unload = (id, event) => {
     event.preventDefault();
     event.stopPropagation();
-    axios.delete(`/frameworks/${id}`).then(function (response) {
-      if (response.data.success) {
-        toaster.toastSuccess(response.data.success);
-      } else if (response.data.error) {
-        toaster.toastError(response.data.error);
-      } else {
-        console.log(response.data);
-      }
-    }).catch(error => toaster.toastAxiosError(error));
+    unloadFrameworkApiCall(id, response => toaster.toastSuccess(response.msg));
   };
 
   let searchText = null;

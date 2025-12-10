@@ -38,8 +38,8 @@ class CyberBuddyProcedure extends Procedure
             "fallback_on_next_collection" => "Automatically search the next collection if the first one yields no result (optional)",
         ],
         result: [
-            "response" => "CyberBuddy's introductory text.",
             "html" => "CyberBuddy's answer in HTML.",
+            "chain_of_thought" => "CyberBuddy's chain of thought.",
         ]
     )]
     public function ask(JsonRpcRequest $request): array
@@ -147,9 +147,29 @@ class CyberBuddyProcedure extends Procedure
             $conversation->save();
         }
         return [
-            'response' => [],
+            'response' => [], // TODO : deprecated, remove ASAP
             'chain_of_thought' => $messages[count($messages) - 1]['chain_of_thought'] ?? '',
             'html' => $messages[count($messages) - 1]['html'] ?? '',
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Delete an existing conversation.",
+        params: [
+            "conversation_id" => "The conversation identifier.",
+        ],
+        result: [
+            "msg" => "A success message.",
+        ]
+    )]
+    public function delete(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'conversation_id' => 'required|integer|exists:cb_conversations,id',
+        ]);
+        Conversation::where('id', $params['conversation_id'])->delete();
+        return [
+            'msg' => __('The conversation has been deleted!'),
         ];
     }
 }

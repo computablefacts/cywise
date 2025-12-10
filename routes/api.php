@@ -223,6 +223,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\CyberScribeProcedure::class,
             \App\Http\Procedures\EventsProcedure::class,
             \App\Http\Procedures\FilesProcedure::class,
+            \App\Http\Procedures\FrameworksProcedure::class,
             \App\Http\Procedures\HoneypotsProcedure::class,
             \App\Http\Procedures\InvitationsProcedure::class,
             \App\Http\Procedures\NotesProcedure::class,

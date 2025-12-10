@@ -6,11 +6,7 @@ use App\AgentSquad\Actions\CyberBuddy;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\Events\IngestFile;
 use App\Models\Chunk;
-use App\Models\Conversation;
 use App\Models\File;
-use App\Models\Template;
-use App\Models\User;
-use App\Models\YnhFramework;
 use App\Rules\IsValidCollectionName;
 use App\Rules\IsValidFileType;
 use Illuminate\Http\Request;
@@ -208,78 +204,6 @@ class CyberBuddyController extends Controller
         return "{$file->id}_{$file->name_normalized}.{$file->extension}";
     }
 
-    public function templates()
-    {
-        return Template::where('readonly', true)
-            ->orderBy('name', 'asc')
-            ->get()
-            ->concat(
-                Template::where('readonly', false)
-                    ->where('created_by', Auth::user()->id)
-                    ->orderBy('name', 'asc')
-                    ->get()
-            )
-            ->map(function (Template $template) {
-                return [
-                    'id' => $template->id,
-                    'name' => $template->name,
-                    'template' => $template->template,
-                    'type' => $template->readonly ? 'template' : 'draft',
-                    'user' => User::find($template->created_by)->name,
-                ];
-            });
-    }
-
-    public function saveTemplate(Request $request)
-    {
-        // TODO : validate request
-        $id = $request->integer('id', 0);
-        $name = $request->string('name', '');
-        $blocks = $request->input('template', []);
-        $model = $request->boolean('is_model', false);
-
-        if (isset($blocks) && count($blocks) > 0) {
-            if ($id === 0) {
-                $template = Template::create([
-                    'name' => Str::replace('v', '', $name),
-                    'template' => $blocks,
-                    'readonly' => $model,
-                ]);
-            } else {
-                $template = Template::where('id', $id)->where('readonly', false)->first();
-                $version = ($template && Str::contains($template->name, 'v') ? (int)Str::afterLast($template->name, 'v') : 0) + 1;
-                if ($template) {
-                    $template->name = Str::beforeLast($template->name, 'v') . "v{$version}";
-                    $template->template = $blocks;
-                    $template->save();
-                } else {
-                    $userId = Auth::user()->id;
-                    $template = Template::create([
-                        'name' => "{$name} u{$userId}v1",
-                        'template' => $blocks,
-                        'readonly' => false,
-                    ]);
-                }
-            }
-            return [
-                'id' => $template->id,
-                'name' => $template->name,
-                'template' => $template->template,
-                'type' => $template->readonly ? 'template' : 'draft',
-                'user' => User::find($template->created_by)->name,
-            ];
-        }
-        return [];
-    }
-
-    public function deleteTemplate(int $id)
-    {
-        Template::where('id', $id)->where('readonly', false)->delete();
-        return response()->json([
-            'success' => __('The template has been deleted!'),
-        ]);
-    }
-
     public function llm1(Request $request)
     {
         $params = $request->validate([
@@ -431,51 +355,6 @@ class CyberBuddyController extends Controller
         ]);
     }
 
-    public function unloadFramework(int $id, Request $request)
-    {
-        /** @var YnhFramework $framework */
-        $framework = YnhFramework::where('id', $id)->firstOrFail();
-        if ($framework->collection()) {
-            File::where('is_deleted', false)
-                ->where('collection_id', $framework->collection()->id)
-                ->where('name', trim(basename($framework->file, '.jsonl')))
-                ->where('extension', 'jsonl')
-                ->delete();
-        }
-        return response()->json([
-            'success' => 'The framework has been unloaded and will be removed soon.',
-        ]);
-    }
-
-    public function loadFramework(int $id, Request $request)
-    {
-        /** @var YnhFramework $framework */
-        $framework = YnhFramework::where('id', $id)->firstOrFail();
-
-        /** @var \App\Models\Collection $collection */
-        $collection = \App\Models\Collection::where('name', $framework->collectionName())
-            ->where('is_deleted', false)
-            ->first();
-
-        if (!$collection) {
-            if (!IsValidCollectionName::test($framework->collectionName())) {
-                return response()->json(['error' => 'Invalid collection name.'], 500);
-            }
-            $collection = \App\Models\Collection::create(['name' => $framework->collectionName()]);
-        }
-
-        $path = Str::replace('.jsonl.gz', '.2.jsonl.gz', $framework->path());
-        $url = self::saveLocalFile($collection, $path);
-
-        if ($url) {
-            return response()->json([
-                'success' => 'The framework has been loaded and will be processed soon.',
-                'url' => $url,
-            ]);
-        }
-        return response()->json(['error' => 'The framework could not be loaded.'], 500);
-    }
-
     public function uploadOneFile(Request $request)
     {
         if (!Auth::user()->canUseCyberBuddy()) {
@@ -578,14 +457,6 @@ class CyberBuddyController extends Controller
             'urls_success' => $successes,
             'filenames_error' => $errors,
         ], 500);
-    }
-
-    public function deleteConversation(int $id)
-    {
-        Conversation::where('id', $id)->delete();
-        return response()->json([
-            'success' => __('The conversation has been deleted!'),
-        ]);
     }
 
     private function storagePath(\App\Models\Collection $collection, File $file): string

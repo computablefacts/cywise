@@ -75,11 +75,10 @@
     const file = files[0];
     const reader = new FileReader();
     reader.onload = e => {
-      axios.post('/templates', {name: file.name, template: JSON.parse(e.target.result), is_model: true})
-      .then(response => {
-        elTemplates.items = elTemplates.items.concat(response.data); // TODO : sort by name?
+      saveTemplateApiCall(null, true, file.name, JSON.parse(e.target.result), response => {
+        elTemplates.items = [response.template].concat(elTemplates.items); // TODO : sort by name?
         toaster.toastSuccess("{{ __('Your model has been successfully uploaded!') }}");
-      }).catch(error => toaster.toastAxiosError(error)).finally(() => {
+      }, () => {
         elSubmit.loading = false;
         elSubmit.disabled = false;
       });
@@ -95,11 +94,8 @@
   elFile.text = "{{ __('Import your own template...') }}";
   elFile.buttonText = "{{ __('Browse') }}";
 
-  document.addEventListener('DOMContentLoaded', function (event) {
-    axios.get('/templates').then(response => {
-      elTemplates.items = response.data;
-    }).catch(error => toaster.toastAxiosError(error));
-  });
+  document.addEventListener('DOMContentLoaded',
+    (event) => listTemplatesApiCall(response => elTemplates.items = response.templates));
 
   const documentCannotBeDeleted = () => !elTemplates.selectedItem || !elTemplates.selectedItem.id
     || elTemplates.selectedItem.type === 'template';
@@ -113,17 +109,15 @@
       toaster.toastError("{{ __('The document is not loaded!') }}");
       return;
     }
-    axios.post('/templates', {id: template.id, name: template.name, template: ctx.blocks})
-    .then(response => {
+    saveTemplateApiCall(template.id, false, template.name, ctx.blocks, response => {
       if (!template.id) {
-        template.type = response.data.type;
+        template.type = response.template.type;
       }
-      template.id = response.data.id;
-      elTemplates.items = elTemplates.items.filter(item => item.id !== template.id).concat(response.data); // TODO : sort by name?
-      elTemplates.selectedItem = response.data;
+      template.id = response.template.id;
+      elTemplates.items = [response.template].concat(elTemplates.items.filter(item => item.id !== template.id)); // TODO : sort by name?
+      elTemplates.selectedItem = response.template;
       toaster.toastSuccess("{{ __('The document has been saved!') }}");
-    })
-    .catch(error => toaster.toastAxiosError(error));
+    });
   };
 
   const exportDocument = () => {
@@ -209,12 +203,11 @@
     if (documentCannotBeDeleted()) {
       clearDocument();
     } else {
-      axios.delete(`/templates/${elTemplates.selectedItem.id}`).then(response => {
+      deleteTemplateApiCall(elTemplates.selectedItem.id, () => {
         elTemplates.items = elTemplates.items.filter(item => item.id !== elTemplates.selectedItem.id);
         clearDocument();
         toaster.toastSuccess("{{ __('The document has been deleted!') }}");
-      })
-      .catch(error => toaster.toastAxiosError(error));
+      });
     }
   };
 

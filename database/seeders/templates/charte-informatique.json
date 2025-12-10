@@ -105,7 +105,7 @@
     "content": [
       {
         "type": "text",
-        "text": "Ressources informatiques :"
+        "text": "Ressources informatiques :",
         "styles": {
           "bold": true
         }
@@ -117,7 +117,7 @@
       },
       {
         "type": "text",
-        "text": "Services internet :"
+        "text": "Services internet :",
         "styles": {
           "bold": true
         }
@@ -129,7 +129,7 @@
       },
       {
         "type": "text",
-        "text": "Utilisateur :"
+        "text": "Utilisateur :",
         "styles": {
           "bold": true
         }
@@ -193,7 +193,7 @@
         "Le matériel informatique personnel peut-il être connecté au réseau ? Si oui, comment ?",
         "L'utilisateur dispose-t-il d'une connexion Wi-Fi? Si oui donner le ou les noms de réseau et leur utilité respective. Peut-il y connecter son équipement personnel (smartphone par exemple)?",
         "L'utilisateur peut-il avoir recours à des supports amovibles (type clé usb)? Si oui, lesquels?",
-        "À quelles fins la navigation sur Internet au moyen des ressources informatiques de l'entité est-elle permise? L'usage ponctuel à titre personnel est-il toléré?"
+        "À quelles fins la navigation sur Internet au moyen des ressources informatiques de l'entité est-elle permise? L'usage ponctuel à titre personnel est-il toléré?",
         "Est-ce que les informations de navigation des utilisateurs sont stockées et analysées? Si oui, dans quel but?"
       ],
       "answers": [],
