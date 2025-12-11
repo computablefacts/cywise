@@ -121,7 +121,8 @@
       const tags = widgets.elTags.selectedItems;
 
       console.log('[Share]', email, tags);
-      // TODO: call API here
+      // Call API
+      shareAssetApiCall(tags, email);
 
       closeShareModal();
     }

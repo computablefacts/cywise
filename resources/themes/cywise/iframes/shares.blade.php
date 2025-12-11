@@ -19,7 +19,6 @@
         <th>{{ __('Tags') }}</th>
         <th class="text-end">{{ __('Number of Assets') }}</th>
         <th class="text-end">{{ __('Number of Vulnerabilities') }}</th>
-        <th>{{ __('User') }}</th>
         <th class="text-end">{{ __('Actions') }}</th>
       </tr>
       </thead>
@@ -34,7 +33,6 @@
         </td>
         <td class="text-end">{{ $share['nb_assets'] }}</td>
         <td class="text-end">{{ $share['nb_vulnerabilities'] }}</td>
-        <td>{{ $share['target'] }}</td>
         <td class="text-end">
           <a href="#" onclick="degroup('{{ $share['group'] }}')" class="text-decoration-none" style="color:red">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"

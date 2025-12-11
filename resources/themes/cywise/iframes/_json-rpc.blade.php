@@ -413,5 +413,9 @@
     executeJsonRpcApiCall('invitations@create', {email: email}, onSuccess);
   }
 
+  function shareAssetApiCall(tags, email, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('assets@share', {tags: tags, email: email}, onSuccess);
+  }
+
 </script>
 @endonce

@@ -810,6 +810,43 @@ class AssetsProcedure extends Procedure
         ];
     }
 
+    #[RpcMethod(
+        description: "Share assets with a user by email.",
+        params: [
+            "email" => "The recipient's email address.",
+            "tags" => "An array of tags to share.",
+        ],
+        result: [
+            "msg" => "A success message.",
+        ]
+    )]
+    public function share(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'email' => 'required|email|max:191',
+            'tags' => 'required|array|min:1',
+            'tags.*' => 'required|string|exists:am_assets_tags,tag',
+        ]);
+
+        $email = $params['email'];
+        $tags = $params['tags'];
+
+        foreach ($tags as $tag) {
+            AssetTagHash::create([
+                'tag' => $tag,
+                'hash' => $email,
+            ]);
+        }
+
+        $user = User::firstOrCreate(['email' => $email]);
+
+        // Send an email
+
+        return [
+            'msg' => "Les assets avec les tags [" . implode(', ', $tags) . "] ont été partagés avec {$email}.",
+        ];
+    }
+
     private function convertAsset(Asset $asset): array
     {
         return [
