@@ -81,6 +81,7 @@ class YnhOsquery extends Model
         return md5($uid);
     }
 
+    /** @deprecated */
     public static function configLogParserLinux(YnhServer $server): string
     {
         $url = app_url();
@@ -204,6 +205,7 @@ fi
 EOT;
     }
 
+    /** @deprecated */
     public static function configLogParserWindows(YnhServer $server): string
     {
         $url = app_url();
