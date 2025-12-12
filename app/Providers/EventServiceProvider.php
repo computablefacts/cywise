@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\AddTwrUserPermission;
 use App\Events\AddUserPermission;
+use App\Events\AssetsShared;
 use App\Events\BeginPortsScan;
 use App\Events\BeginVulnsScan;
 use App\Events\ConfigureHost;
@@ -52,6 +53,7 @@ use App\Listeners\RebuildLatestEventsCacheListener;
 use App\Listeners\RebuildPackagesListListener;
 use App\Listeners\RemoveUserPermissionListener;
 use App\Listeners\SendAuditReportListener;
+use App\Listeners\AssetsSharedListener;
 use App\Listeners\StartAssetsDiscoverListener;
 use App\Listeners\StoreLoginTime;
 use App\Listeners\UninstallAppListener;
@@ -161,6 +163,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         Logout::class => [
             LogoutSucceededListener::class,
+        ],
+        AssetsShared::class => [
+            AssetsSharedListener::class,
         ],
     ];
 

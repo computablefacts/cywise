@@ -2,6 +2,7 @@
 
 namespace App\Http\Procedures;
 
+use App\Events\AssetsShared;
 use App\Events\BeginPortsScan;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
 use App\Http\Requests\JsonRpcRequest;
@@ -838,12 +839,19 @@ class AssetsProcedure extends Procedure
             ]);
         }
 
-        $user = User::firstOrCreate(['email' => $email]);
+        $authUserSaved = $request->user();
+        $user = User::firstOrCreate([
+            'email' => $email,
+        ],[
+            'email' => $email,
+            'name' => Str::before($email, '@'),
+        ]);
+        $authUserSaved->actAs();
 
-        // Send an email
+        AssetsShared::dispatch($request->user(), $user, $tags, $user->wasRecentlyCreated);
 
         return [
-            'msg' => "Les assets avec les tags [" . implode(', ', $tags) . "] ont été partagés avec {$email}.",
+            'msg' => "Les actifs avec les étiquettes [" . implode(', ', $tags) . "] ont été partagés avec {$email}.",
         ];
     }
 
