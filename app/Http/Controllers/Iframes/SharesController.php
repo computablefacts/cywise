@@ -19,9 +19,6 @@ class SharesController extends Controller
         $rows = collect($procedure->listGroups(new JsonRpcRequest())['groups'] ?? [])
             ->groupBy('hash')
             ->mapWithKeys(function (Collection $shares, string $group) use ($procedure) {
-                // Log::debug('shares=', $shares->toArray());
-                // $patrick1 = $shares->map(fn($share) => $share['tags'])->unique()->flatten();
-                // Log::debug('tags=', $patrick1->toArray());
                 $request = new JsonRpcRequest(['group' => $group]);
                 $request->setUserResolver(fn() => $request->user());
                 return [
@@ -30,7 +27,7 @@ class SharesController extends Controller
                         'tags' => $shares->map(fn($share) => $share['tags'])->unique()->flatten(),
                         'nb_assets' => count($procedure->assetsInGroup($request)['assets'] ?? []),
                         'nb_vulnerabilities' => count($procedure->vulnerabilitiesInGroup($request)['vulnerabilities'] ?? []),
-                        //'target' => User::find($shares->first()['created_by'])?->email ?? __('Unknown'),
+                        'target' => $shares->first()['created_by_email'] ?? __('Unknown'),
                     ],
                 ];
             })

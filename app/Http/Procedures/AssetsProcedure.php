@@ -661,6 +661,7 @@ class AssetsProcedure extends Procedure
                     'hash' => $hash,
                     'tags' => $items->pluck('tag')->toArray(),
                     'views' => $items->sum('views'),
+                    'created_by_email' => User::find($items->first()['created_by'])?->email ?? null,
                 ];
             })
             ->values()
