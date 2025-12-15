@@ -140,37 +140,6 @@ Route::group([
     });
 })->middleware(['throttle:480,1']);
 
-Route::group([
-    'prefix' => 'inventory',
-], function () {
-    Route::post('assets/discover', '\App\Http\Controllers\AssetController@discover');
-    Route::post('assets/discover/from/ip', '\App\Http\Controllers\AssetController@discoverFromIp');
-    Route::post('assets', '\App\Http\Controllers\AssetController@saveAsset');
-    Route::get('assets', '\App\Http\Controllers\AssetController@userAssets');
-})->middleware(['auth:sanctum']);
-
-Route::group([
-    'prefix' => 'inbox',
-], function () {
-    Route::get('screenshot/{screenshot}', '\App\Http\Controllers\AssetController@screenshot');
-})->middleware(['auth:sanctum']);
-
-Route::group([
-    'prefix' => 'facts',
-], function () {
-    Route::post('{asset}/metadata', '\App\Http\Controllers\AssetController@addTag');
-    Route::delete('{asset}/metadata/{assetTag}', '\App\Http\Controllers\AssetController@removeTag');
-})->middleware(['auth:sanctum']);
-
-Route::group([
-    'prefix' => 'adversary',
-], function () {
-    Route::get('infos-from-asset/{asset}', '\App\Http\Controllers\AssetController@infosFromAsset');
-    Route::get('vulnerabilities/{attackerId?}', '\App\Http\Controllers\HoneypotController@getVulnerabilitiesWithAssetInfo');
-    Route::get('vulnerabilities2/{asset}', '\App\Http\Controllers\HoneypotController@getVulnerabilitiesWithAssetInfo2');
-    Route::get('alerts/stats', '\App\Http\Controllers\HoneypotController@getAlertStats');
-})->middleware(['auth:sanctum']);
-
 Route::middleware('auth:api')->get('/v2/public/whoami', fn(Request $request) => Auth::user());
 
 Route::middleware('auth:api')->post('/tables/tsv/upload', [TablesUploadController::class, 'upload']);
