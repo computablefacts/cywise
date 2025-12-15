@@ -45,16 +45,13 @@
                     <x-logo class="w-auto h-8 md:h-9"></x-logo>
                     </a>
                 </div>
-              @if(!Request::is('/'))
                 <div class="flex justify-end flex-grow md:hidden">
                     <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex items-center justify-center p-2 transition duration-150 ease-in-out rounded-full text-zinc-400 hover:text-zinc-500 hover:bg-zinc-100">
                         <svg x-show="!mobileMenuOpen" class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
                         <svg x-show="mobileMenuOpen" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
-              @endif
             </div>
-            @if(!Request::is('/'))
             <nav :class="{ 'hidden' : !mobileMenuOpen, 'block md:relative absolute top-0 left-0 md:w-auto w-screen md:h-auto h-screen pointer-events-none md:z-10 z-10' : mobileMenuOpen }" class="h-full md:flex">
                 <ul :class="{ 'hidden md:flex' : !mobileMenuOpen, 'flex flex-col absolute md:relative md:w-auto w-screen h-full md:h-full md:overflow-auto overflow-scroll md:pt-0 mt-24 md:pb-0 pb-48 bg-white md:bg-transparent' : mobileMenuOpen }" id="menu" class="flex items-stretch justify-start flex-1 w-full h-full ml-0 border-t border-gray-100 pointer-events-auto md:items-center md:justify-center gap-x-8 md:w-auto md:border-t-0 md:flex-row">
                     <li x-data="{ open: false }" @mouseenter="showOverlay=true" @mouseleave="showOverlay=false" class="z-30 flex flex-col items-start h-auto border-b border-gray-100 md:h-full md:border-b-0 group md:flex-row md:items-center">
@@ -70,7 +67,7 @@
                             <ul class="flex flex-col justify-between mx-auto max-w-7xl md:flex-row md:px-12">
                                 <div class="flex flex-col w-full border-l border-r divide-x md:flex-row divide-zinc-100 border-zinc-100">
                                     <div class="w-auto divide-y divide-zinc-100">
-                                        <a href="{{ route('tpe-pme') }}" class="block text-sm p-7 hover:bg-neutral-100 group">
+                                        <a href="/" class="block text-sm p-7 hover:bg-neutral-100 group">
                                             <span class="block mb-1 font-medium text-black">
                                               Assistant Cyber
                                             </span>
@@ -138,7 +135,6 @@
 
                 </ul>
             </nav>
-            @endif
             @guest
                 <div class="relative z-30 items-center justify-center flex-shrink-0 hidden h-full space-x-3 text-sm md:flex">
                     <x-button href="{{ route('login') }}" tag="a" class="text-sm" color="secondary">
