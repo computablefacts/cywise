@@ -265,7 +265,7 @@
   "We have found <b>:count leaked or compromised</b> identifiers. If no action has been taken yet, ask the affected users to change their passwords.": "Nous avons trouvé <b>:count identifiants fuités ou compromis</b>. Si aucune action n'a encore été entreprise, demandez aux utilisateurs concernés de modifier leur mot de passe.",
   "Weight": "Poids",
   "Website": "Site web",
-  "What's new": "Nouveautés",
+  "What's new": "Voir les nouveautés",
   "Would you like to protect a new server?": "Vous souhaitez protéger un nouveau serveur ?",
   "Would you like to protect a new domain?": "Vous souhaitez protéger un nouveau domaine ?",
   "Would you like to redirect one of your domains to this honeypot? Contact support!": "Vous souhaitez rediriger un de vos domaines vers ce honeypot ? Contactez le support !",
