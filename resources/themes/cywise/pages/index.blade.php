@@ -38,7 +38,7 @@ name('home');
             </a>
           </div>
           <h1 class="mt-10 text-pretty text-5xl font-semibold tracking-tight text-gray-900 sm:text-7xl">
-            Cywise, la <span class="text-indigo-600">cybersécurité</span> simplifiée
+            La <span class="text-indigo-600">cybersécurité</span> simplifiée
           </h1>
           <p class="mt-8 text-pretty text-lg font-medium text-gray-500 sm:text-xl/8">
             Protégez vos données et votre activité sans être un expert de la sécurité informatique.
