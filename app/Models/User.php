@@ -135,11 +135,6 @@ class User extends WaveUser
                 'avatar' => 'demo/default.png',
             ]);
         }
-        /* if (!isset($user->superset_id)) { // Automatically create a proper superset account for all users
-            $json = SupersetApiUtils::get_or_add_user($user);
-            $user->superset_id = $json['id'] ?? null;
-            $user->save();
-        } */
         return $user;
     }
 

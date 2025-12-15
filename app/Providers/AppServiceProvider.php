@@ -62,11 +62,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('cb_api_utils', function () {
             return new \App\Helpers\ApiUtils();
         });
-
-        // Reports
-        $this->app->bind('re_api_utils', function () {
-            return new \App\Helpers\SupersetApiUtils();
-        });
     }
 
     /**
