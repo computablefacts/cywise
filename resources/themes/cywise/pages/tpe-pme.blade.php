@@ -234,7 +234,7 @@ name('tpe-pme');
           $nbUsers = format_number(\App\Models\User::count());
           $nbAssets = format_number(\App\Models\Asset::count() + \App\Models\YnhServer::count());
           $nbHoneypots = format_number(\App\Models\Honeypot::count());
-          $nbLeaks = format_number(\App\Helpers\JosianneClient::numberOfRows('dumps_login_email_domain'));
+          $nbLeaks = format_number(\App\Helpers\JosianeClient::numberOfRows('dumps_login_email_domain'));
           @endphp
           <div class="max-lg:mt-16 lg:col-span-1">
             <p class="text-base/7 font-semibold text-gray-500">
@@ -496,7 +496,8 @@ name('tpe-pme');
                 </div>
               </figcaption>
             </figure>
-          </div> -->
+            -->
+          </div>
         </div>
       </div>
     </section>

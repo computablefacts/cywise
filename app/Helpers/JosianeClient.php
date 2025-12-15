@@ -5,7 +5,7 @@ namespace App\Helpers;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 
-class JosianneClient
+class JosianeClient
 {
     private static ?string $executeQueryLastError = null;
 
