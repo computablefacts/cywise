@@ -315,7 +315,7 @@ EOT;
             ->join("\n");
         $installPerforma = '';
         $updatePerformaConfig = '';
-        if (!is_null($server->user()->first()->performa_domain)) {
+        if (!is_null($server->user()->first()?->performa_domain)) {
             $installPerforma = <<<EOT
 
 # Install performa-satellite
