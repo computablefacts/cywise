@@ -15,11 +15,11 @@
     <table class="table mb-0">
       <thead>
       <tr>
-        <th>{{ __('Group') }}</th>
+        <th>{{ __('Shared to') }}</th>
         <th>{{ __('Tags') }}</th>
         <th class="text-end">{{ __('Number of Assets') }}</th>
         <th class="text-end">{{ __('Number of Vulnerabilities') }}</th>
-        <th>{{ __('User') }}</th>
+        <th>{{ __('Shared by') }}</th>
         <th class="text-end">{{ __('Actions') }}</th>
       </tr>
       </thead>
