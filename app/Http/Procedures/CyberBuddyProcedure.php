@@ -19,9 +19,7 @@ use App\Enums\RoleEnum;
 use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
 use App\Models\Conversation;
-use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -52,9 +50,7 @@ class CyberBuddyProcedure extends Procedure
         $threadId = Str::trim($params['thread_id'] ?? '');
         $question = Str::trim($params['directive'] ?? '');
         $fallbackOnNextCollection = Str::lower($params['fallback_on_next_collection'] ?? 'true') === 'true';
-
-        /** @var User $user */
-        $user = Auth::user();
+        $user = $request->user();
 
         if (!$user) {
             throw new \Exception('Unauthorized. Please log in and try again.');
