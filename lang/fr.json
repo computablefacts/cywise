@@ -19,6 +19,7 @@
   "<b>Asset.</b> The asset involved is :asset pointing to the server :ip. Port :port of this server is open and exposes a service :service (:product).": "<b>Actif.</b> L'actif concerné est :asset pointant vers le serveur :ip. Le port :port de ce serveur est ouvert et expose un service :service (:product).",
   "<b>Note.</b> This vulnerability has the identifier <a href=\"https://nvd.nist.gov/vuln/detail/:cve\" target=\"_blank\" class=\"link\">:cve</a>": "<b>Note.</b> Cette vulnérabilité a pour identifiant <a href=\"https://nvd.nist.gov/vuln/detail/:cve\" target=\"_blank\" class=\"link\">:cve</a>",
   "About": "A propos",
+  "Actions for all": "Actions pour tous",
   "Add a note... (press Enter to submit)": "Ajouter une note... (entrée pour la sauvegarder)",
   "Add a tag": "Ajouter une étiquette",
   "Agents for all": "Agents pour tous",
