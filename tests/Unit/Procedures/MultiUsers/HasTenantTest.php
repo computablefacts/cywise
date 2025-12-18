@@ -123,3 +123,54 @@ test("shared assets should be from all users of sharing user's tenant", function
     asTenant2User();
     expect(Asset::count())->toBe(2);
 });
+
+test("sharing a tag twice should not list assets twice", function () {
+    // force tenant2user to be created
+    asTenant2User();
+    $tenant2UserEmail = tenant2User()->email;
+
+    asTenant1User();
+    // 1 asset with 'tag1'
+    $asset = Asset::factory()->monitored()->create();
+    AssetTag::factory(['tag' => 'tag1', 'asset_id' => $asset->id])->create();
+
+    expect(Asset::count())->toBe(1);
+
+    // 1 asset with 'tag2'
+    $asset = Asset::factory()->monitored()->create();
+    AssetTag::factory(['tag' => 'tag2', 'asset_id' => $asset->id])->create();
+
+    expect(Asset::count())->toBe(2);
+
+    // Share assets with tag1 to tenant2User
+    AssetTagHash::factory([
+        'hash' => $tenant2UserEmail,
+        'tag' => 'tag1',
+    ])->create();
+
+    // We should have only 2 assets but AssetTagHash::factory creates a 3rd one...
+    expect(Asset::withoutGlobalScope('tenant_scope')->count())->toBe(3);
+
+    // Share assets with tag1 twice to tenant2User
+    AssetTagHash::factory([
+        'hash' => $tenant2UserEmail,
+        'tag' => 'tag1',
+    ])->create();
+
+    // We should have only 2 assets but AssetTagHash::factory creates a 4th one...
+    expect(Asset::withoutGlobalScope('tenant_scope')->count())->toBe(4);
+
+    expect(AssetTagHash::count())->toBe(2);
+
+    // dump('---- Asset::withoutGlobalScope(tenant_scope)->get()->toArray() ----');
+    // dump(Asset::withoutGlobalScope('tenant_scope')->get()->toArray());
+
+    // dump('---- AssetTag::withoutGlobalScope(tenant_scope)->get()->toArray() ----');
+    // dump(AssetTag::withoutGlobalScope('tenant_scope')->get()->toArray());
+
+    // dump('---- Asset::query()->toSql() ----');
+    // dump(Asset::query()->toSql());
+
+    asTenant2User();
+    expect(Asset::count())->toBe(1);
+})->only();
