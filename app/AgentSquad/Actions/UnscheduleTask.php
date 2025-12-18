@@ -6,7 +6,8 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\Models\ScheduledTask;
+use App\Http\Procedures\ScheduledTasksProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
 use Illuminate\Support\Str;
 
@@ -58,7 +59,9 @@ class UnscheduleTask extends AbstractAction
         if (!is_numeric($taskId)) {
             return new FailedAnswer(__("Invalid task identifier. Please provide a valid task identifier."));
         }
-        ScheduledTask::findOrFail($taskId)->delete();
+        $request = new JsonRpcRequest(['task_id' => $taskId]);
+        $request->setUserResolver(fn() => $user);
+        (new ScheduledTasksProcedure())->delete($request);
         return new SuccessfulAnswer(__("The task has been unscheduled successfully."));
     }
 }

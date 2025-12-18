@@ -38,7 +38,7 @@ class ListScheduledTasks extends AbstractAction
         $tasks = ScheduledTask::query()
             ->where('created_by', $user->id)
             ->get()
-            ->map(fn(ScheduledTask $task) => "<b>{$task->id}.</b> {$task->name}")
+            ->map(fn(ScheduledTask $task) => "<b>{$task->id}.</b> {$task->name} ({$task->readableCron()})")
             ->join("</li><li>");
         return empty($tasks) ?
             new SuccessfulAnswer(__("No scheduled tasks found.")) :

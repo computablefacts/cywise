@@ -417,5 +417,13 @@
     executeJsonRpcApiCall('assets@share', {tags: tags, email: email}, onSuccess);
   }
 
+  function toggleScheduledTaskApiCall(taskId, enabled = null, onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('scheduled-tasks@toggle', {task_id: taskId, enabled: enabled}, onSuccess, onError);
+  }
+
+  function deleteScheduledTaskApiCall(taskId, onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('scheduled-tasks@delete', {task_id: taskId}, onSuccess, onError);
+  }
+
 </script>
 @endonce

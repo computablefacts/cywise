@@ -25,6 +25,7 @@ use App\Http\Controllers\Iframes\DocumentationController;
 use App\Http\Controllers\Iframes\DocumentsController;
 use App\Http\Controllers\Iframes\FrameworksController;
 use App\Http\Controllers\Iframes\PromptsController;
+use App\Http\Controllers\Iframes\ScheduledTasksController;
 use App\Http\Controllers\Iframes\RolesPermissionsController;
 use App\Http\Controllers\Iframes\RulesController;
 use App\Http\Controllers\Iframes\RulesEditorController;
@@ -507,6 +508,7 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
     Route::get('/prompts', [PromptsController::class, '__invoke'])->name('prompts');
     Route::get('/roles-and-permissions', [RolesPermissionsController::class, '__invoke'])->name('roles-and-permissions');
+    Route::get('/scheduled-tasks', [ScheduledTasksController::class, '__invoke'])->name('scheduled-tasks');
     Route::get('/rules', [RulesController::class, '__invoke'])->name('rules');
     Route::get('/rules/edit', [RulesEditorController::class, '__invoke'])->name('rules-editor');
     Route::get('/sca', [ScaController::class, '__invoke'])->name('sca');

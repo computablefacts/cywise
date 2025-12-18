@@ -42,6 +42,7 @@
         "league/flysystem-path-prefixing": "^3.28",
         "league/html-to-markdown": "^5.1",
         "livewire/livewire": "^3.0",
+        "lorisleiva/cron-translator": "^0.4.6",
         "phpseclib/phpseclib": "^3.0",
         "ralphjsmit/livewire-urls": "^1.4",
         "sajya/server": "^7.0",

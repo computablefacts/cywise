@@ -33,13 +33,15 @@ class RunScheduledTasks implements ShouldQueue
 
     public function handle()
     {
-        ScheduledTask::where('next_run_date', '<=', Carbon::now())
+        ScheduledTask::query()
+            ->where('enabled', true)
+            ->where('next_run_date', '<=', Carbon::now())
             ->get()
             ->each(function (ScheduledTask $task) {
                 try {
 
                     // Retrieve the user who created the task
-                    /** @var User|null $user */
+                    /** @var ?User $user */
                     $user = User::find($task->created_by);
 
                     if (!$user) {
@@ -66,13 +68,11 @@ class RunScheduledTasks implements ShouldQueue
 
                     // Step 1: Check condition (if provided)
                     $runTask = true;
-                    $condition = Str::trim($task->condition);
+                    $condition = Str::trim($task->trigger);
 
                     if (!empty($condition)) {
-                        $question = "Answer only with YES or NO and nothing else. Question: {$condition}";
-                        $response = $this->ask($user, $threadId, $question);
-                        $answer = $response['html'] ?? '';
-                        $runTask = Str::contains(strip_tags($answer), ['oui', 'yes'], true);
+                        $answer = LlmsProvider::provide("Answer only with YES or NO and nothing else. Question: {$condition}");
+                        $runTask = Str::contains($answer, ['oui', 'yes'], true);
                         Log::debug("[RunScheduledTasks] Condition evaluated for task {$task->id}: '{$condition}' => {$answer}");
                     }
 

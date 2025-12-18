@@ -246,7 +246,8 @@ $user = \Auth::user();
           @if($user->canView('iframes.users')
           || $user->canView('iframes.shares')
           || $user->canView('iframes.roles-and-permissions')
-          || $user->canView('iframes.traces'))
+          || $user->canView('iframes.traces')
+          || $user->canView('iframes.scheduled-tasks'))
           <x-app.sidebar-dropdown text="{{ __('Administration') }}"
                                   icon="phosphor-gear"
                                   id="admin_dropdown"
@@ -255,8 +256,16 @@ $user = \Auth::user();
                           Request::is('users') ||
                           Request::is('shares') ||
                           Request::is('roles-and-permissions') ||
+                          Request::is('scheduled-tasks') ||
                           Request::is('traces')
                         ) ? '1' : '0'">
+            @if($user->canView('iframes.scheduled-tasks'))
+            <x-app.sidebar-link href="{{ route('scheduled-tasks') }}"
+                                icon="phosphor-clock"
+                                :active="Request::is('scheduled-tasks')">
+              {{ __('Scheduled Tasks') }}
+            </x-app.sidebar-link>
+            @endif
             @if($user->canView('iframes.shares'))
             <x-app.sidebar-link href="{{ route('shares') }}"
                                 icon="phosphor-share-network"

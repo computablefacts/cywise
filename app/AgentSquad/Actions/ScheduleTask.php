@@ -6,11 +6,9 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\AgentSquad\Providers\LlmsProvider;
-use App\Models\ScheduledTask;
+use App\Http\Procedures\ScheduledTasksProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
-use Cron\CronExpression;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class ScheduleTask extends AbstractAction
@@ -56,24 +54,19 @@ class ScheduleTask extends AbstractAction
     {
         $action = Str::trim(Str::before($input, ':'));
         $cron = Str::trim(Str::before(Str::between($input, ':', ':'), ':'));
-        $condition = Str::trim(Str::afterLast(Str::between($input, ':', ':'), ':'));
+        $trigger = Str::trim(Str::afterLast(Str::between($input, ':', ':'), ':'));
         $task = Str::trim(Str::afterLast($input, ':'));
 
         if ($action !== 'schedule') {
             return new FailedAnswer(__("Invalid action. Please use schedule."));
         }
-        if (!CronExpression::isValidExpression($cron)) {
-            return new FailedAnswer(__("Invalid cron expression ':cron'. Please provide a valid cron expression in the format: MIN HOUR DOM MON DOW.", ['cron' => $cron]));
-        }
-        ScheduledTask::create([
-            'name' => LlmsProvider::provide("Summarize the task in about 10 words :\n\n{$task}"),
+        $request = new JsonRpcRequest([
             'cron' => $cron,
-            'condition' => $condition,
+            'trigger' => $trigger,
             'task' => $task,
-            'prev_run_date' => null,
-            'next_run_date' => Carbon::instance((new CronExpression($cron))->getNextRunDate()),
-            'created_by' => $user->id,
         ]);
-        return new SuccessfulAnswer(__("The task ':task' has been scheduled. The task output will be sent to :email.", ['task' => $task, 'email' => $user->email]));
+        $request->setUserResolver(fn() => $user);
+        $result = (new ScheduledTasksProcedure())->create($request);
+        return new SuccessfulAnswer($result['msg'] ?? __("The task ':task' has been scheduled. The task output will be sent to :email.", ['task' => $task, 'email' => $user->email]));
     }
 }
