@@ -248,7 +248,7 @@ $user = \Auth::user();
           || $user->canView('iframes.roles-and-permissions')
           || $user->canView('iframes.traces')
           || $user->canView('iframes.scheduled-tasks')
-          || $user->canView('iframes.tools')
+          || $user->canView('iframes.actions')
           || $user->isCywiseAdmin())
           <x-app.sidebar-dropdown text="{{ __('Administration') }}"
                                   icon="phosphor-gear"
