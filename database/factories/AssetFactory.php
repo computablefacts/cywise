@@ -28,7 +28,7 @@ class AssetFactory extends Factory
                     return $this->faker->domainName;
                 } elseif ($attributes['type'] === AssetTypesEnum::IP) {
                     return $this->faker->ipv4;
-                } else {
+                } else { // AssetTypesEnum::RANGE
                     return $this->faker->ipv4.'/24';
                 }
             },

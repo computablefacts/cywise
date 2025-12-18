@@ -34,17 +34,22 @@ trait HasTenant
                     $users = User::select('id')->where('tenant_id', $tenantId);
                 }
 
+                // dump('---- $users->get()->toArray() ----');
+                // dump(User::select(['id', 'email'])->where('tenant_id', $tenantId)->get()->toArray());
+
                 if ($builder->getModel()->getTable() === 'am_assets') {
-                    // Get all hashes for current user
+                    // Get all hashes (= shares) for current user
                     $hashes = AssetTagHash::withoutGlobalScope('tenant_scope')->where('hash', '=', $user->email)->get();
                     // dump('---- $hashes->toArray() ----');
                     // dump($hashes->toArray());
 
-                    // Get all tags from hashes (tag and hash should have the same created_by ID)
+                    // Get all tags from hashes (tag and hash should have the same created_by ID !?!)
                     $tags = $hashes->flatMap(function ($hash) {
+                        $sharingUser = User::where('id', $hash->created_by)->first();
+                        $sharingTenantUsers = User::select('id')->where('tenant_id', $sharingUser->tenant_id);
                         return AssetTag::withoutGlobalScope('tenant_scope')
                             ->where('tag', $hash->tag)
-                            ->where('created_by', $hash->created_by)
+                            ->whereIn('created_by', $sharingTenantUsers)
                             ->get();
                     });
                     // dump('---- $tags->toArray() ----');

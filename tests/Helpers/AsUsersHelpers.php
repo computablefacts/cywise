@@ -40,7 +40,7 @@ function tenant1User2(): User
     Role::createRoles();
 
     return User::firstOrCreate(
-        ['email' => 'user@tenant1.com'],
+        ['email' => 'user2@tenant1.com'],
         [
             'name' => 'User2 Tenant 1',
             'email' => 'user2@tenant1.com',

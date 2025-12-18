@@ -152,11 +152,12 @@ describe('assets@listGroups', function () {
                 'jsonrpc',
                 'result' => [
                     'groups' => [
-                        ['hash', 'tags', 'views'],
+                        ['created_by_email', 'hash', 'tags', 'views'],
                     ],
                 ],
             ])
             ->assertJsonFragment([
+                'created_by_email' => tenant1User()->email,
                 'hash' => $hash,
                 'tags' => ['tag1'],
                 'views' => 0,
@@ -181,11 +182,12 @@ describe('assets@listGroups', function () {
                 'jsonrpc',
                 'result' => [
                     'groups' => [
-                        ['hash', 'tags', 'views'],
+                        ['created_by_email', 'hash', 'tags', 'views'],
                     ],
                 ],
             ])
             ->assertJsonFragment([
+                'created_by_email' => tenant1User()->email,
                 'hash' => $hash,
                 'tags' => ['tag1', 'tag2'],
                 'views' => 0,
@@ -213,17 +215,19 @@ describe('assets@listGroups', function () {
                 'jsonrpc',
                 'result' => [
                     'groups' => [
-                        ['hash', 'tags', 'views'],
-                        ['hash', 'tags', 'views'],
+                        ['created_by_email', 'hash', 'tags', 'views'],
+                        ['created_by_email', 'hash', 'tags', 'views'],
                     ],
                 ],
             ])
             ->assertJsonFragments([
                 [
+                    'created_by_email' => tenant1User()->email,
                     'hash' => $hashTag1AndTag2,
                     'tags' => ['tag1', 'tag2'],
                     'views' => 0,
                 ], [
+                    'created_by_email' => tenant1User()->email,
                     'hash' => $hashTag1Only,
                     'tags' => ['tag1'],
                     'views' => 0,
