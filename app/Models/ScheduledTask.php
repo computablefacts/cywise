@@ -20,6 +20,7 @@ use Lorisleiva\CronTranslator\CronTranslator;
  * @property bool enabled
  * @property ?Carbon prev_run_date
  * @property ?Carbon next_run_date
+ * @property ?Carbon last_email_sent_at
  * @property int created_by
  */
 class ScheduledTask extends Model
@@ -36,6 +37,7 @@ class ScheduledTask extends Model
         'enabled',
         'prev_run_date',
         'next_run_date',
+        'last_email_sent_at',
         'created_by',
     ];
 
@@ -43,6 +45,7 @@ class ScheduledTask extends Model
         'enabled' => 'boolean',
         'prev_run_date' => 'datetime',
         'next_run_date' => 'datetime',
+        'last_email_sent_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -55,5 +58,22 @@ class ScheduledTask extends Model
     public function readableCron(): string
     {
         return CronTranslator::translate($this->cron);
+    }
+
+    /**
+     * Returns true iff the last email was sent within today's window
+     * [today 00:00, tomorrow 00:00) in the app timezone.
+     */
+    public function emailSentToday(): bool
+    {
+        if (!$this->last_email_sent_at) {
+            return false;
+        }
+
+        $startOfToday = Carbon::today();
+        $startOfTomorrow = Carbon::tomorrow();
+
+        return $this->last_email_sent_at->greaterThanOrEqualTo($startOfToday)
+            && $this->last_email_sent_at->lessThan($startOfTomorrow);
     }
 }

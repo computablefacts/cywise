@@ -76,17 +76,20 @@ class RunScheduledTasks implements ShouldQueue
                         Log::debug("[RunScheduledTasks] Condition evaluated for task {$task->id}: '{$condition}' => {$answer}");
                     }
 
-                    // Step 2: Execute the task and email the result
+                    // Step 2: Execute the task and email the result (only once per day)
                     $tsk = Str::trim($task->task);
 
                     if (!$runTask || empty($tsk)) {
                         Log::debug("[RunScheduledTasks] Skipping task {$task->id} because condition evaluated to false");
+                    } else if ($task->emailSentToday()) {
+                        Log::debug("[RunScheduledTasks] Skipping task {$task->id} because an email has already been sent today");
                     } else {
                         $response = $this->ask($user, $threadId, $tsk);
                         $answer = $response['html'] ?? '';
                         $summary = LlmsProvider::provide("Summarize this text in about 10 words :\n\n{$answer}");
                         MailCoachSimpleEmail::sendEmail("Cywise : {$summary}", "CyberBuddy vous répond !", $answer, $user->email);
                         Log::debug("[RunScheduledTasks] Emailed result for task {$task->id} to {$user->email}");
+                        $task->last_email_sent_at = Carbon::now();
                     }
 
                     $task->prev_run_date = Carbon::now();
