@@ -21,16 +21,16 @@ class ToggleUserGetsAuditReport extends AbstractAction
             "function" => [
                 "name" => "toggle_user_gets_audit_report",
                 "description" => "
-                    Toggle the gets_audit_report flag for one or more users.
-                    The action (such as enable or disable) must come first, followed by a colon and then a comma-separated list of email addresses.
-                    For example:
-                    - if the request is 'envoie une copie du rapport à alice@example.com', the input should be 'enable:alice@example.com'
-                    - if the request is 'arrête d'envoyer des emails à alice@example.com et bob@example.com', the input should be 'disable:alice@example.com,bob@example.com'
-                    - if the request is 'arrête de m'envoyer des emails', the input should be 'disable:me'
-                    - if the request is 'réactive l'envoie des notifications', the input should be 'enable:me'
-                    - if the request is 'active les emails pour tous les utilisateurs', the input should be 'enable:all'
-                    - if the request is 'active les emails pour tous', the input should be 'enable:all'
-                    - if the request is 'désactive les notifications pour tous les utilisateurs', the input should be 'disable:all'
+Toggle the gets_audit_report flag for one or more users.
+The action (such as enable or disable) must come first, followed by a colon and then a comma-separated list of email addresses.
+For example:
+- if the request is 'envoie une copie du rapport à alice@example.com', the input should be 'enable:alice@example.com'
+- if the request is 'arrête d'envoyer des emails à alice@example.com et bob@example.com', the input should be 'disable:alice@example.com,bob@example.com'
+- if the request is 'arrête de m'envoyer des emails', the input should be 'disable:me'
+- if the request is 'réactive l'envoie des notifications', the input should be 'enable:me'
+- if the request is 'active les emails pour tous les utilisateurs', the input should be 'enable:all'
+- if the request is 'active les emails pour tous', the input should be 'enable:all'
+- if the request is 'désactive les notifications pour tous les utilisateurs', the input should be 'disable:all'
                 ",
                 "parameters" => [
                     "type" => "object",

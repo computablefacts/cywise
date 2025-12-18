@@ -25,11 +25,11 @@ class LabourLawyerConclusionsWriter extends AbstractAction
             "function" => [
                 "name" => "labour_lawyer",
                 "description" => "
-                    Write conclusions (formal written pleadings through which a party (or their lawyer) sets out their 
-                    claims (what they are asking the court to grant) and the grounds (factual and legal arguments) 
-                    supporting those claims) related to the French labour law.
-                    The action's input must always be the original user's input. 
-                    The action's input must always be in French, regardless of the user's language.
+Write conclusions (formal written pleadings through which a party (or their lawyer) sets out their 
+claims (what they are asking the court to grant) and the grounds (factual and legal arguments) 
+supporting those claims) related to the French labour law.
+The action's input must always be the original user's input. 
+The action's input must always be in French, regardless of the user's language.
                 ",
                 "parameters" => [
                     "type" => "object",

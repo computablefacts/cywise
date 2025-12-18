@@ -21,17 +21,17 @@ class ListAssets extends AbstractAction
             "function" => [
                 "name" => "list_assets",
                 "description" => "
-                    Retrieve the list of assets (domains or IP addresses) based on their monitoring status and type.
-                    Provide the action to perform followed by the asset status (monitored/monitorable/any) and the asset type (domain/ip/any), using the format: 'action:status:type'.
-                    The action (always list) must come first, followed by a colon and then the asset status (monitored/monitorable/any), followed by a colon and then the asset type (domain/ip/any).
-                    For example:
-                    - if the request is 'quels sont mes actifs ?', the input should be 'list:any:any'
-                    - if the request is 'quels sont mes actifs surveillés ?', the input should be 'list:monitored:any'
-                    - if the request is 'quels sont mes domaines surveillés ?', the input should be 'list:monitored:domain'
-                    - if the request is 'quels sont mes IP surveillées ?', the input should be 'list:monitored:ip'
-                    - if the request is 'quels sont mes actifs à surveiller ?', the input should be 'list:monitorable:any'
-                    - if the request is 'quels sont mes domaines à surveiller ?', the input should be 'list:monitorable:domain'
-                    - if the request is 'quels sont mes IP à surveiller ?', the input should be 'list:monitorable:ip'
+Retrieve the list of assets (domains or IP addresses) based on their monitoring status and type.
+Provide the action to perform followed by the asset status (monitored/monitorable/any) and the asset type (domain/ip/any), using the format: 'action:status:type'.
+The action (always list) must come first, followed by a colon and then the asset status (monitored/monitorable/any), followed by a colon and then the asset type (domain/ip/any).
+For example:
+- if the request is 'quels sont mes actifs ?', the input should be 'list:any:any'
+- if the request is 'quels sont mes actifs surveillés ?', the input should be 'list:monitored:any'
+- if the request is 'quels sont mes domaines surveillés ?', the input should be 'list:monitored:domain'
+- if the request is 'quels sont mes IP surveillées ?', the input should be 'list:monitored:ip'
+- if the request is 'quels sont mes actifs à surveiller ?', the input should be 'list:monitorable:any'
+- if the request is 'quels sont mes domaines à surveiller ?', the input should be 'list:monitorable:domain'
+- if the request is 'quels sont mes IP à surveiller ?', the input should be 'list:monitorable:ip'
                 ",
                 "parameters" => [
                     "type" => "object",

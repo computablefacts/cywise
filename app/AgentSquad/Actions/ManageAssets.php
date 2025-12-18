@@ -22,14 +22,14 @@ class ManageAssets extends AbstractAction
             "function" => [
                 "name" => "manage_assets",
                 "description" => "
-                    Manage assets such as domain names and IP addresses. This includes adding, removing and monitoring assets.
-                    Provide the action to perform followed by the asset, using the format: 'action:asset'.
-                    The action (such as add, remove, monitor, or unmonitor) must come first, followed by a colon and then the asset (a domain name or an IP address).
-                    For example:
-                    - if the request is 'ajoute example.com', the input should be 'add:example.com'
-                    - if the request is 'supprime 192.168.1.1', the input should be 'remove:192.168.1.1'
-                    - if the request is 'surveille sub.domain.net', the input should be 'monitor:sub.domain.net'
-                    - if the request is 'arrête la surveillance de 10.0.0.5', the input should be 'unmonitor:10.0.0.5'
+Manage assets such as domain names and IP addresses. This includes adding, removing and monitoring assets.
+Provide the action to perform followed by the asset, using the format: 'action:asset'.
+The action (such as add, remove, monitor, or unmonitor) must come first, followed by a colon and then the asset (a domain name or an IP address).
+For example:
+- if the request is 'ajoute example.com', the input should be 'add:example.com'
+- if the request is 'supprime 192.168.1.1', the input should be 'remove:192.168.1.1'
+- if the request is 'surveille sub.domain.net', the input should be 'monitor:sub.domain.net'
+- if the request is 'arrête la surveillance de 10.0.0.5', the input should be 'unmonitor:10.0.0.5'
                 ",
                 "parameters" => [
                     "type" => "object",

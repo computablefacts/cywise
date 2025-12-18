@@ -20,12 +20,12 @@ class UnscheduleTask extends AbstractAction
             "function" => [
                 "name" => "unschedule_task",
                 "description" => "
-                    Unschedule a task.
-                    Provide the action to perform followed by a task identifier, using the format: 'action:task_id'.
-                    The action (always unschedule) must come first, followed by a colon and then a task identifier.
-                    For example:
-                    - if the request is 'arrête la tâche 1234', the input should be 'unschedule:1234'
-                    - if the request is 'stop la tâche 6789', the input should be 'unschedule:6789'
+Unschedule a task.
+Provide the action to perform followed by a task identifier, using the format: 'action:task_id'.
+The action (always unschedule) must come first, followed by a colon and then a task identifier.
+For example:
+- if the request is 'arrête la tâche 1234', the input should be 'unschedule:1234'
+- if the request is 'stop la tâche 6789', the input should be 'unschedule:6789'
                 ",
                 "parameters" => [
                     "type" => "object",

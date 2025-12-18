@@ -20,14 +20,14 @@ class ScheduleTask extends AbstractAction
             "function" => [
                 "name" => "schedule_task",
                 "description" => "
-                    Schedule a task to run at a specific time and/or when a given condition is met. The task output will be sent as an email report.
-                    Provide the action to perform followed by a cron expression, a condition and a task to perform, using the format: 'action:cron:condition:task'.
-                    The action (always schedule) must come first, followed by a colon and then a cron expression, followed by a colon and then a condition to meet, followed by a colon and then a task to execute.
-                    For example:
-                    - if the request is 'préviens-moi si www.example.com devient vulnérable', the input should be 'schedule:* * * * *:le site www.example.com est-il vulnérable ?:liste les vulnérabilités de www.example.com'
-                    - if the request is 'envoie-moi un email tous les matins à 9h si www.example.com est vulnérable', the input should be 'schedule:0 9 * * *:le site www.example.com est-il vulnérable ?:liste les vulnérabilités de www.example.com'
-                    - if the request is 'récapitule-moi tous les matins à 9h les vulnérabilités de www.example.com', the input should be 'schedule:0 9 * * *::liste les vulnérabilités de www.example.com'
-                    - if the request is 'préviens-moi si John Doe se connecte au serveur 145.242.34.179', the input should be 'schedule:* * * * *:John Doe s'est-il connecté au serveur 145.242.34.179 ?:John Doe s'est connecté au serveur 145.242.34.179'
+Schedule a task to run at a specific time and/or when a given condition is met. The task output will be sent as an email report.
+Provide the action to perform followed by a cron expression, a condition and a task to perform, using the format: 'action:cron:condition:task'.
+The action (always schedule) must come first, followed by a colon and then a cron expression, followed by a colon and then a condition to meet, followed by a colon and then a task to execute.
+For example:
+- if the request is 'préviens-moi si www.example.com devient vulnérable', the input should be 'schedule:* * * * *:le site www.example.com est-il vulnérable ?:liste les vulnérabilités de www.example.com'
+- if the request is 'envoie-moi un email tous les matins à 9h si www.example.com est vulnérable', the input should be 'schedule:0 9 * * *:le site www.example.com est-il vulnérable ?:liste les vulnérabilités de www.example.com'
+- if the request is 'récapitule-moi tous les matins à 9h les vulnérabilités de www.example.com', the input should be 'schedule:0 9 * * *::liste les vulnérabilités de www.example.com'
+- if the request is 'préviens-moi si John Doe se connecte au serveur 145.242.34.179', the input should be 'schedule:* * * * *:John Doe s'est-il connecté au serveur 145.242.34.179 ?:John Doe s'est connecté au serveur 145.242.34.179'
                 ",
                 "parameters" => [
                     "type" => "object",

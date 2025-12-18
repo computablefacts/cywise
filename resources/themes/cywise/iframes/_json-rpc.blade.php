@@ -186,6 +186,11 @@
     executeJsonRpcApiCall('cyberbuddy@delete', {conversation_id: conversationId}, onSuccess);
   }
 
+  function saveActionSettingsApiCall(scopeType, scopeId, actions, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberbuddy@saveActionSettings', {scope_type: scopeType, scope_id: scopeId, actions: actions},
+      onSuccess);
+  }
+
   function loadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('frameworks@load', {framework_id: frameworkId}, onSuccess);
   }

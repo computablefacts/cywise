@@ -247,7 +247,9 @@ $user = \Auth::user();
           || $user->canView('iframes.shares')
           || $user->canView('iframes.roles-and-permissions')
           || $user->canView('iframes.traces')
-          || $user->canView('iframes.scheduled-tasks'))
+          || $user->canView('iframes.scheduled-tasks')
+          || $user->canView('iframes.tools')
+          || $user->isCywiseAdmin())
           <x-app.sidebar-dropdown text="{{ __('Administration') }}"
                                   icon="phosphor-gear"
                                   id="admin_dropdown"
@@ -257,8 +259,16 @@ $user = \Auth::user();
                           Request::is('shares') ||
                           Request::is('roles-and-permissions') ||
                           Request::is('scheduled-tasks') ||
-                          Request::is('traces')
+                          Request::is('traces') ||
+                          Request::is('actions')
                         ) ? '1' : '0'">
+            @if($user->canView('iframes.actions'))
+            <x-app.sidebar-link href="{{ route('actions') }}"
+                                icon="phosphor-wrench"
+                                :active="Request::is('actions')">
+              {{ __('Actions') }}
+            </x-app.sidebar-link>
+            @endif
             @if($user->canView('iframes.scheduled-tasks'))
             <x-app.sidebar-link href="{{ route('scheduled-tasks') }}"
                                 icon="phosphor-clock"

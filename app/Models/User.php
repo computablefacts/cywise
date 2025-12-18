@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Helpers\MailCoach;
+use App\AgentSquad\ActionsRegistry;
+use App\Models\ActionSetting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -104,6 +106,22 @@ class User extends WaveUser
             // Set frameworks, templates and roles
             $user->actAs();
             $user->init();
+
+            // Ensure all agents are added (enabled) at tenant level for this user's tenant
+            try {
+                $all = ActionsRegistry::all();
+                foreach ($all as $actionName => $cls) {
+                    ActionSetting::firstOrCreate([
+                        'scope_type' => 'tenant',
+                        'scope_id' => $user->tenant_id,
+                        'action' => $actionName,
+                    ], [
+                        'enabled' => true,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                // Non-fatal during user creation
+            }
         });
     }
 
