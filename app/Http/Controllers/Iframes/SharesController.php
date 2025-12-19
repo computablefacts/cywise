@@ -13,10 +13,19 @@ use Illuminate\View\View;
 
 class SharesController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request, AssetsProcedure $procedure): View
     {
-        $procedure = new AssetsProcedure();
-        $rows = collect($procedure->listGroups(new JsonRpcRequest())['groups'] ?? [])
+        $rows = $this->getRows($procedure->listGroups(new JsonRpcRequest())['groups'] ?? [], $procedure);
+        
+        Log::debug('rows=', $rows->toArray());
+
+        return view('theme::iframes.shares', [
+            'shares' => $rows,
+        ]);
+    }
+
+    public function getRows(array $groups, AssetsProcedure $procedure): Collection{
+        $rows = collect($groups)
             ->groupBy('hash')
             ->mapWithKeys(function (Collection $shares, string $group) use ($procedure) {
                 $request = new JsonRpcRequest(['group' => $group]);
@@ -24,7 +33,7 @@ class SharesController extends Controller
                 return [
                     $group => [
                         'group' => $group,
-                        'tags' => $shares->map(fn($share) => $share['tags'])->unique()->flatten(),
+                        'tags' => $shares->map(fn($share) => $share['tags'])->unique()->flatten()->toArray(),
                         'nb_assets' => count($procedure->assetsInGroup($request)['assets'] ?? []),
                         'nb_vulnerabilities' => count($procedure->vulnerabilitiesInGroup($request)['vulnerabilities'] ?? []),
                         'target' => $shares->first()['created_by_email'] ?? __('Unknown'),
@@ -32,11 +41,6 @@ class SharesController extends Controller
                 ];
             })
             ->values();
-        
-        // Log::debug('rows=', $rows->toArray());
-
-        return view('theme::iframes.shares', [
-            'shares' => $rows,
-        ]);
+        return $rows;
     }
 }

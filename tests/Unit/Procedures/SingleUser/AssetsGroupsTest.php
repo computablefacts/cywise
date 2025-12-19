@@ -1,8 +1,11 @@
 <?php
 
+use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\AssetTag;
 use App\Models\AssetTagHash;
+use App\Models\Port;
+use App\Models\Scan;
 
 uses(\Sajya\Server\Testing\ProceduralRequests::class);
 
@@ -234,6 +237,70 @@ describe('assets@listGroups', function () {
                 ],
             ]);
     });
+
+    it('avoid tag duplication in tags array', function () {
+        asTenant1User();
+
+        AssetTag::factory(['tag' => 'tag1'])->create();
+
+        AssetTagHash::factory(['hash' => 'user1@tenant2.com', 'tag' => 'tag1'])->create();
+        AssetTagHash::factory(['hash' => 'user1@tenant2.com', 'tag' => 'tag1'])->create();
+
+        $this
+            ->setRpcRoute('v2.private.rpc.endpoint')
+            ->callProcedure('assets@listGroups', [])
+            ->assertExactJsonStructure([
+                'id',
+                'jsonrpc',
+                'result' => [
+                    'groups' => [
+                        ['created_by_email', 'hash', 'tags', 'views'],
+                    ],
+                ],
+            ])
+            ->assertJsonFragments([
+                [
+                    'created_by_email' => tenant1User()->email,
+                    'hash' => 'user1@tenant2.com',
+                    'tags' => ['tag1'],
+                    'views' => 0,
+                ],
+            ]);
+    });
+
+    it('avoid tag duplication in tags array with more complex cases', function () {
+        asTenant1User();
+
+        AssetTag::factory(['tag' => 'tag1'])->create();
+        AssetTag::factory(['tag' => 'tag2'])->create();
+
+        AssetTagHash::factory(['hash' => 'user1@tenant2.com', 'tag' => 'tag1'])->create();
+        AssetTagHash::factory(['hash' => 'user1@tenant2.com', 'tag' => 'tag1'])->create();
+        AssetTagHash::factory(['hash' => 'user1@tenant2.com', 'tag' => 'tag1'])->create();
+        AssetTagHash::factory(['hash' => 'user1@tenant2.com', 'tag' => 'tag2'])->create();
+        AssetTagHash::factory(['hash' => 'user1@tenant2.com', 'tag' => 'tag2'])->create();
+
+        $this
+            ->setRpcRoute('v2.private.rpc.endpoint')
+            ->callProcedure('assets@listGroups', [])
+            ->assertExactJsonStructure([
+                'id',
+                'jsonrpc',
+                'result' => [
+                    'groups' => [
+                        ['created_by_email', 'hash', 'tags', 'views'],
+                    ],
+                ],
+            ])
+            ->assertJsonFragments([
+                [
+                    'created_by_email' => tenant1User()->email,
+                    'hash' => 'user1@tenant2.com',
+                    'tags' => ['tag1', 'tag2'],
+                    'views' => 0,
+                ],
+            ]);
+    });
 });
 
 describe('assets@getGroup', function () {
@@ -369,7 +436,7 @@ describe('assets@assetsInGroup', function () {
                 ],
             ]);
 
-        expect($response->json('result.assets'))->toBeArray()->toHaveCount(10);            
+        expect($response->json('result.assets'))->toBeArray()->toHaveCount(10);
     });
 
     it('returns assets in a group with 2 tags', function () {
@@ -404,6 +471,74 @@ describe('assets@assetsInGroup', function () {
                 ],
             ]);
 
-        expect($response->json('result.assets'))->toBeArray()->toHaveCount(15);            
+        expect($response->json('result.assets'))->toBeArray()->toHaveCount(15);
     });
+});
+
+describe('assets@vulnerabilitiesInGroup', function () {
+    it('returns vulnerabilities for assets in a group', function () {
+        asTenant1User();
+
+        $assetsTag1 = Asset::factory(2)->monitored()->create();
+        $assetsTag1->each(function ($asset) {
+            AssetTag::factory(['tag' => 'tag1'])->for($asset)->create();
+            Alert::factory(3)->for(
+                Port::factory()->for(
+                    Scan::factory()->for($asset)->vulnsScanEnded()->create()
+                )->create()
+            )->levelHigh()->create();
+        });
+
+        $hash = 'single_hash_1';
+        AssetTagHash::factory(['hash' => $hash, 'tag' => 'tag1'])->create();
+
+        $response = $this
+            ->setRpcRoute('v2.private.rpc.endpoint')
+            ->callProcedure('assets@vulnerabilitiesInGroup', ['group' => $hash])
+            ->assertExactJsonStructure([
+                'id',
+                'jsonrpc',
+                'result' => [
+                    'vulnerabilities',
+                ],
+            ]);
+
+        expect($response->json('result.vulnerabilities'))->toBeArray()->toHaveCount(6);
+    });
+
+    it('avoid vulnerabilities duplication when sharing same tag twice', function () {
+        asTenant1User();
+
+        $assetsTag1 = Asset::factory(2)->monitored()->create();
+        $assetsTag1->each(function ($asset) {
+            AssetTag::factory(['tag' => 'tag1'])->for($asset)->create();
+            Alert::factory(3)->for(
+                Port::factory()->for(
+                    Scan::factory()->for($asset)->vulnsScanEnded()->create()
+                )->create()
+            )->levelHigh()->create();
+        });
+
+        expect(Asset::withoutGlobalScope('tenant_scope')->count())->toBe(2);
+
+        AssetTagHash::factory(['hash' => 'user1@tenant2.com', 'tag' => 'tag1'])->create();
+        AssetTagHash::factory(['hash' => 'user1@tenant2.com', 'tag' => 'tag1'])->create();
+
+        // We should have only 3 assets but AssetTagHash::factory creates a 3rd and a 4th one...
+        expect(Asset::withoutGlobalScope('tenant_scope')->count())->toBe(4);
+
+        $response = $this
+            ->setRpcRoute('v2.private.rpc.endpoint')
+            ->callProcedure('assets@vulnerabilitiesInGroup', ['group' => 'user1@tenant2.com'])
+            ->assertExactJsonStructure([
+                'id',
+                'jsonrpc',
+                'result' => [
+                    'vulnerabilities',
+                ],
+            ]);
+
+        expect($response->json('result.vulnerabilities'))->toBeArray()->toHaveCount(6);
+    });
+
 });

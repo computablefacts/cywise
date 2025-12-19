@@ -173,4 +173,4 @@ test("sharing a tag twice should not list assets twice", function () {
 
     asTenant2User();
     expect(Asset::count())->toBe(1);
-})->only();
+});

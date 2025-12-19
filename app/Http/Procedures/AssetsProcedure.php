@@ -659,7 +659,7 @@ class AssetsProcedure extends Procedure
             ->map(function ($items, $hash) {
                 return [
                     'hash' => $hash,
-                    'tags' => $items->pluck('tag')->toArray(),
+                    'tags' => $items->pluck('tag')->unique()->values()->toArray(),
                     'views' => $items->sum('views'),
                     'created_by_email' => User::find($items->first()['created_by'])?->email ?? null,
                 ];
@@ -759,7 +759,8 @@ class AssetsProcedure extends Procedure
             ->join('am_assets_tags', 'am_assets_tags.asset_id', '=', 'am_assets.id')
             ->join('am_assets_tags_hashes', 'am_assets_tags_hashes.tag', '=', 'am_assets_tags.tag')
             ->where('am_assets_tags_hashes.hash', $group->hash)
-            ->get();
+            ->get()
+            ->unique('id');
 
         $vulnerabilities = $assets
             ->flatMap(fn(Asset $asset) => $asset->alerts()->get()->map(function (Alert $alert) use ($asset) {
