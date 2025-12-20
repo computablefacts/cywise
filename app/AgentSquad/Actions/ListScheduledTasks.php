@@ -10,7 +10,7 @@ use App\Models\User;
 
 class ListScheduledTasks extends AbstractAction
 {
-    static function schema(): array
+    protected function schema(): array
     {
         return [
             "type" => "function",

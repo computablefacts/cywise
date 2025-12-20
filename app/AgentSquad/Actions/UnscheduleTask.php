@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 class UnscheduleTask extends AbstractAction
 {
-    static function schema(): array
+    protected function schema(): array
     {
         return [
             "type" => "function",

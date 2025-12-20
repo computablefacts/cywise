@@ -42,9 +42,8 @@ $me = Auth::user();
           @csrf
           <input type="hidden" name="scope_type" value="tenant">
           <input type="hidden" name="scope_id" value="{{ $me->tenant_id }}">
-          @foreach($actions as $actionName => $cls)
+          @foreach($actions as $actionName => $instance)
           @php
-          $instance = new $cls();
           $checked = ($tenantSettings[$actionName]->enabled ?? true);
           @endphp
           <label class="mb-3">
@@ -52,12 +51,14 @@ $me = Auth::user();
                    name="actions[]"
                    value="{{ $actionName }}"
                    @checked($checked)>
-            <b>{{ $instance->name() }}</b>
+            <b>{{ $instance->name() }}</b> {{ $instance->isRemote() ? '(remote)' : '' }}
           </label>
           <pre class="pre-light mb-3">{{ \Str::trim($instance->description()) }}</pre>
           @endforeach
           <div class="mt-3 text-end">
-            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+            <button type="submit" class="btn btn-primary">
+              {{ __('Save') }}
+            </button>
           </div>
         </form>
       </div>
@@ -84,9 +85,8 @@ $me = Auth::user();
           @csrf
           <input type="hidden" name="scope_type" value="user">
           <input type="hidden" name="scope_id" value="{{ $userSelected->id }}">
-          @foreach($actions as $actionName => $cls)
+          @foreach($actions as $actionName => $instance)
           @php
-          $instance = new $cls();
           $checked = ($userSettings[$actionName]->enabled ?? null);
           @endphp
           <label class="mb-3">
@@ -94,7 +94,7 @@ $me = Auth::user();
                    name="actions[]"
                    value="{{ $actionName }}"
                    @checked($checked=== null ? ($tenantSettings[$actionName]->enabled ?? true) : $checked)>
-            <b>{{ $instance->name() }}</b>
+            <b>{{ $instance->name() }}</b> {{ $instance->isRemote() ? '(remote)' : '' }}
           </label>
           <pre class="pre-light mb-3">{{ \Str::trim($instance->description()) }}</pre>
           @endforeach

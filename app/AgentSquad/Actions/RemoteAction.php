@@ -1,0 +1,216 @@
+<?php
+
+namespace App\AgentSquad\Actions;
+
+use App\AgentSquad\AbstractAction;
+use App\AgentSquad\Answers\AbstractAnswer;
+use App\AgentSquad\Answers\FailedAnswer;
+use App\AgentSquad\Answers\SuccessfulAnswer;
+use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\ThoughtActionObservation;
+use App\Models\User;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
+class RemoteAction extends AbstractAction
+{
+    private \App\Models\RemoteAction $action;
+
+    public function isRemote(): bool
+    {
+        return true;
+    }
+
+    protected function schema(): array
+    {
+        $schema = '';
+        foreach ($this->action->schema as $key => $properties) {
+            $schema .= "- {$key}: {$properties['description']} ({$properties['type']})\n";
+        }
+        return [
+            "type" => "function",
+            "function" => [
+                "name" => $this->action->name,
+                "description" => "{$this->action->description}\n\nThe following informations are needed:\n{$schema}",
+                "parameters" => [
+                    "type" => "object",
+                    "properties" => [
+                        "input" => [
+                            "type" => "string",
+                            "description" => "A summary of the action to perform.",
+                        ],
+                    ],
+                    "required" => ["input"],
+                    "additionalProperties" => false,
+                ],
+                "strict" => true,
+            ],
+        ];
+    }
+
+    public function __construct(\App\Models\RemoteAction $action)
+    {
+        $this->action = $action;
+    }
+
+    public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
+    {
+        /** @param ThoughtActionObservation[] $chainOfThought */
+        $chainOfThought = [];
+        $action = $this->action;
+
+        // Extract parameters from input
+        $prompt = 'Extract the following informations:';
+
+        foreach ($this->action->schema as $key => $properties) {
+            $prompt .= "- {$key}: {$properties['description']} ({$properties['type']})\n";
+        }
+
+        $prompt .= "\n\nFrom the following data: {$input}\n\nReturn the parameters in JSON format.";
+        $answer = LlmsProvider::provide($prompt);
+        $params = json_decode($answer, true);
+
+        if ($params === null) {
+            $chainOfThought[] = new ThoughtActionObservation("Extract parameters for the remote action " . $this->name() . " parameters.", "extract_parameters[{$input}]", "The extraction failed: {$answer}");
+            return new FailedAnswer("Parameter extraction failed for action " . $this->name(), $chainOfThought);
+        }
+
+        $chainOfThought[] = new ThoughtActionObservation("Extract parameters for the remote action " . $this->name() . " parameters.", "extract_parameters[{$input}]", "The extraction succeeded. I must now validate the parameters.");
+
+        // Validate the parameters
+        $validator = $this->buildValidator($action->schema['parameters']['properties'] ?? [], $params);
+
+        if ($validator->fails()) {
+            $chainOfThought[] = new ThoughtActionObservation("Validate the remote action " . $this->name() . " parameters.", "validate_parameters[" . json_encode($params) . "]", "The validation failed: " . $validator->errors()->toJson());
+            return new FailedAnswer("Parameter validation failed for action " . $this->name(), $chainOfThought);
+        }
+
+        $chainOfThought[] = new ThoughtActionObservation("Validate the remote action " . $this->name() . " parameters.", "validate_parameters[" . json_encode($params) . "]", "The validation succeeded. I must now build the payload.");
+
+        // Build the JSON-RPC payload
+        $payload = $this->buildPayload($action->payload_template, $params);
+        $chainOfThought[] = new ThoughtActionObservation("Build the remote action " . $this->name() . " payload.", "build_payload[" . json_encode($params) . "]", "The payload has been built: " . json_encode($payload) . ". I must now call the endpoint.");
+
+        // Call the JSON-RPC endpoint
+        try {
+            $url = Str::replace('{api_token}', $user->sentinelApiToken(), $action->url);
+            if (Str::endsWith($url, '/api/v2/private/endpoint')) {
+                $request = \Illuminate\Http\Request::create(
+                    '/api/v2/private/endpoint',
+                    'POST',
+                    [], // paramètres query
+                    [], // cookies
+                    [], // fichiers
+                    $_SERVER, // serveur
+                    json_encode($payload)
+                );
+                $request->headers->set('Content-Type', 'application/json');
+                $request->headers->set('Accept', 'application/json');
+                $request->headers->set('Accept-Encoding', 'gzip');
+                $request->setUserResolver(fn() => $user);
+                $response = new class($request) {
+
+                    private $raw;
+
+                    public function __construct($request)
+                    {
+                        $this->raw = app()->handle($request);
+                    }
+
+                    public function __toString(): string
+                    {
+                        return $this->body();
+                    }
+
+                    public function failed(): bool
+                    {
+                        return !$this->raw->isSuccessful();
+                    }
+
+                    public function json(): array
+                    {
+                        return json_decode($this->body(), true);
+                    }
+
+                    public function body(): string
+                    {
+                        return gzdecode($this->raw->getContent()); // due to Sajya\Server\Middleware\GzipCompress
+                    }
+                };
+            } else {
+                $headers = collect($action->headers)->toArray();
+                if (isset($headers['Authorization'])) {
+                    $headers['Authorization'] = Str::replace('{api_token}', $user->sentinelApiToken(), $headers['Authorization']);
+                }
+                $response = Http::withHeaders($headers)->timeout(5)->post($url, $payload);
+            }
+        } catch (\Exception $e) {
+            $chainOfThought[] = new ThoughtActionObservation("Call the remote action " . $this->name() . " endpoint.", "call[{$action->url}]", "The endpoint has been called but the call failed: {$e->getMessage()}");
+            return new FailedAnswer("Remote action call failed for action " . $this->name(), $chainOfThought);
+        }
+        if ($response->failed()) {
+            $chainOfThought[] = new ThoughtActionObservation("Call the remote action " . $this->name() . " endpoint.", "call[{$action->url}]", "The endpoint has been called but the call failed: {$response->body()}");
+            return new FailedAnswer("Remote action call failed for action " . $this->name(), $chainOfThought);
+        }
+
+        $data = $response->json();
+
+        // Ensure the response is not a JSON-RPC error
+        if (isset($data['error'])) {
+            $chainOfThought[] = new ThoughtActionObservation("Call the remote action " . $this->name() . " endpoint.", "call[{$action->url}]", "The endpoint has been called but the call failed: " . json_encode($data));
+            return new FailedAnswer("Remote action call failed for action " . $this->name(), $chainOfThought);
+        }
+
+        $chainOfThought[] = new ThoughtActionObservation("Call the remote action " . $this->name() . " endpoint.", "call[{$action->url}]", "The endpoint has been called and the call succeeded: " . json_encode($data));
+
+        // Build the response
+        if (empty($action->response_template)) {
+            $answer = ['transformation' => $data];
+            $chainOfThought[] = new ThoughtActionObservation("Return data from action " . $this->name() . " as-is.", "transform[" . json_encode($data) . "]", "The data have not been transformed: " . json_encode($answer));
+        } else {
+            $answer = $this->buildResponse($action->response_template, $data);
+            $chainOfThought[] = new ThoughtActionObservation("Return data from action " . $this->name() . " after transformation.", "transform[" . json_encode($data) . "]", "The data have been transformed: " . json_encode($answer));
+        }
+        return new SuccessfulAnswer(json_encode($answer['transformation']), $chainOfThought);
+    }
+
+    private function buildValidator(array $properties, array $params): \Illuminate\Validation\Validator
+    {
+        $rules = [];
+        foreach ($properties as $key => $details) {
+            if (isset($details['validation'])) {
+                $rules[$key] = $details['validation'];
+            }
+        }
+        return Validator::make($params, $rules);
+    }
+
+    /**
+     * Recursively replace {{key}} dans un template (array ou string)
+     */
+    private function buildPayload(array|string $template, array $data): array|string
+    {
+        if (is_string($template)) {
+            return preg_replace_callback(
+                '/\{\{(.*?)\}\}/',
+                fn($matches) => Arr::get($data, trim($matches[1]), $matches[0]),
+                $template
+            );
+        }
+        if (is_array($template)) {
+            foreach ($template as $key => $value) {
+                if (is_array($value) || is_string($value)) {
+                    $template[$key] = $this->buildPayload($value, $data);
+                }
+            }
+        }
+        return $template;
+    }
+
+    private function buildResponse(array|string $template, array $data): array|string
+    {
+        return $this->buildPayload($template, $data);
+    }
+}

@@ -18,7 +18,7 @@ class LabourLawyerConclusionsWriter extends AbstractAction
     private AbstractVectorStore $vectorStore;
     private string $dir;
 
-    static function schema(): array
+    protected function schema(): array
     {
         return [
             "type" => "function",

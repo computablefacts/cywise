@@ -16,7 +16,7 @@ use App\Models\User;
 class ActionsRegistry
 {
     /**
-     * Returns a map of action name => class-string<AbstractAction>
+     * Returns a map of action name => AbstractAction
      */
     public static function all(): array
     {
@@ -37,14 +37,21 @@ class ActionsRegistry
         foreach ($classes as $cls) {
             /** @var AbstractAction $inst */
             $inst = new $cls();
-            $map[$inst->name()] = $cls;
+            $map[$inst->name()] = $inst;
+        }
+
+        $actions = \App\Models\RemoteAction::all();
+
+        foreach ($actions as $action) {
+            $inst = new \App\AgentSquad\Actions\RemoteAction($action);
+            $map[$inst->name()] = $inst;
         }
         return $map;
     }
 
     /**
      * Resolve enabled action classes for a user, considering user overrides first, then tenant-level, default=true.
-     * @return array<class-string<AbstractAction>>
+     * @return array<AbstractAction>
      */
     public static function enabledFor(User $user): array
     {
@@ -64,7 +71,7 @@ class ActionsRegistry
             ->get()
             ->groupBy(fn($row) => "{$row->scope_type}#{$row->action}");
 
-        foreach ($actions as $name => $cls) {
+        foreach ($actions as $name => $action) {
 
             // user override
             $userKey = 'user#' . $name;
@@ -79,7 +86,7 @@ class ActionsRegistry
                 }
             }
             if ($enabled) {
-                $result[] = $cls;
+                $result[] = $action;
             }
         }
         return $result;

@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 
 class ManageAssets extends AbstractAction
 {
-    static function schema(): array
+    protected function schema(): array
     {
         return [
             "type" => "function",

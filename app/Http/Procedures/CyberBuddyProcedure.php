@@ -90,8 +90,8 @@ class CyberBuddyProcedure extends Procedure
             $orchestrator = new Orchestrator();
 
             if (!empty($actions)) {
-                foreach ($actions as $cls) { // Register agents based on admin configuration
-                    $orchestrator->registerAgent(new $cls());
+                foreach ($actions as $name => $action) { // Register agents based on admin configuration
+                    $orchestrator->registerAgent($action);
                 }
             }
             if ($user->isCywiseAdmin()) { // TODO : move to the registry
@@ -194,9 +194,9 @@ class CyberBuddyProcedure extends Procedure
         }
 
         $enabledList = collect($params['actions'] ?? []);
-        $all = ActionsRegistry::all();
+        $actions = ActionsRegistry::all();
 
-        foreach ($all as $actionName => $cls) {
+        foreach ($actions as $actionName => $action) {
             $enabled = $enabledList->contains($actionName);
             /** @var ActionSetting $setting */
             $setting = ActionSetting::firstOrNew([

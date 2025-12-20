@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 class ScheduleTask extends AbstractAction
 {
-    static function schema(): array
+    protected function schema(): array
     {
         return [
             "type" => "function",
