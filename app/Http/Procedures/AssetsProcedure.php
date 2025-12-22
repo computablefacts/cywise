@@ -239,7 +239,7 @@ class AssetsProcedure extends Procedure
             null;
 
         // Load the identity of the user who created the asset
-        $user = $asset->createdBy();
+        $user = $asset->createdBy;
 
         return [
             'asset' => $asset->asset,

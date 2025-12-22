@@ -43,7 +43,7 @@
           {{ $task->task }}
         </td>
         <td>
-          {{ $task->createdBy()?->email }}
+          {{ $task->createdBy?->email }}
         </td>
         <td class="text-end">
           <a href="#" onclick="deleteTask({{ $task->id }})" class="text-decoration-none" style="color:red">

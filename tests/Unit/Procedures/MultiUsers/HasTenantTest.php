@@ -27,7 +27,7 @@ test('asset created_by relationship returns correct user', function () {
     asTenant1User();
     $asset = Asset::factory()->create();
 
-    expect($asset->createdBy()->id)->toBe(tenant1User()->id);
+    expect($asset->createdBy->id)->toBe(tenant1User()->id);
 });
 
 test('users with the same tenant see all assets', function () {
@@ -37,10 +37,10 @@ test('users with the same tenant see all assets', function () {
     $asset2 = Asset::factory()->create();
 
     asTenant1User();
-    expect($asset1->createdBy()->id)->toBe(tenant1User()->id);
+    expect($asset1->createdBy->id)->toBe(tenant1User()->id);
     expect(Asset::count())->toBe(2);
     asTenant1User2();
-    expect($asset2->createdBy()->id)->toBe(tenant1User2()->id);
+    expect($asset2->createdBy->id)->toBe(tenant1User2()->id);
     expect(Asset::count())->toBe(2);
 });
 

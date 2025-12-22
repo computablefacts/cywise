@@ -46,7 +46,7 @@
           {{ Illuminate\Support\Number::format($collection->chunks->where('is_embedded', true)->count(), locale:'sv') }}
         </td>
         <td>{{ $collection->created_at->format('Y-m-d H:i') }}</td>
-        <td>{{ $collection->createdBy()?->name }}</td>
+        <td>{{ $collection->createdBy?->name }}</td>
         <td class="text-end">
           <a href="#" onclick="deleteCollection({{ $collection->id }})" class="text-decoration-none" style="color:red">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"

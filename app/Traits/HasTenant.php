@@ -7,6 +7,7 @@ use App\Models\AssetTagHash;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -76,13 +77,13 @@ trait HasTenant
         });
     }
 
-    public function createdBy(): User
+    public function createdBy(): BelongsTo
     {
-        return User::where('id', $this->created_by)->firstOrFail();
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function tenant(): ?Tenant
     {
-        return $this->createdBy()->tenant();
+        return $this->createdBy->tenant();
     }
 }

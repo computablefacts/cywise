@@ -48,7 +48,7 @@ class EndVulnsScanListener extends AbstractListener
                     return;
                 }
 
-                $user = $trial->createdBy();
+                $user = $trial->createdBy;
                 $assets = $trial->assets()->get();
                 $scansInProgress = $assets->contains(fn(Asset $asset) => $asset->scanInProgress()->isNotEmpty());
 
@@ -287,7 +287,7 @@ class EndVulnsScanListener extends AbstractListener
                 $item->deleteItem();
                 $item->save();
             });
-            $asset->alerts()->get()->each(fn(Alert $alert) => TimelineItem::createAlert($alert->asset()->createdBy(), $scan, $alert));
+            $asset->alerts()->get()->each(fn(Alert $alert) => TimelineItem::createAlert($alert->asset()->createdBy, $scan, $alert));
         }
     }
 }

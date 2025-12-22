@@ -77,10 +77,10 @@ class EndDiscoveryListener extends AbstractListener
                     ->get()
                     ->filter(function (Asset $asset) {
                         // Deal with clients using one of our many domains...
-                        return $asset->createdBy()->isCywiseAdmin() || !Str::endsWith($asset->asset, ['computablefacts.com', 'computablefacts.io', 'towerify.io', 'cywise.io']);
+                        return $asset->createdBy->isCywiseAdmin() || !Str::endsWith($asset->asset, ['computablefacts.com', 'computablefacts.io', 'towerify.io', 'cywise.io']);
                     })
                     ->each(function (Asset $asset) use ($domain) {
-                        CreateAsset::dispatch($asset->createdBy(), $domain, true);
+                        CreateAsset::dispatch($asset->createdBy, $domain, true);
                     });
             });
 
