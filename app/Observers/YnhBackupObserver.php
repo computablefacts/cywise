@@ -2,9 +2,9 @@
 
 namespace App\Observers;
 
-use App\Traits\IsTenantAware2;
+use App\Traits\IsTenantAware;
 
 class YnhBackupObserver
 {
-    use IsTenantAware2;
+    use IsTenantAware;
 }

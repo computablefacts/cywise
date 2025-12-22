@@ -29,9 +29,9 @@ test('ynh backup result is cast to array', function () {
 
 test('ynh backup belongs to user', function () {
     $user = User::factory()->create();
-    $backup = YnhBackup::factory()->for($user)->create();
-    expect($backup->user)->toBeInstanceOf(User::class);
-    expect($backup->user->id)->toBe($user->id);
+    $backup = YnhBackup::factory()->for($user, 'createdBy')->create();
+    expect($backup->createdBy)->toBeInstanceOf(User::class);
+    expect($backup->createdBy->id)->toBe($user->id);
 });
 
 test('ynh backup factory uses authenticated user when available', function () {
@@ -53,8 +53,8 @@ test('ynh backup belongs to server', function () {
     expect($backup->server->id)->toBe($server->id);
 });
 
-test('ynh backup with null user id', function () {
-    $backup = YnhBackup::factory()->create(['user_id' => null]);
+test('ynh backup with null created by', function () {
+    $backup = YnhBackup::factory()->create(['created_by' => null]);
     expect($backup->createdBy)->toBeNull();
 });
 

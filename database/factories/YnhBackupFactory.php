@@ -21,7 +21,7 @@ class YnhBackupFactory extends Factory
     {
         return [
             'ynh_server_id' => YnhServer::factory(),
-            'user_id' => Auth::user()->id ?? User::factory(),
+            'created_by' => Auth::user()->id ?? User::factory(),
             'name' => $this->faker->word(),
             'size' => $this->faker->numberBetween(1000, 1000000),
             'storage_path' => $this->faker->optional()->filePath(),
