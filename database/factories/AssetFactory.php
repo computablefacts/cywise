@@ -27,9 +27,9 @@ class AssetFactory extends Factory
                 if ($attributes['type'] === AssetTypesEnum::DNS) {
                     return $this->faker->domainName;
                 } elseif ($attributes['type'] === AssetTypesEnum::IP) {
-                    return $this->faker->ipv4;
+                    return $this->fakeValidIpv4();
                 } else { // AssetTypesEnum::RANGE
-                    return $this->faker->ipv4.'/24';
+                    return $this->fakeValidIpv4().'/24';
                 }
             },
             'is_monitored' => $this->faker->boolean,
@@ -66,5 +66,14 @@ class AssetFactory extends Factory
                 'is_monitored' => false,
             ];
         });
+    }
+
+    private function fakeValidIpv4(): string
+    {
+        do {
+            $ip = $this->faker->ipv4;
+        } while (! IsValidIpAddress::test($ip));
+
+        return $ip;
     }
 }
