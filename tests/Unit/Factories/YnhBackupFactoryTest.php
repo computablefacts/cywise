@@ -54,7 +54,13 @@ test('ynh backup belongs to server', function () {
 });
 
 test('ynh backup with null created by', function () {
-    $backup = YnhBackup::factory()->create(['created_by' => null]);
+    Auth::logout();
+    
+    $backup = YnhBackup::factory(['created_by' => null])->for(
+        YnhServer::factory(['user_id' => null])->create(), 
+        'server'
+    )->create();
+
     expect($backup->createdBy)->toBeNull();
 });
 

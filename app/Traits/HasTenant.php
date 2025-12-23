@@ -84,6 +84,6 @@ trait HasTenant
 
     public function tenant(): ?Tenant
     {
-        return $this->createdBy->tenant();
+        return $this->createdBy?->tenant();
     }
 }

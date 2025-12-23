@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -91,30 +92,21 @@ class YnhServer extends Model
 
     public static function forUser(User $user, bool $readyOnly = false): Collection
     {
-        if ($user->tenant_id) {
-            if ($user->customer_id) {
-                return YnhServer::with('applications', 'domains', 'users')
-                    ->select('ynh_servers.*')
-                    ->whereRaw($readyOnly ? "ynh_servers.is_ready = true" : "1=1")
-                    ->join('users', 'users.id', '=', 'ynh_servers.user_id')
-                    ->whereRaw("(users.tenant_id IS NULL OR users.tenant_id = {$user->tenant_id})")
-                    ->whereRaw("(users.customer_id IS NULL OR users.customer_id = {$user->customer_id})")
-                    ->orderBy('ynh_servers.name')
-                    ->get();
-            }
-            return YnhServer::with('applications', 'domains', 'users')
-                ->select('ynh_servers.*')
-                ->whereRaw($readyOnly ? "ynh_servers.is_ready = true" : "1=1")
-                ->join('users', 'users.id', '=', 'ynh_servers.user_id')
-                ->whereRaw("(users.tenant_id IS NULL OR users.tenant_id = {$user->tenant_id})")
-                ->orderBy('ynh_servers.name')
-                ->get();
-        }
-        return YnhServer::with('applications', 'domains', 'users')
+        $currentUser = Auth::user();
+        Auth::login($user);
+
+        $query = YnhServer::with('applications', 'domains', 'users')
             ->select('ynh_servers.*')
             ->whereRaw($readyOnly ? "ynh_servers.is_ready = true" : "1=1")
-            ->orderBy('ynh_servers.name')
-            ->get();
+            ->orderBy('ynh_servers.name');
+
+        // dump($query->toSql());
+
+        $servers = $query->get();
+
+        Auth::login($currentUser);
+
+        return $servers;
     }
 
     public function applications(): HasMany
