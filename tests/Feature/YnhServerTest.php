@@ -30,7 +30,7 @@ describe('forUser()', function () {
 
     it('returns servers', function () {
         $user = User::factory()->create(['tenant_id' => null]);
-        $server = YnhServer::factory()->create(['user_id' => $user->id]);
+        $server = YnhServer::factory()->create(['created_by' => $user->id]);
 
         $servers = YnhServer::forUser($user);
         expect($servers->contains($server))->toBeTrue();
@@ -38,8 +38,8 @@ describe('forUser()', function () {
 
     it('filters ready servers', function () {
         $user = User::factory()->create(['tenant_id' => null]);
-        YnhServer::factory()->create(['user_id' => $user->id, 'is_ready' => true]);
-        YnhServer::factory()->create(['user_id' => $user->id, 'is_ready' => false]);
+        YnhServer::factory()->create(['created_by' => $user->id, 'is_ready' => true]);
+        YnhServer::factory()->create(['created_by' => $user->id, 'is_ready' => false]);
 
         $servers = YnhServer::forUser($user, true);
         expect($servers->count())->toBe(1);
@@ -55,7 +55,7 @@ describe('forUser()', function () {
         expect($servers->count())->toBe(1);
         $servers = YnhServer::forUser(tenant2User());
         expect($servers->count())->toBe(2);
-        $allServers = YnhServer::withoutGlobalScope('tenant_scope_2')->get();
+        $allServers = YnhServer::withoutGlobalScope('tenant_scope')->get();
         expect($allServers->count())->toBe(3);
     });
 

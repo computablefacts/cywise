@@ -10,7 +10,7 @@ use App\Hashing\TwHasher;
 use App\Helpers\AppStore;
 use App\Helpers\SshConnection2;
 use App\Helpers\SshKeyPair;
-use App\Traits\HasTenant2;
+use App\Traits\HasTenant;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -34,7 +34,7 @@ use Illuminate\Support\Str;
  * @property ?string ssh_username
  * @property ?string ssh_public_key
  * @property ?string ssh_private_key
- * @property ?int user_id
+ * @property ?int created_by
  * @property bool updated
  * @property bool is_ready
  * @property ?int ynh_order_id
@@ -46,7 +46,7 @@ use Illuminate\Support\Str;
  */
 class YnhServer extends Model
 {
-    use HasFactory, HasTenant2;
+    use HasFactory, HasTenant;
 
     protected $fillable = [
         'name',
@@ -57,7 +57,7 @@ class YnhServer extends Model
         'ssh_username',
         'ssh_public_key',
         'ssh_private_key',
-        'user_id', // the user who created this server
+        'created_by', // the user who created this server
         'updated', // restricted usage to PullServersInfos
         'is_ready',
         'ynh_order_id',
@@ -138,7 +138,7 @@ class YnhServer extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function order(): BelongsTo

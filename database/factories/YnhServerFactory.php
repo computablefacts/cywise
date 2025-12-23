@@ -21,7 +21,7 @@ class YnhServerFactory extends Factory
         $dateTime = $this->faker->dateTimeBetween('-24 hour', 'now');
 
         return [
-            'user_id' => Auth::user()->id ?? User::factory(),
+            'created_by' => Auth::user()->id ?? User::factory(),
             'created_at' => $dateTime,
             'updated_at' => $dateTime,
             'name' => $this->faker->word,

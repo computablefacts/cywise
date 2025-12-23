@@ -57,7 +57,7 @@ test('ynh backup with null created by', function () {
     Auth::logout();
     
     $backup = YnhBackup::factory(['created_by' => null])->for(
-        YnhServer::factory(['user_id' => null])->create(), 
+        YnhServer::factory(['created_by' => null])->create(), 
         'server'
     )->create();
 
