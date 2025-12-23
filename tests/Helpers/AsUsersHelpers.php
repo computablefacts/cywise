@@ -3,6 +3,8 @@
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 
 function asTenant1User(): TestCase
@@ -64,4 +66,12 @@ function tenant2User(): User
             'verified' => true,
         ]
     );
+}
+
+function becomeCywiseAdmin(): void
+{
+    $user = Auth::user();
+    if ($user) {
+        Config::set('towerify.admin.email', $user->email);
+    }
 }
