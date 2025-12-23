@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon updated_at
  * @property string hash
  * @property string tag
- * @property int views
  * @property int created_by
  */
 class AssetTagHash extends Model
@@ -24,7 +23,6 @@ class AssetTagHash extends Model
 
     protected $fillable = [
         'hash',
-        'views',
         'tag',
         'created_by',
     ];

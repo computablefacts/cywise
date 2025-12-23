@@ -155,7 +155,7 @@ describe('assets@listGroups', function () {
                 'jsonrpc',
                 'result' => [
                     'groups' => [
-                        ['created_by_email', 'hash', 'tags', 'views'],
+                        ['created_by_email', 'hash', 'tags'],
                     ],
                 ],
             ])
@@ -163,7 +163,6 @@ describe('assets@listGroups', function () {
                 'created_by_email' => tenant1User()->email,
                 'hash' => $hash,
                 'tags' => ['tag1'],
-                'views' => 0,
             ]);
     });
 
@@ -185,7 +184,7 @@ describe('assets@listGroups', function () {
                 'jsonrpc',
                 'result' => [
                     'groups' => [
-                        ['created_by_email', 'hash', 'tags', 'views'],
+                        ['created_by_email', 'hash', 'tags'],
                     ],
                 ],
             ])
@@ -193,7 +192,6 @@ describe('assets@listGroups', function () {
                 'created_by_email' => tenant1User()->email,
                 'hash' => $hash,
                 'tags' => ['tag1', 'tag2'],
-                'views' => 0,
             ]);
     });
 
@@ -218,8 +216,8 @@ describe('assets@listGroups', function () {
                 'jsonrpc',
                 'result' => [
                     'groups' => [
-                        ['created_by_email', 'hash', 'tags', 'views'],
-                        ['created_by_email', 'hash', 'tags', 'views'],
+                        ['created_by_email', 'hash', 'tags'],
+                        ['created_by_email', 'hash', 'tags'],
                     ],
                 ],
             ])
@@ -228,12 +226,10 @@ describe('assets@listGroups', function () {
                     'created_by_email' => tenant1User()->email,
                     'hash' => $hashTag1AndTag2,
                     'tags' => ['tag1', 'tag2'],
-                    'views' => 0,
                 ], [
                     'created_by_email' => tenant1User()->email,
                     'hash' => $hashTag1Only,
                     'tags' => ['tag1'],
-                    'views' => 0,
                 ],
             ]);
     });
@@ -254,7 +250,7 @@ describe('assets@listGroups', function () {
                 'jsonrpc',
                 'result' => [
                     'groups' => [
-                        ['created_by_email', 'hash', 'tags', 'views'],
+                        ['created_by_email', 'hash', 'tags'],
                     ],
                 ],
             ])
@@ -263,7 +259,6 @@ describe('assets@listGroups', function () {
                     'created_by_email' => tenant1User()->email,
                     'hash' => 'user1@tenant2.com',
                     'tags' => ['tag1'],
-                    'views' => 0,
                 ],
             ]);
     });
@@ -288,7 +283,7 @@ describe('assets@listGroups', function () {
                 'jsonrpc',
                 'result' => [
                     'groups' => [
-                        ['created_by_email', 'hash', 'tags', 'views'],
+                        ['created_by_email', 'hash', 'tags'],
                     ],
                 ],
             ])
@@ -297,7 +292,6 @@ describe('assets@listGroups', function () {
                     'created_by_email' => tenant1User()->email,
                     'hash' => 'user1@tenant2.com',
                     'tags' => ['tag1', 'tag2'],
-                    'views' => 0,
                 ],
             ]);
     });
@@ -322,14 +316,12 @@ describe('assets@getGroup', function () {
                     'group' => [
                         'hash',
                         'tags',
-                        'views',
                     ],
                 ],
             ])
             ->assertJsonFragment([
                 'hash' => $hash,
                 'tags' => ['tag1'],
-                'views' => 0,
             ]);
     });
 });

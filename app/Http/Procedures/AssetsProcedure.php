@@ -660,7 +660,6 @@ class AssetsProcedure extends Procedure
                 return [
                     'hash' => $hash,
                     'tags' => $items->pluck('tag')->unique()->values()->toArray(),
-                    'views' => $items->sum('views'),
                     'created_by_email' => User::find($items->first()['created_by'])?->email ?? null,
                 ];
             })
@@ -695,7 +694,6 @@ class AssetsProcedure extends Procedure
             'group' => [
                 'hash' => $params['group'],
                 'tags' => $items->pluck('tag')->toArray(),
-                'views' => $items->sum('views'),
             ],
         ];
     }
@@ -717,8 +715,6 @@ class AssetsProcedure extends Procedure
 
         /** @var AssetTagHash $group */
         $group = AssetTagHash::where('hash', $params['group'])->firstOrFail();
-        $group->views = $group->views + 1;
-        $group->update();
 
         $assets = Asset::select('am_assets.*')
             ->distinct()
@@ -751,8 +747,6 @@ class AssetsProcedure extends Procedure
 
         /** @var AssetTagHash $group */
         $group = AssetTagHash::where('hash', $params['group'])->firstOrFail();
-        $group->views = $group->views + 1;
-        $group->update();
 
         $assets = Asset::select('am_assets.*')
             ->where('am_assets.is_monitored', true)
