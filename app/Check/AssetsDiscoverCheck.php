@@ -55,7 +55,7 @@ class AssetsDiscoverCheck extends Check
         return cache()->get($this->getCacheKey('lastStart'));
     }
 
-    public function setLastStart(int $timestamp = null): void
+    public function setLastStart(?int $timestamp = null): void
     {
         if (is_null($timestamp)) {
             $timestamp = now()->timestamp;
