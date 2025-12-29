@@ -4,14 +4,20 @@ namespace Database\Seeders;
 
 use App\Models\AppConfig;
 use App\Models\Permission;
+use App\Models\RemoteAction;
 use App\Models\Role;
 use App\Models\User;
 use Database\Seeders\DbConfig\DbAppConfigInterface;
 use Illuminate;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use ReflectionClass;
+use ReflectionMethod;
+use Sajya\Server\Attributes\RpcMethod;
+use Sajya\Server\Procedure;
 use Symfony\Component\Yaml\Yaml;
 use Wave\Plan;
 use Wave\Setting;
@@ -33,6 +39,7 @@ class CywiseSeeder extends Seeder
         $this->setupOssecRules();
         $this->setupOsqueryRules();
         $this->setupCyberFrameworks();
+        $this->setupCyberBuddy();
         $this->updateAccountsData();
     }
 
@@ -518,6 +525,134 @@ class CywiseSeeder extends Seeder
                     });
             }
         });
+    }
+
+    private function setupCyberBuddy(): void
+    {
+        $whitelist = [
+            'assets@create',
+            'assets@delete',
+            'assets@list',
+        ];
+        $methods = $this->discoverProcedures();
+
+        foreach ($methods as $rpc) {
+
+            $name = $rpc['full_name'];
+            $description = $rpc['description'];
+            $params = $rpc['params'];
+
+            if (in_array($name, $whitelist)) {
+
+                Log::debug("Loading action {$name} schema...");
+
+                $payload = [
+                    "jsonrpc" => "2.0",
+                    "id" => 1,
+                    "method" => $name,
+                    "params" => [],
+                ];
+
+                $schema = [];
+
+                foreach ($params as $key => $desc) {
+                    // $desc = "The attribute description. (Laravel's validation string starting with the attribute type)"
+                    if (Str::containsAll($desc, ['(', ')'])) {
+                        $validation = Str::trim(Str::between($desc, '(', ')'));
+                        $schema[$key] = [
+                            'type' => Str::before($validation, '|'),
+                            'validation' => $validation,
+                            'description' => Str::trim(Str::replace("({$validation})", "", $desc)),
+                        ];
+                        if (Str::contains($validation, 'required')) {
+                            $payload['params'][$key] = "{{" . $key . "}}";
+                        }
+                    }
+                }
+
+                Log::debug("Action {$name} schema loaded : ", $schema);
+
+                if (empty($schema)) {
+                    Log::warning("Action {$name} schema has no properties. Skipped.");
+                    continue;
+                }
+
+                Log::debug("Updating or creating action {$name}...");
+
+                /** @var RemoteAction $action */
+                $action = RemoteAction::updateOrCreate([
+                    'name' => $name,
+                ], [
+                    'description' => $description,
+                    'url' => '/api/v2/private/endpoint',
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                        'Accept-Encoding' => 'gzip',
+                        'Authorization' => 'Bearer {api_token}',
+                    ],
+                    'schema' => $schema,
+                    'payload_template' => $payload,
+                    'response_template' => null,
+                ]);
+
+                Log::debug("Action {$name} updated or created.");
+            }
+        }
+    }
+
+    /**
+     * Discover all JSON-RPC methods in App\Http\Procedures
+     *
+     * @return array
+     */
+    private function discoverProcedures(): array
+    {
+        $path = app_path('Http/Procedures');
+
+        if (!File::isDirectory($path)) {
+            return [];
+        }
+
+        $files = File::files($path);
+        $methods = [];
+
+        foreach ($files as $file) {
+
+            $className = 'App\\Http\\Procedures\\' . $file->getBasename('.php');
+
+            if (!class_exists($className)) {
+                continue;
+            }
+
+            $reflectionClass = new ReflectionClass($className);
+
+            if (!$reflectionClass->isSubclassOf(Procedure::class) || $reflectionClass->isAbstract()) {
+                continue;
+            }
+
+            $procedureName = $className::$name ?? Str::lower($reflectionClass->getShortName());
+
+            foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+
+                $attributes = $method->getAttributes(RpcMethod::class);
+
+                foreach ($attributes as $attribute) {
+                    /** @var RpcMethod $method */
+                    $m = $attribute->newInstance();
+                    $methods[] = [
+                        'procedure' => $procedureName,
+                        'method' => $method->getName(),
+                        'full_name' => "{$procedureName}@{$method->getName()}",
+                        'description' => $m->description,
+                        'params' => $m->params,
+                        'result' => $m->result,
+                        'class' => $className,
+                    ];
+                }
+            }
+        }
+        return $methods;
     }
 
     private function setupCyberFrameworks(): void

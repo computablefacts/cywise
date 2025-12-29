@@ -33,7 +33,7 @@ class RemoteAction extends AbstractAction
             "type" => "function",
             "function" => [
                 "name" => $this->action->name,
-                "description" => "{$this->action->description}\n\nThe following informations are needed:\n{$schema}",
+                "description" => "{$this->action->description}\n\nThe following information are needed:\n{$schema}",
                 "parameters" => [
                     "type" => "object",
                     "properties" => [
@@ -62,9 +62,9 @@ class RemoteAction extends AbstractAction
         $action = $this->action;
 
         // Extract parameters from input
-        $prompt = 'Extract the following informations:';
+        $prompt = 'Extract the following information:';
 
-        foreach ($this->action->schema as $key => $properties) {
+        foreach ($action->schema as $key => $properties) {
             $prompt .= "- {$key}: {$properties['description']} ({$properties['type']})\n";
         }
 
@@ -80,7 +80,7 @@ class RemoteAction extends AbstractAction
         $chainOfThought[] = new ThoughtActionObservation("Extract parameters for the remote action " . $this->name() . " parameters.", "extract_parameters[{$input}]", "The extraction succeeded. I must now validate the parameters.");
 
         // Validate the parameters
-        $validator = $this->buildValidator($action->schema['parameters']['properties'] ?? [], $params);
+        $validator = $this->buildValidator($action->schema ?? [], $params);
 
         if ($validator->fails()) {
             $chainOfThought[] = new ThoughtActionObservation("Validate the remote action " . $this->name() . " parameters.", "validate_parameters[" . json_encode($params) . "]", "The validation failed: " . $validator->errors()->toJson());

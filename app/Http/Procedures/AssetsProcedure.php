@@ -274,9 +274,9 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "Create a single asset.",
         params: [
-            "asset" => "The asset as an IP address or a DNS.",
-            "watch" => "True if the asset should be monitored directly after the creation. False otherwise.",
-            "trial_id" => "The trial id this asset belongs to (if any).",
+            "asset" => "The asset as an IP address or a DNS. (string|required|min:1|max:191)",
+            "watch" => "True if the asset should be monitored directly after the creation. False otherwise. (boolean)",
+            "trial_id" => "If any, the trial id this asset belongs to. (integer|exists:ynh_trials,id)",
         ],
         result: [
             "asset" => "An asset object.",
@@ -285,7 +285,7 @@ class AssetsProcedure extends Procedure
     public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset' => 'required|string|min:1|max:191',
+            'asset' => 'string|required|min:1|max:191',
             'watch' => 'boolean',
             'trial_id' => 'integer|exists:ynh_trials,id',
         ]);
@@ -312,7 +312,7 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "Delete an asset.",
         params: [
-            "asset_id" => "The asset id.",
+            "asset_id" => "The asset id. (integer|required|exists:am_assets,id)",
         ],
         result: [
             "msg" => "A success message.",
@@ -321,7 +321,7 @@ class AssetsProcedure extends Procedure
     public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset_id' => 'required|integer|exists:am_assets,id',
+            'asset_id' => 'integer|required|exists:am_assets,id',
         ]);
 
         /** @var Asset $asset */
@@ -343,8 +343,8 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "List the user's assets.",
         params: [
-            "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets.",
-            "created_the_last_x_hours" => "Keep only assets created after (now - x hours).",
+            "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets. (boolean)",
+            "created_the_last_x_hours" => "Keep only assets created after now - x hours. (integer|min:0)",
         ],
         result: [
             "assets" => "A list of assets.",
@@ -685,11 +685,11 @@ class AssetsProcedure extends Procedure
         $params = $request->validate([
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
         ]);
-        
+
         $items = AssetTagHash::query()
             ->where('hash', '=', $params['group'])
             ->get();
-        
+
         return [
             'group' => [
                 'hash' => $params['group'],
@@ -838,7 +838,7 @@ class AssetsProcedure extends Procedure
         $authUserSaved = $request->user();
         $user = User::firstOrCreate([
             'email' => $email,
-        ],[
+        ], [
             'email' => $email,
             'name' => Str::before($email, '@'),
         ]);
