@@ -23,7 +23,6 @@ class ActionsRegistry
         // Add new actions here to make them configurable in the UI
         $classes = [
             CyberBuddy::class,
-            ManageAssets::class,
             ListAssets::class,
             ListVulnerabilities::class,
             ToggleUserGetsAuditReport::class,

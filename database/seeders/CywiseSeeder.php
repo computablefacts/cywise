@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
-use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 use Symfony\Component\Yaml\Yaml;
 use Wave\Plan;
@@ -531,6 +530,9 @@ class CywiseSeeder extends Seeder
     {
         $whitelist = [
             'assets@create',
+            'assets@delete',
+            'assets@monitor',
+            'assets@unmonitor',
         ];
         $methods = $this->discoverProcedures();
 
@@ -538,7 +540,8 @@ class CywiseSeeder extends Seeder
 
             $name = $rpc['full_name'];
             $description = $rpc['description'];
-            $examples = $rpc['examples'];
+            $examples = $rpc['ai_examples'];
+            $result = $rpc['ai_result'];
             $params = $rpc['params'];
 
             if (in_array($name, $whitelist)) {
@@ -591,7 +594,9 @@ class CywiseSeeder extends Seeder
                     ],
                     'schema' => $schema,
                     'payload_template' => $payload,
-                    'response_template' => null,
+                    'response_template' => [
+                        'transformation' => $result,
+                    ],
                     'examples' => $examples,
                 ]);
 
@@ -637,7 +642,7 @@ class CywiseSeeder extends Seeder
                 $attributes = $method->getAttributes(\App\Http\Procedures\RpcMethod::class);
 
                 foreach ($attributes as $attribute) {
-                    /** @var RpcMethod $method */
+                    /** @var \App\Http\Procedures\RpcMethod $m */
                     $m = $attribute->newInstance();
                     $methods[] = [
                         'procedure' => $procedureName,
@@ -646,7 +651,8 @@ class CywiseSeeder extends Seeder
                         'description' => $m->description,
                         'params' => $m->params,
                         'result' => $m->result,
-                        'examples' => $m->examples ?? [],
+                        'ai_examples' => $m->ai_examples ?? [],
+                        'ai_result' => $m->ai_result,
                         'class' => $className,
                     ];
                 }

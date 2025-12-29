@@ -165,7 +165,10 @@ class RemoteAction extends AbstractAction
             $answer = $this->buildResponse($action->response_template, $data);
             $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} after transformation.", "transform[" . json_encode($data) . "]", "The data have been transformed: " . json_encode($answer));
         }
-        return new SuccessfulAnswer(json_encode($answer['transformation']), $chainOfThought);
+        return new SuccessfulAnswer(
+            is_string($answer['transformation']) ? $answer['transformation'] : json_encode($answer['transformation']),
+            $chainOfThought
+        );
     }
 
     private function buildValidator(array $properties, array $params): \Illuminate\Validation\Validator

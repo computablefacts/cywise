@@ -24,7 +24,6 @@ use App\Rules\IsValidIpAddress;
 use App\Rules\IsValidTag;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Sajya\Server\Procedure;
@@ -280,11 +279,11 @@ class AssetsProcedure extends Procedure
         result: [
             "asset" => "An asset object.",
         ],
-        examples: [
-            "if the request is 'ajoute example.com', the input should be {\"asset\":\"example.com\",\"watch\":false}",
-            "if the request is 'surveille sub.domain.net', the input should be {\"asset\":\"sub.domain.net\",\"watch\":true}",
+        ai_examples: [
+            "if the request is 'add example.com', the input should be {\"asset\":\"example.com\",\"watch\":false}",
             "if the request is 'add and monitor 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\",\"watch\":true}",
-        ]
+        ],
+        ai_result: "The asset {{result.asset.asset}} has been created.",
     )]
     public function create(JsonRpcRequest $request): array
     {
@@ -301,9 +300,7 @@ class AssetsProcedure extends Procedure
         $asset = $params['asset'];
         $watch = is_bool($params['watch']) && $params['watch'];
         $trialId = $params['trial_id'] ?? 0;
-
-        $user = $request->user();
-        $obj = CreateAssetListener::execute($user, $asset, $watch, [], $trialId);
+        $obj = CreateAssetListener::execute($request->user(), $asset, $watch, [], $trialId);
 
         if (!$obj) {
             throw new \Exception("The asset could not be created : {$params['asset']}");
@@ -316,28 +313,41 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "Delete an asset.",
         params: [
-            "asset_id" => "The asset id.",
+            "asset" => "The asset as an IP address or DNS. (string|required|min:1|max:191)",
+            "asset_id" => "The asset id if the parameter asset is not specified.",
         ],
         result: [
             "msg" => "A success message.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'remove 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\"}",
+            "if the request is 'delete example.com', the input should be {\"asset\":\"example.com\"}",
+        ],
+        ai_result: "{{result.msg}}",
     )]
     public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset_id' => 'integer|required|exists:am_assets,id',
+            'asset_id' => 'integer|required_without:asset|prohibits:asset|exists:am_assets,id',
+            'asset' => 'string|required_without:asset_id|prohibits:asset_id|min:1|max:191|exists:am_assets,asset',
         ]);
 
-        /** @var Asset $asset */
-        $asset = Asset::find($params['asset_id']);
-
+        if (isset($params['asset_id'])) {
+            /** @var Asset $asset */
+            $asset = Asset::find($params['asset_id']);
+        } else {
+            /** @var Asset $asset */
+            $asset = Asset::where('asset', $params['asset'])->first();
+        }
         if ($asset->is_monitored) {
-            throw new \Exception('Deletion not allowed, asset is monitored.');
+
+            Scan::query()->where('asset_id', $asset->id)->delete();
+
+            $asset->is_monitored = false;
+            $asset->save();
         }
 
-        /** @var User $user */
-        $user = Auth::user();
-        DeleteAssetListener::execute($user, $asset->asset);
+        DeleteAssetListener::execute($request->user(), $asset->asset);
 
         return [
             "msg" => "{$asset->asset} has been removed.",
@@ -417,23 +427,34 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Start monitoring an asset.",
+        description: "Start monitoring an existing asset.",
         params: [
-            "asset_id" => "The asset id.",
+            "asset" => "The asset as an IP address or DNS. (string|required|min:1|max:191)",
+            "asset_id" => "The asset id if the parameter asset is not specified.",
         ],
         result: [
             "asset" => "The monitored asset.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'monitor example.com', the input should be {\"asset\":\"example.com\"}",
+            "if the request is 'watch 10.0.0.5', the input should be {\"asset\":\"10.0.0.5\"}",
+        ],
+        ai_result: "The monitoring of {{result.asset.asset}} started.",
     )]
     public function monitor(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset_id' => 'required|integer|exists:am_assets,id',
+            'asset_id' => 'integer|required_without:asset|prohibits:asset|exists:am_assets,id',
+            'asset' => 'string|required_without:asset_id|prohibits:asset_id|min:1|max:191|exists:am_assets,asset',
         ]);
 
-        /** @var Asset $asset */
-        $asset = Asset::find($params['asset_id']);
-
+        if (isset($params['asset_id'])) {
+            /** @var Asset $asset */
+            $asset = Asset::find($params['asset_id']);
+        } else {
+            /** @var Asset $asset */
+            $asset = Asset::where('asset', $params['asset'])->first();
+        }
         if (!$asset->is_monitored) {
             $asset->is_monitored = true;
             $asset->save();
@@ -444,23 +465,34 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Stop monitoring an asset.",
+        description: "Stop monitoring an existing asset.",
         params: [
-            "asset_id" => "The asset id.",
+            "asset" => "The asset as an IP address or DNS. (string|required|min:1|max:191)",
+            "asset_id" => "The asset id if the parameter asset is not specified.",
         ],
         result: [
             "asset" => "The unmonitored asset.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'unwatch example.com', the input should be {\"asset\":\"example.com\"}",
+            "if the request is 'stop monitoring 10.0.0.5', the input should be {\"asset\":\"10.0.0.5\"}",
+        ],
+        ai_result: "The monitoring of {{result.asset.asset}} ended.",
     )]
     public function unmonitor(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset_id' => 'required|integer|exists:am_assets,id',
+            'asset_id' => 'integer|required_without:asset|prohibits:asset|exists:am_assets,id',
+            'asset' => 'string|required_without:asset_id|prohibits:asset_id|min:1|max:191|exists:am_assets,asset',
         ]);
 
-        /** @var Asset $asset */
-        $asset = Asset::find($params['asset_id']);
-
+        if (isset($params['asset_id'])) {
+            /** @var Asset $asset */
+            $asset = Asset::find($params['asset_id']);
+        } else {
+            /** @var Asset $asset */
+            $asset = Asset::where('asset', $params['asset'])->first();
+        }
         if ($asset->is_monitored) {
 
             Scan::query()->where('asset_id', $asset->id)->delete();
