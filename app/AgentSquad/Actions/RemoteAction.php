@@ -6,7 +6,6 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\ThoughtActionObservation;
 use App\Models\User;
 use Illuminate\Support\Arr;
@@ -25,21 +24,25 @@ class RemoteAction extends AbstractAction
 
     protected function schema(): array
     {
-        $schema = '';
+        $parameters = "The following information are needed:\n";
+
         foreach ($this->action->schema as $key => $properties) {
-            $schema .= "- {$key}: {$properties['description']} ({$properties['type']})\n";
+            $parameters .= "- {$key}: {$properties['description']} ({$properties['type']})\n";
         }
+
+        $examples = empty($this->action->examples) ? "" : "For example:\n-" . implode("\n-", $this->action->examples);
+
         return [
             "type" => "function",
             "function" => [
                 "name" => $this->action->name,
-                "description" => "{$this->action->description}\n\nThe following information are needed:\n{$schema}",
+                "description" => "{$this->action->description}\n\n{$parameters}\n{$examples}",
                 "parameters" => [
                     "type" => "object",
                     "properties" => [
                         "input" => [
                             "type" => "string",
-                            "description" => "A summary of the action to perform.",
+                            "description" => "A JSON object with the parameters to be used in the remote action.",
                         ],
                     ],
                     "required" => ["input"],
@@ -62,41 +65,36 @@ class RemoteAction extends AbstractAction
         $action = $this->action;
 
         // Extract parameters from input
-        $prompt = 'Extract the following information:';
-
-        foreach ($action->schema as $key => $properties) {
-            $prompt .= "- {$key}: {$properties['description']} ({$properties['type']})\n";
-        }
-
-        $prompt .= "\n\nFrom the following data: {$input}\n\nReturn the parameters in JSON format.";
-        $answer = LlmsProvider::provide($prompt);
-        $params = json_decode($answer, true);
+        $params = json_decode($input, true);
 
         if ($params === null) {
-            $chainOfThought[] = new ThoughtActionObservation("Extract parameters for the remote action " . $this->name() . " parameters.", "extract_parameters[{$input}]", "The extraction failed: {$answer}");
-            return new FailedAnswer("Parameter extraction failed for action " . $this->name(), $chainOfThought);
+            $chainOfThought[] = new ThoughtActionObservation("Extract parameters for the remote action {$this->name()} parameters.", "extract_parameters[{$input}]", "The extraction failed: {$input}");
+            return new FailedAnswer("Parameter extraction failed for action {$this->name()}", $chainOfThought);
         }
 
-        $chainOfThought[] = new ThoughtActionObservation("Extract parameters for the remote action " . $this->name() . " parameters.", "extract_parameters[{$input}]", "The extraction succeeded. I must now validate the parameters.");
+        $chainOfThought[] = new ThoughtActionObservation("Extract parameters for the remote action {$this->name()} parameters.", "extract_parameters[{$input}]", "The extraction succeeded. I must now validate the parameters.");
 
         // Validate the parameters
         $validator = $this->buildValidator($action->schema ?? [], $params);
 
         if ($validator->fails()) {
-            $chainOfThought[] = new ThoughtActionObservation("Validate the remote action " . $this->name() . " parameters.", "validate_parameters[" . json_encode($params) . "]", "The validation failed: " . $validator->errors()->toJson());
-            return new FailedAnswer("Parameter validation failed for action " . $this->name(), $chainOfThought);
+            $chainOfThought[] = new ThoughtActionObservation("Validate the remote action {$this->name()} parameters.", "validate_parameters[" . json_encode($params) . "]", "The validation failed: {$validator->errors()->toJson()}");
+            return new FailedAnswer("Parameter validation failed for action {$this->name()}", $chainOfThought);
         }
 
-        $chainOfThought[] = new ThoughtActionObservation("Validate the remote action " . $this->name() . " parameters.", "validate_parameters[" . json_encode($params) . "]", "The validation succeeded. I must now build the payload.");
+        $chainOfThought[] = new ThoughtActionObservation("Validate the remote action {$this->name()} parameters.", "validate_parameters[" . json_encode($params) . "]", "The validation succeeded. I must now build the payload.");
 
         // Build the JSON-RPC payload
         $payload = $this->buildPayload($action->payload_template, $params);
-        $chainOfThought[] = new ThoughtActionObservation("Build the remote action " . $this->name() . " payload.", "build_payload[" . json_encode($params) . "]", "The payload has been built: " . json_encode($payload) . ". I must now call the endpoint.");
+        $chainOfThought[] = new ThoughtActionObservation("Build the remote action {$this->name()} payload.", "build_payload[" . json_encode($params) . "]", "The payload has been built: " . json_encode($payload) . ". I must now call the endpoint.");
 
         // Call the JSON-RPC endpoint
         try {
             $url = Str::replace('{api_token}', $user->sentinelApiToken(), $action->url);
-            if (Str::endsWith($url, '/api/v2/private/endpoint')) {
+            if (!Str::endsWith($url, '/api/v2/private/endpoint')) {
+                $headers = collect($action->headers)->toArray();
+                $response = Http::withHeaders($headers)->timeout(5)->post($url, $payload);
+            } else {
                 $request = \Illuminate\Http\Request::create(
                     '/api/v2/private/endpoint',
                     'POST',
@@ -139,39 +137,33 @@ class RemoteAction extends AbstractAction
                         return gzdecode($this->raw->getContent()); // due to Sajya\Server\Middleware\GzipCompress
                     }
                 };
-            } else {
-                $headers = collect($action->headers)->toArray();
-                if (isset($headers['Authorization'])) {
-                    $headers['Authorization'] = Str::replace('{api_token}', $user->sentinelApiToken(), $headers['Authorization']);
-                }
-                $response = Http::withHeaders($headers)->timeout(5)->post($url, $payload);
             }
         } catch (\Exception $e) {
-            $chainOfThought[] = new ThoughtActionObservation("Call the remote action " . $this->name() . " endpoint.", "call[{$action->url}]", "The endpoint has been called but the call failed: {$e->getMessage()}");
-            return new FailedAnswer("Remote action call failed for action " . $this->name(), $chainOfThought);
+            $chainOfThought[] = new ThoughtActionObservation("Call the remote action {$this->name()} endpoint.", "call[{$action->url}]", "The endpoint has been called but the call failed: {$e->getMessage()}");
+            return new FailedAnswer("Remote action call failed for action {$this->name()}", $chainOfThought);
         }
         if ($response->failed()) {
-            $chainOfThought[] = new ThoughtActionObservation("Call the remote action " . $this->name() . " endpoint.", "call[{$action->url}]", "The endpoint has been called but the call failed: {$response->body()}");
-            return new FailedAnswer("Remote action call failed for action " . $this->name(), $chainOfThought);
+            $chainOfThought[] = new ThoughtActionObservation("Call the remote action {$this->name()} endpoint.", "call[{$action->url}]", "The endpoint has been called but the call failed: {$response->body()}");
+            return new FailedAnswer("Remote action call failed for action {$this->name()}", $chainOfThought);
         }
 
         $data = $response->json();
 
         // Ensure the response is not a JSON-RPC error
         if (isset($data['error'])) {
-            $chainOfThought[] = new ThoughtActionObservation("Call the remote action " . $this->name() . " endpoint.", "call[{$action->url}]", "The endpoint has been called but the call failed: " . json_encode($data));
-            return new FailedAnswer("Remote action call failed for action " . $this->name(), $chainOfThought);
+            $chainOfThought[] = new ThoughtActionObservation("Call the remote action {$this->name()} endpoint.", "call[{$action->url}]", "The endpoint has been called but the call failed: " . json_encode($data));
+            return new FailedAnswer("Remote action call failed for action {$this->name()}", $chainOfThought);
         }
 
-        $chainOfThought[] = new ThoughtActionObservation("Call the remote action " . $this->name() . " endpoint.", "call[{$action->url}]", "The endpoint has been called and the call succeeded: " . json_encode($data));
+        $chainOfThought[] = new ThoughtActionObservation("Call the remote action {$this->name()} endpoint.", "call[{$action->url}]", "The endpoint has been called and the call succeeded: " . json_encode($data));
 
         // Build the response
         if (empty($action->response_template)) {
             $answer = ['transformation' => $data];
-            $chainOfThought[] = new ThoughtActionObservation("Return data from action " . $this->name() . " as-is.", "transform[" . json_encode($data) . "]", "The data have not been transformed: " . json_encode($answer));
+            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} as-is.", "transform[" . json_encode($data) . "]", "The data have not been transformed: " . json_encode($answer));
         } else {
             $answer = $this->buildResponse($action->response_template, $data);
-            $chainOfThought[] = new ThoughtActionObservation("Return data from action " . $this->name() . " after transformation.", "transform[" . json_encode($data) . "]", "The data have been transformed: " . json_encode($answer));
+            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} after transformation.", "transform[" . json_encode($data) . "]", "The data have been transformed: " . json_encode($answer));
         }
         return new SuccessfulAnswer(json_encode($answer['transformation']), $chainOfThought);
     }

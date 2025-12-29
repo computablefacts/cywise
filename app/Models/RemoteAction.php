@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property array headers
  * @property array payload_template
  * @property ?array response_template
+ * @property ?array examples
  * @property ?\Illuminate\Support\Carbon created_at
  * @property ?\Illuminate\Support\Carbon updated_at
  */
@@ -31,7 +32,7 @@ class RemoteAction extends Model
         'schema',
         'payload_template',
         'response_template',
-
+        'examples',
     ];
 
     protected $casts = [
@@ -39,6 +40,7 @@ class RemoteAction extends Model
         'headers' => 'array',
         'payload_template' => 'array',
         'response_template' => 'array',
+        'examples' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

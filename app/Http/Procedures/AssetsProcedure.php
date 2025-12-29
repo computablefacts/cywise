@@ -27,7 +27,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
 class AssetsProcedure extends Procedure
@@ -276,10 +275,15 @@ class AssetsProcedure extends Procedure
         params: [
             "asset" => "The asset as an IP address or a DNS. (string|required|min:1|max:191)",
             "watch" => "True if the asset should be monitored directly after the creation. False otherwise. (boolean)",
-            "trial_id" => "If any, the trial id this asset belongs to. (integer|exists:ynh_trials,id)",
+            "trial_id" => "If any, the trial id this asset belongs to.",
         ],
         result: [
             "asset" => "An asset object.",
+        ],
+        examples: [
+            "if the request is 'ajoute example.com', the input should be {\"asset\":\"example.com\",\"watch\":false}",
+            "if the request is 'surveille sub.domain.net', the input should be {\"asset\":\"sub.domain.net\",\"watch\":true}",
+            "if the request is 'add and monitor 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\",\"watch\":true}",
         ]
     )]
     public function create(JsonRpcRequest $request): array
@@ -312,7 +316,7 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "Delete an asset.",
         params: [
-            "asset_id" => "The asset id. (integer|required|exists:am_assets,id)",
+            "asset_id" => "The asset id.",
         ],
         result: [
             "msg" => "A success message.",
@@ -343,8 +347,8 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "List the user's assets.",
         params: [
-            "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets. (boolean)",
-            "created_the_last_x_hours" => "Keep only assets created after now - x hours. (integer|min:0)",
+            "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets.",
+            "created_the_last_x_hours" => "Keep only assets created after now - x hours.",
         ],
         result: [
             "assets" => "A list of assets.",

@@ -531,8 +531,6 @@ class CywiseSeeder extends Seeder
     {
         $whitelist = [
             'assets@create',
-            'assets@delete',
-            'assets@list',
         ];
         $methods = $this->discoverProcedures();
 
@@ -540,6 +538,7 @@ class CywiseSeeder extends Seeder
 
             $name = $rpc['full_name'];
             $description = $rpc['description'];
+            $examples = $rpc['examples'];
             $params = $rpc['params'];
 
             if (in_array($name, $whitelist)) {
@@ -557,6 +556,7 @@ class CywiseSeeder extends Seeder
 
                 foreach ($params as $key => $desc) {
                     // $desc = "The attribute description. (Laravel's validation string starting with the attribute type)"
+                    // If there is no validation string, the parameter will be disregarded
                     if (Str::containsAll($desc, ['(', ')'])) {
                         $validation = Str::trim(Str::between($desc, '(', ')'));
                         $schema[$key] = [
@@ -564,9 +564,7 @@ class CywiseSeeder extends Seeder
                             'validation' => $validation,
                             'description' => Str::trim(Str::replace("({$validation})", "", $desc)),
                         ];
-                        if (Str::contains($validation, 'required')) {
-                            $payload['params'][$key] = "{{" . $key . "}}";
-                        }
+                        $payload['params'][$key] = "{{" . $key . "}}";
                     }
                 }
 
@@ -594,6 +592,7 @@ class CywiseSeeder extends Seeder
                     'schema' => $schema,
                     'payload_template' => $payload,
                     'response_template' => null,
+                    'examples' => $examples,
                 ]);
 
                 Log::debug("Action {$name} updated or created.");
@@ -635,7 +634,7 @@ class CywiseSeeder extends Seeder
 
             foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
 
-                $attributes = $method->getAttributes(RpcMethod::class);
+                $attributes = $method->getAttributes(\App\Http\Procedures\RpcMethod::class);
 
                 foreach ($attributes as $attribute) {
                     /** @var RpcMethod $method */
@@ -647,6 +646,7 @@ class CywiseSeeder extends Seeder
                         'description' => $m->description,
                         'params' => $m->params,
                         'result' => $m->result,
+                        'examples' => $m->examples ?? [],
                         'class' => $className,
                     ];
                 }
