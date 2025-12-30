@@ -594,9 +594,7 @@ class CywiseSeeder extends Seeder
                     ],
                     'schema' => $schema,
                     'payload_template' => $payload,
-                    'response_template' => [
-                        'transformation' => $result,
-                    ],
+                    'response_template' => $result,
                     'examples' => $examples,
                 ]);
 

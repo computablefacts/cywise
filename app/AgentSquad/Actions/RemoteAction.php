@@ -9,6 +9,7 @@ use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\AgentSquad\ThoughtActionObservation;
 use App\Models\User;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -159,14 +160,14 @@ class RemoteAction extends AbstractAction
 
         // Build the response
         if (empty($action->response_template)) {
-            $answer = ['transformation' => $data];
-            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} as-is.", "transform[" . json_encode($data) . "]", "The data have not been transformed: " . json_encode($answer));
+            $transformation = $data;
+            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} as-is.", "transform[" . json_encode($data) . "]", "The data have not been transformed: " . json_encode($transformation));
         } else {
-            $answer = $this->buildResponse($action->response_template, $data);
-            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} after transformation.", "transform[" . json_encode($data) . "]", "The data have been transformed: " . json_encode($answer));
+            $transformation = $this->buildResponse($action->response_template, $data);
+            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} after transformation.", "transform[" . json_encode($data) . "]", "The data have been transformed: {$transformation}");
         }
         return new SuccessfulAnswer(
-            is_string($answer['transformation']) ? $answer['transformation'] : json_encode($answer['transformation']),
+            is_string($transformation) ? $transformation : json_encode($transformation),
             $chainOfThought
         );
     }
@@ -204,8 +205,8 @@ class RemoteAction extends AbstractAction
         return $template;
     }
 
-    private function buildResponse(array|string $template, array $data): array|string
+    private function buildResponse(string $template, array $data): string
     {
-        return $this->buildPayload($template, $data);
+        return Blade::render($template, ['result' => $data['result']]);
     }
 }

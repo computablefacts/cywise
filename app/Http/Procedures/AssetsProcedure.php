@@ -283,7 +283,7 @@ class AssetsProcedure extends Procedure
             "if the request is 'add example.com', the input should be {\"asset\":\"example.com\",\"watch\":false}",
             "if the request is 'add and monitor 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\",\"watch\":true}",
         ],
-        ai_result: "The asset {{result.asset.asset}} has been created.",
+        ai_result: "The asset {{ \$result['asset']['asset'] }} has been created.",
     )]
     public function create(JsonRpcRequest $request): array
     {
@@ -323,7 +323,7 @@ class AssetsProcedure extends Procedure
             "if the request is 'remove 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\"}",
             "if the request is 'delete example.com', the input should be {\"asset\":\"example.com\"}",
         ],
-        ai_result: "{{result.msg}}",
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function delete(JsonRpcRequest $request): array
     {
@@ -439,7 +439,7 @@ class AssetsProcedure extends Procedure
             "if the request is 'monitor example.com', the input should be {\"asset\":\"example.com\"}",
             "if the request is 'watch 10.0.0.5', the input should be {\"asset\":\"10.0.0.5\"}",
         ],
-        ai_result: "The monitoring of {{result.asset.asset}} started.",
+        ai_result: "The monitoring of {{ \$result['asset']['asset'] }} started.",
     )]
     public function monitor(JsonRpcRequest $request): array
     {
@@ -477,7 +477,7 @@ class AssetsProcedure extends Procedure
             "if the request is 'unwatch example.com', the input should be {\"asset\":\"example.com\"}",
             "if the request is 'stop monitoring 10.0.0.5', the input should be {\"asset\":\"10.0.0.5\"}",
         ],
-        ai_result: "The monitoring of {{result.asset.asset}} ended.",
+        ai_result: "The monitoring of {{ \$result['asset']['asset'] }} ended.",
     )]
     public function unmonitor(JsonRpcRequest $request): array
     {

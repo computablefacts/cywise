@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property array schema
  * @property array headers
  * @property array payload_template
- * @property ?array response_template
+ * @property ?string response_template
  * @property ?array examples
  * @property ?\Illuminate\Support\Carbon created_at
  * @property ?\Illuminate\Support\Carbon updated_at
@@ -39,7 +39,6 @@ class RemoteAction extends Model
         'schema' => 'array',
         'headers' => 'array',
         'payload_template' => 'array',
-        'response_template' => 'array',
         'examples' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
