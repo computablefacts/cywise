@@ -3,10 +3,8 @@
 namespace App\AgentSquad;
 
 use App\AgentSquad\Actions\CyberBuddy;
-use App\AgentSquad\Actions\ListAssets;
 use App\AgentSquad\Actions\ListScheduledTasks;
 use App\AgentSquad\Actions\ListVulnerabilities;
-use App\AgentSquad\Actions\ManageAssets;
 use App\AgentSquad\Actions\ScheduleTask;
 use App\AgentSquad\Actions\ToggleUserGetsAuditReport;
 use App\AgentSquad\Actions\UnscheduleTask;
@@ -23,7 +21,6 @@ class ActionsRegistry
         // Add new actions here to make them configurable in the UI
         $classes = [
             CyberBuddy::class,
-            ListAssets::class,
             ListVulnerabilities::class,
             ToggleUserGetsAuditReport::class,
             ScheduleTask::class,

@@ -529,6 +529,7 @@ class CywiseSeeder extends Seeder
     private function setupCyberBuddy(): void
     {
         $whitelist = [
+            'assets@list',
             'assets@create',
             'assets@delete',
             'assets@monitor',

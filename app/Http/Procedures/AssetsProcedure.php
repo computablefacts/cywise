@@ -2,6 +2,7 @@
 
 namespace App\Http\Procedures;
 
+use App\Enums\AssetTypesEnum;
 use App\Events\AssetsShared;
 use App\Events\BeginPortsScan;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
@@ -357,24 +358,65 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "List the user's assets.",
         params: [
-            "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets.",
+            "type" => "The type of asset to list: domain or ip_address. (string|nullable|in:domain,ip_address)",
+            "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets. (boolean|nullable)",
             "created_the_last_x_hours" => "Keep only assets created after now - x hours.",
         ],
         result: [
             "assets" => "A list of assets.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'list assets', the input should be {\"is_monitored\":null,\"type\":null}",
+            "if the request is 'list domains', the input should be {\"type\":\"domain\"}",
+            "if the request is 'list IP addresses', the input should be {\"type\":\"ip_address\"}",
+            "if the request is 'list monitored assets', the input should be {\"is_monitored\":true}",
+            "if the request is 'list monitored domains', the input should be {\"is_monitored\":true,\"type\":\"domain\"}",
+            "if the request is 'list monitored IP addresses', the input should be {\"is_monitored\":true,\"type\":\"ip_address\"}",
+            "if the request is 'list monitorable assets', the input should be {\"is_monitored\":false}",
+            "if the request is 'list monitorable domains', the input should be {\"is_monitored\":false,\"type\":\"domain\"}",
+            "if the request is 'list monitorable IP addresses', the input should be {\"is_monitored\":false,\"type\":\"ip_address\"}",
+        ],
+        ai_result: "
+            @php
+                \$assets = collect(\$result['assets'] ?? []);
+            @endphp
+            @if(\$assets->isEmpty())
+                @if(!\$params['type'])
+                    No asset found.
+                @else
+                    No {{ \$params['type'] === 'domain' ? 'domain' : 'IP address' }} found.
+                @endif
+            @else
+                @if(!\$params['type'])
+                    {{ \$assets->count() }} assets found:
+                @else
+                    {{ \$assets->count() }} {{ \$params['type'] === 'domain' ? 'domain' : 'IP address' }} found:
+                @endif
+                @foreach(\$assets as \$asset)
+                    - {{ \$asset['asset'] }}
+                @endforeach
+            @endif
+        ",
     )]
     public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'is_monitored' => 'boolean',
+            'type' => 'string|nullable|in:domain,ip_address',
+            'is_monitored' => 'boolean|nullable',
             'created_the_last_x_hours' => 'integer|min:0',
         ]);
 
+        $type = $params['type'] ?? null;
         $valid = $params['is_monitored'] ?? null;
         $hours = $params['created_the_last_x_hours'] ?? null;
         $query = Asset::query();
 
+        if ($type === 'domain') {
+            $query->where('type', AssetTypesEnum::DNS);
+        }
+        if ($type === 'ip_address') {
+            $query->where('type', AssetTypesEnum::IP);
+        }
         if ($valid === true) {
             $query->where('is_monitored', true);
         }
@@ -894,7 +936,8 @@ class AssetsProcedure extends Procedure
             'asset' => $asset->asset,
             'tld' => $asset->tld(),
             'type' => $asset->type->name,
-            'status' => $asset->is_monitored ? 'valid' : 'invalid',
+            'status' => $asset->is_monitored ? 'valid' : 'invalid', // TODO : remove
+            'is_monitored' => $asset->is_monitored,
             'tags' => $asset->tags()
                 ->get()
                 ->map(fn(AssetTag $tag) => [

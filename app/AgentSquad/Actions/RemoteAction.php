@@ -163,7 +163,7 @@ class RemoteAction extends AbstractAction
             $transformation = $data;
             $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} as-is.", "transform[" . json_encode($data) . "]", "The data have not been transformed: " . json_encode($transformation));
         } else {
-            $transformation = $this->buildResponse($action->response_template, $data);
+            $transformation = $this->buildResponse($action->response_template, $payload['params'], $data);
             $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} after transformation.", "transform[" . json_encode($data) . "]", "The data have been transformed: {$transformation}");
         }
         return new SuccessfulAnswer(
@@ -186,14 +186,14 @@ class RemoteAction extends AbstractAction
     /**
      * Recursively replace {{key}} dans un template (array ou string)
      */
-    private function buildPayload(array|string $template, array $data): array|string
+    private function buildPayload(array|string $template, array $data): mixed
     {
         if (is_string($template)) {
-            return preg_replace_callback(
-                '/\{\{(.*?)\}\}/',
-                fn($matches) => Arr::get($data, trim($matches[1]), $matches[0]),
-                $template
-            );
+            $placeholder = Str::between($template, '{{', '}}');
+            if ($placeholder === $template) {
+                return $template;
+            }
+            return Arr::get($data, $placeholder);
         }
         if (is_array($template)) {
             foreach ($template as $key => $value) {
@@ -205,8 +205,8 @@ class RemoteAction extends AbstractAction
         return $template;
     }
 
-    private function buildResponse(string $template, array $data): string
+    private function buildResponse(string $template, array $params, array $data): string
     {
-        return Blade::render($template, ['result' => $data['result']]);
+        return Blade::render($template, ['params' => $params, 'result' => $data['result']]);
     }
 }

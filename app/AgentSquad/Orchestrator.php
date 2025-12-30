@@ -95,13 +95,13 @@ class Orchestrator
 
                 /* if ($answer->failure()) {
                     $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", 'An error occurred. Returning to the user.');
-                    $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
+                    $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
                     $answer->setChainOfThought($chainOfThought);
                     return $answer;
                 } */
 
                 $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", strip_tags($answer->markdown()));
-                $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
+                $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
 
                 if ($answer->final()) {
 
@@ -188,13 +188,13 @@ class Orchestrator
 
         if ($answer->failure()) {
             $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An error occurred. Returning to the user.');
-            $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
+            $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
             $answer->setChainOfThought($chainOfThought);
             return $answer;
         }
 
         $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", strip_tags($answer->markdown()));
-        $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
+        $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
 
         if ($answer->final()) {
 
