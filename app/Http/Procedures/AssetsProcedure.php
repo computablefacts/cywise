@@ -81,8 +81,8 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "Get everything known about a single asset.",
         params: [
-            "asset" => "The asset name.",
-            "trial_id" => "The trial id this asset belongs to (if any).",
+            "asset" => "The asset name. (string|required|min:1|max:191)",
+            "trial_id" => "If any, the trial id this asset belongs to.",
         ],
         result: [
             "asset" => "The asset name. May be different from the one given in the request on ranges.",
@@ -104,12 +104,17 @@ class AssetsProcedure extends Procedure
                 'nb_vulns_scans_completed' => "The number of completed scans.",
             ],
             'hiddenAlerts' => "The asset's hidden vulnerabilities (if any).",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'Can you provide information about my website example.com?', the input should be {\"asset\":\"example.com\"}",
+            "if the request is 'retrieve detailed information about 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\"}",
+        ],
+        ai_result: "@json(\$result)",
     )]
     public function get(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset' => 'required|string|min:1|max:191',
+            'asset' => 'string|required|min:1|max:191',
             'trial_id' => 'integer|min:0',
         ]);
 
