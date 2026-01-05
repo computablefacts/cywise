@@ -27,18 +27,18 @@ use Illuminate\Support\Str;
 class CyberBuddy extends AbstractAction
 {
     private const string MODEL_REFORMULATE = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
-    private const string MODEL_ANSWER = 'deepseek-ai/DeepSeek-R1-Turbo';
+    private const string MODEL_ANSWER = 'deepseek-ai/DeepSeek-R1-0528-Turbo';
 
-    static function schema(): array
+    protected function schema(): array
     {
         return [
             "type" => "function",
             "function" => [
                 "name" => "query_knowledge_base",
                 "description" => "
-                    Answer questions related to cybersecurity guidelines or procedures. 
-                    This includes inquiries about best practices, frameworks (such as ANSSI, NIST, OWASP, NIS2, DORA), or the Information Systems Security Policy (ISSP). 
-                    The action's input must use the same language as the user's input: if the user asks their question in French, the input must be in French; if they ask in English, the input must be in English.
+Answer questions related to cybersecurity guidelines or procedures. 
+This includes inquiries about best practices, frameworks (such as ANSSI, NIST, OWASP, NIS2, DORA), or the Information Systems Security Policy (ISSP). 
+The action's input must use the same language as the user's input: if the user asks their question in French, the input must be in French; if they ask in English, the input must be in English.
                 ",
                 "parameters" => [
                     "type" => "object",

@@ -572,7 +572,7 @@ class ScansTest extends TestCaseWithDbAndSeeders
         });
 
         // Remove the asset
-        DeleteAssetListener::execute($asset->createdBy(), $asset->asset);
+        DeleteAssetListener::execute($asset->createdBy, $asset->asset);
 
         // Ensure removing the asset removes all associated data
         $this->assertEquals(0, Asset::count());
@@ -914,7 +914,7 @@ class ScansTest extends TestCaseWithDbAndSeeders
         $this->assertTrue($port443['ssl']); */
 
         // Remove the asset
-        DeleteAssetListener::execute($asset->createdBy(), $asset->asset);
+        DeleteAssetListener::execute($asset->createdBy, $asset->asset);
 
         // Ensure removing the asset removes all associated data
         $this->assertEquals(0, Asset::count());

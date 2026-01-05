@@ -232,6 +232,11 @@
       <excludeFolder url="file://$MODULE_DIR$/bootstrap/cache/filament" />
       <excludeFolder url="file://$MODULE_DIR$/storage/app/vectors" />
       <excludeFolder url="file://$MODULE_DIR$/vendor" />
+      <excludeFolder url="file://$MODULE_DIR$/storage/app" />
+      <excludeFolder url="file://$MODULE_DIR$/storage/debugbar" />
+      <excludeFolder url="file://$MODULE_DIR$/storage/framework" />
+      <excludeFolder url="file://$MODULE_DIR$/storage/pail" />
+      <excludeFolder url="file://$MODULE_DIR$/storage/test" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

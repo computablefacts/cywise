@@ -104,7 +104,7 @@ class FilesProcedure extends Procedure
                     'collection' => $file->collection->name,
                     'filename' => "{$file->name_normalized}.{$file->extension}",
                     'created_at' => $file->created_at,
-                    'created_by' => $file->createdBy(),
+                    'created_by' => $file->createdBy,
                     'size' => $file->size,
                     'nb_chunks' => $nbChunks,
                     'nb_vectors' => $nbVectors,

@@ -129,19 +129,24 @@ class ToolsController extends Controller
 
             // Register assets and start scans
             $assets = [];
+            $procedure = new AssetsProcedure();
 
             foreach ($trial->subdomains as $subdomain) {
 
-                $request = new Request([
+                $request = new JsonRpcRequest([
                     'asset' => $subdomain,
                     'watch' => true,
                     'trial_id' => $trial->id,
                 ]);
                 $request->setUserResolver(fn() => auth()->user());
-                $controller = new AssetController();
-                $controller->saveAsset($request);
+                $procedure->create($request);
 
-                $assets[] = $controller->infosFromAsset(base64_encode($subdomain), $trial->id);
+                $request = new JsonRpcRequest([
+                    'asset' => $subdomain,
+                    'trial_id' => $trial->id,
+                ]);
+                $request->setUserResolver(fn() => auth()->user());
+                $assets[] = $procedure->get($request);
             }
 
             usort($assets, fn($a, $b) => strcmp($a['asset'], $b['asset']));

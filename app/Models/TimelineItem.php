@@ -46,7 +46,7 @@ class TimelineItem extends Model
     public static function createAlert(User $user, Scan $scan, Alert $alert): TimelineItem
     {
         $asset = $alert->asset();
-        $port = $alert->port();
+        $port = $alert->port;
 
         if (empty($alert->title)) {
             $title = '';

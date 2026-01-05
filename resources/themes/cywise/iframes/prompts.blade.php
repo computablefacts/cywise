@@ -40,7 +40,7 @@
           {{ Illuminate\Support\Number::format(\Illuminate\Support\Str::length($prompt->template), locale:'sv') }}
         </td>
         <td>{{ $prompt->created_at->format('Y-m-d H:i') }}</td>
-        <td>{{ $prompt->createdBy()->name }}</td>
+        <td>{{ $prompt->createdBy->name }}</td>
         <td class="text-end">
           <a href="#" onclick="deletePrompt({{ $prompt->id }})" class="text-decoration-none" style="color:red">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"

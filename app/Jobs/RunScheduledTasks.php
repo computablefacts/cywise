@@ -2,11 +2,13 @@
 
 namespace App\Jobs;
 
-use App\Http\Controllers\Iframes\CyberBuddyController;
-use App\Http\Requests\ConverseRequest;
-use App\Listeners\EndVulnsScanListener;
+use App\AgentSquad\Providers\LlmsProvider;
+use App\Http\Procedures\CyberBuddyProcedure;
+use App\Http\Requests\JsonRpcRequest;
+use App\Mail\MailCoachSimpleEmail;
 use App\Models\Conversation;
 use App\Models\ScheduledTask;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,37 +33,64 @@ class RunScheduledTasks implements ShouldQueue
 
     public function handle()
     {
-        ScheduledTask::where('next_run_date', '<=', Carbon::now())
+        ScheduledTask::query()
+            ->where('enabled', true)
+            ->where('next_run_date', '<=', Carbon::now())
             ->get()
             ->each(function (ScheduledTask $task) {
                 try {
 
+                    // Retrieve the user who created the task
+                    /** @var ?User $user */
+                    $user = User::find($task->created_by);
+
+                    if (!$user) {
+                        Log::warning("[RunScheduledTasks] Skipping task {$task->id} — user not found: {$task->created_by}");
+                        return;
+                    }
+
+                    $user->actAs();
                     $threadId = Str::random(10);
-                    $conversation = Conversation::create([
+
+                    /** @var Conversation $conversation */
+                    $conversation = Conversation::where('thread_id', $threadId)
+                        ->where('format', Conversation::FORMAT_V1)
+                        ->where('created_by', $user->id)
+                        ->first();
+
+                    $conversation = $conversation ?? Conversation::create([
                         'thread_id' => $threadId,
                         'dom' => json_encode([]),
                         'autosaved' => true,
-                        'created_by' => $task->createdBy()->id,
+                        'created_by' => $user->id,
                         'format' => Conversation::FORMAT_V1,
                     ]);
-                    $request = new ConverseRequest([
-                        'thread_id' => $threadId,
-                        'directive' => $task->task,
-                    ]);
-                    $response = (new CyberBuddyController())->converse($request, true);
-                    $json = json_decode($response->content(), true);
-                    $subject = $task->name;
-                    $body = $json['answer']['html'] ?? '';
 
-                    Log::debug($json);
+                    // Step 1: Check condition (if provided)
+                    $runTask = true;
+                    $condition = Str::trim($task->trigger);
 
-                    EndVulnsScanListener::sendEmail(
-                        ProcessIncomingEmails::SENDER_CYBERBUDDY,
-                        $task->createdBy()->email,
-                        $subject,
-                        "",
-                        $body
-                    );
+                    if (!empty($condition)) {
+                        $answer = LlmsProvider::provide("Answer only with YES or NO and nothing else. Question: {$condition}");
+                        $runTask = Str::contains($answer, ['oui', 'yes'], true);
+                        Log::debug("[RunScheduledTasks] Condition evaluated for task {$task->id}: '{$condition}' => {$answer}");
+                    }
+
+                    // Step 2: Execute the task and email the result (only once per day)
+                    $tsk = Str::trim($task->task);
+
+                    if (!$runTask || empty($tsk)) {
+                        Log::debug("[RunScheduledTasks] Skipping task {$task->id} because condition evaluated to false");
+                    } else if ($task->emailSentToday()) {
+                        Log::debug("[RunScheduledTasks] Skipping task {$task->id} because an email has already been sent today");
+                    } else {
+                        $response = $this->ask($user, $threadId, $tsk);
+                        $answer = $response['html'] ?? '';
+                        $summary = LlmsProvider::provide("Summarize this text in about 10 words :\n\n{$answer}");
+                        MailCoachSimpleEmail::sendEmail("Cywise : {$summary}", "CyberBuddy vous répond !", $answer, $user->email);
+                        Log::debug("[RunScheduledTasks] Emailed result for task {$task->id} to {$user->email}");
+                        $task->last_email_sent_at = Carbon::now();
+                    }
 
                     $task->prev_run_date = Carbon::now();
                     $task->next_run_date = Carbon::instance($task->cron()->getNextRunDate());
@@ -71,5 +100,15 @@ class RunScheduledTasks implements ShouldQueue
                     Log::error($exception->getMessage());
                 }
             });
+    }
+
+    private function ask(User $user, string $threadId, string $question): array
+    {
+        $request = new JsonRpcRequest([
+            'thread_id' => $threadId,
+            'directive' => $question,
+        ]);
+        $request->setUserResolver(fn() => $user);
+        return (new CyberBuddyProcedure())->ask($request);
     }
 }

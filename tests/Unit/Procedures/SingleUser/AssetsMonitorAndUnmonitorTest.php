@@ -18,6 +18,7 @@ test('the monitoring begins', function ($assetAddress) {
             'result' => [
                 'asset' => [
                     'asset',
+                    'is_monitored',
                     'status',
                     'tags',
                     'tld',
@@ -28,6 +29,7 @@ test('the monitoring begins', function ($assetAddress) {
         ])
         ->assertJsonFragment([
             'asset' => $assetAddress,
+            'is_monitored' => true,
             'status' => 'valid',
         ]);
 
@@ -87,6 +89,7 @@ test('the monitoring stops', function ($assetAddress) {
             'result' => [
                 'asset' => [
                     'asset',
+                    'is_monitored',
                     'status',
                     'tags',
                     'tld',
@@ -97,6 +100,7 @@ test('the monitoring stops', function ($assetAddress) {
         ])
         ->assertJsonFragment([
             'asset' => $assetAddress,
+            'is_monitored' => false,
             'status' => 'invalid',
         ]);
 

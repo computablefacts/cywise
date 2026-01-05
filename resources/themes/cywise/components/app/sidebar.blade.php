@@ -244,17 +244,45 @@ $user = \Auth::user();
           </x-app.sidebar-dropdown>
           @endif
           @if($user->canView('iframes.users')
+          || $user->canView('iframes.shares')
           || $user->canView('iframes.roles-and-permissions')
-          || $user->canView('iframes.traces'))
+          || $user->canView('iframes.traces')
+          || $user->canView('iframes.scheduled-tasks')
+          || $user->canView('iframes.actions')
+          || $user->isCywiseAdmin())
           <x-app.sidebar-dropdown text="{{ __('Administration') }}"
                                   icon="phosphor-gear"
                                   id="admin_dropdown"
                                   :active="false"
                                   :open="(
                           Request::is('users') ||
+                          Request::is('shares') ||
                           Request::is('roles-and-permissions') ||
-                          Request::is('traces')
+                          Request::is('scheduled-tasks') ||
+                          Request::is('traces') ||
+                          Request::is('actions')
                         ) ? '1' : '0'">
+            @if($user->canView('iframes.actions'))
+            <x-app.sidebar-link href="{{ route('actions') }}"
+                                icon="phosphor-wrench"
+                                :active="Request::is('actions')">
+              {{ __('Actions') }}
+            </x-app.sidebar-link>
+            @endif
+            @if($user->canView('iframes.scheduled-tasks'))
+            <x-app.sidebar-link href="{{ route('scheduled-tasks') }}"
+                                icon="phosphor-clock"
+                                :active="Request::is('scheduled-tasks')">
+              {{ __('Scheduled Tasks') }}
+            </x-app.sidebar-link>
+            @endif
+            @if($user->canView('iframes.shares'))
+            <x-app.sidebar-link href="{{ route('shares') }}"
+                                icon="phosphor-share-network"
+                                :active="Request::is('shares')">
+              {{ __('Shares') }}
+            </x-app.sidebar-link>
+            @endif
             @if($user->canView('iframes.users'))
             <x-app.sidebar-link href="{{ route('users') }}"
                                 icon="phosphor-users"

@@ -7,8 +7,6 @@ use App\Models\User;
 
 abstract class AbstractAction
 {
-    abstract static function schema(): array;
-
     public function name(): string
     {
         return $this->schema()['function']['name'] ?? '';
@@ -24,5 +22,12 @@ abstract class AbstractAction
         return true;
     }
 
+    public function isRemote(): bool
+    {
+        return false;
+    }
+
     public abstract function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer;
+
+    protected abstract function schema(): array;
 }

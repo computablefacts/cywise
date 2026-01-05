@@ -15,6 +15,7 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
+use App\Http\Controllers\Iframes\ActionsController;
 use App\Http\Controllers\Iframes\AnalyzeController;
 use App\Http\Controllers\Iframes\ChunksController;
 use App\Http\Controllers\Iframes\CollectionsController;
@@ -30,6 +31,8 @@ use App\Http\Controllers\Iframes\RulesController;
 use App\Http\Controllers\Iframes\RulesEditorController;
 use App\Http\Controllers\Iframes\ScaController;
 use App\Http\Controllers\Iframes\ScaEditorController;
+use App\Http\Controllers\Iframes\ScheduledTasksController;
+use App\Http\Controllers\Iframes\SharesController;
 use App\Http\Controllers\Iframes\TableController;
 use App\Http\Controllers\Iframes\TablesController;
 use App\Http\Controllers\Iframes\TimelineController;
@@ -480,12 +483,6 @@ Route::post('/llm1', '\App\Http\Controllers\CyberBuddyController@llm1')->middlew
 
 Route::post('/llm2', '\App\Http\Controllers\CyberBuddyController@llm2')->middleware('auth');
 
-Route::get('/templates', '\App\Http\Controllers\CyberBuddyController@templates')->middleware('auth');
-
-Route::post('/templates', '\App\Http\Controllers\CyberBuddyController@saveTemplate')->middleware('auth');
-
-Route::delete('/templates/{id}', '\App\Http\Controllers\CyberBuddyController@deleteTemplate')->middleware('auth');
-
 Route::get('/files/stream/{secret}', '\App\Http\Controllers\CyberBuddyController@streamFile');
 
 Route::get('/files/download/{secret}', '\App\Http\Controllers\CyberBuddyController@downloadFile');
@@ -493,12 +490,6 @@ Route::get('/files/download/{secret}', '\App\Http\Controllers\CyberBuddyControll
 Route::post('/files/one', '\App\Http\Controllers\CyberBuddyController@uploadOneFile')->middleware('auth:sanctum');
 
 Route::post('/files/many', '\App\Http\Controllers\CyberBuddyController@uploadManyFiles')->middleware('auth:sanctum');
-
-Route::delete('/conversations/{id}', '\App\Http\Controllers\CyberBuddyController@deleteConversation')->middleware('auth');
-
-Route::delete('/frameworks/{id}', '\App\Http\Controllers\CyberBuddyController@unloadFramework')->middleware('auth');
-
-Route::post('/frameworks/{id}', '\App\Http\Controllers\CyberBuddyController@loadFramework')->middleware('auth');
 
 Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class])->prefix('iframes')->name('iframes.')->group(function () {
     Route::get('/analyze', [AnalyzeController::class, '__invoke'])->name('analyze');
@@ -518,13 +509,16 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
     Route::get('/prompts', [PromptsController::class, '__invoke'])->name('prompts');
     Route::get('/roles-and-permissions', [RolesPermissionsController::class, '__invoke'])->name('roles-and-permissions');
+    Route::get('/scheduled-tasks', [ScheduledTasksController::class, '__invoke'])->name('scheduled-tasks');
     Route::get('/rules', [RulesController::class, '__invoke'])->name('rules');
     Route::get('/rules/edit', [RulesEditorController::class, '__invoke'])->name('rules-editor');
     Route::get('/sca', [ScaController::class, '__invoke'])->name('sca');
     Route::get('/sca/edit', [ScaEditorController::class, '__invoke'])->name('sca-editor');
+    Route::get('/shares', [SharesController::class, '__invoke'])->name('shares');
     Route::get('/table', [TableController::class, '__invoke'])->name('table');
     Route::get('/tables', [TablesController::class, '__invoke'])->name('tables');
     Route::get('/traces', [TracesController::class, '__invoke'])->name('traces');
+    Route::get('/actions', [ActionsController::class, '__invoke'])->name('actions');
     Route::get('/users', [UsersController::class, '__invoke'])->name('users');
     Route::get('/users/invitation', [UsersInvitationController::class, '__invoke'])->name('user-invitation');
     Route::get('/vulnerabilities', [TimelineController::class, '__invoke'])->name('vulnerabilities');

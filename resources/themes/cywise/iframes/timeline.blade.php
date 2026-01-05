@@ -455,6 +455,7 @@
     <span class="bp4-icon bp4-icon-arrow-up"></span>
   </button>
 </div>
+@include('theme::iframes.timeline._share-modal')
 @endsection
 
 @push('scripts')
@@ -570,19 +571,9 @@
   /** CONVERSATIONS */
 
   const deleteConversation = (conversationId) => {
-
     const response = confirm("{{ __('Are you sure you want to delete this conversation?') }}");
-
     if (response) {
-      axios.delete(`/conversations/${conversationId}`).then(function (response) {
-        if (response.data.success) {
-          toaster.toastSuccess(response.data.success);
-        } else if (response.data.error) {
-          toaster.toastError(response.data.error);
-        } else {
-          console.log(response.data);
-        }
-      }).catch(error => toaster.toastAxiosError(error));
+      deleteConversationApiCall(conversationId, (response) => toaster.toastSuccess(response.msg));
     }
   }
 

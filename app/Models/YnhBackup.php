@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\HasTenant2;
+use App\Traits\HasTenant;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int id
  * @property Carbon created_at
  * @property Carbon updated_at
- * @property ?int user_id
+ * @property ?int created_by
  * @property int ynh_server_id
  * @property string name
  * @property int size
@@ -22,13 +22,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class YnhBackup extends Model
 {
-    use HasFactory, HasTenant2;
+    use HasFactory, HasTenant;
 
     protected $table = 'ynh_backups';
 
     protected $fillable = [
         'ynh_server_id',
-        'user_id',
+        'created_by',
         'name',
         'size',
         'storage_path',
@@ -40,11 +40,6 @@ class YnhBackup extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function server(): BelongsTo
     {

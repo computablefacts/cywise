@@ -10,7 +10,7 @@ use App\Hashing\TwHasher;
 use App\Helpers\AppStore;
 use App\Helpers\SshConnection2;
 use App\Helpers\SshKeyPair;
-use App\Traits\HasTenant2;
+use App\Traits\HasTenant;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -33,7 +34,7 @@ use Illuminate\Support\Str;
  * @property ?string ssh_username
  * @property ?string ssh_public_key
  * @property ?string ssh_private_key
- * @property ?int user_id
+ * @property ?int created_by
  * @property bool updated
  * @property bool is_ready
  * @property ?int ynh_order_id
@@ -45,7 +46,7 @@ use Illuminate\Support\Str;
  */
 class YnhServer extends Model
 {
-    use HasFactory, HasTenant2;
+    use HasFactory, HasTenant;
 
     protected $fillable = [
         'name',
@@ -56,7 +57,7 @@ class YnhServer extends Model
         'ssh_username',
         'ssh_public_key',
         'ssh_private_key',
-        'user_id', // the user who created this server
+        'created_by', // the user who created this server
         'updated', // restricted usage to PullServersInfos
         'is_ready',
         'ynh_order_id',
@@ -91,30 +92,21 @@ class YnhServer extends Model
 
     public static function forUser(User $user, bool $readyOnly = false): Collection
     {
-        if ($user->tenant_id) {
-            if ($user->customer_id) {
-                return YnhServer::with('applications', 'domains', 'users')
-                    ->select('ynh_servers.*')
-                    ->whereRaw($readyOnly ? "ynh_servers.is_ready = true" : "1=1")
-                    ->join('users', 'users.id', '=', 'ynh_servers.user_id')
-                    ->whereRaw("(users.tenant_id IS NULL OR users.tenant_id = {$user->tenant_id})")
-                    ->whereRaw("(users.customer_id IS NULL OR users.customer_id = {$user->customer_id})")
-                    ->orderBy('ynh_servers.name')
-                    ->get();
-            }
-            return YnhServer::with('applications', 'domains', 'users')
-                ->select('ynh_servers.*')
-                ->whereRaw($readyOnly ? "ynh_servers.is_ready = true" : "1=1")
-                ->join('users', 'users.id', '=', 'ynh_servers.user_id')
-                ->whereRaw("(users.tenant_id IS NULL OR users.tenant_id = {$user->tenant_id})")
-                ->orderBy('ynh_servers.name')
-                ->get();
-        }
-        return YnhServer::with('applications', 'domains', 'users')
+        $currentUser = Auth::user();
+        Auth::login($user);
+
+        $query = YnhServer::with('applications', 'domains', 'users')
             ->select('ynh_servers.*')
             ->whereRaw($readyOnly ? "ynh_servers.is_ready = true" : "1=1")
-            ->orderBy('ynh_servers.name')
-            ->get();
+            ->orderBy('ynh_servers.name');
+
+        // dump($query->toSql());
+
+        $servers = $query->get();
+
+        Auth::login($currentUser);
+
+        return $servers;
     }
 
     public function applications(): HasMany
@@ -146,7 +138,7 @@ class YnhServer extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function order(): BelongsTo

@@ -31,4 +31,14 @@ class AssetTag extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function asset()
+    {
+        return $this->belongsTo(Asset::class, 'asset_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

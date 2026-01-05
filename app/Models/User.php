@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\AgentSquad\ActionsRegistry;
 use App\Helpers\MailCoach;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
@@ -104,6 +105,22 @@ class User extends WaveUser
             // Set frameworks, templates and roles
             $user->actAs();
             $user->init();
+
+            // Ensure all agents are added (enabled) at tenant level for this user's tenant
+            try {
+                $actions = ActionsRegistry::all();
+                foreach ($actions as $actionName => $action) {
+                    ActionSetting::firstOrCreate([
+                        'scope_type' => 'tenant',
+                        'scope_id' => $user->tenant_id,
+                        'action' => $actionName,
+                    ], [
+                        'enabled' => true,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                // Non-fatal during user creation
+            }
         });
     }
 
@@ -135,11 +152,6 @@ class User extends WaveUser
                 'avatar' => 'demo/default.png',
             ]);
         }
-        /* if (!isset($user->superset_id)) { // Automatically create a proper superset account for all users
-            $json = SupersetApiUtils::get_or_add_user($user);
-            $user->superset_id = $json['id'] ?? null;
-            $user->save();
-        } */
         return $user;
     }
 
@@ -191,7 +203,6 @@ class User extends WaveUser
     public function init(): void
     {
         try {
-            // Set the user's prompts
             Log::debug("[{$this->email}] Updating user's prompts...");
 
             $this->setupPrompts('default_answer_question', 'seeders/prompts/default_answer_question.txt');
@@ -205,8 +216,12 @@ class User extends WaveUser
             $this->setupPrompts('default_summarize', 'seeders/prompts/default_summarize.txt');
 
             Log::debug("[{$this->email}] User's prompts updated.");
+            Log::debug("[{$this->email}] Updating user's templates...");
 
-            // TODO : create CyberScribe's templates
+            $this->setupTemplates();
+
+            Log::debug("[{$this->email}] User's templates updated.");
+
             // TODO : create user's private collection privcol*
 
         } catch (\Exception $e) {
@@ -271,5 +286,35 @@ class User extends WaveUser
                 'template' => $newPrompt
             ]);
         }
+    }
+
+    private function setupTemplates(): void
+    {
+        $template = Template::updateOrCreate([
+            'name' => 'charte-informatique.json',
+            'created_by' => $this->id,
+        ], [
+            'template' => $this->templateCharteInformatique(),
+            'readonly' => true,
+        ]);
+        $template = Template::updateOrCreate([
+            'name' => 'pssi.json',
+            'created_by' => $this->id,
+        ], [
+            'template' => $this->templatePssi(),
+            'readonly' => true,
+        ]);
+    }
+
+    private function templateCharteInformatique(): array
+    {
+        $path = database_path('seeders/templates/charte-informatique.json');
+        return json_decode(Str::trim(\File::get($path)), true);
+    }
+
+    private function templatePssi(): array
+    {
+        $path = database_path('seeders/templates/pssi.json');
+        return json_decode(Str::trim(\File::get($path)), true);
     }
 }

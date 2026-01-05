@@ -13,13 +13,13 @@
             }
          }" 
         x-init="
-                setTimeout(function(){ 
-                    toggleRepositionMarker($refs.monthly); 
-                    $refs.marker.classList.remove('opacity-0');
-                    setTimeout(function(){ 
-                        $refs.marker.classList.add('duration-300', 'ease-out');
-                    }, 10); 
-                }, 1);
+            setTimeout(function(){
+                toggleRepositionMarker($refs.yearly);
+                $refs.marker.classList.remove('opacity-0');
+                setTimeout(function(){
+                    $refs.marker.classList.add('duration-300', 'ease-out');
+                }, 10);
+            }, 1);
         "
         class="w-full max-w-6xl mx-auto mt-12 mb-2 md:my-12" x-cloak>
 

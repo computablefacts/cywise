@@ -2,6 +2,8 @@
 
 namespace App\Http\Procedures;
 
+use App\Enums\AssetTypesEnum;
+use App\Events\AssetsShared;
 use App\Events\BeginPortsScan;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
 use App\Http\Requests\JsonRpcRequest;
@@ -23,10 +25,8 @@ use App\Rules\IsValidIpAddress;
 use App\Rules\IsValidTag;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
 class AssetsProcedure extends Procedure
@@ -81,8 +81,8 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "Get everything known about a single asset.",
         params: [
-            "asset" => "The asset name.",
-            "trial_id" => "The trial id this asset belongs to (if any).",
+            "asset" => "The asset name. (string|required|min:1|max:191)",
+            "trial_id" => "If any, the trial id this asset belongs to.",
         ],
         result: [
             "asset" => "The asset name. May be different from the one given in the request on ranges.",
@@ -104,12 +104,17 @@ class AssetsProcedure extends Procedure
                 'nb_vulns_scans_completed' => "The number of completed scans.",
             ],
             'hiddenAlerts' => "The asset's hidden vulnerabilities (if any).",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'Can you provide information about my website example.com?', the input should be {\"asset\":\"example.com\"}",
+            "if the request is 'retrieve detailed information about 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\"}",
+        ],
+        ai_result: "@json(\$result)",
     )]
     public function get(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset' => 'required|string|min:1|max:191',
+            'asset' => 'string|required|min:1|max:191',
             'trial_id' => 'integer|min:0',
         ]);
 
@@ -173,7 +178,7 @@ class AssetsProcedure extends Procedure
             ->get()
             ->map(function (Alert $alert) use ($asset) {
 
-                $port = $alert->port();
+                $port = $alert->port;
 
                 return [
                     'id' => $alert->id,
@@ -238,7 +243,7 @@ class AssetsProcedure extends Procedure
             null;
 
         // Load the identity of the user who created the asset
-        $user = $asset->createdBy();
+        $user = $asset->createdBy;
 
         return [
             'asset' => $asset->asset,
@@ -273,18 +278,23 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "Create a single asset.",
         params: [
-            "asset" => "The asset as an IP address or a DNS.",
-            "watch" => "True if the asset should be monitored directly after the creation. False otherwise.",
-            "trial_id" => "The trial id this asset belongs to (if any).",
+            "asset" => "The asset as an IP address or a DNS. (string|required|min:1|max:191)",
+            "watch" => "True if the asset should be monitored directly after the creation. False otherwise. (boolean)",
+            "trial_id" => "If any, the trial id this asset belongs to.",
         ],
         result: [
             "asset" => "An asset object.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'add example.com', the input should be {\"asset\":\"example.com\",\"watch\":false}",
+            "if the request is 'add and monitor 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\",\"watch\":true}",
+        ],
+        ai_result: "The asset {{ \$result['asset']['asset'] }} has been created.",
     )]
     public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset' => 'required|string|min:1|max:191',
+            'asset' => 'string|required|min:1|max:191',
             'watch' => 'boolean',
             'trial_id' => 'integer|exists:ynh_trials,id',
         ]);
@@ -296,9 +306,7 @@ class AssetsProcedure extends Procedure
         $asset = $params['asset'];
         $watch = is_bool($params['watch']) && $params['watch'];
         $trialId = $params['trial_id'] ?? 0;
-
-        $user = $request->user();
-        $obj = CreateAssetListener::execute($user, $asset, $watch, [], $trialId);
+        $obj = CreateAssetListener::execute($request->user(), $asset, $watch, [], $trialId);
 
         if (!$obj) {
             throw new \Exception("The asset could not be created : {$params['asset']}");
@@ -311,28 +319,41 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "Delete an asset.",
         params: [
-            "asset_id" => "The asset id.",
+            "asset" => "The asset as an IP address or DNS. (string|required|min:1|max:191)",
+            "asset_id" => "The asset id if the parameter asset is not specified.",
         ],
         result: [
             "msg" => "A success message.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'remove 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\"}",
+            "if the request is 'delete example.com', the input should be {\"asset\":\"example.com\"}",
+        ],
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset_id' => 'required|integer|exists:am_assets,id',
+            'asset_id' => 'integer|required_without:asset|prohibits:asset|exists:am_assets,id',
+            'asset' => 'string|required_without:asset_id|prohibits:asset_id|min:1|max:191|exists:am_assets,asset',
         ]);
 
-        /** @var Asset $asset */
-        $asset = Asset::find($params['asset_id']);
-
+        if (isset($params['asset_id'])) {
+            /** @var Asset $asset */
+            $asset = Asset::find($params['asset_id']);
+        } else {
+            /** @var Asset $asset */
+            $asset = Asset::where('asset', $params['asset'])->first();
+        }
         if ($asset->is_monitored) {
-            throw new \Exception('Deletion not allowed, asset is monitored.');
+
+            Scan::query()->where('asset_id', $asset->id)->delete();
+
+            $asset->is_monitored = false;
+            $asset->save();
         }
 
-        /** @var User $user */
-        $user = Auth::user();
-        DeleteAssetListener::execute($user, $asset->asset);
+        DeleteAssetListener::execute($request->user(), $asset->asset);
 
         return [
             "msg" => "{$asset->asset} has been removed.",
@@ -342,24 +363,65 @@ class AssetsProcedure extends Procedure
     #[RpcMethod(
         description: "List the user's assets.",
         params: [
-            "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets.",
-            "created_the_last_x_hours" => "Keep only assets created after (now - x hours).",
+            "type" => "The type of asset to list: domain or ip_address. (string|nullable|in:domain,ip_address)",
+            "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets. (boolean|nullable)",
+            "created_the_last_x_hours" => "Keep only assets created after now - x hours.",
         ],
         result: [
             "assets" => "A list of assets.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'list assets', the input should be {\"is_monitored\":null,\"type\":null}",
+            "if the request is 'list domains', the input should be {\"type\":\"domain\"}",
+            "if the request is 'list IP addresses', the input should be {\"type\":\"ip_address\"}",
+            "if the request is 'list monitored assets', the input should be {\"is_monitored\":true}",
+            "if the request is 'list monitored domains', the input should be {\"is_monitored\":true,\"type\":\"domain\"}",
+            "if the request is 'list monitored IP addresses', the input should be {\"is_monitored\":true,\"type\":\"ip_address\"}",
+            "if the request is 'list monitorable assets', the input should be {\"is_monitored\":false}",
+            "if the request is 'list monitorable domains', the input should be {\"is_monitored\":false,\"type\":\"domain\"}",
+            "if the request is 'list monitorable IP addresses', the input should be {\"is_monitored\":false,\"type\":\"ip_address\"}",
+        ],
+        ai_result: "
+            @php
+                \$assets = collect(\$result['assets'] ?? []);
+            @endphp
+            @if(\$assets->isEmpty())
+                @if(!\$params['type'])
+                    No asset found.
+                @else
+                    No {{ \$params['type'] === 'domain' ? 'domain' : 'IP address' }} found.
+                @endif
+            @else
+                @if(!\$params['type'])
+                    {{ \$assets->count() }} assets found:
+                @else
+                    {{ \$assets->count() }} {{ \$params['type'] === 'domain' ? 'domain' : 'IP address' }} found:
+                @endif
+                @foreach(\$assets as \$asset)
+                    - {{ \$asset['asset'] }}
+                @endforeach
+            @endif
+        ",
     )]
     public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'is_monitored' => 'boolean',
+            'type' => 'string|nullable|in:domain,ip_address',
+            'is_monitored' => 'boolean|nullable',
             'created_the_last_x_hours' => 'integer|min:0',
         ]);
 
+        $type = $params['type'] ?? null;
         $valid = $params['is_monitored'] ?? null;
         $hours = $params['created_the_last_x_hours'] ?? null;
         $query = Asset::query();
 
+        if ($type === 'domain') {
+            $query->where('type', AssetTypesEnum::DNS);
+        }
+        if ($type === 'ip_address') {
+            $query->where('type', AssetTypesEnum::IP);
+        }
         if ($valid === true) {
             $query->where('is_monitored', true);
         }
@@ -412,23 +474,34 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Start monitoring an asset.",
+        description: "Start monitoring an existing asset.",
         params: [
-            "asset_id" => "The asset id.",
+            "asset" => "The asset as an IP address or DNS. (string|required|min:1|max:191)",
+            "asset_id" => "The asset id if the parameter asset is not specified.",
         ],
         result: [
             "asset" => "The monitored asset.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'monitor example.com', the input should be {\"asset\":\"example.com\"}",
+            "if the request is 'watch 10.0.0.5', the input should be {\"asset\":\"10.0.0.5\"}",
+        ],
+        ai_result: "The monitoring of {{ \$result['asset']['asset'] }} started.",
     )]
     public function monitor(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset_id' => 'required|integer|exists:am_assets,id',
+            'asset_id' => 'integer|required_without:asset|prohibits:asset|exists:am_assets,id',
+            'asset' => 'string|required_without:asset_id|prohibits:asset_id|min:1|max:191|exists:am_assets,asset',
         ]);
 
-        /** @var Asset $asset */
-        $asset = Asset::find($params['asset_id']);
-
+        if (isset($params['asset_id'])) {
+            /** @var Asset $asset */
+            $asset = Asset::find($params['asset_id']);
+        } else {
+            /** @var Asset $asset */
+            $asset = Asset::where('asset', $params['asset'])->first();
+        }
         if (!$asset->is_monitored) {
             $asset->is_monitored = true;
             $asset->save();
@@ -439,23 +512,34 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Stop monitoring an asset.",
+        description: "Stop monitoring an existing asset.",
         params: [
-            "asset_id" => "The asset id.",
+            "asset" => "The asset as an IP address or DNS. (string|required|min:1|max:191)",
+            "asset_id" => "The asset id if the parameter asset is not specified.",
         ],
         result: [
             "asset" => "The unmonitored asset.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'unwatch example.com', the input should be {\"asset\":\"example.com\"}",
+            "if the request is 'stop monitoring 10.0.0.5', the input should be {\"asset\":\"10.0.0.5\"}",
+        ],
+        ai_result: "The monitoring of {{ \$result['asset']['asset'] }} ended.",
     )]
     public function unmonitor(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset_id' => 'required|integer|exists:am_assets,id',
+            'asset_id' => 'integer|required_without:asset|prohibits:asset|exists:am_assets,id',
+            'asset' => 'string|required_without:asset_id|prohibits:asset_id|min:1|max:191|exists:am_assets,asset',
         ]);
 
-        /** @var Asset $asset */
-        $asset = Asset::find($params['asset_id']);
-
+        if (isset($params['asset_id'])) {
+            /** @var Asset $asset */
+            $asset = Asset::find($params['asset_id']);
+        } else {
+            /** @var Asset $asset */
+            $asset = Asset::where('asset', $params['asset'])->first();
+        }
         if ($asset->is_monitored) {
 
             Scan::query()->where('asset_id', $asset->id)->delete();
@@ -587,9 +671,10 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Group together assets sharing a given tag.",
+        description: "Group together assets sharing given tags.",
         params: [
-            "tag" => "The tag.",
+            "tags" => "An array of tags.",
+            "hash" => "An optional hash for the group.",
         ],
         result: [
             "group" => "The group object.",
@@ -598,13 +683,26 @@ class AssetsProcedure extends Procedure
     public function group(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'tag' => 'required|string|exists:am_assets_tags,tag',
+            'tags' => 'required|array|min:1',
+            'tags.*' => 'required|string|exists:am_assets_tags,tag',
+            'hash' => 'nullable|string|max:191',
         ]);
+
+        $hash = $params['hash'] ?? Str::random(32);
+        $tags = $params['tags'];
+
+        foreach ($tags as $tag) {
+            AssetTagHash::create([
+                'tag' => $tag,
+                'hash' => $hash,
+            ]);
+        }
+
         return [
-            'group' => AssetTagHash::create([
-                'tag' => $params['tag'],
-                'hash' => Str::random(32),
-            ]),
+            'group' => [
+                'hash' => $hash,
+                'tags' => $tags,
+            ],
         ];
     }
 
@@ -623,9 +721,7 @@ class AssetsProcedure extends Procedure
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
         ]);
 
-        /** @var AssetTagHash $group */
-        $group = AssetTagHash::query()->where('hash', '=', $params['group'])->firstOrFail();
-        $group->delete();
+        AssetTagHash::query()->where('hash', '=', $params['group'])->delete();
 
         return [
             'msg' => "The group {$params['group']} has been disbanded!",
@@ -641,8 +737,20 @@ class AssetsProcedure extends Procedure
     )]
     public function listGroups(JsonRpcRequest $request): array
     {
+        $groups = AssetTagHash::all()
+            ->groupBy('hash')
+            ->map(function ($items, $hash) {
+                return [
+                    'hash' => $hash,
+                    'tags' => $items->pluck('tag')->unique()->values()->toArray(),
+                    'created_by_email' => User::find($items->first()['created_by'])?->email ?? null,
+                ];
+            })
+            ->values()
+            ->toArray();
+
         return [
-            'groups' => AssetTagHash::all()->toArray(),
+            'groups' => $groups,
         ];
     }
 
@@ -660,10 +768,16 @@ class AssetsProcedure extends Procedure
         $params = $request->validate([
             'group' => 'required|string|exists:am_assets_tags_hashes,hash',
         ]);
+
+        $items = AssetTagHash::query()
+            ->where('hash', '=', $params['group'])
+            ->get();
+
         return [
-            'group' => AssetTagHash::query()
-                ->where('hash', '=', $params['group'])
-                ->firstOrFail(),
+            'group' => [
+                'hash' => $params['group'],
+                'tags' => $items->pluck('tag')->toArray(),
+            ],
         ];
     }
 
@@ -684,10 +798,9 @@ class AssetsProcedure extends Procedure
 
         /** @var AssetTagHash $group */
         $group = AssetTagHash::where('hash', $params['group'])->firstOrFail();
-        $group->views = $group->views + 1;
-        $group->update();
 
         $assets = Asset::select('am_assets.*')
+            ->distinct()
             ->where('am_assets.is_monitored', true)
             ->join('am_assets_tags', 'am_assets_tags.asset_id', '=', 'am_assets.id')
             ->join('am_assets_tags_hashes', 'am_assets_tags_hashes.tag', '=', 'am_assets_tags.tag')
@@ -717,19 +830,18 @@ class AssetsProcedure extends Procedure
 
         /** @var AssetTagHash $group */
         $group = AssetTagHash::where('hash', $params['group'])->firstOrFail();
-        $group->views = $group->views + 1;
-        $group->update();
 
         $assets = Asset::select('am_assets.*')
             ->where('am_assets.is_monitored', true)
             ->join('am_assets_tags', 'am_assets_tags.asset_id', '=', 'am_assets.id')
             ->join('am_assets_tags_hashes', 'am_assets_tags_hashes.tag', '=', 'am_assets_tags.tag')
             ->where('am_assets_tags_hashes.hash', $group->hash)
-            ->get();
+            ->get()
+            ->unique('id');
 
         $vulnerabilities = $assets
             ->flatMap(fn(Asset $asset) => $asset->alerts()->get()->map(function (Alert $alert) use ($asset) {
-                $port = $alert->port();
+                $port = $alert->port;
                 return [
                     'id' => $alert->id,
                     'asset' => $asset->asset,
@@ -778,6 +890,50 @@ class AssetsProcedure extends Procedure
         ];
     }
 
+    #[RpcMethod(
+        description: "Share assets with a user by email.",
+        params: [
+            "email" => "The recipient's email address.",
+            "tags" => "An array of tags to share.",
+        ],
+        result: [
+            "msg" => "A success message.",
+        ]
+    )]
+    public function share(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'email' => 'required|email|max:191',
+            'tags' => 'required|array|min:1',
+            'tags.*' => 'required|string|exists:am_assets_tags,tag',
+        ]);
+
+        $email = $params['email'];
+        $tags = $params['tags'];
+
+        foreach ($tags as $tag) {
+            AssetTagHash::create([
+                'tag' => $tag,
+                'hash' => $email,
+            ]);
+        }
+
+        $authUserSaved = $request->user();
+        $user = User::firstOrCreate([
+            'email' => $email,
+        ], [
+            'email' => $email,
+            'name' => Str::before($email, '@'),
+        ]);
+        $authUserSaved->actAs();
+
+        AssetsShared::dispatch($request->user(), $user, $tags, $user->wasRecentlyCreated);
+
+        return [
+            'msg' => "Les actifs avec les étiquettes [" . implode(', ', $tags) . "] ont été partagés avec {$email}.",
+        ];
+    }
+
     private function convertAsset(Asset $asset): array
     {
         return [
@@ -785,7 +941,8 @@ class AssetsProcedure extends Procedure
             'asset' => $asset->asset,
             'tld' => $asset->tld(),
             'type' => $asset->type->name,
-            'status' => $asset->is_monitored ? 'valid' : 'invalid',
+            'status' => $asset->is_monitored ? 'valid' : 'invalid', // TODO : remove
+            'is_monitored' => $asset->is_monitored,
             'tags' => $asset->tags()
                 ->get()
                 ->map(fn(AssetTag $tag) => [

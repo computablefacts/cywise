@@ -14,12 +14,12 @@
         'asset' => $asset->asset,
         'count' => $alerts->count(),
         'href' => route('iframes.vulnerabilities', [ 'asset_id' => $asset->id ]),
-        'user' => $asset->createdBy()->name
+        'user' => $asset->createdBy->name
         ]) !!}
         @else
         {!! __('<b>:user</b> has added the asset <b>:asset</b>', [
         'asset' => $asset->asset,
-        'user' => $asset->createdBy()->name
+        'user' => $asset->createdBy->name
         ]) !!}
         @endif
       </span>
@@ -41,6 +41,10 @@
       <button class="show-replies" title="{{ __('Restart Scan') }}"
               onclick="restartScan('{{ $asset->id }}')">
         <span class="bp4-icon bp4-icon-repeat"></span>
+      </button>
+      <button class="show-replies" title="{{ __('Partager') }}"
+              onclick="openShareModal('asset','{{ $asset->id }}')">
+        <span class="bp4-icon bp4-icon-follower"></span>
       </button>
       @endif
       <div class="d-flex align-items-center" style="gap:6px;margin-top:16px;">

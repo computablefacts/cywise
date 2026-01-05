@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Iframes;
 
-use App\Helpers\JosianneClient;
+use App\Helpers\JosianeClient;
 use App\Helpers\Messages;
 use App\Http\Controllers\Controller;
 use App\Http\Procedures\EventsProcedure;
@@ -60,7 +60,7 @@ class TimelineController extends Controller
 
                 // Log::debug($query);
 
-                $output = JosianneClient::executeQuery($query);
+                $output = JosianeClient::executeQuery($query);
                 $leaks = collect(explode("\n", $output))
                     ->filter(fn(string $line) => !empty($line) && $line !== 'ok')
                     ->map(function (string $line) {
@@ -629,7 +629,7 @@ class TimelineController extends Controller
                 $date = Str::before($timestamp, ' ');
                 $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
                 $asset = $alert->asset();
-                $port = $alert->port();
+                $port = $alert->port;
 
                 if ($alert->isHigh()) {
                     $txtColor = "white";

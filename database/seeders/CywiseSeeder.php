@@ -3,17 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\AppConfig;
-use App\Models\Collection;
 use App\Models\Permission;
+use App\Models\RemoteAction;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\YnhFramework;
 use Database\Seeders\DbConfig\DbAppConfigInterface;
 use Illuminate;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use ReflectionClass;
+use ReflectionMethod;
+use Sajya\Server\Procedure;
 use Symfony\Component\Yaml\Yaml;
 use Wave\Plan;
 use Wave\Setting;
@@ -34,9 +37,9 @@ class CywiseSeeder extends Seeder
         $this->setupCywiseAdmin();
         $this->setupOssecRules();
         $this->setupOsqueryRules();
-        $this->fillMissingOsqueryUids();
-        $this->setupFrameworks();
-        $this->setupUserPromptsAndFrameworks();
+        $this->setupCyberFrameworks();
+        $this->setupCyberBuddy();
+        $this->updateAccountsData();
     }
 
     private function setupConfig(): void
@@ -505,18 +508,7 @@ class CywiseSeeder extends Seeder
         }
     }
 
-    private function fillMissingOsqueryUids(): void
-    {
-        \App\Models\YnhOsquery::whereNull('columns_uid')
-            ->chunk(1000, function (\Illuminate\Support\Collection $osquery) {
-                $osquery->each(function (\App\Models\YnhOsquery $osquery) {
-                    $osquery->columns_uid = \App\Models\YnhOsquery::computeColumnsUid($osquery->columns);
-                    $osquery->save();
-                });
-            });
-    }
-
-    private function setupUserPromptsAndFrameworks(): void
+    private function updateAccountsData(): void
     {
         \App\Models\Tenant::query()->chunkById(100, function ($tenants) {
             /** @var \App\Models\Tenant $tenant */
@@ -526,39 +518,150 @@ class CywiseSeeder extends Seeder
                     ->chunkById(100, function ($users) {
                         /** @var User $user */
                         foreach ($users as $user) {
-
                             $user->actAs();
                             $user->init();
-
-                            // TODO : BEGIN REMOVE ASAP
-                            Log::debug("[{$user->email}] Detaching frameworks...");
-
-                            \App\Models\YnhFramework::whereIn('file', [
-                                'seeders/frameworks/nis2/annex-implementing-regulation-of-nis2-on-t-m.jsonl.gz',
-                                'seeders/frameworks/gdpr/gdpr.jsonl.gz',
-                                'seeders/frameworks/dora/dora.jsonl.gz',
-                                'seeders/frameworks/anssi/anssi-guide-hygiene.jsonl.gz',
-                                'seeders/frameworks/anssi/anssi-genai-security-recommendations-1.0.jsonl.gz',
-                            ])
-                                ->get()
-                                ->map(fn(YnhFramework $framework) => $framework->collection())
-                                ->filter(fn(?Collection $collection) => isset($collection))
-                                ->each(function (Collection $collection) use ($user) {
-                                    Log::debug("[{$user->email}] Marking collection {$collection->name} as deleted...");
-                                    $collection->is_deleted = true;
-                                    $collection->save();
-                                    Log::debug("[{$user->email}] Collection {$collection->name} marked as deleted.");
-                                });
-
-                            Log::debug("[{$user->email}] Frameworks detached.");
-                            // TODO : END REMOVE ASAP
                         }
                     });
             }
         });
     }
 
-    private function setupFrameworks(): void
+    private function setupCyberBuddy(): void
+    {
+        $whitelist = [
+            'assets@get',
+            'assets@list',
+            'assets@create',
+            'assets@delete',
+            'assets@monitor',
+            'assets@unmonitor',
+        ];
+        $methods = $this->discoverProcedures();
+
+        foreach ($methods as $rpc) {
+
+            $name = $rpc['full_name'];
+            $description = $rpc['description'];
+            $examples = $rpc['ai_examples'];
+            $result = $rpc['ai_result'];
+            $params = $rpc['params'];
+
+            if (in_array($name, $whitelist)) {
+
+                Log::debug("Loading action {$name} schema...");
+
+                $payload = [
+                    "jsonrpc" => "2.0",
+                    "id" => 1,
+                    "method" => $name,
+                    "params" => [],
+                ];
+
+                $schema = [];
+
+                foreach ($params as $key => $desc) {
+                    // $desc = "The attribute description. (Laravel's validation string starting with the attribute type)"
+                    // If there is no validation string, the parameter will be disregarded
+                    if (Str::containsAll($desc, ['(', ')'])) {
+                        $validation = Str::trim(Str::between($desc, '(', ')'));
+                        $schema[$key] = [
+                            'type' => Str::before($validation, '|'),
+                            'validation' => $validation,
+                            'description' => Str::trim(Str::replace("({$validation})", "", $desc)),
+                        ];
+                        $payload['params'][$key] = "{{" . $key . "}}";
+                    }
+                }
+
+                Log::debug("Action {$name} schema loaded : ", $schema);
+
+                if (empty($schema)) {
+                    Log::warning("Action {$name} schema has no properties. Skipped.");
+                    continue;
+                }
+
+                Log::debug("Updating or creating action {$name}...");
+
+                /** @var RemoteAction $action */
+                $action = RemoteAction::updateOrCreate([
+                    'name' => $name,
+                ], [
+                    'description' => $description,
+                    'url' => '/api/v2/private/endpoint',
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                        'Accept-Encoding' => 'gzip',
+                        'Authorization' => 'Bearer {api_token}',
+                    ],
+                    'schema' => $schema,
+                    'payload_template' => $payload,
+                    'response_template' => $result,
+                    'examples' => $examples,
+                ]);
+
+                Log::debug("Action {$name} updated or created.");
+            }
+        }
+    }
+
+    /**
+     * Discover all JSON-RPC methods in App\Http\Procedures
+     *
+     * @return array
+     */
+    private function discoverProcedures(): array
+    {
+        $path = app_path('Http/Procedures');
+
+        if (!File::isDirectory($path)) {
+            return [];
+        }
+
+        $files = File::files($path);
+        $methods = [];
+
+        foreach ($files as $file) {
+
+            $className = 'App\\Http\\Procedures\\' . $file->getBasename('.php');
+
+            if (!class_exists($className)) {
+                continue;
+            }
+
+            $reflectionClass = new ReflectionClass($className);
+
+            if (!$reflectionClass->isSubclassOf(Procedure::class) || $reflectionClass->isAbstract()) {
+                continue;
+            }
+
+            $procedureName = $className::$name ?? Str::lower($reflectionClass->getShortName());
+
+            foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+
+                $attributes = $method->getAttributes(\App\Http\Procedures\RpcMethod::class);
+
+                foreach ($attributes as $attribute) {
+                    /** @var \App\Http\Procedures\RpcMethod $m */
+                    $m = $attribute->newInstance();
+                    $methods[] = [
+                        'procedure' => $procedureName,
+                        'method' => $method->getName(),
+                        'full_name' => "{$procedureName}@{$method->getName()}",
+                        'description' => $m->description,
+                        'params' => $m->params,
+                        'result' => $m->result,
+                        'ai_examples' => $m->ai_examples ?? [],
+                        'ai_result' => $m->ai_result,
+                        'class' => $className,
+                    ];
+                }
+            }
+        }
+        return $methods;
+    }
+
+    private function setupCyberFrameworks(): void
     {
         $this->importFramework('seeders/frameworks/anssi');
         $this->importFramework('seeders/frameworks/dora');
@@ -600,7 +703,7 @@ class CywiseSeeder extends Seeder
     private function mitreAttckMatrix(): array
     {
         // https://github.com/bgenev/impulse-xdr/blob/main/managerd/main/helpers/data/mitre_matrix.json
-        $path = database_path('seeders/mitre_matrix.json');
+        $path = database_path('seeders/misc/mitre_matrix.json');
         $json = Illuminate\Support\Facades\File::get($path);
         return json_decode($json, true);
     }
@@ -614,7 +717,7 @@ class CywiseSeeder extends Seeder
         // - https://github.com/osquery/osquery/blob/master/packs/osquery-monitoring.conf
         // - https://github.com/osquery/osquery/blob/master/packs/ossec-rootkit.conf
         // - https://github.com/osquery/osquery/blob/master/packs/vuln-management.conf
-        $path = database_path('seeders/osquery.json');
+        $path = database_path('seeders/misc/osquery.json');
         $json = Illuminate\Support\Facades\File::get($path);
         return json_decode($json, true);
     }

@@ -1,0 +1,379 @@
+[
+  {
+    "type": "heading",
+    "props": {
+      "level": 1
+    },
+    "content": "Charte informatique"
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Préambule"
+  },
+  {
+    "type": "paragraph",
+    "content": [
+      {
+        "type": "text",
+        "text": "La présente charte d'utilisation des moyens informatiques a pour finalité de contribuer à la préservation de la sécurité du système d'information de l'entité et fait de l'utilisateur un acteur essentiel à la réalisation de cet objectif.",
+        "styles": []
+      }
+    ]
+  },
+  {
+    "type": "paragraph",
+    "content": [
+      {
+        "type": "text",
+        "text": "De façon pragmatique ce document a pour vocation d'informer l'utilisateur sur :",
+        "styles": []
+      }
+    ]
+  },
+  {
+    "type": "paragraph",
+    "content": [
+      {
+        "type": "text",
+        "text": "- les usages permis des moyens informatiques mis à sa disposition ;",
+        "styles": []
+      }
+    ]
+  },
+  {
+    "type": "paragraph",
+    "content": [
+      {
+        "type": "text",
+        "text": "- les règles de sécurité en vigueur ;",
+        "styles": []
+      }
+    ]
+  },
+  {
+    "type": "paragraph",
+    "content": [
+      {
+        "type": "text",
+        "text": "- les mesures de contrôle prises par l'employeur ;",
+        "styles": []
+      }
+    ]
+  },
+  {
+    "type": "paragraph",
+    "content": [
+      {
+        "type": "text",
+        "text": "- les sanctions encourues par l'utilisateur en cas de non respect des règles.",
+        "styles": []
+      }
+    ]
+  },
+  {
+    "type": "paragraph",
+    "content": [
+      {
+        "type": "text",
+        "text": "Au besoin, la charte servira également de support juridique à la collecte de preuves numériques en cas de contentieux.",
+        "styles": []
+      }
+    ]
+  },
+  {
+    "type": "paragraph",
+    "content": [
+      {
+        "type": "text",
+        "text": "Il incombe donc à l'utilisateur d'utiliser le système d'information d'une manière raisonnée et responsable des ressources informatiques et technologiques de l'entité mises à sa disposition.",
+        "styles": []
+      }
+    ]
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Définitions"
+  },
+  {
+    "type": "paragraph",
+    "content": [
+      {
+        "type": "text",
+        "text": "Ressources informatiques :",
+        "styles": {
+          "bold": true
+        }
+      },
+      {
+        "type": "text",
+        "text": "les réseaux, les moyens informatiques de calcul ou de gestion locaux, ainsi que ceux auxquels il est possible d'accéder à distance, directement ou en cascade à partir du réseau de l'entité, les logiciels, les applications, les bases de données…",
+        "styles": []
+      },
+      {
+        "type": "text",
+        "text": "Services internet :",
+        "styles": {
+          "bold": true
+        }
+      },
+      {
+        "type": "text",
+        "text": "la mise à disposition par des serveurs locaux ou distants de moyens d'échanges et d'informations diverses : web, messagerie, forum, téléphonie IP (Internet Protocol), visioconférence…",
+        "styles": []
+      },
+      {
+        "type": "text",
+        "text": "Utilisateur :",
+        "styles": {
+          "bold": true
+        }
+      },
+      {
+        "type": "text",
+        "text": "la personne ayant accès ou utilisant les ressources informatiques et services Internet quel que soit son statut.",
+        "styles": []
+      },
+      {
+        "type": "text",
+        "text": "Entité",
+        "styles": {
+          "bold": true
+        }
+      }
+    ]
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quel est le nom de l'entité?",
+        "Quel est le type d'entité (société, collectivité, etc.)?"
+      ],
+      "answers": [],
+      "template": "Désigne ci-après la société <SOCIETE> ainsi que toutes les sous-entités créées par cette dernière pour l'accomplissement de ses missions."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Champ d'application de la charte"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Est-ce que la charte s'applique à tous les utilisateurs? (préciser les exceptions)",
+        "Est-ce que la charte s'applique aux prestataires de services ayant accès qu'au système d'information?",
+        "La présente charte doit-elle être annexée à tout contrat avec un prestataire extérieur?"
+      ],
+      "answers": [],
+      "template": "La présente charte s'applique à l'ensemble des utilisateurs des ressources informatique de l'entité tous statuts confondus.\n\nElle s'applique également à tout prestataire extérieur ayant accès aux services internet et resources informatique de l'entité.\n\nTout contrat avec un prestataire extérieur devra faire référence et comporter comme annexe la présente charte."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Accès aux ressources informatiques et aux services Internet"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "L'entité met-elle à disposition une messagerie professionnelle?",
+        "Le matériel informatique personnel peut-il être connecté au réseau ? Si oui, comment ?",
+        "L'utilisateur dispose-t-il d'une connexion Wi-Fi? Si oui donner le ou les noms de réseau et leur utilité respective. Peut-il y connecter son équipement personnel (smartphone par exemple)?",
+        "L'utilisateur peut-il avoir recours à des supports amovibles (type clé usb)? Si oui, lesquels?",
+        "À quelles fins la navigation sur Internet au moyen des ressources informatiques de l'entité est-elle permise? L'usage ponctuel à titre personnel est-il toléré?",
+        "Est-ce que les informations de navigation des utilisateurs sont stockées et analysées? Si oui, dans quel but?"
+      ],
+      "answers": [],
+      "template": "L'utilisation des ressources informatiques et des services Internet est strictement destinée aux activités professionnelles, conformément à la législation en vigueur.\n\nLa connexion d'équipements externes (ordinateur, modem, téléphone portable, etc.) est soumise à autorisation préalable et aux règles de sécurité en place.\n\nLes autorisations sont personnelles, non transférables et peuvent être retirées à tout moment.\n\nDes restrictions spécifiques peuvent être appliquées (certificats électroniques, filtrage sécurisé, etc.).\n\nL'usage personnel des ressources informatiques et des services Internet est toléré dans la mesure où il ne nuit pas à la sécurité du système d'information et ne perturbe pas le bon fonctionnement des services.\n\nLes informations de navigation des utilisateurs peuvent être stockées et analysées à des fins de sécurité, de contrôle et de statistiques. Les utilisateurs sont informés de cette collecte de données et de leur finalité."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Confidentialité des paramètres d'accès"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quels sont les moyens d'authentification prévus par l'entité? (mot de passes, token d'identification, etc.)"
+      ],
+      "answers": [],
+      "template": "Les accès aux éléments du système (poste, messagerie, réseau, etc.) sont protégés par des identifiants (nom d'utilisateur et mot de passe). Ces identifiants sont personnels et confidentiels, ne doivent pas être partagés et doivent répondre à des critères de complexité.\n\nLes utilisateurs doivent mémoriser leurs identifiants et éviter de les stocker. Il est interdit de noter les identifiants sur un support papier potentiellement accessible par un tiers."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Gestion des identifiants et mots de passe"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quelles sont les contraintes de complexité des mots de passe?",
+        "Les identifiants doivent-ils être renouvelés périodiquement?",
+        "Des mesures de contrôle des connexions sont-elles mises en place?"
+      ],
+      "answers": [],
+      "template": "Chaque utilisateur est responsable de la confidentialité de ses identifiants.\n\nLes mots de passe doivent respecter des critères de complexité stricts et être renouvelés tous les trois mois.\n\nLes connexions suspectes sont surveillées et peuvent faire l'objet d'un blocage automatique en cas d'activité inhabituelle."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Protection des ressources"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "L'entité réalise-t-elle des sauvegardes des postes utilisateur ? Si oui, à quelle fréquence et quels dossiers sont concernés ?",
+        "L'utilisateur a-t-il des responsabilités en matière de sécurité des données ? (déplacer les données à un endroit pour les sauvegarder par exemple)",
+        "Qui contacter en cas de perte de données ?",
+        "Qui contacter en cas d'anomalie constatée ?",
+        "Est-ce que le poste d'utilisateur doit être verrouillé en cas d'absence ?",
+        "Est-ce que le poste utilisateur doit être éteind après la journée de travail, si oui comment ?"
+      ],
+      "answers": [],
+      "template": "L'organisation met en place des moyens techniques et humains pour sécuriser ses systèmes. Les utilisateurs sont tenus de respecter les règles de sécurité en vigueur et de signaler tout incident ou anomalie constaté.\n\nLes sauvegardes des postes utilisateurs sont réalisées régulièrement par l'entité. Les utilisateurs sont informés des procédures de sauvegarde et des dossiers concernés.\n\nEn cas de perte de données, les utilisateurs doivent contacter le service informatique pour obtenir de l'aide et des conseils.\n\nLes utilisateurs doivent verrouiller leurs équipements en cas d'absence et effectuer des sauvegardes régulières en copiant les fichiers dans les dossiers sauvegardés.\n\nL'Toute utilisation d'équipements personnels engage leur responsabilité en matière de sécurité.\n\n"
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Messagerie électronique"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Les utilisateurs peuvent-ils utiliser la messagerie électronique à des fins personnelles?",
+        "Des règles spécifiques s'appliquent-elles aux pièces jointes?",
+        "Les emails sont-ils surveillés par l'organisation?",
+        "Quelles sont les bonnes pratiques recommandées pour l'utilisation de la messagerie?",
+        "Quels types de contenu sont interdits dans les emails?",
+        "Les utilisateurs doivent-ils configurer un message d'absence en cas de congé?"
+      ],
+      "answers": [],
+      "template": "L'utilisation de la messagerie électronique est strictement réservée à un usage professionnel.\n\nToute utilisation à des fins personnelles doit être limitée et ne pas nuire à l'activité professionnelle.\n\nLes utilisateurs sont tenus de respecter les règles de confidentialité en vigueur et de ne pas partager d'informations sensibles via la messagerie.\n\nL'envoi de pièces jointes volumineuses doit être conforme aux limites établies par l'organisation, et les pièces jointes doivent être scannées pour détecter d'éventuels logiciels malveillants.\n\nLes messages envoyés et reçus peuvent faire l'objet de contrôles afin d'assurer le respect des politiques de sécurité et de confidentialité.\n\nIl est interdit d'envoyer des contenus offensants, diffamatoires ou inappropriés.\n\nEn cas d'absence prolongée, les utilisateurs doivent configurer un message automatique indiquant la durée de leur absence et les contacts à joindre en cas d'urgence."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Utilisation d'Internet"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "L'accès à Internet est-il autorisé à des fins personnelles?",
+        "Quels sites web sont interdits par l'organisation? (réseaux sociaux, divertissement, pornographique ?)",
+        "Les utilisateurs doivent-ils respecter des restrictions de temps d'utilisation d'Internet?",
+        "Des outils de filtrage sont-ils mis en place pour contrôler l'accès à Internet?"
+      ],
+      "answers": [],
+      "template": "L'accès à Internet est autorisé exclusivement à des fins professionnelles et doit respecter les règles établies par l'organisation.\n\nL'utilisation des réseaux sociaux et de sites de divertissement est strictement encadrée et peut être interdite selon les politiques internes.\n\nLes utilisateurs doivent faire preuve de vigilance et éviter la consultation de sites non autorisés ou à risque pour la sécurité du système d'information.\n\nDes outils de filtrage et de surveillance peuvent être déployés afin de garantir un usage conforme aux règles établies.\n\nTout usage abusif d'Internet pourra entraîner des sanctions disciplinaires."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Pare-feu"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quelles sont les règles d'utilisation du pare-feu?",
+        "Les utilisateurs peuvent-ils demander des exceptions pour accéder à certains sites?",
+        "Comment les accès sont-ils journalisés et surveillés?"
+      ],
+      "answers": [],
+      "template": "Le pare-feu est un dispositif essentiel pour protéger le réseau de l'entité contre les intrusions et les menaces extérieures.\n\nIl est configuré pour bloquer les accès non autorisés et filtrer les sites non conformes aux usages professionnels.\n\nToute demande de dérogation doit être soumise à l'approbation du service informatique."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Nomadisme et accès à distance"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "L'accès à distance est-il autorisé pour tous les utilisateurs?",
+        "Quels dispositifs de sécurité sont requis pour les connexions distantes?",
+        "Les utilisateurs doivent-ils utiliser des VPN spécifiques?"
+      ],
+      "answers": [],
+      "template": "L'accès à distance aux ressources de l'entité est autorisé sous réserve du respect des mesures de sécurité définies.\n\nLes utilisateurs doivent se connecter via un VPN sécurisé et utiliser des dispositifs d'authentification forte.\n\nToute connexion distante doit être justifiée par des besoins professionnels validés par la hiérarchie."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Départ d'un utilisateur"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quelles sont les étapes à suivre en cas de départ d'un utilisateur?",
+        "Les accès sont-ils immédiatement révoqués?",
+        "Comment la récupération des équipements est-elle organisée?"
+      ],
+      "answers": [],
+      "template": "Lors du départ d'un utilisateur, l'accès aux systèmes informatiques est immédiatement révoqué.\n\nL'utilisateur doit restituer tout équipement mis à disposition et supprimer toutes les données personnelles des équipements professionnels.\n\nUn audit de compte est effectué pour s'assurer de la conformité aux procédures de départ."
+    }
+  },
+  {
+    "type": "heading",
+    "props": {
+      "level": 2
+    },
+    "content": "Manquement à la charte"
+  },
+  {
+    "type": "qa_block",
+    "props": {
+      "questions": [
+        "Quelles sont les sanctions en cas de non-respect de la charte?",
+        "Les utilisateurs sont-ils informés des manquements constatés?",
+        "Existe-t-il des procédures de recours pour les utilisateurs?"
+      ],
+      "answers": [],
+      "template": "Tout manquement à la charte informatique peut entraîner des sanctions disciplinaires allant de l'avertissement à la suspension d'accès aux ressources informatiques.\n\nLes utilisateurs seront informés des infractions constatées et auront la possibilité de présenter leur défense.\n\nDes procédures de recours existent et doivent être suivies conformément aux règlements en vigueur."
+    }
+  }
+]

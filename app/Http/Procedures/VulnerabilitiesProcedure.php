@@ -40,7 +40,8 @@ class VulnerabilitiesProcedure extends Procedure
         $assetId = $params['asset_id'] ?? null;
         $tld = $params['tld'] ?? null;
         $tags = $params['tags'] ?? null;
-        $alerts = Asset::where('is_monitored', true)
+        $alerts = Asset::query()
+            ->where('is_monitored', true)
             ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
             ->when($tld, fn($query, $domain) => $query->where('tld', $tld))
             ->when($tags, fn($query, $domain) => $query

@@ -10,6 +10,6 @@ class TablesList extends Component
 {
     public function render(): View|Closure|string
     {
-        return view('cywise.components.tables-list');
+        return view('theme::components.elements.tables-list');
     }
 }

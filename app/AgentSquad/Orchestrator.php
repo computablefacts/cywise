@@ -95,13 +95,13 @@ class Orchestrator
 
                 /* if ($answer->failure()) {
                     $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", 'An error occurred. Returning to the user.');
-                    $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
+                    $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
                     $answer->setChainOfThought($chainOfThought);
                     return $answer;
                 } */
 
                 $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", strip_tags($answer->markdown()));
-                $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
+                $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
 
                 if ($answer->final()) {
 
@@ -180,18 +180,21 @@ class Orchestrator
             $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An unknown action was requested. Returning to the user.');
             return new FailedAnswer(__("The action is unknown: :answer", ['answer' => $answer]), $chainOfThought);
         }
+        if (is_array($json['action_input'])) { // edge case for remote actions : the input is a JSON string
+            $json['action_input'] = json_encode($json['action_input']);
+        }
 
         $answer = $this->agents[$json['action_name']]->execute($user, $threadId, $messages, $json['action_input']);
 
         if ($answer->failure()) {
             $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An error occurred. Returning to the user.');
-            $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
+            $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
             $answer->setChainOfThought($chainOfThought);
             return $answer;
         }
 
         $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", strip_tags($answer->markdown()));
-        $chainOfThought = array_merge($answer->chainOfThought(), $chainOfThought);
+        $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
 
         if ($answer->final()) {
 

@@ -89,7 +89,12 @@ if (!function_exists('get_default_billing_cycle')){
             return 'Yearly';
         }
 
+        // Return 'Monthly' if only monthly ID is present
+        if (!$hasYearly && $hasMonthly) {
+            return 'Monthly';
+        }
+
         // Return null or a default value if neither is present
-        return 'Monthly'; // or any default value you prefer
+        return 'Yearly'; // or any default value you prefer
     }
 }

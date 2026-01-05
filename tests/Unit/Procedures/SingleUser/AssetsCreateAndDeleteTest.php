@@ -18,6 +18,7 @@ test('create and delete valid asset', function ($asset, $tld, $type) {
             'result' => [
                 'asset' => [
                     'asset',
+                    'is_monitored',
                     'status',
                     'tags',
                     'tld',
@@ -28,6 +29,7 @@ test('create and delete valid asset', function ($asset, $tld, $type) {
         ])
         ->assertJsonFragment([
             'asset' => $asset,
+            'is_monitored' => false,
             'status' => 'invalid',
             'tags' => [],
             'tld' => $tld,
@@ -141,7 +143,7 @@ test('cannot delete an unknown asset id', function () {
         ]);
 });
 
-test('cannot delete monitored asset', function ($assetAddress) {
+test('can delete monitored asset', function ($assetAddress) {
     asTenant1User();
 
     $asset = createAsset($assetAddress, true);
@@ -155,14 +157,12 @@ test('cannot delete monitored asset', function ($assetAddress) {
         ->assertExactJsonStructure([
             'id',
             'jsonrpc',
-            'error' => [
-                'code',
-                'data',
-                'message',
+            'result' => [
+                'msg',
             ],
         ])
         ->assertJsonFragment([
-            'message' => 'Deletion not allowed, asset is monitored.',
+            'msg' => "$assetAddress has been removed.",
         ]);
 })->with([
     'Valid DNS' => ['www.example.com'],

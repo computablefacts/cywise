@@ -16,22 +16,22 @@ use Illuminate\Support\Str;
 
 class ListVulnerabilities extends AbstractAction
 {
-    static function schema(): array
+    protected function schema(): array
     {
         return [
             "type" => "function",
             "function" => [
                 "name" => "list_vulnerabilities",
                 "description" => "
-                    Retrieve the list of vulnerabilities associated to one or more assets (domains or IP addresses).
-                    Provide the action to perform followed by the criticality level (high/medium/low/any) and the asset (or all), using the format: 'action:level:asset'.
-                    The action (always list) must come first, followed by a colon and then the criticality level (high/medium/low/any), followed by a colon and then the asset (or all).
-                    For example:
-                    - if the request is 'quelles sont mes vulnérabilités ?', the input should be 'list:any:all'
-                    - if the request is 'quelles sont mes vulnérabilités critiques ?', the input should be 'list:high:all'
-                    - if the request is 'quelles sont les vulnérabilités de www.example.com ?', the input should be 'list:any:www.example.com'
-                    - if the request is 'quelles sont les vulnérabilités de criticité basse de blog.example.com ?', the input should be 'list:low:blog.example.com' 
-                    - if the request is 'quelles sont les vulnérabilités de criticité moyenne du serveur d'adresse IP 192.168.1.1 ?', the input should be 'list:medium:192.168.1.1'                   
+Retrieve the list of vulnerabilities associated to one or more assets (domains or IP addresses).
+Provide the action to perform followed by the criticality level (high/medium/low/any) and the asset (or all), using the format: 'action:level:asset'.
+The action (always list) must come first, followed by a colon and then the criticality level (high/medium/low/any), followed by a colon and then the asset (or all).
+For example:
+- if the request is 'quelles sont mes vulnérabilités ?', the input should be 'list:any:all'
+- if the request is 'quelles sont mes vulnérabilités critiques ?', the input should be 'list:high:all'
+- if the request is 'quelles sont les vulnérabilités de www.example.com ?', the input should be 'list:any:www.example.com'
+- if the request is 'quelles sont les vulnérabilités de criticité basse de blog.example.com ?', the input should be 'list:low:blog.example.com' 
+- if the request is 'quelles sont les vulnérabilités de criticité moyenne du serveur d'adresse IP 192.168.1.1 ?', the input should be 'list:medium:192.168.1.1'                   
                 ",
                 "parameters" => [
                     "type" => "object",
@@ -136,8 +136,8 @@ class ListVulnerabilities extends AbstractAction
 ### {$alert->title} {$level}
 
 **Actif concerné.** L'actif concerné est {$alert->asset()?->asset} pointant vers le serveur 
-{$alert->port()?->ip}. Le port {$alert->port()?->port} de ce serveur est ouvert et expose un service 
-{$alert->port()?->service} ({$alert->port()?->product}).
+{$alert->port?->ip}. Le port {$alert->port?->port} de ce serveur est ouvert et expose un service 
+{$alert->port?->service} ({$alert->port?->product}).
 
 **Description détaillée.** {$vulnerability}
 

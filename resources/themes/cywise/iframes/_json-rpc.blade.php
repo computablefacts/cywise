@@ -39,25 +39,25 @@
         'Authorization': 'Bearer {{ Auth::user()->sentinelApiToken() }}',
       }
     })
-    .then(response => {
-      if (response.data && response.data.error && onError) {
-        onError(response.data.error);
-      } else if (response.data && response.data.result && onSuccess) {
-        onSuccess(response.data.result);
-      } else {
-        console.log(response);
-      }
-    })
-    .catch(error => {
-      if (toaster) {
-        toaster.toastAxiosError(error);
-      }
-    })
-    .finally(() => {
-      if (onFinally) {
-        onFinally();
-      }
-    });
+      .then(response => {
+        if (response.data && response.data.error && onError) {
+          onError(response.data.error);
+        } else if (response.data && response.data.result && onSuccess) {
+          onSuccess(response.data.result);
+        } else {
+          console.log(response);
+        }
+      })
+      .catch(error => {
+        if (toaster) {
+          toaster.toastAxiosError(error);
+        }
+      })
+      .finally(() => {
+        if (onFinally) {
+          onFinally();
+        }
+      });
   }
 
   function createInvitationsApiCall(users, onFinally = onFinallyDefault) {
@@ -165,9 +165,52 @@
     executeJsonRpcApiCall('assets@untag', {asset_id: assetId, tag_id: tagId}, onSuccess, onError);
   }
 
+  function listAllTagsApiCall(onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('assets@listTags', {}, onSuccess, onError);
+  }
+
+  function listAllGroupsApiCall(onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('assets@listGroups', {}, onSuccess, onError);
+  }
+
+  function degroupApiCall(group, onSuccess = onSuccessDefault, onError = onErrorDefault, onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('assets@degroup', {group: group}, onSuccess, onError, onFinally);
+  }
+
   function askCyberBuddyApiCall(threadId, directive, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
-    executeJsonRpcApiCall('cyberbuddy@ask', {thread_id: threadId, directive: directive}, onSuccess,
-      (response) => toaster.toastError(response.message), onFinally);
+    executeJsonRpcApiCall('cyberbuddy@ask', {thread_id: threadId, directive: directive}, onSuccess, onErrorDefault,
+      onFinally);
+  }
+
+  function deleteConversationApiCall(conversationId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberbuddy@delete', {conversation_id: conversationId}, onSuccess);
+  }
+
+  function saveActionSettingsApiCall(scopeType, scopeId, actions, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberbuddy@saveActionSettings', {scope_type: scopeType, scope_id: scopeId, actions: actions},
+      onSuccess);
+  }
+
+  function loadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('frameworks@load', {framework_id: frameworkId}, onSuccess);
+  }
+
+  function unloadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('frameworks@unload', {framework_id: frameworkId}, onSuccess);
+  }
+
+  function listTemplatesApiCall(onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberscribe@listTemplates', {}, onSuccess);
+  }
+
+  function deleteTemplateApiCall(templateId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberscribe@deleteTemplate', {template_id: templateId}, onSuccess);
+  }
+
+  function saveTemplateApiCall(templateId, isModel, name, blocks, onSuccess = onSuccessDefault,
+    onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('cyberscribe@saveTemplate',
+      {template_id: templateId, is_model: isModel, name: name, blocks: blocks}, onSuccess, onErrorDefault, onFinally);
   }
 
   function listTablesApiCall(onSuccess = onSuccessDefault) {
@@ -373,6 +416,18 @@
 
   function createUserInvitationApiCall(email, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('invitations@create', {email: email}, onSuccess);
+  }
+
+  function shareAssetApiCall(tags, email, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('assets@share', {tags: tags, email: email}, onSuccess);
+  }
+
+  function toggleScheduledTaskApiCall(taskId, enabled = null, onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('scheduled-tasks@toggle', {task_id: taskId, enabled: enabled}, onSuccess, onError);
+  }
+
+  function deleteScheduledTaskApiCall(taskId, onSuccess = onSuccessDefault, onError = onErrorDefault) {
+    executeJsonRpcApiCall('scheduled-tasks@delete', {task_id: taskId}, onSuccess, onError);
   }
 
 </script>

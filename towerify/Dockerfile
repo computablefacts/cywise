@@ -38,7 +38,7 @@ RUN npm run build
 #
 # Application
 #
-FROM php:8.3-apache AS final
+FROM php:8.4-apache AS final
 
 LABEL maintainer="Patrick Brisacier <pbrisacier@mncc.fr>"
 

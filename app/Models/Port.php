@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -69,5 +70,10 @@ class Port extends Model
     public function screenshot(): HasOne
     {
         return $this->hasOne(Screenshot::class, 'port_id', 'id');
+    }
+
+    public function scan(): BelongsTo
+    {
+        return $this->belongsTo(Scan::class, 'scan_id', 'id');
     }
 }
