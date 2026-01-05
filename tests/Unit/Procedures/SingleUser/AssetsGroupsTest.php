@@ -346,7 +346,7 @@ describe('assets@assetsInGroup', function () {
                 'jsonrpc',
                 'result' => [
                     'assets' => [
-                        ['asset', 'status', 'tags', 'tld', 'type', 'uid'],
+                        ['asset', 'is_monitored', 'status', 'tags', 'tld', 'type', 'uid'],
                     ],
                 ],
             ])
@@ -379,8 +379,8 @@ describe('assets@assetsInGroup', function () {
                 'jsonrpc',
                 'result' => [
                     'assets' => [
-                        ['asset', 'status', 'tags', 'tld', 'type', 'uid'],
-                        ['asset', 'status', 'tags', 'tld', 'type', 'uid'],
+                        ['asset', 'is_monitored', 'status', 'tags', 'tld', 'type', 'uid'],
+                        ['asset', 'is_monitored', 'status', 'tags', 'tld', 'type', 'uid'],
                     ],
                 ],
             ])
