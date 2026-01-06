@@ -26,7 +26,7 @@ use Illuminate\View\View;
 
 class TimelineController extends Controller
 {
-    public static function fetchLeaks(User $user): Collection
+    public static function fetchLeaks(User $user, ?Carbon $createdAtOrAfter = null): Collection
     {
         $now = Carbon::now()->utc()->subDays(15);
         $leaks = TimelineItem::fetchLeaks($user->id, $now, null, 0);
@@ -106,7 +106,7 @@ class TimelineController extends Controller
                 }
             }
         }
-        return TimelineItem::fetchLeaks($user->id, null, null, 0);
+        return TimelineItem::fetchLeaks($user->id, $createdAtOrAfter, null, 0);
     }
 
     public static function noteAndMemo(User $user, TimelineItem $item): array

@@ -23,7 +23,7 @@ class SendAuditReportListener extends AbstractListener
 
     protected function handle2($event)
     {
-        if (! ($event instanceof SendAuditReport)) {
+        if (!($event instanceof SendAuditReport)) {
             throw new \Exception('Invalid event type!');
         }
 
@@ -33,7 +33,7 @@ class SendAuditReportListener extends AbstractListener
         $from = 'cyberbuddy@cywise.io'; // config('towerify.freshdesk.from_email');
         $to = $user->email;
 
-        if (! $user->gets_audit_report) {
+        if (!$user->gets_audit_report) {
             return;
         }
 
@@ -98,20 +98,20 @@ class SendAuditReportListener extends AbstractListener
         $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->subDay())->count();
 
         $nbLeaks = TimelineController::fetchLeaks($user)
-            ->flatMap(fn (TimelineItem $item) => json_decode($item->attributes()['credentials']))
+            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
             ->unique()
             ->count();
 
-        $nbHigh = $assets->flatMap(fn (Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
-            ->filter(fn (Alert $alert) => $alert->is_hidden === 0)
+        $nbHigh = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
+            ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
-        $nbMedium = $assets->flatMap(fn (Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
-            ->filter(fn (Alert $alert) => $alert->is_hidden === 0)
+        $nbMedium = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
+            ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
-        $nbLow = $assets->flatMap(fn (Asset $asset) => $asset->alertsWithCriticalityLow()->get())
-            ->filter(fn (Alert $alert) => $alert->is_hidden === 0)
+        $nbLow = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityLow()->get())
+            ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
         $nbIssues = $nbNewAssets + $nbLeaks + $nbHigh + $nbMedium + $nbLow;
@@ -141,31 +141,31 @@ class SendAuditReportListener extends AbstractListener
             ->count();
 
         $nbLeaks = TimelineController::fetchLeaks($user)
-            ->flatMap(fn (TimelineItem $item) => json_decode($item->attributes()['credentials']))
+            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
             ->unique()
             ->count();
 
-        $nbDns = $assets->filter(fn (Asset $asset) => $asset->is_monitored && $asset->isDns())
+        $nbDns = $assets->filter(fn(Asset $asset) => $asset->is_monitored && $asset->isDns())
             ->pluck('asset')
             ->unique()
             ->count();
 
-        $nbIpAddresses = $assets->filter(fn (Asset $asset) => $asset->is_monitored)
-            ->flatMap(fn (Asset $asset) => $asset->ports()->get())
+        $nbIpAddresses = $assets->filter(fn(Asset $asset) => $asset->is_monitored)
+            ->flatMap(fn(Asset $asset) => $asset->ports()->get())
             ->pluck('ip')
             ->unique()
             ->count();
 
-        $nbHigh = $assets->flatMap(fn (Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
-            ->filter(fn (Alert $alert) => $alert->is_hidden === 0)
+        $nbHigh = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
+            ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
-        $nbMedium = $assets->flatMap(fn (Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
-            ->filter(fn (Alert $alert) => $alert->is_hidden === 0)
+        $nbMedium = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
+            ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
-        $nbLow = $assets->flatMap(fn (Asset $asset) => $asset->alertsWithCriticalityLow()->get())
-            ->filter(fn (Alert $alert) => $alert->is_hidden === 0)
+        $nbLow = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityLow()->get())
+            ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
         $nbAlerts = $nbHigh + $nbMedium + $nbLow;
@@ -225,11 +225,12 @@ class SendAuditReportListener extends AbstractListener
 
     private function buildSectionLeaks(User $user): string
     {
-        $leaks = TimelineController::fetchLeaks($user)
-            ->flatMap(fn (TimelineItem $item) => json_decode($item->attributes()['credentials']))
+        $leaks = TimelineController::fetchLeaks($user, Carbon::now()->utc()->subDays(7))
+            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
             ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE)
             ->reverse()
             ->map(function (object $leak) {
+
                 $date = empty($leak->leak_date) ? '' : " (date est. {$leak->leak_date})";
                 $password = empty($leak->password) ? '' : " ({$leak->password})";
 
@@ -250,14 +251,14 @@ class SendAuditReportListener extends AbstractListener
 
     private function buildSectionVulns(Collection $assets): string
     {
-        $high = $assets->flatMap(fn (Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
-            ->filter(fn (Alert $alert) => $alert->is_hidden === 0);
+        $high = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
+            ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 
-        $medium = $assets->flatMap(fn (Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
-            ->filter(fn (Alert $alert) => $alert->is_hidden === 0);
+        $medium = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
+            ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 
-        $low = $assets->flatMap(fn (Asset $asset) => $asset->alertsWithCriticalityLow()->get())
-            ->filter(fn (Alert $alert) => $alert->is_hidden === 0);
+        $low = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityLow()->get())
+            ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 
         return $high
             ->concat($medium)
@@ -295,7 +296,7 @@ class SendAuditReportListener extends AbstractListener
                     $remediation = $result['response'];
                 }
 
-                $link = route('iframes.assets')."#aid-{$alert->asset()->id}";
+                $link = route('iframes.assets') . "#aid-{$alert->asset()->id}";
 
                 return "
                     <h3>{$alert->title} {$level}</h3>
