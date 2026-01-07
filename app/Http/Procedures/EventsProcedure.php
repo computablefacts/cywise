@@ -44,7 +44,7 @@ class EventsProcedure extends Procedure
             'ynh_osquery_rules.comments',
             'ynh_osquery.*'
         ])
-            ->where('ynh_osquery.calendar_time', '>=', $cutOffTime)
+            ->where('ynh_osquery_latest_events.calendar_time', '>=', $cutOffTime)
             ->join('ynh_osquery_latest_events', 'ynh_osquery_latest_events.ynh_osquery_id', '=', 'ynh_osquery.id')
             ->join('ynh_osquery_rules', 'ynh_osquery_rules.id', '=', 'ynh_osquery.ynh_osquery_rule_id')
             ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
