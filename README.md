@@ -34,8 +34,8 @@ Vous travaillez avec des prestataires informatiques ? Aucun problème !
 Cywise intègre toutes les fonctionnalités essentielles aux TPE et PME. En voici quelques-unes :
 
 - Collecte des métriques systèmes avec [Performa](https://github.com/jhuckaby/performa)
-- Collecte des événements de sécurité avec des règles [Osquery](https://osquery.io/)
-- Vérifications de configuration avec des règles [OSSEC](https://www.ossec.net/)
+- Collecte des événements de sécurité avec [Osquery](https://osquery.io/)
+- Vérifications de configuration avec [OSSEC](https://www.ossec.net/)
 - Scanner de vulnérabilités
 - Système d’alertes
 - CyberBuddy, une interface utilisateur conversationnelle
