@@ -51,6 +51,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Spatie\Health\Http\Controllers\HealthCheckJsonResultsController;
 use Spatie\Health\Http\Controllers\HealthCheckResultsController;
 use Spatie\Health\Http\Controllers\SimpleHealthCheckController;
 use Wave\Facades\Wave;
@@ -91,6 +92,7 @@ Route::get('/cyber-advisor', [\App\Http\Controllers\ToolsController::class, 'cyb
  */
 Route::get('check-health', [SimpleHealthCheckController::class, '__invoke']);
 Route::get('check-health/ui', [HealthCheckResultsController::class, '__invoke'])->middleware('auth');
+Route::get('check-health/json', [HealthCheckJsonResultsController::class, '__invoke'])->middleware('auth.basic');
 
 // Cywise routes
 Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
