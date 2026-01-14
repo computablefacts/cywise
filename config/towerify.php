@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'website' => env('WEBSITE_URL'),
     'freshdesk' => [
         'widget_id' => env('FRESHDESK_ID'),
         'to_email' => env('FRESHDESK_TO_EMAIL'),

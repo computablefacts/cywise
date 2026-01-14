@@ -7,8 +7,6 @@ class ProdDbAppConfig implements DbAppConfigInterface
     public function getParams(): array
     {
         return [
-            'towerify.website' => 'https://www.cywise.io',
-
             'towerify.freshdesk.widget_id' => '44000004635',
             'towerify.freshdesk.to_email' => 'support@computablefacts.freshdesk.com',
             'towerify.freshdesk.from_email' => 'support@cywise.io',

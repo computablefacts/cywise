@@ -7,8 +7,6 @@ class LocalDbAppConfig implements DbAppConfigInterface
     public function getParams(): array
     {
         return [
-            'towerify.website' => 'http://127.0.0.1:8000',
-
             'towerify.freshdesk.widget_id' => '',
             'towerify.freshdesk.to_email' => 'support@computablefacts.freshdesk.com',
             'towerify.freshdesk.from_email' => 'support@cywise.io',
