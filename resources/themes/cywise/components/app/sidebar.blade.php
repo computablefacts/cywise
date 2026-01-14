@@ -102,7 +102,7 @@ $user = \Auth::user();
             @endif
             @if(isset(Auth::user()->performa_domain))
             <x-app.sidebar-link
-              href="https://{{ Auth::user()->performa_domain }}"
+              href="{{ request()->isSecure() ? 'https://' : 'http://' }}{{ Auth::user()->performa_domain }}"
               icon="phosphor-chart-line"
               target="_blank">
               {{ __('Metrics') }}
