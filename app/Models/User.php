@@ -215,8 +215,7 @@ class User extends WaveUser
             $this->setupPrompts('default_reformulate_question', 'seeders/prompts/default_reformulate_question.txt');
             $this->setupPrompts('default_summarize', 'seeders/prompts/default_summarize.txt');
 
-            //Remediation prompts
-
+            // Remediation prompts
             $this->setupPrompts('cve_explanation_prompt', 'seeders/prompts/cve_explanation_prompt.txt');
             $this->setupPrompts('explanation_only_prompt', 'seeders/prompts/explanation_only_prompt.txt');
             $this->setupPrompts('false_positive_prompt', 'seeders/prompts/false_positive_prompt.txt');
