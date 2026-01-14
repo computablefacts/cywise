@@ -13,8 +13,11 @@ use App\Models\TimelineItem;
 use App\Models\YnhTrial;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\PromptsProvider;
 
 class EndVulnsScanListener extends AbstractListener
 {
@@ -189,21 +192,34 @@ class EndVulnsScanListener extends AbstractListener
                         $type .= '_v3_alert';
                     }
 
+                    $vulnerability = Str::limit(trim($alert['vulnerability'] ?? ''), 5000);
+                    $remediation = Str::limit(trim($alert['remediation'] ?? ''), 5000);
+                    $level = trim($alert['level'] ?? '');
+                    $uid = trim($alert['uid'] ?? '');
+                    $cve_id = empty($alert['cve_id']) ? null : $alert['cve_id'];
+                    $cve_cvss = empty($alert['cve_cvss']) ? null : $alert['cve_cvss'];
+                    $cve_vendor = empty($alert['cve_vendor']) ? null : $alert['cve_vendor'];
+                    $cve_product = empty($alert['cve_product']) ? null : $alert['cve_product'];
+                    $title = trim($alert['title'] ?? '');
+
+                    $aiRemediation = $this->generateAiRemediation($port, $alert);
+
                     Alert::updateOrCreate([
                         'port_id' => $port->id,
-                        'uid' => trim($alert['uid'])
+                        'uid' => $uid
                     ], [
                         'port_id' => $port->id,
                         'type' => $type,
-                        'vulnerability' => Str::limit(trim($alert['vulnerability']), 5000),
-                        'remediation' => Str::limit(trim($alert['remediation']), 5000),
-                        'level' => trim($alert['level']),
-                        'uid' => trim($alert['uid']),
-                        'cve_id' => empty($alert['cve_id']) ? null : $alert['cve_id'],
-                        'cve_cvss' => empty($alert['cve_cvss']) ? null : $alert['cve_cvss'],
-                        'cve_vendor' => empty($alert['cve_vendor']) ? null : $alert['cve_vendor'],
-                        'cve_product' => empty($alert['cve_product']) ? null : $alert['cve_product'],
-                        'title' => trim($alert['title']),
+                        'vulnerability' => $vulnerability,
+                        'remediation' => $remediation,
+                        'ai_remediation' => $aiRemediation,
+                        'level' => $level,
+                        'uid' => $uid,
+                        'cve_id' => $cve_id,
+                        'cve_cvss' => $cve_cvss,
+                        'cve_vendor' => $cve_vendor,
+                        'cve_product' => $cve_product,
+                        'title' => $title,
                         'flarum_slug' => null, // TODO : remove?
                     ]);
                 } catch (\Exception $exception) {
@@ -271,6 +287,181 @@ class EndVulnsScanListener extends AbstractListener
     private function taskOutput(string $taskId): array
     {
         return ApiUtils::task_get_scan_public($taskId);
+    }
+
+    private function generateAiRemediation(Port $port, array $alert, string $mode = 'both'): string
+    {
+        $category = $this->detectVulnerabilityCategory($alert);
+        $context = $this->gatherSecurityContext($port, $alert, $category);
+        $results = [];
+
+        if ($mode === 'explanation' || $mode === 'both') {
+            $results['explanation'] = $this->processLlmPart($port, $alert, $category, $context, 'explanation');
+        }
+
+        if ($mode === 'script' || $mode === 'both') {
+            $results['script'] = $this->processLlmPart($port, $alert, $category, $context, 'script');
+        }
+
+        $aiRemediation = $results['explanation'] ?? '';
+        if (!empty($results['script'])) {
+            $aiRemediation .= "\n\n" . $results['script'];
+        }
+
+        return $aiRemediation;
+    }
+
+    private function detectVulnerabilityCategory(array $alert): string
+    {
+        $type = strtolower($alert['type'] ?? '');
+
+        if (Str::contains($type, ['quickhits_file', 'config_file', 'backup_file', 'file_alert', 'file_v3'])) {
+            return 'file_exposed';
+        }
+        if (Str::contains($type, ['weak_cipher', 'ssl_certificate', 'tls_', 'cipher'])) {
+            return "weak_cipher";
+        }
+        if (!empty($alert['cve_id'])) {
+            return "cve";
+        }
+        return "general";
+    }
+
+    private function gatherSecurityContext(Port $port, array $alert, string $category): array
+    {
+        $context = [
+            'ip' => $port->ip ?? 'N/A',
+            'port' => $port->port ?? 0,
+            'protocol' => $port->protocol ?? 'tcp',
+            'vulnerability' => $alert['vulnerability'] ?? '',
+            'title' => $alert['title'] ?? '',
+            'technology' => 'unknown',
+            'cve_id' => $alert['cve_id'] ?? null,
+        ];
+
+        if ($category === 'file_exposed') {
+            if (preg_match('/url\s*:(?:http?:\/\/)?([^\s<>"\']+)/i', $context['vulnerability'], $matches)) {
+                $url = Str::contains($matches[0], 'url :') ? Str::after($matches[0], ':') : $matches[1];
+                $url = trim($url);
+                $context['exposed_url'] = $url;
+
+                try {
+                    $response = Http::withOptions(['verify' => false])->timeout(10)->get($url);
+                    if ($response->successful()) {
+                        $context['file_content'] = Str::limit($response->body(), 4000);
+                        $serverHeader = strtolower($response->header('Server', ''));
+                        $poweredBy = strtolower($response->header('X-Powered-By', ''));
+                        if (Str::contains($serverHeader, 'nginx')) $context['technology'] = 'nginx';
+                        elseif (Str::contains($serverHeader, 'apache') || Str::contains($poweredBy, 'apache')) $context['technology'] = 'apache';
+                    }
+                } catch (\Exception $e) {
+                    Log::warning("Impossible de fetch le fichier exposé: " . $e->getMessage());
+                }
+            }
+        }
+
+        if ($context['technology'] === 'unknown' && in_array($category, ['file_exposed', 'weak_cipher'])) {
+            $context['technology'] = $this->probeTechnology($context['ip'], (int)$context['port']);
+        }
+
+        if ($category === 'cve' && $context['cve_id']) {
+            $context['cve_info'] = "NIST NVD: https://nvd.nist.gov/vuln/detail/" . strtoupper($context['cve_id']);
+        }
+
+        return $context;
+    }
+
+    private function probeTechnology(string $ip, int $port): string
+    {
+        try {
+            foreach (["https://$ip:$port", "http://$ip:$port"] as $url) {
+                $response = Http::withOptions(['verify' => false])->timeout(3)->head($url);
+                $server = strtolower($response->header('Server', ''));
+                if (Str::contains($server, 'nginx')) return 'nginx';
+                if (Str::contains($server, 'apache')) return 'apache';
+            }
+        } catch (\Exception $e) {
+        }
+        return 'unknown';
+    }
+
+    private function processLlmPart(Port $port, array $alert, string $category, array $context, string $type): string
+    {
+        $title = $alert['title'] ?? '';
+        $alertType = $alert['type'] ?? '';
+
+        if ($category === 'file_exposed' && !empty($context['file_content']) && $type === 'explanation') {
+            $fpPrompt = PromptsProvider::provide('false_positive_prompt', [
+                'CONTENT' => $context['file_content'],
+                'TITLE' => $title,
+                'TYPE' => $alertType
+            ]);
+            $fpResult = LlmsProvider::provide($fpPrompt);
+            if (Str::contains(strtolower($fpResult), '<is_false_positive>true</is_false_positive>')) {
+                return "Faux positif" . $fpResult;
+            }
+        }
+
+        $template = $this->resolveTemplate($category, $type);
+
+        $vars = [
+            'ip' => $context['ip'],
+            'port' => $context['port'],
+            'protocol' => $context['protocol'],
+            'title' => $title,
+            'type' => $alertType,
+            'vulnerability' => $context['vulnerability'],
+            'remediation' => $alert['remediation'] ?? '',
+            'technology' => $context['technology'],
+            'technology_upper' => strtoupper($context['technology']),
+            'cve_id' => $context['cve_id'] ?? 'N/A',
+            'domain' => $context['ip'],
+            'filename' => basename(parse_url($context['exposed_url'] ?? '', PHP_URL_PATH) ?: 'file'),
+            'analysis_context' => '',
+            'risky_parts' => 'Analyse en cours...',
+            'cve_info' => $context['cve_info'] ?? '',
+        ];
+
+        if ($type === 'script') {
+            $scriptDir = base_path("database/seeders/remediations");
+            $scriptFile = match ($category) {
+                'file_exposed' => "script_{$context['technology']}.bash",
+                'weak_cipher' => "fix_weak_ciphers_{$context['technology']}.bash",
+                default => null
+            };
+
+            if ($scriptFile && file_exists("$scriptDir/$scriptFile")) {
+                $vars['script_content'] = file_get_contents("$scriptDir/$scriptFile");
+            } else {
+                return "Erreur : Template de script bash introuvable ({$scriptFile}).";
+            }
+        }
+
+        return LlmsProvider::provide(PromptsProvider::provide($template, $vars));
+    }
+
+    private function resolveTemplate(string $category, string $type): string
+    {
+        $map = [
+            'file_exposed' => [
+                'explanation' => 'file_removal_explanation_only_prompt',
+                'script' => 'file_removal_script_only_prompt',
+            ],
+            'weak_cipher' => [
+                'explanation' => 'weak_cipher_explanation_prompt',
+                'script' => 'weak_cipher_script_only_prompt',
+            ],
+            'cve' => [
+                'explanation' => 'cve_explanation_prompt',
+                'script' => 'explanation_only_prompt',
+            ],
+            'general' => [
+                'explanation' => 'explanation_only_prompt',
+                'script' => 'explanation_only_prompt',
+            ]
+        ];
+
+        return $map[$category][$type] ?? 'explanation_only_prompt';
     }
 
     // Whatever happens during the ports scan, a vuln scan is triggered!
