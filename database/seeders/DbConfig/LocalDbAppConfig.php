@@ -90,9 +90,6 @@ class LocalDbAppConfig implements DbAppConfigInterface
             'towerify.clickhouse.password' => '',
             'towerify.clickhouse.database' => '',
 
-            'towerify.sendgrid.api' => 'https://api.sendgrid.com/v3/mail/send',
-            // 'encrypted:towerify.sendgrid.api_key' => '',
-
             'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
             'towerify.josianne.username' => 'cywise',
             // 'encrypted:towerify.josianne.password' => '',

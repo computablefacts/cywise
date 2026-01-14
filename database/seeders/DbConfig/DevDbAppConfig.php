@@ -90,9 +90,6 @@ class DevDbAppConfig implements DbAppConfigInterface
             'towerify.clickhouse.password' => '',
             'towerify.clickhouse.database' => '',
 
-            'towerify.sendgrid.api' => 'https://api.sendgrid.com/v3/mail/send',
-            'encrypted:towerify.sendgrid.api_key' => 'vkqBP73Ezm3oFqcQ_h5scMEOSW3HC1DcsRJmHI+V2nWMr5TQ4KYJbYePliV8JsObaNKqVqGXl81XGbj445U3oP2O2lyUbClsabgTL/wy0XiWX6KL11uvW+tsN0QE=',
-
             'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
             'towerify.josianne.username' => 'cywise',
             'encrypted:towerify.josianne.password' => 'BZMMOKdbxEtn?mpc_xZS2m+XhLGIkAQC7rhtpVKG3diisqZkgxGmSrCPkx7o=',
