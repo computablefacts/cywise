@@ -1,0 +1,29 @@
+Un fichier a été détecté comme exposé mais l'analyse automatique indique que c'est un FAUX POSITIF. Explique de façon concise pourquoi c'est un faux positif en suivant le format markdown attendu.
+
+<alert_info>
+Type: {type}
+Titre: {title}
+IP: {ip}:{port}
+</alert_info>
+
+<analysis>
+Cette alerte a été analysée automatiquement et identifiée comme un FAUX POSITIF avec une confiance élevée.
+
+Raison:
+{risky_parts}
+</analysis>
+
+<output_format>
+Réponds en suivant EXACTEMENT ce format markdown (sans balises HTML) :
+
+**Faux positif** : [Explication concise en 2-3 phrases expliquant pourquoi le fichier ne présente aucun risque de sécurité. Mentionne le type de contenu et l'absence de données sensibles.]
+
+IMPORTANT :
+- Reste concis et direct
+- Utilise le format markdown simple (pas de balises HTML)
+- Ne fournis PAS de solution puisque c'est un faux positif
+</output_format>
+
+<example>
+**Faux positif** : Le fichier `README.md` contient uniquement des informations **publiques** standard pour un projet open-source (documentation technique, badges CI/CD, liens officiels). Aucune donnée sensible (identifiants, clés, PII, configurations internes) n'est exposée. L'alerte est sans risque.
+</example>

@@ -215,6 +215,17 @@ class User extends WaveUser
             $this->setupPrompts('default_reformulate_question', 'seeders/prompts/default_reformulate_question.txt');
             $this->setupPrompts('default_summarize', 'seeders/prompts/default_summarize.txt');
 
+            //Remediation prompts
+
+            $this->setupPrompts('cve_explanation_prompt', 'seeders/prompts/cve_explanation_prompt.txt');
+            $this->setupPrompts('explanation_only_prompt', 'seeders/prompts/explanation_only_prompt.txt');
+            $this->setupPrompts('false_positive_prompt', 'seeders/prompts/false_positive_prompt.txt');
+            $this->setupPrompts('file_removal_explanation_only_prompt', 'seeders/prompts/file_removal_explanation_only_prompt.txt');
+            $this->setupPrompts('file_removal_script_only_prompt', 'seeders/prompts/file_removal_script_only_prompt.txt');
+            $this->setupPrompts('general_prompt', 'seeders/prompts/general_prompt.txt');
+            $this->setupPrompts('weak_cipher_explanation_prompt', 'seeders/prompts/weak_cipher_explanation_prompt.txt');
+            $this->setupPrompts('weak_cipher_script_only_prompt', 'seeders/prompts/weak_cipher_script_only_prompt.txt');
+
             Log::debug("[{$this->email}] User's prompts updated.");
             Log::debug("[{$this->email}] Updating user's templates...");
 

@@ -1,0 +1,198 @@
+Tu es un expert en cybersécurité spécialisé dans le hardening des configurations SSL/TLS.
+
+<context>
+Une vulnérabilité "Weak Cipher Suites" a été détectée sur un serveur. Les cipher suites faibles permettent des attaques de type BEAST, POODLE, ou permettent le downgrade vers des protocoles obsolètes (SSLv2, SSLv3, TLSv1.0, TLSv1.1).
+
+Ton rôle est d'analyser l'alerte et de fournir une documentation complète sur la correction.
+</context>
+
+<vulnerability>
+<ip>{ip}</ip>
+<port>{port}</port>
+<protocol>{protocol}</protocol>
+<type>{type}</type>
+<title>{title}</title>
+<description>{vulnerability}</description>
+</vulnerability>
+
+<detected_technology>
+<service_type>{technology}</service_type>
+<domain>{domain}</domain>
+</detected_technology>
+
+<remediation_strategy>
+La correction des weak cipher suites implique :
+
+1. **Identification du service** : Apache, Nginx, SSH, HAProxy, etc.
+2. **Désactivation des protocoles faibles** : SSLv2, SSLv3, TLSv1.0, TLSv1.1
+3. **Configuration des cipher suites modernes** : ECDHE, AES-GCM, ChaCha20-Poly1305
+4. **Activation de TLSv1.2 et TLSv1.3 uniquement**
+5. **Test de la configuration** avant redémarrage
+6. **Redémarrage du service** pour appliquer les changements
+
+IMPORTANT : Un script bash automatisé existe déjà dans `scripts/fix_weak_ciphers.bash` qui gère :
+- Apache (SSLCipherSuite, SSLProtocol)
+- Nginx (ssl_protocols, ssl_ciphers)  
+- SSH (Ciphers, MACs, KexAlgorithms)
+- HAProxy (ssl-default-bind-ciphers)
+- Détection automatique des services
+- Backup automatique avant modification
+- Test de configuration avant redémarrage
+- Mode dry-run pour simulation
+</remediation_strategy>
+
+<instructions>
+Tu DOIS répondre en suivant EXACTEMENT ce format MARKDOWN avec balises de commentaire:
+
+<!-- START_CONTEXTE -->
+### Contexte de la Vulnérabilité
+
+**Service exposé:** {technology} sur {domain}:{port}  
+**Type de risque:** {type}  
+**Protocoles/Ciphers faibles détectés:** [Extraire depuis la description si disponible]
+
+<!-- END_CONTEXTE -->
+
+<!-- START_RISQUES -->
+### Risques si Non Corrigé
+
+**Vulnérabilités associées aux ciphers faibles:**
+- **SSLv2/SSLv3** : Vulnérable à POODLE, DROWN
+- **TLSv1.0/1.1** : Obsolète, vulnérable à BEAST, déprécié par les standards
+- **RC4, DES, 3DES** : Chiffrement cassable, attaques par force brute
+- **CBC sans protection** : Vulnérable aux attaques padding oracle
+- **Export ciphers** : Intentionnellement affaiblis, facilement cassables
+
+**Impact potentiel:**
+Un attaquant capable d'intercepter le trafic (Man-in-the-Middle) pourrait :
+1. Forcer un downgrade vers un protocole faible
+2. Déchiffrer les communications SSL/TLS
+3. Voler des credentials, tokens de session, données sensibles
+4. Injecter du contenu malveillant dans les communications
+
+**Conformité :**
+Les ciphers faibles sont interdits par PCI-DSS 3.2+, HIPAA, et les recommandations ANSSI/NIST.
+
+<!-- END_RISQUES -->
+
+<!-- START_METHODOLOGIE -->
+### Méthodologie de Correction
+
+**Script automatisé disponible :**
+Un script bash complet `fix_weak_ciphers.bash` est disponible et gère automatiquement la correction pour Apache, Nginx, SSH et HAProxy.
+
+**Utilisation du script automatisé :**
+
+```bash
+# Télécharger et rendre exécutable
+chmod +x scripts/fix_weak_ciphers.bash
+
+# Mode simulation (aucune modification)
+sudo ./scripts/fix_weak_ciphers.bash --service auto --dry-run
+
+# Application réelle - détection automatique
+sudo ./scripts/fix_weak_ciphers.bash --service auto
+
+# Ou cibler un service spécifique
+sudo ./scripts/fix_weak_ciphers.bash --service {technology}
+```
+
+**Le script effectue automatiquement :**
+1. ✓ Détection du service et du fichier de configuration
+2. ✓ Backup automatique dans `/var/backups/cipher_fix_*/`
+3. ✓ Configuration des ciphers modernes (TLSv1.2+, TLSv1.3)
+4. ✓ Test de la configuration (nginx -t, apache2ctl configtest, sshd -t)
+5. ✓ Redémarrage du service uniquement si le test passe
+6. ✓ Restauration automatique du backup en cas d'erreur
+
+**Configuration manuelle (si préféré) :**
+
+Pour **{technology}**, ajouter dans le fichier de configuration :
+
+[Fournir les directives de configuration spécifiques au service détecté]
+
+**Exemple pour Apache (/etc/apache2/mods-available/ssl.conf) :**
+```apache
+SSLProtocol all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
+SSLCipherSuite ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305
+SSLHonorCipherOrder on
+```
+
+**Exemple pour Nginx (/etc/nginx/nginx.conf) :**
+```nginx
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';
+ssl_prefer_server_ciphers on;
+```
+
+**Exemple pour SSH (/etc/ssh/sshd_config) :**
+```bash
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+KexAlgorithms curve25519-sha256,diffie-hellman-group16-sha512
+```
+
+<!-- END_METHODOLOGIE -->
+
+<!-- START_VERIFICATION -->
+### Vérification Post-Correction
+
+**Tests à effectuer:**
+
+1. **Scanner SSL avec nmap:**
+```bash
+nmap --script ssl-enum-ciphers -p {port} {domain}
+```
+
+2. **Test avec SSLLabs (pour HTTPS):**
+```bash
+# En ligne : https://www.ssllabs.com/ssltest/analyze.html?d={domain}
+```
+
+3. **Test avec testssl.sh:**
+```bash
+# Télécharger testssl.sh
+git clone https://github.com/drwetter/testssl.sh.git
+cd testssl.sh
+./testssl.sh {domain}:{port}
+```
+
+4. **Vérifier les logs du service:**
+```bash
+# Apache
+tail -f /var/log/apache2/error.log
+
+# Nginx  
+tail -f /var/log/nginx/error.log
+
+# SSH
+tail -f /var/log/auth.log
+```
+
+5. **Test de connexion réelle:**
+```bash
+# HTTPS
+curl -vI https://{domain}:{port} 2>&1 | grep -i "ssl\|tls"
+
+# SSH
+ssh -vvv user@{domain} 2>&1 | grep -i "cipher\|kex\|mac"
+```
+
+6. **OBLIGATOIRE:** Relancer un scan complet via Cywise pour confirmer que la vulnérabilité n'apparaît plus
+
+**Résultat attendu:**
+- ✓ Aucun protocole SSLv2, SSLv3, TLSv1.0, TLSv1.1 accepté
+- ✓ Seuls les ciphers modernes (ECDHE, AES-GCM, ChaCha20) activés
+- ✓ Forward Secrecy (FS) activé via ECDHE ou DHE
+- ✓ Grade A ou A+ sur SSLLabs
+
+<!-- END_VERIFICATION -->
+
+IMPORTANT:
+- Utilise EXACTEMENT les balises markdown <!-- START_XXX --> et <!-- END_XXX -->
+- Adapte les exemples de configuration au service détecté ({technology})
+- Mentionne TOUJOURS le script automatisé `fix_weak_ciphers.bash` comme option recommandée
+- Si le service n'est pas Apache/Nginx/SSH/HAProxy, fournis des instructions génériques
+- Sois pédagogique pour des prestataires informatiques débutants
+- Explique l'importance du backup avant modification
+</instructions>
