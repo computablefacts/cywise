@@ -7,7 +7,7 @@ use App\Enums\HoneypotCloudSensorsEnum;
 use App\Enums\HoneypotStatusesEnum;
 use App\Http\Procedures\AssetsProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\MailCoachHoneypotRequested;
+use App\Mail\HoneypotRequested;
 use App\Models\Honeypot;
 use App\Models\User;
 use App\Models\YnhTrial;
@@ -101,7 +101,7 @@ class ToolsController extends Controller
                     'cloud_provider' => HoneypotCloudProvidersEnum::AWS,
                     'cloud_sensor' => HoneypotCloudSensorsEnum::HTTP,
                 ]);
-                MailCoachHoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
+                HoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
 
                 // HTTPS
                 /** @var Honeypot $honeypot */
@@ -111,7 +111,7 @@ class ToolsController extends Controller
                     'cloud_provider' => HoneypotCloudProvidersEnum::AWS,
                     'cloud_sensor' => HoneypotCloudSensorsEnum::HTTPS,
                 ]);
-                MailCoachHoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
+                HoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
 
                 // SSH
                 /** @var Honeypot $honeypot */
@@ -121,7 +121,7 @@ class ToolsController extends Controller
                     'cloud_provider' => HoneypotCloudProvidersEnum::AWS,
                     'cloud_sensor' => HoneypotCloudSensorsEnum::SSH,
                 ]);
-                MailCoachHoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
+                HoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
 
                 $trial->honeypots = true;
                 $trial->save();

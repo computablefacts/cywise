@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Mail\MailCoachSimpleEmail;
+use App\Mail\SimpleEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -100,7 +100,7 @@ Cliquez sur ce lien pour créer votre compte : <br/>
 <a href="{$invitationLink}">{$invitationLink}</a>
 EOT;
 
-        MailCoachSimpleEmail::sendEmail($subject, $htmlTitle, $htmlBody, $this->email);
+        SimpleEmail::sendEmail($subject, $htmlTitle, $htmlBody, $this->email);
     }
 
     public function getLink()

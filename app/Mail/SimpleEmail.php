@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Spatie\MailcoachMailer\Concerns\UsesMailcoachMail;
 
-class MailCoachSimpleEmail extends Mailable
+class SimpleEmail extends Mailable
 {
     use Queueable, SerializesModels, UsesMailcoachMail;
 
@@ -23,7 +23,7 @@ class MailCoachSimpleEmail extends Mailable
         try {
             Mail::mailer()
                 ->to($to ?? config('towerify.freshdesk.to_email'))
-                ->send(new MailCoachSimpleEmail($subject, $htmlTitle, $htmlBody, $from));
+                ->send(new SimpleEmail($subject, $htmlTitle, $htmlBody, $from));
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }

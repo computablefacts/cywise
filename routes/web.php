@@ -42,7 +42,7 @@ use App\Http\Controllers\Iframes\UsersInvitationController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
-use App\Mail\MailCoachPerformaRequested;
+use App\Mail\PerformaRequested;
 use App\Models\YnhServer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
@@ -198,7 +198,7 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
 
     // Send a Performa setup request if the tenant does not have a Performa domain yet
     if (!$user->performa_domain || !$user->performa_secret) {
-        MailCoachPerformaRequested::sendEmail();
+        PerformaRequested::sendEmail();
     }
 
     // 1. In the browser, go to "https://app.towerify.io" and login using your user account

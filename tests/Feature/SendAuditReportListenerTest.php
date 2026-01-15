@@ -3,7 +3,7 @@
 use App\Events\SendAuditReport;
 use App\Helpers\ApiUtilsFacade;
 use App\Listeners\SendAuditReportListener;
-use App\Mail\MailCoachSimpleEmail;
+use App\Mail\SimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\AssetTag;
@@ -37,7 +37,7 @@ test('listener skips when user does not want audit report', function () {
     $listener = new SendAuditReportListener;
     $listener->handle($event);
 
-    Mail::assertNotSent(MailCoachSimpleEmail::class);
+    Mail::assertNotSent(SimpleEmail::class);
 });
 
 test('listener skips when no assets exist', function () {
@@ -49,7 +49,7 @@ test('listener skips when no assets exist', function () {
     $listener = new SendAuditReportListener;
     $listener->handle($event);
 
-    Mail::assertNotSent(MailCoachSimpleEmail::class);
+    Mail::assertNotSent(SimpleEmail::class);
 });
 
 test('listener sends email when conditions are met', function () {
@@ -64,7 +64,7 @@ test('listener sends email when conditions are met', function () {
     $listener = new SendAuditReportListener;
     $listener->handle($event);
 
-    Mail::assertSent(MailCoachSimpleEmail::class, function ($mail) {
+    Mail::assertSent(SimpleEmail::class, function ($mail) {
         // dump($mail->__get('emailSubject'));
         return str_contains($mail->__get('emailSubject'), 'nouveaux actifs ont été ajoutés !');
     });
@@ -82,7 +82,7 @@ test('email includes onboarding cta when isOnboarding is true', function () {
     $listener = new SendAuditReportListener;
     $listener->handle($event);
 
-    Mail::assertSent(MailCoachSimpleEmail::class, function ($mail) {
+    Mail::assertSent(SimpleEmail::class, function ($mail) {
         // dump($mail->__get('htmlBody'));
         return str_contains($mail->__get('htmlBody'), 'finalisez votre inscription à Cywise');
     });
@@ -109,7 +109,7 @@ test('email subject reflects vulnerabilities severity', function ($alertLevel, $
     $listener = new SendAuditReportListener;
     $listener->handle($event);
 
-    Mail::assertSent(MailCoachSimpleEmail::class, function ($mail) use ($expectedMailTitle) {
+    Mail::assertSent(SimpleEmail::class, function ($mail) use ($expectedMailTitle) {
         // dump($mail->__get('emailSubject'));
         return str_contains($mail->__get('emailSubject'), $expectedMailTitle);
     });
@@ -133,7 +133,7 @@ test('email body contains summary section', function () {
     $listener = new SendAuditReportListener;
     $listener->handle($event);
 
-    Mail::assertSent(MailCoachSimpleEmail::class, function ($mail) {
+    Mail::assertSent(SimpleEmail::class, function ($mail) {
         // dump($mail->__get('htmlBody'));
         return str_contains($mail->__get('htmlBody'), 'résumé des résultats');
     });
@@ -177,7 +177,7 @@ test('email contains correct vulnerability counts and severity messages', functi
     $listener = new SendAuditReportListener;
     $listener->handle($event);
 
-    Mail::assertSent(MailCoachSimpleEmail::class, function ($mail) {
+    Mail::assertSent(SimpleEmail::class, function ($mail) {
         // dump($mail->__get('htmlBody'));
         $htmlBody = $mail->__get('htmlBody');
 
@@ -228,7 +228,7 @@ test('email contains vulnerabilities from a shared asset', function () {
     $listener = new SendAuditReportListener;
     $listener->handle($event);
 
-    Mail::assertSent(MailCoachSimpleEmail::class, function ($mail) {
+    Mail::assertSent(SimpleEmail::class, function ($mail) {
         dump($mail->__get('htmlBody'));
         $htmlBody = $mail->__get('htmlBody');
 

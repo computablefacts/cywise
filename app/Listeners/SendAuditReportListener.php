@@ -5,7 +5,7 @@ namespace App\Listeners;
 use App\Events\SendAuditReport;
 use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use App\Http\Controllers\Iframes\TimelineController;
-use App\Mail\MailCoachSimpleEmail;
+use App\Mail\SimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\TimelineItem;
@@ -70,7 +70,7 @@ class SendAuditReportListener extends AbstractListener
         $body[] = '</td></tr>';
         $body[] = '</tbody></table>';
 
-        MailCoachSimpleEmail::sendEmail($subject, '', implode("\n", $body), $to, $from);
+        SimpleEmail::sendEmail($subject, '', implode("\n", $body), $to, $from);
     }
 
     private function buildEmailCta(User $user): string
