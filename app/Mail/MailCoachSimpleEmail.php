@@ -72,7 +72,7 @@ class MailCoachSimpleEmail extends Mailable
                 'title' => $this->htmlTitle,
                 'content' => $this->htmlBody,
             ])
-            ->faking(app()->environment('local', 'dev'));
+            ->faking(! app()->environment('prod', 'production'));
     }
 
     /**

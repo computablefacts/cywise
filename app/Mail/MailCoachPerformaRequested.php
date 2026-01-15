@@ -71,7 +71,7 @@ class MailCoachPerformaRequested extends Mailable
                 'secret' => $this->secret,
                 'id' => $this->id,
             ])
-            ->faking(app()->environment('local', 'dev'));
+            ->faking(! app()->environment('prod', 'production'));
     }
 
     /**
