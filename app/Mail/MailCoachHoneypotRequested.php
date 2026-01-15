@@ -25,7 +25,7 @@ class MailCoachHoneypotRequested extends Mailable
     public static function sendEmail(int $id, HoneypotCloudSensorsEnum $sensor, HoneypotCloudProvidersEnum $provider, string $dns): void
     {
         try {
-            Mail::mailer('mailcoach')
+            Mail::mailer()
                 ->to(config('towerify.freshdesk.to_email'))
                 ->send(new MailCoachHoneypotRequested($id, $sensor, $provider, $dns, Auth::user()->email));
         } catch (\Exception $e) {
@@ -54,6 +54,17 @@ class MailCoachHoneypotRequested extends Mailable
      */
     public function build()
     {
+        return match (config('mail.default')) {
+            'mailcoach' => $this->buildMailcoach(),
+            default     => $this->buildStandard(), // Tous les autres
+        };
+    }
+
+    /**
+     * Build for Mailcoach (remote template).
+     */
+    protected function buildMailcoach(): self
+    {
         return $this
             ->from(config('towerify.freshdesk.from_email'), 'Support')
             ->mailcoachMail('honeypot-requested', [
@@ -65,5 +76,23 @@ class MailCoachHoneypotRequested extends Mailable
                 'dns' => $this->dns,
             ])
             ->faking(app()->environment('local', 'dev'));
+    }
+
+    /**
+     * Build standard (local Blade template).
+     */
+    protected function buildStandard(): self
+    {
+        return $this
+            ->from(config('towerify.freshdesk.from_email'), 'Support')
+            ->subject("Cywise : Honeypot requested by {$this->user}")
+            ->view('emails.honeypot_requested', [
+                'subject' => "Cywise : Honeypot requested by {$this->user}",
+                'title' => "Honeypot requested by {$this->user}",
+                'id' => $this->id,
+                'cloud_provider' => $this->provider->value,
+                'cloud_sensor' => $this->sensor->value,
+                'dns' => $this->dns,
+            ]);
     }
 }

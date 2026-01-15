@@ -3,8 +3,8 @@
 return [
     'freshdesk' => [
         'widget_id' => env('FRESHDESK_ID'),
-        'to_email' => env('FRESHDESK_TO_EMAIL'),
-        'from_email' => env('FRESHDESK_FROM_EMAIL'),
+        'to_email' => env('FRESHDESK_TO_EMAIL', 'support@mydomain.com'),
+        'from_email' => env('FRESHDESK_FROM_EMAIL', 'support@mydomain.com'),
     ],
     'reports' => [
         'url' => env('REPORTS_URL'),
