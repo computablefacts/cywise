@@ -2,6 +2,8 @@
 
 namespace App\Listeners;
 
+use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\PromptsProvider;
 use App\Events\EndVulnsScan;
 use App\Events\SendAuditReport;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
@@ -9,15 +11,13 @@ use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\Port;
 use App\Models\Scan;
-use App\Models\TimelineItem;
+use App\Models\User;
 use App\Models\YnhTrial;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use App\AgentSquad\Providers\LlmsProvider;
-use App\AgentSquad\Providers\PromptsProvider;
 
 class EndVulnsScanListener extends AbstractListener
 {
@@ -39,7 +39,6 @@ class EndVulnsScanListener extends AbstractListener
 
         if ($scan) {
 
-            // $this->createTimelineItem($scan);
             /** @var Asset $asset */
             $asset = $scan->asset()->firstOrFail();
             /** @var YnhTrial $trial */
@@ -180,6 +179,10 @@ class EndVulnsScanListener extends AbstractListener
 
     private function setAlertsV2(Port $port, array $task): void
     {
+        /** @var User $user */
+        $user = $port->scan->asset->createdBy;
+        $user->actAs(); // Because we need to access the user's prompts through PromptsProcedure
+
         collect($task['data'] ?? [])
             ->filter(fn(array $data) => isset($data['alerts']) && count($data['alerts']))
             ->flatMap(fn(array $data) => $data['alerts'])
@@ -201,7 +204,6 @@ class EndVulnsScanListener extends AbstractListener
                     $cve_vendor = empty($alert['cve_vendor']) ? null : $alert['cve_vendor'];
                     $cve_product = empty($alert['cve_product']) ? null : $alert['cve_product'];
                     $title = trim($alert['title'] ?? '');
-
                     $aiRemediation = $this->generateAiRemediation($port, $alert);
 
                     Alert::updateOrCreate([
@@ -298,23 +300,21 @@ class EndVulnsScanListener extends AbstractListener
         if ($mode === 'explanation' || $mode === 'both') {
             $results['explanation'] = $this->processLlmPart($port, $alert, $category, $context, 'explanation');
         }
-
         if ($mode === 'script' || $mode === 'both') {
             $results['script'] = $this->processLlmPart($port, $alert, $category, $context, 'script');
         }
 
         $aiRemediation = $results['explanation'] ?? '';
+
         if (!empty($results['script'])) {
             $aiRemediation .= "\n\n" . $results['script'];
         }
-
         return $aiRemediation;
     }
 
     private function detectVulnerabilityCategory(array $alert): string
     {
-        $type = strtolower($alert['type'] ?? '');
-
+        $type = Str::lower($alert['type'] ?? '');
         if (Str::contains($type, ['quickhits_file', 'config_file', 'backup_file', 'file_alert', 'file_v3'])) {
             return 'file_exposed';
         }
@@ -359,15 +359,12 @@ class EndVulnsScanListener extends AbstractListener
                 }
             }
         }
-
         if ($context['technology'] === 'unknown' && in_array($category, ['file_exposed', 'weak_cipher'])) {
             $context['technology'] = $this->probeTechnology($context['ip'], (int)$context['port']);
         }
-
         if ($category === 'cve' && $context['cve_id']) {
             $context['cve_info'] = "NIST NVD: https://nvd.nist.gov/vuln/detail/" . strtoupper($context['cve_id']);
         }
-
         return $context;
     }
 
@@ -375,12 +372,19 @@ class EndVulnsScanListener extends AbstractListener
     {
         try {
             foreach (["https://$ip:$port", "http://$ip:$port"] as $url) {
+
                 $response = Http::withOptions(['verify' => false])->timeout(3)->head($url);
                 $server = strtolower($response->header('Server', ''));
-                if (Str::contains($server, 'nginx')) return 'nginx';
-                if (Str::contains($server, 'apache')) return 'apache';
+
+                if (Str::contains($server, 'nginx')) {
+                    return 'nginx';
+                }
+                if (Str::contains($server, 'apache')) {
+                    return 'apache';
+                }
             }
         } catch (\Exception $e) {
+            Log::warning($e->getMessage());
         }
         return 'unknown';
     }
@@ -423,6 +427,7 @@ class EndVulnsScanListener extends AbstractListener
         ];
 
         if ($type === 'script') {
+
             $scriptDir = base_path("database/seeders/remediations");
             $scriptFile = match ($category) {
                 'file_exposed' => "script_{$context['technology']}.bash",
@@ -436,7 +441,6 @@ class EndVulnsScanListener extends AbstractListener
                 return "Erreur : Template de script bash introuvable ({$scriptFile}).";
             }
         }
-
         return LlmsProvider::provide(PromptsProvider::provide($template, $vars));
     }
 
@@ -460,25 +464,6 @@ class EndVulnsScanListener extends AbstractListener
                 'script' => 'explanation_only_prompt',
             ]
         ];
-
         return $map[$category][$type] ?? 'explanation_only_prompt';
-    }
-
-    // Whatever happens during the ports scan, a vuln scan is triggered!
-    private function createTimelineItem(Scan $scan): void
-    {
-        /** @var Asset $asset */
-        $asset = $scan->asset()->first();
-        if ($asset->cur_scan_id !== $scan->ports_scan_id || $asset->next_scan_id === $scan->ports_scan_id) {
-            Log::warning("Asset is still being scanned for scan {$scan->id}");
-        } else {
-            TimelineItem::fetchAlerts($asset->created_by, null, null, 0, [
-                [['asset_id', '=', $asset->id]],
-            ])->each(function (TimelineItem $item) {
-                $item->deleteItem();
-                $item->save();
-            });
-            $asset->alerts()->get()->each(fn(Alert $alert) => TimelineItem::createAlert($alert->asset()->createdBy, $scan, $alert));
-        }
     }
 }
