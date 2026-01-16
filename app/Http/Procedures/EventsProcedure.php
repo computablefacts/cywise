@@ -20,7 +20,7 @@ class EventsProcedure extends Procedure
         description: "List collected events.",
         params: [
             "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise.",
-            "server_id" => "An optional server id.",
+            "server_id" => "An optional server id to filter events by.",
             "window" => "An optional window of time [min_date, max_date] to filter events by."
         ],
         result: [
