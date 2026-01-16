@@ -497,10 +497,10 @@ class AssetsProcedure extends Procedure
 
         if (isset($params['asset_id'])) {
             /** @var Asset $asset */
-            $asset = Asset::find($params['asset_id']);
+            $asset = Asset::findOrFail($params['asset_id']);
         } else {
             /** @var Asset $asset */
-            $asset = Asset::where('asset', $params['asset'])->first();
+            $asset = Asset::where('asset', $params['asset'])->firstOrFail();
         }
         if (!$asset->is_monitored) {
             $asset->is_monitored = true;
@@ -535,10 +535,10 @@ class AssetsProcedure extends Procedure
 
         if (isset($params['asset_id'])) {
             /** @var Asset $asset */
-            $asset = Asset::find($params['asset_id']);
+            $asset = Asset::findOrFail($params['asset_id']);
         } else {
             /** @var Asset $asset */
-            $asset = Asset::where('asset', $params['asset'])->first();
+            $asset = Asset::where('asset', $params['asset'])->firstOrFail();
         }
         if ($asset->is_monitored) {
 
@@ -576,7 +576,7 @@ class AssetsProcedure extends Procedure
         }
 
         /** @var Asset $asset */
-        $asset = Asset::find($params['asset_id']);
+        $asset = Asset::findOrFail($params['asset_id']);
         $obj = $asset->tags()->where('tag', $tag)->first();
 
         if (!$obj) {
@@ -609,9 +609,9 @@ class AssetsProcedure extends Procedure
         ]);
 
         /** @var Asset $asset */
-        $asset = Asset::find($params['asset_id']);
+        $asset = Asset::findOrFail($params['asset_id']);
         /** @var AssetTag $tag */
-        $tag = AssetTag::find($params['tag_id']);
+        $tag = AssetTag::findOrFail($params['tag_id']);
 
         if ($asset->id === $tag->asset_id) {
             $tag->delete();
@@ -657,7 +657,7 @@ class AssetsProcedure extends Procedure
         ]);
 
         /** @var Asset $asset */
-        $asset = Asset::find($params['asset_id']);
+        $asset = Asset::findOrFail($params['asset_id']);
 
         if (!$asset->is_monitored) {
             throw new \Exception("Restart scan not allowed, {$asset->asset} is not monitored.");
@@ -881,7 +881,7 @@ class AssetsProcedure extends Procedure
         /** @var AssetTagHash $group */
         $group = AssetTagHash::query()->where('hash', '=', $params['group'])->firstOrFail();
         /** @var Alert $alert */
-        $alert = Alert::find($params['vulnerability_id']);
+        $alert = Alert::findOrFail($params['vulnerability_id']);
         $request->replace(['asset_id' => $alert->asset()->id]);
         $this->restartScan($request);
 
