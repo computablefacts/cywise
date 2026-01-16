@@ -95,14 +95,7 @@ class EventsProcedure extends Procedure
         ]);
 
         /** @var YnhOsquery $event */
-        $event = YnhOsquery::find($params['event_id']);
-        /** @var YnhServer $server */
-        $server = YnhServer::find($event->ynh_server_id);
-
-        if (!$server) {
-            throw new \Exception("Unknown server.");
-        }
-
+        $event = YnhOsquery::findOrFail($params['event_id']);
         $event->dismissed = true;
         $event->save();
 
