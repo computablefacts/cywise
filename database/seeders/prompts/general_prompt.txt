@@ -9,6 +9,7 @@ Tu travailles pour une equipe SecOps qui doit corriger des vulnerabilites detect
 <port>{port}</port>
 <protocol>{protocol}</protocol>
 <type>{type}</type>
+<technology>{technology}</technology>
 <title>{title}</title>
 <cve_id>{cve_id}</cve_id>
 <description>
