@@ -64,7 +64,7 @@ class SendAuditReportListener extends AbstractListener
         $body[] = $summary;
         $body[] = empty($leaks) && empty($vulns) ?
             "<p>Félicitations ! Vous n'avez aucune action à entreprendre.</p>" :
-            "<p>Je vous propose d'effectuer les correctifs suivants :</p>";
+            "<p>Cet email ne présente que les 10 vulnérabilités les plus critiques détectées. Pour accéder à la liste complète des vulnérabilités détectées, connectez-vous directement à la plateforme.</p><p>Je vous propose de commencer par effectuer les correctifs suivants :</p>";
         $body[] = $vulns;
         $body[] = $leaks;
         $body[] = $iocs;
@@ -320,6 +320,7 @@ class SendAuditReportListener extends AbstractListener
                     {$cve}
                 ";
             })
+            ->take(10)
             ->join("\n");
     }
 
@@ -513,6 +514,7 @@ class SendAuditReportListener extends AbstractListener
                 </ul></li>";
             })
             ->filter(fn(string $event) => !empty($event))
+            ->sort()
             ->values();
 
         Log::debug("SOC operator report: " . json_encode(['activity' => $activity]));
