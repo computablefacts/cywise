@@ -247,7 +247,7 @@
   "The virtual table name such as active_users": "Le nom de la table virtuelle comme par exemple active_users",
   "The&nbsp;<span style=\"color: var(--c-orange-light);\">5</span>&nbsp;most recent attacks": "Les <span style=\"color: var(--c-orange-light);\">5</span> attaques les plus récentes",
   "There is no remediation information available for this alert.": "Il n'y a pas d'information de remédiation disponible pour cette alerte.",
-  "To access the remediation script, click <a href=\"/recipe/:alert\" target=\"_blank\">here</a>!": "Pour accéder le script de remédiation, cliquer <a href=\"/recipe/:alert\" target=\"_blank\">ici</a> !",
+  "To access the remediation script, click <a href=\"/recipe/:alert\" target=\"_blank\">here</a>!": "Pour accéder au script de remédiation, cliquer <a href=\"/recipe/:alert\" target=\"_blank\">ici</a> !",
   "User": "Utilisateur",
   "User overrides": "Personnalisations utilisateur",
   "Invalid action. Please use enable or disable.": "Action invalide. Veuillez utiliser enable ou disable.",
