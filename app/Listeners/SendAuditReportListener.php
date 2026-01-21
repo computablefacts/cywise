@@ -24,6 +24,8 @@ use Illuminate\Support\Str;
 
 class SendAuditReportListener extends AbstractListener
 {
+    public $timeout = 30 * 60; // 30 mn
+
     public function viaQueue(): string
     {
         return self::CRITICAL;
@@ -323,7 +325,7 @@ class SendAuditReportListener extends AbstractListener
 
     private function buildSectionIoCs(User $user): string
     {
-        $minDate = Carbon::now()->utc()->startOfDay()->subDays(7);
+        $minDate = Carbon::now()->utc()->startOfDay()->subDays(2);
         $maxDate = Carbon::now()->utc()->endOfDay();
         $activity = YnhServer::select('ynh_servers.*')
             ->whereRaw("ynh_servers.is_ready = true")
@@ -331,7 +333,7 @@ class SendAuditReportListener extends AbstractListener
             ->get()
             ->map(function (YnhServer $server) use ($user, $minDate, $maxDate) {
 
-                Log::info("Building SOC operator report for server {$server->name} ({$server->ip()})...");
+                Log::debug("Building SOC operator report for server {$server->name} ({$server->ip()})...");
 
                 // Get the server OS infos
                 $osInfo = YnhOsquery::osInfos(collect([$server]))->first();
@@ -459,9 +461,6 @@ class SendAuditReportListener extends AbstractListener
                     
                     {$list}
                 ";
-
-                Log::debug("SOC operator prompt: " . json_encode(['prompt' => $prompt]));
-
                 $answer = LlmsProvider::provide($prompt);
                 $matches = null;
                 preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
@@ -488,9 +487,6 @@ class SendAuditReportListener extends AbstractListener
                     Log::error('Failed to parse SOC operator answer (suggested_action): ' . $answer);
                     return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'suggested_action' est invalide).</li>";
                 }
-
-                Log::debug("SOC operator answer: " . json_encode(['answer' => $answer]));
-
                 if ($json['activity'] === "NORMAL") {
                     return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
@@ -516,7 +512,10 @@ class SendAuditReportListener extends AbstractListener
                     <li><b>Action suggérée :</b> {$suggestedAction}</li>
                 </ul></li>";
             })
-            ->filter(fn(string $event) => !empty($event));
+            ->filter(fn(string $event) => !empty($event))
+            ->values();
+
+        Log::debug("SOC operator report: " . json_encode(['activity' => $activity]));
 
         return $activity->isEmpty() ? '' : "
             <h3>Activité & Indicateurs de compromission (IoCs)</h3>
