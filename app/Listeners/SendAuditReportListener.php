@@ -462,8 +462,24 @@ class SendAuditReportListener extends AbstractListener
                 $json = json_decode($answer, true);
 
                 if (empty($json)) {
-                    Log::warning('Failed to parse SOC operator answer: ' . $answer);
-                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()}.</li>";
+                    Log::error('Failed to parse SOC operator answer (json): ' . $answer);
+                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (le JSON est invalide).</li>";
+                }
+                if (!isset($json['severity']) || !in_array($json['severity'], ['NORMAL', 'SUSPICIOUS', 'ANORMAL'])) {
+                    Log::error('Failed to parse SOC operator answer (severity): ' . $answer);
+                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'severity' est invalide).</li>";
+                }
+                if (!isset($json['confidence']) || !is_numeric($json['confidence']) || $json['confidence'] < 0 || $json['confidence'] > 1) {
+                    Log::error('Failed to parse SOC operator answer (confidence): ' . $answer);
+                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'confidence' est invalide).</li>";
+                }
+                if (!isset($json['reasoning']) || !is_string($json['reasoning'])) {
+                    Log::error('Failed to parse SOC operator answer (reasoning): ' . $answer);
+                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'reasoning' est invalide).</li>";
+                }
+                if (!isset($json['suggested_action']) || !is_string($json['suggested_action'])) {
+                    Log::error('Failed to parse SOC operator answer (suggested_action): ' . $answer);
+                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'suggested_action' est invalide).</li>";
                 }
 
                 Log::debug("SOC operator answer: " . $answer);
@@ -471,10 +487,26 @@ class SendAuditReportListener extends AbstractListener
                 if ($json['severity'] === "NORMAL") {
                     return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
-                return "<li>L'activité sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} est {$json['severity']}.<ul>
+
+                $result = ApiUtils2::translate($json['reasoning']);
+
+                if ($result['error'] !== false) {
+                    $reasoning = $json['reasoning'];
+                } else {
+                    $reasoning = $result['response'];
+                }
+
+                $result = ApiUtils2::translate($json['suggested_action']);
+
+                if ($result['error'] !== false) {
+                    $suggestedAction = $json['suggested_action'];
+                } else {
+                    $suggestedAction = $result['response'];
+                }
+                return "<li>L'activité sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} est <b>{$json['severity']}</b>.<ul>
                     <li><b>Indice de confiance (0=faible, 1=haute) :</b> {$json['confidence']}</li>
-                    <li><b>Raisonnement :</b> {$json['reasoning']}</li>
-                    <li><b>Action suggérée :</b> {$json['suggested_action']}</li>
+                    <li><b>Raisonnement :</b> {$reasoning}</li>
+                    <li><b>Action suggérée :</b> {$suggestedAction}</li>
                 </ul></li>";
             })
             ->filter(fn(string $event) => !empty($event));
