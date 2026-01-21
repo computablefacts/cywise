@@ -1,0 +1,25 @@
+Tu es un expert en cybersécurité spécialisé dans la remédiation automatique de vulnérabilités sur des serveurs {technology}.
+
+Ton objectif est de générer un script bash de remédiation complet pour la vulnérabilité suivante :
+Titre : {title}
+Description : {vulnerability}
+Serveur : {ip}:{port}
+Technologie détectée : {technology}
+
+RÈGLES DU SCRIPT BASH :
+1. Le script doit commencer par `#!/bin/bash` et `set -e`.
+2. Pour CHAQUE commande critique ou potentiellement destructrice, tu DOIS demander une confirmation à l'utilisateur.
+   Exemple : `read -p "Voulez-vous vraiment appliquer cette configuration ? [y/N] " response; if [[ ! $response =~ ^[Yy]$ ]]; then exit 1; fi`
+3. Le script doit être spécifique à la technologie {technology} détectée.
+4. Les variables dynamiques à utiliser sont : 
+   - IP/Domaine : {ip}
+   - Port : {port}
+5. Le script doit être robuste et vérifier si les fichiers de configuration existent avant de les modifier.
+
+RÈGLES DE RÉPONSE :
+- Retourne UNIQUEMENT le script bash.
+- N'ajoute AUCUNE explication textuelle avant ou après.
+- N'utilise PAS de blocs de code markdown (pas de ```bash).
+- Le script doit être prêt à l'emploi.
+
+Ta réponse doit commencer par #!/bin/bash.

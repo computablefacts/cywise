@@ -359,7 +359,7 @@ class EndVulnsScanListener extends AbstractListener
                 }
             }
         }
-        if ($context['technology'] === 'unknown' && in_array($category, ['file_exposed', 'weak_cipher'])) {
+        if ($context['technology'] === 'unknown' && in_array($category, ['file_exposed', 'weak_cipher', 'general'])) {
             $context['technology'] = $this->probeTechnology($context['ip'], (int)$context['port']);
         }
         if ($category === 'cve' && $context['cve_id']) {
@@ -435,10 +435,12 @@ class EndVulnsScanListener extends AbstractListener
                 default => null
             };
 
-            if ($scriptFile && file_exists("$scriptDir/$scriptFile")) {
-                $vars['script_content'] = file_get_contents("$scriptDir/$scriptFile");
-            } else {
-                return "Erreur : Template de script bash introuvable ({$scriptFile}).";
+            if ($scriptFile) {
+                if (file_exists("$scriptDir/$scriptFile")) {
+                    $vars['script_content'] = file_get_contents("$scriptDir/$scriptFile");
+                } else {
+                    return "Erreur : Template de script bash introuvable ({$scriptFile}).";
+                }
             }
         }
         return LlmsProvider::provide(PromptsProvider::provide($template, $vars));
@@ -460,8 +462,8 @@ class EndVulnsScanListener extends AbstractListener
                 'script' => 'explanation_only_prompt',
             ],
             'general' => [
-                'explanation' => 'explanation_only_prompt',
-                'script' => 'explanation_only_prompt',
+                'explanation' => 'general_prompt',
+                'script' => 'general_script_only_prompt',
             ]
         ];
         return $map[$category][$type] ?? 'explanation_only_prompt';

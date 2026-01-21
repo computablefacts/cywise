@@ -222,6 +222,7 @@ class User extends WaveUser
             $this->setupPrompts('file_removal_explanation_only_prompt', 'seeders/prompts/file_removal_explanation_only_prompt.txt');
             $this->setupPrompts('file_removal_script_only_prompt', 'seeders/prompts/file_removal_script_only_prompt.txt');
             $this->setupPrompts('general_prompt', 'seeders/prompts/general_prompt.txt');
+            $this->setupPrompts('general_script_only_prompt', 'seeders/prompts/general_script_only_prompt.txt');
             $this->setupPrompts('weak_cipher_explanation_prompt', 'seeders/prompts/weak_cipher_explanation_prompt.txt');
             $this->setupPrompts('weak_cipher_script_only_prompt', 'seeders/prompts/weak_cipher_script_only_prompt.txt');
 
