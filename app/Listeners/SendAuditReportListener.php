@@ -64,7 +64,7 @@ class SendAuditReportListener extends AbstractListener
         $body[] = $summary;
         $body[] = empty($leaks) && empty($vulns) ?
             "<p>Félicitations ! Vous n'avez aucune action à entreprendre.</p>" :
-            "<p>Cet email ne présente que les 10 vulnérabilités les plus critiques détectées. Pour accéder à la liste complète des vulnérabilités détectées, connectez-vous directement à la plateforme.</p><p>Je vous propose de commencer par effectuer les correctifs suivants :</p>";
+            "<p>Cet email met en avant les 10 vulnérabilités les plus critiques identifiées lors de notre dernière analyse. Pour consulter la liste complète des vulnérabilités détectées, je vous invite à vous connecter directement à la plateforme.</p><p>Afin de renforcer rapidement la sécurité de votre infrastructure, je vous recommande de prioriser les correctifs suivants :</p>";
         $body[] = $vulns;
         $body[] = $leaks;
         $body[] = $iocs;
