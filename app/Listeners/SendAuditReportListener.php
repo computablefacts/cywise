@@ -51,6 +51,7 @@ class SendAuditReportListener extends AbstractListener
             return;
         }
 
+        $iocs = $this->buildSectionIoCs($user);
         $summary = $this->buildSummary($user, $assets);
         $leaks = $this->buildSectionLeaks($user);
         $vulns = $this->buildSectionVulns($assets);
@@ -64,7 +65,7 @@ class SendAuditReportListener extends AbstractListener
             "<p>Je vous propose d'effectuer les correctifs suivants :</p>";
         $body[] = $vulns;
         $body[] = $leaks;
-        $body[] = $this->buildSectionIoCs($user);
+        $body[] = $iocs;
 
         if ($isOnboarding) {
             $body[] = '<p>Pour découvrir comment corriger vos vulnérabilités et renforcer la sécurité de votre infrastructure, finalisez votre inscription à Cywise :</p>';
@@ -324,12 +325,13 @@ class SendAuditReportListener extends AbstractListener
     {
         $minDate = Carbon::now()->utc()->startOfDay()->subDays(7);
         $maxDate = Carbon::now()->utc()->endOfDay();
-        $activity = YnhServer::with('applications', 'domains', 'users')
-            ->select('ynh_servers.*')
+        $activity = YnhServer::select('ynh_servers.*')
             ->whereRaw("ynh_servers.is_ready = true")
             ->orderBy('ynh_servers.name')
             ->get()
             ->map(function (YnhServer $server) use ($user, $minDate, $maxDate) {
+
+                Log::info("Building SOC operator report for server {$server->name} ({$server->ip()})...");
 
                 // Get the server OS infos
                 $osInfo = YnhOsquery::osInfos(collect([$server]))->first();
@@ -436,9 +438,11 @@ class SendAuditReportListener extends AbstractListener
                         return empty($comment) ? '' : "{$time} - {$server->name} (ip address: {$server->ip()}) - {$comment} (criticality: {$criticality})";
                     })
                     ->filter(fn(string $event) => !empty($event))
-                    ->sort(); // Reorder events from the oldest to the newest
+                    ->sort() // Reorder events from the oldest to the newest
+                    ->values();
 
                 if ($events->isEmpty()) {
+                    Log::debug("No notable events found for server {$server->name} ({$server->ip()})");
                     return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
 
@@ -455,6 +459,9 @@ class SendAuditReportListener extends AbstractListener
                     
                     {$list}
                 ";
+
+                Log::debug("SOC operator prompt: " . json_encode(['prompt' => $prompt]));
+
                 $answer = LlmsProvider::provide($prompt);
                 $matches = null;
                 preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
@@ -482,7 +489,7 @@ class SendAuditReportListener extends AbstractListener
                     return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'suggested_action' est invalide).</li>";
                 }
 
-                Log::debug("SOC operator answer: " . $answer);
+                Log::debug("SOC operator answer: " . json_encode(['answer' => $answer]));
 
                 if ($json['activity'] === "NORMAL") {
                     return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
