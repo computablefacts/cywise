@@ -2,17 +2,25 @@
 
 namespace App\Listeners;
 
+use App\AgentSquad\Providers\LlmsProvider;
 use App\Events\SendAuditReport;
 use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use App\Http\Controllers\Iframes\TimelineController;
+use App\Http\Procedures\EventsProcedure;
+use App\Http\Requests\JsonRpcRequest;
 use App\Mail\MailCoachSimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\TimelineItem;
 use App\Models\User;
+use App\Models\YnhCve;
+use App\Models\YnhOsquery;
+use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SendAuditReportListener extends AbstractListener
 {
@@ -56,6 +64,7 @@ class SendAuditReportListener extends AbstractListener
             "<p>Je vous propose d'effectuer les correctifs suivants :</p>";
         $body[] = $vulns;
         $body[] = $leaks;
+        $body[] = $this->buildSectionIoCs($user);
 
         if ($isOnboarding) {
             $body[] = '<p>Pour découvrir comment corriger vos vulnérabilités et renforcer la sécurité de votre infrastructure, finalisez votre inscription à Cywise :</p>';
@@ -309,5 +318,209 @@ class SendAuditReportListener extends AbstractListener
                 ";
             })
             ->join("\n");
+    }
+
+    private function buildSectionIoCs(User $user): string
+    {
+        $minDate = Carbon::now()->utc()->startOfDay()->subDays(7);
+        $maxDate = Carbon::now()->utc()->endOfDay();
+        $activity = YnhServer::with('applications', 'domains', 'users')
+            ->select('ynh_servers.*')
+            ->whereRaw("ynh_servers.is_ready = true")
+            ->orderBy('ynh_servers.name')
+            ->get()
+            ->map(function (YnhServer $server) use ($user, $minDate, $maxDate) {
+
+                // Get the server OS infos
+                $osInfo = YnhOsquery::osInfos(collect([$server]))->first();
+
+                // Load both security events and IoCs
+                $request = new JsonRpcRequest([
+                    'min_score' => 0,
+                    'server_id' => $server->id,
+                    'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')]
+                ]);
+                $request->setUserResolver(fn() => $user);
+                $events = (new EventsProcedure())->list($request)['events']
+                    ->map(function (YnhOsquery $event) use ($server, $osInfo) {
+
+                        $comment = '';
+                        $criticality = 0;
+                        $time = $event->calendar_time->utc()->format('Y-m-d H:i:s');
+
+                        if ($event->score > 0) { // IoC
+                            $comment = $event->comments;
+                            $criticality = $event->score;
+                        } else { // Standard security event
+                            if ($event->name === 'last') {
+                                $username = $event->columns['username'] === 'null' ? null : $event->columns['username'] ?? null;
+                                if ($event->isAdded()) {
+                                    $comment = "L'utilisateur {$username} s'est connecté au serveur.";
+                                }
+                                if ($event->isRemoved()) {
+                                    $comment = "L'utilisateur {$username} s'est déconnecté du serveur.";
+                                }
+                            } else if ($event->name === 'shell_history') {
+                                $username = $event->columns['username'] === 'null' ? null : $event->columns['username'] ?? null;
+                                if ($event->isAdded()) {
+                                    $comment = "L'utilisateur {$username} a lancé la commande {$event->columns['command']}.";
+                                }
+                            } else if ($event->name === 'users') {
+                                $username = $event->columns['username'] === 'null' ? null : $event->columns['username'] ?? null;
+                                if ($event->isAdded()) {
+                                    $home = empty($event->columns['directory']) ? "" : " ({$event->columns['directory']})";
+                                    $comment = "L'utilisateur {$username}{$home} a été créé.";
+                                }
+                                if ($event->isRemoved()) {
+                                    $home = empty($event->columns['directory']) ? "" : " ({$event->columns['directory']})";
+                                    $comment = "L'utilisateur {$username}{$home} a été supprimé.";
+                                }
+                            } else if ($event->name === 'groups') {
+                                if ($event->isAdded()) {
+                                    $comment = "Le groupe {$event->columns['groupname']} a été créé.";
+                                }
+                                if ($event->isRemoved()) {
+                                    $comment = "Le groupe {$event->columns['groupname']} a été supprimé.";
+                                }
+                            } else if ($event->name === 'authorized_keys') {
+                                if ($event->isAdded()) {
+                                    $comment = "Une clef SSH a été ajoutée au trousseau {$event->columns['key_file']}.";
+                                }
+                                if ($event->isRemoved()) {
+                                    $comment = "Une clef SSH a été supprimée du trousseau {$event->columns['key_file']}.";
+                                }
+                            } else if ($event->name === 'user_ssh_keys') {
+                                $username = $event->columns['username'] === 'null' ? null : $event->columns['username'] ?? null;
+                                if ($event->isAdded()) {
+                                    $comment = "L'utilisateur {$username} a créé une clef SSH ({$event->columns['path']}).";
+                                }
+                                if ($event->isRemoved()) {
+                                    $comment = "L'utilisateur {$username} a supprimé une clef SSH ({$event->columns['path']}).";
+                                }
+                            } else if ($event->name === 'win_packages' ||
+                                $event->name === 'deb_packages' ||
+                                $event->name === 'portage_packages' ||
+                                $event->name === 'npm_packages' ||
+                                $event->name === 'python_packages' ||
+                                $event->name === 'rpm_packages' ||
+                                $event->name === 'homebrew_packages' ||
+                                $event->name === 'chocolatey_packages') {
+                                $type = match ($event->name) {
+                                    'win_packages' => 'win',
+                                    'deb_packages' => 'deb',
+                                    'portage_packages' => 'portage',
+                                    'npm_packages' => 'npm',
+                                    'python_packages' => 'python',
+                                    'rpm_packages' => 'rpm',
+                                    'homebrew_packages' => 'homebrew',
+                                    'chocolatey_packages' => 'chocolatey',
+                                    default => 'unknown',
+                                };
+                                if ($event->isAdded()) {
+                                    if (!$osInfo) {
+                                        $cves = '';
+                                    } else {
+                                        $cves = YnhCve::appCves($osInfo->os, $osInfo->codename, $event->columns['name'], $event->columns['version'])
+                                            ->pluck('cve')
+                                            ->unique()
+                                            ->join(', ');
+                                    }
+                                    $warning = empty($cves) ? '' : "Attention, ce paquet est vulnérable: {$cves}.";
+                                    $comment = "Le paquet {$event->columns['name']} {$event->columns['version']} ({$type}) a été installé. {$warning}";
+                                }
+                                if ($event->isRemoved()) {
+                                    $comment = "Le paquet {$event->columns['name']} {$event->columns['version']} ({$type}) a été désinstallé.";
+                                }
+                            }
+                        }
+                        return empty($comment) ? '' : "{$time} - {$server->name} (ip address: {$server->ip()}) - {$comment} (criticality: {$criticality})";
+                    })
+                    ->filter(fn(string $event) => !empty($event))
+                    ->sort(); // Reorder events from the oldest to the newest
+
+                if ($events->isEmpty()) {
+                    return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
+                }
+
+                $list = implode("\n", $this->compress($events->toArray()));
+                $prompt = "
+                    You are a Cybersecurity expert working as a SOC operator. 
+                    Analyze the following security events to determine if any of them could indicate a compromise on the server {$server->name} ({$server->ip()}).
+                    Focus on 'intent' rather than just keywords.
+                    Return a single JSON object with the following attributes:
+                    - severity: NORMAL, SUSPICIOUS, ANORMAL
+                    - confidence: 0.0 to 1.0 confidence score
+                    - reasoning: brief explanation of the verdict
+                    - suggested_action: recommended next step
+                    
+                    {$list}
+                ";
+                $answer = LlmsProvider::provide($prompt);
+                $matches = null;
+                preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
+                $answer = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
+                $json = json_decode($answer, true);
+
+                if (empty($json)) {
+                    Log::warning('Failed to parse SOC operator answer: ' . $answer);
+                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()}.</li>";
+                }
+
+                Log::debug("SOC operator answer: " . $answer);
+
+                if ($json['severity'] === "NORMAL") {
+                    return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
+                }
+                return "<li>L'activité sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} est {$json['severity']}.<ul>
+                    <li><b>Indice de confiance (0=faible, 1=haute) :</b> {$json['confidence']}</li>
+                    <li><b>Raisonnement :</b> {$json['reasoning']}</li>
+                    <li><b>Action suggérée :</b> {$json['suggested_action']}</li>
+                </ul></li>";
+            })
+            ->filter(fn(string $event) => !empty($event));
+
+        return $activity->isEmpty() ? '' : "
+            <h3>Activité & Indicateurs de compromission (IoCs)</h3>
+            <ul>{$activity->implode('')}</ul>
+        ";
+    }
+
+    private function compress(array $logs): array
+    {
+        if (empty($logs)) {
+            return [];
+        }
+
+        $compressed = [];
+        $lastLine = $logs[0];
+        $count = 1;
+        $size = count($logs);
+
+        for ($i = 1; $i < $size; $i++) {
+
+            $line = $logs[$i];
+            $len1 = Str::length($line);
+            $len2 = Str::length($lastLine);
+            $maxLength = max($len1, $len2);
+            $ratio = 0;
+
+            if ($maxLength === 0) {
+                $ratio = 1.0;
+            } else {
+                $distance = cywise_levenshtein($line, $lastLine);
+                $ratio = 1 - ($distance / $maxLength);
+            }
+            if ($ratio > 0.9) {
+                $count++;
+            } else {
+                $compressed[] = ($count > 1) ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
+                $lastLine = $line;
+                $count = 1;
+            }
+        }
+
+        $compressed[] = ($count > 1) ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
+
+        return $compressed;
     }
 }

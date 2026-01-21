@@ -196,6 +196,42 @@ if (!function_exists('cywise_unpack_files')) {
         return $directories;
     }
 }
+if (!function_exists('cywise_levenshtein')) {
+    function cywise_levenshtein(string $s1, string $s2): int
+    {
+        $l1 = mb_strlen($s1);
+        $l2 = mb_strlen($s2);
+
+        if ($l1 > $l2) {
+            return cywise_levenshtein($s2, $s1);
+        }
+        if ($l1 === 0) {
+            return $l2;
+        }
+        if ($s1 === $s2) {
+            return 0;
+        }
+
+        $rowPrev = range(0, $l1);
+        $row = [];
+
+        for ($i = 1; $i <= $l2; $i++) {
+
+            $row[0] = $i;
+
+            for ($j = 1; $j <= $l1; $j++) {
+                $cost = ($s1[$j - 1] === $s2[$i - 1]) ? 0 : 1;
+                $row[$j] = min(
+                    $row[$j - 1] + 1, // Insertion
+                    $rowPrev[$j] + 1, // Suppression
+                    $rowPrev[$j - 1] + $cost // Substitution
+                );
+            }
+            $rowPrev = $row;
+        }
+        return $rowPrev[$l1];
+    }
+}
 if (!function_exists('app_config_override')) {
     function app_config_override(): array
     {
@@ -238,3 +274,4 @@ if (!function_exists('app_config_override')) {
         }
     }
 }
+

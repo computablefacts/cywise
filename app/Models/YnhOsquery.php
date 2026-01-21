@@ -974,6 +974,7 @@ EOT;
         "));
     }
 
+    /** @deprecated */
     public static function suspiciousEvents(Collection $servers, Carbon $cutOffTime): Collection
     {
         return Messages::get($servers, $cutOffTime, [
