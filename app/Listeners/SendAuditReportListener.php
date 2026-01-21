@@ -448,7 +448,7 @@ class SendAuditReportListener extends AbstractListener
                     Analyze the following security events to determine if any of them could indicate a compromise on the server {$server->name} ({$server->ip()}).
                     Focus on 'intent' rather than just keywords.
                     Return a single JSON object with the following attributes:
-                    - severity: NORMAL, SUSPICIOUS, ANORMAL
+                    - activity: NORMAL, SUSPECT, ANORMAL
                     - confidence: 0.0 to 1.0 confidence score
                     - reasoning: brief explanation of the verdict
                     - suggested_action: recommended next step
@@ -465,9 +465,9 @@ class SendAuditReportListener extends AbstractListener
                     Log::error('Failed to parse SOC operator answer (json): ' . $answer);
                     return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (le JSON est invalide).</li>";
                 }
-                if (!isset($json['severity']) || !in_array($json['severity'], ['NORMAL', 'SUSPICIOUS', 'ANORMAL'])) {
-                    Log::error('Failed to parse SOC operator answer (severity): ' . $answer);
-                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'severity' est invalide).</li>";
+                if (!isset($json['activity']) || !in_array($json['activity'], ['NORMAL', 'SUSPICIOUS', 'ANORMAL'])) {
+                    Log::error('Failed to parse SOC operator answer (activity): ' . $answer);
+                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'activity' est invalide).</li>";
                 }
                 if (!isset($json['confidence']) || !is_numeric($json['confidence']) || $json['confidence'] < 0 || $json['confidence'] > 1) {
                     Log::error('Failed to parse SOC operator answer (confidence): ' . $answer);
@@ -484,7 +484,7 @@ class SendAuditReportListener extends AbstractListener
 
                 Log::debug("SOC operator answer: " . $answer);
 
-                if ($json['severity'] === "NORMAL") {
+                if ($json['activity'] === "NORMAL") {
                     return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
 
@@ -503,7 +503,7 @@ class SendAuditReportListener extends AbstractListener
                 } else {
                     $suggestedAction = $result['response'];
                 }
-                return "<li>L'activité sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} est <b>{$json['severity']}</b>.<ul>
+                return "<li>L'activité sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} est <b>{$json['activity']}E</b>.<ul>
                     <li><b>Indice de confiance (0=faible, 1=haute) :</b> {$json['confidence']}</li>
                     <li><b>Raisonnement :</b> {$reasoning}</li>
                     <li><b>Action suggérée :</b> {$suggestedAction}</li>
