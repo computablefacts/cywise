@@ -334,6 +334,10 @@
     executeJsonRpcApiCall('users@toggleGetsAuditReport', {user_id: userId}, onSuccess);
   }
 
+  function sendAuditReportApiCall(userId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('users@sendAuditReport', {user_id: userId}, onSuccess);
+  }
+
   function deletePromptApiCall(promptId) {
     executeJsonRpcApiCall('prompts@delete', {prompt_id: promptId});
   }
