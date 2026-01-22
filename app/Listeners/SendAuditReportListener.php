@@ -13,7 +13,6 @@ use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\TimelineItem;
 use App\Models\User;
-use App\Models\YnhCve;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
 use Carbon\Carbon;
@@ -336,111 +335,15 @@ class SendAuditReportListener extends AbstractListener
 
                 Log::debug("Building SOC operator report for server {$server->name} ({$server->ip()})...");
 
-                // Get the server OS infos
-                $osInfo = YnhOsquery::osInfos(collect([$server]))->first();
-
-                // Load both security events and IoCs
                 $request = new JsonRpcRequest([
-                    'min_score' => 0,
+                    'min_score' => 0, // Load both security events and IoCs
                     'server_id' => $server->id,
                     'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')]
                 ]);
                 $request->setUserResolver(fn() => $user);
                 $events = (new EventsProcedure())->list($request)['events']
-                    ->map(function (YnhOsquery $event) use ($server, $osInfo) {
-
-                        $comment = '';
-                        $criticality = 0;
-                        $time = $event->calendar_time->utc()->format('Y-m-d H:i:s');
-
-                        if ($event->score > 0) { // IoC
-                            $comment = $event->comments;
-                            $criticality = $event->score;
-                        } else { // Standard security event
-                            if ($event->name === 'last') {
-                                $username = $event->columns['username'] === 'null' ? null : $event->columns['username'] ?? null;
-                                if ($event->isAdded()) {
-                                    $comment = "L'utilisateur {$username} s'est connecté au serveur.";
-                                }
-                                if ($event->isRemoved()) {
-                                    $comment = "L'utilisateur {$username} s'est déconnecté du serveur.";
-                                }
-                            } else if ($event->name === 'shell_history') {
-                                $username = $event->columns['username'] === 'null' ? null : $event->columns['username'] ?? null;
-                                if ($event->isAdded()) {
-                                    $comment = "L'utilisateur {$username} a lancé la commande {$event->columns['command']}.";
-                                }
-                            } else if ($event->name === 'users') {
-                                $username = $event->columns['username'] === 'null' ? null : $event->columns['username'] ?? null;
-                                if ($event->isAdded()) {
-                                    $home = empty($event->columns['directory']) ? "" : " ({$event->columns['directory']})";
-                                    $comment = "L'utilisateur {$username}{$home} a été créé.";
-                                }
-                                if ($event->isRemoved()) {
-                                    $home = empty($event->columns['directory']) ? "" : " ({$event->columns['directory']})";
-                                    $comment = "L'utilisateur {$username}{$home} a été supprimé.";
-                                }
-                            } else if ($event->name === 'groups') {
-                                if ($event->isAdded()) {
-                                    $comment = "Le groupe {$event->columns['groupname']} a été créé.";
-                                }
-                                if ($event->isRemoved()) {
-                                    $comment = "Le groupe {$event->columns['groupname']} a été supprimé.";
-                                }
-                            } else if ($event->name === 'authorized_keys') {
-                                if ($event->isAdded()) {
-                                    $comment = "Une clef SSH a été ajoutée au trousseau {$event->columns['key_file']}.";
-                                }
-                                if ($event->isRemoved()) {
-                                    $comment = "Une clef SSH a été supprimée du trousseau {$event->columns['key_file']}.";
-                                }
-                            } else if ($event->name === 'user_ssh_keys') {
-                                $username = $event->columns['username'] === 'null' ? null : $event->columns['username'] ?? null;
-                                if ($event->isAdded()) {
-                                    $comment = "L'utilisateur {$username} a créé une clef SSH ({$event->columns['path']}).";
-                                }
-                                if ($event->isRemoved()) {
-                                    $comment = "L'utilisateur {$username} a supprimé une clef SSH ({$event->columns['path']}).";
-                                }
-                            } else if ($event->name === 'win_packages' ||
-                                $event->name === 'deb_packages' ||
-                                $event->name === 'portage_packages' ||
-                                $event->name === 'npm_packages' ||
-                                $event->name === 'python_packages' ||
-                                $event->name === 'rpm_packages' ||
-                                $event->name === 'homebrew_packages' ||
-                                $event->name === 'chocolatey_packages') {
-                                $type = match ($event->name) {
-                                    'win_packages' => 'win',
-                                    'deb_packages' => 'deb',
-                                    'portage_packages' => 'portage',
-                                    'npm_packages' => 'npm',
-                                    'python_packages' => 'python',
-                                    'rpm_packages' => 'rpm',
-                                    'homebrew_packages' => 'homebrew',
-                                    'chocolatey_packages' => 'chocolatey',
-                                    default => 'unknown',
-                                };
-                                if ($event->isAdded()) {
-                                    if (!$osInfo) {
-                                        $cves = '';
-                                    } else {
-                                        $cves = YnhCve::appCves($osInfo->os, $osInfo->codename, $event->columns['name'], $event->columns['version'])
-                                            ->pluck('cve')
-                                            ->unique()
-                                            ->join(', ');
-                                    }
-                                    $warning = empty($cves) ? '' : "Attention, ce paquet est vulnérable: {$cves}.";
-                                    $comment = "Le paquet {$event->columns['name']} {$event->columns['version']} ({$type}) a été installé. {$warning}";
-                                }
-                                if ($event->isRemoved()) {
-                                    $comment = "Le paquet {$event->columns['name']} {$event->columns['version']} ({$type}) a été désinstallé.";
-                                }
-                            }
-                        }
-                        return empty($comment) ? '' : "{$time} - {$server->name} (ip address: {$server->ip()}) - {$comment} (criticality: {$criticality})";
-                    })
-                    ->filter(fn(string $event) => !empty($event))
+                    ->map(fn(YnhOsquery $event) => $event->logLine())
+                    ->filter(fn(string $logLine) => !empty($logLine))
                     ->sort() // Reorder events from the oldest to the newest
                     ->values();
 

@@ -931,6 +931,7 @@ Generate-OsqueryJson -Name "memory_available_snapshot" -Columns \$(Get-MemoryMet
 EOT;
     }
 
+    /** @deprecated */
     public static function osInfos(Collection $servers): Collection
     {
         // {
@@ -1031,5 +1032,142 @@ EOT;
     public function isRemoved(): bool
     {
         return $this->action === 'removed';
+    }
+
+    public function logLine(): string
+    {
+        // Attributes server_name, server_ip_address, comments and score are loaded by EventsProcedure::list
+        $criticality = $this->score ?? 0;
+        $time = $this->calendar_time->utc()->format('Y-m-d H:i:s');
+        $message = $this->message();
+        return empty($message) ? '' : "{$time} - {$this->server_name} (ip address: {$this->server_ip_address}) - {$message} (criticality: {$criticality})";
+    }
+
+    public function message(): string
+    {
+        $msg = '';
+        if ($this->score > 0) { // IoC
+            $msg = $this->comments;
+        } else { // Standard security event
+            if ($this->name === 'last') {
+                $username = $this->columns['username'] === 'null' ? null : $this->columns['username'] ?? null;
+                if ($this->isAdded()) {
+                    $msg = "L'utilisateur {$username} s'est connecté au serveur.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "L'utilisateur {$username} s'est déconnecté du serveur.";
+                }
+            } else if ($this->name === 'shell_history') {
+                $username = $this->columns['username'] === 'null' ? null : $this->columns['username'] ?? null;
+                if ($this->isAdded()) {
+                    $msg = "L'utilisateur {$username} a lancé la commande {$this->columns['command']}.";
+                }
+            } else if ($this->name === 'users') {
+                $username = $this->columns['username'] === 'null' ? null : $this->columns['username'] ?? null;
+                if ($this->isAdded()) {
+                    $home = empty($this->columns['directory']) ? "" : " ({$this->columns['directory']})";
+                    $msg = "L'utilisateur {$username}{$home} a été créé.";
+                }
+                if ($this->isRemoved()) {
+                    $home = empty($this->columns['directory']) ? "" : " ({$this->columns['directory']})";
+                    $msg = "L'utilisateur {$username}{$home} a été supprimé.";
+                }
+            } else if ($this->name === 'groups') {
+                if ($this->isAdded()) {
+                    $msg = "Le groupe {$this->columns['groupname']} a été créé.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le groupe {$this->columns['groupname']} a été supprimé.";
+                }
+            } else if ($this->name === 'authorized_keys') {
+                if ($this->isAdded()) {
+                    $msg = "Une clef SSH a été ajoutée au trousseau {$this->columns['key_file']}.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Une clef SSH a été supprimée du trousseau {$this->columns['key_file']}.";
+                }
+            } else if ($this->name === 'user_ssh_keys') {
+                $username = $this->columns['username'] === 'null' ? null : $this->columns['username'] ?? null;
+                if ($this->isAdded()) {
+                    $msg = "L'utilisateur {$username} a créé une clef SSH ({$this->columns['path']}).";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "L'utilisateur {$username} a supprimé une clef SSH ({$this->columns['path']}).";
+                }
+            } else if ($this->name === 'win_packages' ||
+                $this->name === 'deb_packages' ||
+                $this->name === 'portage_packages' ||
+                $this->name === 'npm_packages' ||
+                $this->name === 'python_packages' ||
+                $this->name === 'rpm_packages' ||
+                $this->name === 'homebrew_packages' ||
+                $this->name === 'chocolatey_packages') {
+                $type = match ($this->name) {
+                    'win_packages' => 'win',
+                    'deb_packages' => 'deb',
+                    'portage_packages' => 'portage',
+                    'npm_packages' => 'npm',
+                    'python_packages' => 'python',
+                    'rpm_packages' => 'rpm',
+                    'homebrew_packages' => 'homebrew',
+                    'chocolatey_packages' => 'chocolatey',
+                    default => 'unknown',
+                };
+                if ($this->isAdded()) {
+                    try {
+                        $os = $this->operatingSystem($this->ynh_server_id);
+                    } catch (\Exception $e) {
+                        $os = null;
+                    }
+                    if (!$os) {
+                        $cves = '';
+                    } else {
+                        $cves = YnhCve::appCves($os->os, $os->codename, $this->columns['name'], $this->columns['version'])
+                            ->pluck('cve')
+                            ->unique()
+                            ->join(', ');
+                    }
+                    $warning = empty($cves) ? '' : "Attention, ce paquet est vulnérable: {$cves}.";
+                    $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} ({$type}) a été installé. {$warning}";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} ({$type}) a été désinstallé.";
+                }
+            }
+        }
+        return $msg;
+    }
+
+    private function operatingSystem(int $serverId): ?object
+    {
+        return \Cache::remember('os_infos_' . $serverId, now()->addHours(24), function () use ($serverId) {
+            return collect(DB::select("
+                SELECT DISTINCT 
+                    ynh_osquery.ynh_server_id,
+                    ynh_servers.name AS ynh_server_name,
+                    TIMESTAMP(ynh_osquery.calendar_time - SECOND(ynh_osquery.calendar_time)) AS `timestamp`,
+                    json_unquote(json_extract(ynh_osquery.columns, '$.arch')) AS architecture,
+                    json_unquote(json_extract(ynh_osquery.columns, '$.codename')) AS codename,
+                    CAST(json_unquote(json_extract(ynh_osquery.columns, '$.major')) AS INTEGER) AS major_version,
+                    CAST(json_unquote(json_extract(ynh_osquery.columns, '$.minor')) AS INTEGER) AS minor_version,
+                    json_unquote(json_extract(ynh_osquery.columns, '$.platform')) AS os,
+                    CASE
+                      WHEN json_unquote(json_extract(ynh_osquery.columns, '$.patch')) = 'null' THEN NULL
+                      ELSE CAST(json_unquote(json_extract(ynh_osquery.columns, '$.patch')) AS INTEGER)
+                    END AS patch_version
+                FROM ynh_osquery
+                INNER JOIN (
+                  SELECT 
+                    ynh_server_id, MAX(calendar_time) AS calendar_time 
+                  FROM ynh_osquery 
+                  WHERE name = 'os_version'
+                  GROUP BY ynh_server_id
+                ) AS t ON t.ynh_server_id = ynh_osquery.ynh_server_id AND t.calendar_time = ynh_osquery.calendar_time
+                INNER JOIN ynh_servers ON ynh_servers.id = ynh_osquery.ynh_server_id
+                WHERE ynh_osquery.name = 'os_version'
+                AND ynh_osquery.ynh_server_id = {$serverId}
+                ORDER BY timestamp DESC
+            "))->firstOrFail();
+        });
     }
 }
