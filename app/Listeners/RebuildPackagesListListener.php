@@ -35,7 +35,7 @@ class RebuildPackagesListListener extends AbstractListener
             try {
 
                 Log::info("Processing packages for server {$server->name}...");
-                $osInfo = YnhOsquery::osInfos(collect([$server]))->first();
+                $osInfo = YnhOsquery::operatingSystem($server->id);
 
                 if (!$osInfo) {
                     Log::info("No OS version found for server {$server->name}");

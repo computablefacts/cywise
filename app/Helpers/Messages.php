@@ -528,7 +528,7 @@ class Messages
             ->map(function (VPackage $event) {
                 if ($event->isAdded()) {
 
-                    $osInfo = YnhOsquery::osInfos(collect([$event->server->first()]))->first();
+                    $osInfo = YnhOsquery::operatingSystem($event->server_id);
 
                     if (!$osInfo) {
                         $cves = '';
