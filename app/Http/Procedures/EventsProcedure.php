@@ -20,6 +20,7 @@ class EventsProcedure extends Procedure
         description: "List collected events.",
         params: [
             "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise.",
+            "max_score" => "An optional maximum score to filter events by.",
             "server_id" => "An optional server id to filter events by.",
             "window" => "An optional window of time [min_date, max_date] to filter events by."
         ],
@@ -31,6 +32,7 @@ class EventsProcedure extends Procedure
     {
         $params = $request->validate([
             'min_score' => 'required|integer|min:0|max:100',
+            'max_score' => 'nullable|integer|min:0|max:100',
             'server_id' => 'nullable|integer|exists:ynh_servers,id',
             'window' => 'nullable|array|min:2|max:2',
             'window.*' => 'required|date',
@@ -38,6 +40,7 @@ class EventsProcedure extends Procedure
 
         $serverId = $params['server_id'] ?? null;
         $minScore = $params['min_score'] ?? 0;
+        $maxScore = $params['max_score'] ?? 100;
 
         if (isset($params['window'])) {
             $minDate = Carbon::createFromFormat('Y-m-d', $params['window'][0])->startOfDay();
@@ -69,7 +72,8 @@ class EventsProcedure extends Procedure
                     ->whereColumn('columns_uid', '=', 'ynh_osquery.columns_uid')
                     ->havingRaw('count(1) >=' . Messages::HIDE_AFTER_DISMISS_COUNT);
             })
-            ->where('ynh_osquery_rules.score', '>=', $minScore);
+            ->where('ynh_osquery_rules.score', '>=', $minScore)
+            ->where('ynh_osquery_rules.score', '<=', $maxScore);
 
         if ($minScore > 0) {
             $events = $events->where('ynh_osquery_rules.is_ioc', true);
