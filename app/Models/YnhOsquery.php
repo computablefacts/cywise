@@ -1042,6 +1042,27 @@ EOT;
                 if ($this->isRemoved()) {
                     $msg = "L'utilisateur {$username} a supprimé une clef SSH ({$this->columns['path']}).";
                 }
+            } else if ($this->name === 'etc_hosts') {
+                if ($this->isAdded()) {
+                    $msg = "L'hôte {$this->columns['hostnames']} redirige vers {$this->columns['address']}.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "L'hôte {$this->columns['hostnames']} ne redirige plus vers {$this->columns['address']}.";
+                }
+            } else if ($this->name === 'etc_services') {
+                if ($this->isAdded()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['comment']}) écoute sur le port {$this->columns['port']} ({$this->columns['protocol']}).";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['comment']}) n'écoute plus sur le port {$this->columns['port']} ({$this->columns['protocol']}).";
+                }
+            } else if ($this->name === 'interface_addresses') {
+                if ($this->isAdded()) {
+                    $msg = "L'interface réseau {$this->columns['interface']} ({$this->columns['address']}) a été ajoutée.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "L'interface réseau {$this->columns['interface']} ({$this->columns['address']}) a été supprimée.";
+                }
             } else if ($this->name === 'win_packages' ||
                 $this->name === 'deb_packages' ||
                 $this->name === 'portage_packages' ||

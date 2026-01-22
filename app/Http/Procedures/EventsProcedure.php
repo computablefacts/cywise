@@ -60,6 +60,7 @@ class EventsProcedure extends Procedure
         ])
             ->join('ynh_osquery_rules', 'ynh_osquery_rules.id', '=', 'ynh_osquery.ynh_osquery_rule_id')
             ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
+            ->where('ynh_osquery_rules.enabled', true)
             ->where('ynh_osquery.calendar_time', '>=', $minDate)
             ->where('ynh_osquery.calendar_time', '<=', $maxDate)
             ->whereIn('ynh_osquery.ynh_server_id', $servers->pluck('id'))
