@@ -2,7 +2,6 @@
 
 namespace App\Http\Procedures;
 
-use App\Helpers\Messages;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
@@ -71,7 +70,7 @@ class EventsProcedure extends Procedure
                     ->whereColumn('name', '=', 'ynh_osquery.name')
                     ->whereColumn('action', '=', 'ynh_osquery.action')
                     ->whereColumn('columns_uid', '=', 'ynh_osquery.columns_uid')
-                    ->havingRaw('count(1) >=' . Messages::HIDE_AFTER_DISMISS_COUNT);
+                    ->havingRaw('count(1) >= 3');
             })
             ->where('ynh_osquery_rules.score', '>=', $minScore)
             ->where('ynh_osquery_rules.score', '<=', $maxScore);

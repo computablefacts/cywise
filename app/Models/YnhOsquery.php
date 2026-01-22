@@ -972,6 +972,11 @@ EOT;
         return $this->belongsTo(YnhServer::class, 'ynh_server_id', 'id');
     }
 
+    public function isSnapshot(): bool
+    {
+        return $this->action === 'snapshot';
+    }
+
     public function isAdded(): bool
     {
         return $this->action === 'added';
@@ -1062,6 +1067,79 @@ EOT;
                 }
                 if ($this->isRemoved()) {
                     $msg = "L'interface réseau {$this->columns['interface']} ({$this->columns['address']}) a été supprimée.";
+                }
+            } else if ($this->name === 'suid_bin') {
+                if ($this->isAdded()) {
+                    $msg = "Les privilèges du binaire {$this->columns['path']} ont été élevés.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Les privilèges du binaire {$this->columns['path']} ont été abaissés.";
+                }
+            } else if ($this->name === 'kernel_modules') {
+                if ($this->isAdded()) {
+                    $msg = "Le module {$this->columns['name']} a été ajouté au noyau.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le module {$this->columns['name']} a été enlevé du noyau.";
+                }
+            } else if ($this->name === 'processes') {
+                if ($this->isAdded()) {
+                    $msg = "Le processus {$this->columns['name']} est lancé.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le processus {$this->columns['name']} est arrêté.";
+                }
+            } else if ($this->name === 'ld_preload_snapshot') {
+                if ($this->isSnapshot()) {
+                    $msg = "Le binaire {$this->columns['path']} utilise la variable d'environnement LD_PRELOAD={$this->columns['value']}.";
+                }
+            } else if ($this->name === 'process_listening_port') {
+                if ($this->isAdded()) {
+                    $msg = "Le processus {$this->columns['path']} écoute à l'adresse {$this->columns['address']}:{$this->columns['port']}.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le processus {$this->columns['path']} n'écoute plus à l'adresse {$this->columns['address']}:{$this->columns['port']}.";
+                }
+            } else if ($this->name === 'open_sockets') {
+                if ($this->isAdded()) {
+                    $process = empty($this->columns['path']) ? "{$this->columns['pid']}" : "{$this->columns['path']} ($this->columns['pid'])";
+                    $msg = "Le processus {$process} a une connexion ouverte de {$this->columns['local_address']}:{$this->columns['local_port']} vers {$this->columns['remote_address']}:{$this->columns['remote_port']}.";
+                }
+                if ($this->isRemoved()) {
+                    $process = empty($this->columns['path']) ? "{$this->columns['pid']}" : "{$this->columns['path']} ($this->columns['pid'])";
+                    $msg = "Le processus {$process} n'a plus de connexion ouverte de {$this->columns['local_address']}:{$this->columns['local_port']} vers {$this->columns['remote_address']}:{$this->columns['remote_port']}.";
+                }
+            } else if ($this->name === 'startup_items') {
+                if ($this->isAdded()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['type']}) a été ajouté.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['type']}) a été supprimé.";
+                }
+            } else if ($this->name === 'services') {
+                if ($this->isAdded()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['service_type']}) a été ajouté.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['service_type']}) a été supprimé.";
+                }
+            } else if ($this->name === 'crontab') {
+                if ($this->isAdded()) {
+                    $cron = "{$this->columns['minute']} {$this->columns['hour']} {$this->columns['day_of_month']} {$this->columns['month']} {$this->columns['day_of_week']}";
+                    $msg = "La tâche planifiée {$this->columns['command']} ({$cron}) a été ajoutée au fichier {$this->columns['path']}.";
+                }
+                if ($this->isRemoved()) {
+                    $cron = "{$this->columns['minute']} {$this->columns['hour']} {$this->columns['day_of_month']} {$this->columns['month']} {$this->columns['day_of_week']}";
+                    $msg = "La tâche planifiée {$this->columns['command']} ({$cron}) a été supprimée du fichier {$this->columns['path']}.";
+                }
+            } else if ($this->name === 'scheduled_tasks') {
+                if ($this->isAdded()) {
+                    $schedule = "last_run={$this->columns['last_run_time']}, next_run={$this->columns['next_run_time']}";
+                    $msg = "La tâche planifiée {$this->columns['action']} ({$schedule}) a été ajoutée.";
+                }
+                if ($this->isRemoved()) {
+                    $schedule = "last_run={$this->columns['last_run_time']}, next_run={$this->columns['next_run_time']}";
+                    $msg = "La tâche planifiée {$this->columns['action']} ({$schedule}) a été supprimée.";
                 }
             } else if ($this->name === 'win_packages' ||
                 $this->name === 'deb_packages' ||
