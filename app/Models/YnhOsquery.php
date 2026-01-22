@@ -988,32 +988,6 @@ EOT;
         ]);
     }
 
-    /** @deprecated */
-    public static function suspiciousMetrics(Collection $servers, Carbon $cutOffTime): Collection
-    {
-        return $servers->map(function (YnhServer $server) use ($cutOffTime) {
-
-            /** @var YnhOsquery $metric */
-            $metric = YnhOsquery::where('calendar_time', '>=', $cutOffTime)
-                ->where('name', 'disk_available_snapshot')
-                ->where('ynh_server_id', $server->id)
-                ->orderBy('calendar_time', 'desc')
-                ->first();
-
-            if ($metric && $metric->columns['%_available'] <= 20) {
-                return [
-                    'id' => $metric->id,
-                    'timestamp' => $metric->calendar_time->format('Y-m-d H:i:s'),
-                    'server' => $metric->server->name,
-                    'ip' => $metric->server->ip(),
-                    'message' => "Il vous reste {$metric->columns['%_available']}% d'espace disque disponible, soit {$metric->columns['space_left_gb']} Gb.",
-                ];
-            }
-            return [];
-        })
-            ->filter(fn(array $metric) => count($metric) >= 1);
-    }
-
     public function rule(): BelongsTo
     {
         return $this->belongsTo(YnhOsqueryRule::class, 'ynh_osquery_rule_id', 'id');
