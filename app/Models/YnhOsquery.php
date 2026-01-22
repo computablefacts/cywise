@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\OsqueryPlatformEnum;
-use App\Helpers\Messages;
 use App\Http\Procedures\OsqueryRulesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use Carbon\Carbon;
@@ -973,19 +972,6 @@ EOT;
             AND ynh_osquery.ynh_server_id IN ({$servers->pluck('id')->join(',')})
             ORDER BY timestamp DESC
         "));
-    }
-
-    /** @deprecated */
-    public static function suspiciousEvents(Collection $servers, Carbon $cutOffTime): Collection
-    {
-        return Messages::get($servers, $cutOffTime, [
-            Messages::AUTHENTICATION_AND_SSH_ACTIVITY,
-            Messages::USERS_AND_GROUPS,
-            Messages::PACKAGES,
-            Messages::SUID_BIN,
-            Messages::LD_PRELOAD,
-            Messages::KERNEL_MODULES,
-        ]);
     }
 
     public function rule(): BelongsTo
