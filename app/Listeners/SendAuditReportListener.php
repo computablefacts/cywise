@@ -352,7 +352,7 @@ class SendAuditReportListener extends AbstractListener
                     return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
 
-                $list = implode("\n", $this->compress($events->toArray()));
+                $list = implode("\n", cywise_compress_log_buffer($events->toArray()));
                 $prompt = "
                     You are a Cybersecurity expert working as a SOC operator. 
                     Analyze the following security events to determine if any of them could indicate a compromise on the server {$server->name} ({$server->ip()}).
@@ -426,44 +426,5 @@ class SendAuditReportListener extends AbstractListener
             <h3>Activité & Indicateurs de compromission (IoCs)</h3>
             <ul>{$activity->implode('')}</ul>
         ";
-    }
-
-    private function compress(array $logs): array
-    {
-        if (empty($logs)) {
-            return [];
-        }
-
-        $compressed = [];
-        $lastLine = $logs[0];
-        $count = 1;
-        $size = count($logs);
-
-        for ($i = 1; $i < $size; $i++) {
-
-            $line = $logs[$i];
-            $len1 = Str::length($line);
-            $len2 = Str::length($lastLine);
-            $maxLength = max($len1, $len2);
-            $ratio = 0;
-
-            if ($maxLength === 0) {
-                $ratio = 1.0;
-            } else {
-                $distance = cywise_levenshtein($line, $lastLine);
-                $ratio = 1 - ($distance / $maxLength);
-            }
-            if ($ratio > 0.9) {
-                $count++;
-            } else {
-                $compressed[] = ($count > 1) ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
-                $lastLine = $line;
-                $count = 1;
-            }
-        }
-
-        $compressed[] = ($count > 1) ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
-
-        return $compressed;
     }
 }

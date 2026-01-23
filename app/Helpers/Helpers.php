@@ -196,14 +196,54 @@ if (!function_exists('cywise_unpack_files')) {
         return $directories;
     }
 }
-if (!function_exists('cywise_levenshtein')) {
-    function cywise_levenshtein(string $s1, string $s2): int
+if (!function_exists('cywise_compress_log_buffer')) {
+    function cywise_compress_log_buffer(array $buffer): array
+    {
+        if (empty($buffer)) {
+            return [];
+        }
+
+        $compressed = [];
+        $lastLine = $buffer[0];
+        $count = 1;
+        $size = count($buffer);
+
+        for ($i = 1; $i < $size; $i++) {
+
+            $line = $buffer[$i];
+            $len1 = mb_strlen($line);
+            $len2 = mb_strlen($lastLine);
+            $maxLength = max($len1, $len2);
+            $ratio = 0;
+
+            if ($maxLength === 0) {
+                $ratio = 1.0;
+            } else {
+                $distance = cywise_levenshtein_distance($line, $lastLine);
+                $ratio = 1 - ($distance / $maxLength);
+            }
+            if ($ratio > 0.9) {
+                $count++;
+            } else {
+                $compressed[] = ($count > 1) ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
+                $lastLine = $line;
+                $count = 1;
+            }
+        }
+
+        $compressed[] = ($count > 1) ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
+
+        return $compressed;
+    }
+}
+if (!function_exists('cywise_levenshtein_distance')) {
+    function cywise_levenshtein_distance(string $s1, string $s2): int
     {
         $l1 = mb_strlen($s1);
         $l2 = mb_strlen($s2);
 
         if ($l1 > $l2) {
-            return cywise_levenshtein($s2, $s1);
+            return cywise_levenshtein_distance($s2, $s1);
         }
         if ($l1 === 0) {
             return $l2;
