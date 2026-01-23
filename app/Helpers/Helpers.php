@@ -211,29 +211,30 @@ if (!function_exists('cywise_compress_log_buffer')) {
         for ($i = 1; $i < $size; $i++) {
 
             $line = $buffer[$i];
-            $len1 = mb_strlen($line);
-            $len2 = mb_strlen($lastLine);
-            $maxLength = max($len1, $len2);
-            $ratio = 0;
+            $ratio = 1.0 - cywise_levenshtein_ratio(mb_strtolower($line), mb_strtolower($lastLine));
 
-            if ($maxLength === 0) {
-                $ratio = 1.0;
-            } else {
-                $distance = cywise_levenshtein_distance($line, $lastLine);
-                $ratio = 1 - ($distance / $maxLength);
-            }
             if ($ratio > 0.9) {
                 $count++;
             } else {
-                $compressed[] = ($count > 1) ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
+                $compressed[] = $count > 1 ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
                 $lastLine = $line;
                 $count = 1;
             }
         }
 
-        $compressed[] = ($count > 1) ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
-
+        $compressed[] = $count > 1 ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
         return $compressed;
+    }
+}
+if (!function_exists('cywise_levenshtein_ratio')) {
+    // 0 = identical, 1 = maximally different
+    function cywise_levenshtein_ratio(string $s1, string $s2): float
+    {
+        $maxLength = max(mb_strlen($s1), mb_strlen($s2));
+        if ($maxLength === 0) {
+            return 0.0;
+        }
+        return cywise_levenshtein_distance($s1, $s2) / $maxLength;
     }
 }
 if (!function_exists('cywise_levenshtein_distance')) {
