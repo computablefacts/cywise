@@ -204,25 +204,68 @@ if (!function_exists('cywise_compress_log_buffer')) {
         }
 
         $compressed = [];
-        $lastLine = $buffer[0];
-        $count = 1;
         $size = count($buffer);
+        $i = 0;
 
-        for ($i = 1; $i < $size; $i++) {
+        while ($i < $size) {
 
             $line = $buffer[$i];
-            $ratio = 1.0 - cywise_levenshtein_ratio(mb_strtolower($line), mb_strtolower($lastLine));
+            $lineCount = 1;
 
-            if ($ratio > 0.9) {
-                $count++;
-            } else {
-                $compressed[] = $count > 1 ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
-                $lastLine = $line;
-                $count = 1;
+            // Check if next line is similar (single line compression)
+            while ($i + 1 < $size) {
+
+                $nextLine = $buffer[$i + 1];
+                $ratio = 1.0 - cywise_levenshtein_ratio(mb_strtolower($line), mb_strtolower($nextLine));
+
+                if ($ratio > 0.9) {
+                    $lineCount++;
+                    $i++;
+                } else {
+                    break;
+                }
             }
-        }
+            if ($lineCount > 1) { // If single line compression worked, output it
+                $compressed[] = "[BEGIN {$lineCount}x REPEATED LINE]";
+                $compressed[] = $line;
+                $compressed[] = "[END {$lineCount}x REPEATED LINE]";
+                $i++;
+                continue;
+            }
 
-        $compressed[] = $count > 1 ? "[{$count}x REPEATED] {$lastLine}" : $lastLine;
+            // Try 2-line block compression
+            if ($i + 1 < $size) {
+
+                $block = $line . "\n" . $buffer[$i + 1];
+                $blockCount = 1;
+                $j = $i + 2;
+
+                while ($j + 1 < $size) {
+
+                    $nextBlock = $buffer[$j] . "\n" . $buffer[$j + 1];
+                    $ratio = 1.0 - cywise_levenshtein_ratio(mb_strtolower($block), mb_strtolower($nextBlock));
+
+                    if ($ratio > 0.9) {
+                        $blockCount++;
+                        $j += 2;
+                    } else {
+                        break;
+                    }
+                }
+                if ($blockCount > 1) { // If 2-line block compression worked, output it
+                    $compressed[] = "[BEGIN {$blockCount}x REPEATED BLOCK]";
+                    $compressed[] = $line;
+                    $compressed[] = $buffer[$i + 1];
+                    $compressed[] = "[END {$blockCount}x REPEATED BLOCK]";
+                    $i = $j;
+                    continue;
+                }
+            }
+
+            // No compression possible, output single line
+            $compressed[] = $line;
+            $i++;
+        }
         return $compressed;
     }
 }

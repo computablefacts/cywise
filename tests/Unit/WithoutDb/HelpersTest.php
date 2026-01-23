@@ -58,7 +58,62 @@ test('levenshtein ratio of "CD" and "AB" is 1.0', function () {
     expect(cywise_levenshtein_ratio('AB', 'CD'))->toEqual(1.0);
 });
 
-test('compress log buffer (different lines)', function () {
+test('compress log buffer (2b x 2l x 2b)', function () {
+    $buffer = [
+        "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:03:17 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "2026-01-14 00:03:33 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:04:18 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "2026-01-14 00:04:20 - sentinel-api (ip address: 127.0.0.1) - Busybox is installed, it is often used by attacker to create reverse shell (shell access that connect to a remote server) or listen on the network to provide a shell access or exfiltration means. (criticality: 20)",
+        "2026-01-14 00:04:25 - sentinel-api (ip address: 127.0.0.1) - Busybox is installed, it is often used by attacker to create reverse shell (shell access that connect to a remote server) or listen on the network to provide a shell access or exfiltration means. (criticality: 20)",
+        "2026-01-14 00:04:36 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:05:28 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "2026-01-14 00:05:43 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:06:47 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)"
+    ];
+    $compressed_buffer = cywise_compress_log_buffer($buffer);
+    expect($compressed_buffer)->toEqual([
+        "[BEGIN 2x REPEATED BLOCK]",
+        "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:03:17 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "[END 2x REPEATED BLOCK]",
+        "[BEGIN 2x REPEATED LINE]",
+        "2026-01-14 00:04:20 - sentinel-api (ip address: 127.0.0.1) - Busybox is installed, it is often used by attacker to create reverse shell (shell access that connect to a remote server) or listen on the network to provide a shell access or exfiltration means. (criticality: 20)",
+        "[END 2x REPEATED LINE]",
+        "[BEGIN 2x REPEATED BLOCK]",
+        "2026-01-14 00:04:36 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:05:28 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "[END 2x REPEATED BLOCK]"
+    ]);
+});
+
+test('compress log buffer (2b x 1 x 2b)', function () {
+    $buffer = [
+        "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:03:17 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "2026-01-14 00:03:33 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:04:18 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "2026-01-14 00:04:20 - sentinel-api (ip address: 127.0.0.1) - Busybox is installed, it is often used by attacker to create reverse shell (shell access that connect to a remote server) or listen on the network to provide a shell access or exfiltration means. (criticality: 20)",
+        "2026-01-14 00:04:36 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:05:28 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "2026-01-14 00:05:43 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:06:47 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)"
+    ];
+    $compressed_buffer = cywise_compress_log_buffer($buffer);
+    expect($compressed_buffer)->toEqual([
+        "[BEGIN 2x REPEATED BLOCK]",
+        "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:03:17 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "[END 2x REPEATED BLOCK]",
+        "2026-01-14 00:04:20 - sentinel-api (ip address: 127.0.0.1) - Busybox is installed, it is often used by attacker to create reverse shell (shell access that connect to a remote server) or listen on the network to provide a shell access or exfiltration means. (criticality: 20)",
+        "[BEGIN 2x REPEATED BLOCK]",
+        "2026-01-14 00:04:36 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:05:28 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "[END 2x REPEATED BLOCK]"
+    ]);
+});
+
+test('compress log buffer (4b)', function () {
     $buffer = [
         "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
         "2026-01-14 00:03:17 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
@@ -70,10 +125,15 @@ test('compress log buffer (different lines)', function () {
         "2026-01-14 00:06:47 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)"
     ];
     $compressed_buffer = cywise_compress_log_buffer($buffer);
-    expect($compressed_buffer)->toEqual($buffer);
+    expect($compressed_buffer)->toEqual([
+        "[BEGIN 4x REPEATED BLOCK]",
+        "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "2026-01-14 00:03:17 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "[END 4x REPEATED BLOCK]"
+    ]);
 });
 
-test('compress log buffer (similar lines)', function () {
+test('compress log buffer (4l)', function () {
     $buffer = [
         "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
         "2026-01-14 00:03:33 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
@@ -81,10 +141,14 @@ test('compress log buffer (similar lines)', function () {
         "2026-01-14 00:05:43 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
     ];
     $compressed_buffer = cywise_compress_log_buffer($buffer);
-    expect($compressed_buffer)->toEqual(["[4x REPEATED] 2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)"]);
+    expect($compressed_buffer)->toEqual([
+        "[BEGIN 4x REPEATED LINE]",
+        "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "[END 4x REPEATED LINE]",
+    ]);
 });
 
-test('compress log buffer (two blocks of similar lines)', function () {
+test('compress log buffer (4l x 2l)', function () {
     $buffer = [
         "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
         "2026-01-14 00:03:33 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
@@ -95,7 +159,11 @@ test('compress log buffer (two blocks of similar lines)', function () {
     ];
     $compressed_buffer = cywise_compress_log_buffer($buffer);
     expect($compressed_buffer)->toEqual([
-        "[4x REPEATED] 2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
-        "[2x REPEATED] 2026-01-14 00:06:17 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "[BEGIN 4x REPEATED LINE]",
+        "2026-01-14 00:02:18 - sentinel-api (ip address: 127.0.0.1) - Nmap was used on the machine, this tool is often used by attackers to scan network. (criticality: 30)",
+        "[END 4x REPEATED LINE]",
+        "[BEGIN 2x REPEATED LINE]",
+        "2026-01-14 00:06:17 - sentinel-api (ip address: 127.0.0.1) - Nmap detected scanning the network, commonly used for reconnaissance and enumeration. (criticality: 50)",
+        "[END 2x REPEATED LINE]",
     ]);
 });
