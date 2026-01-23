@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\MemosProvider;
 use App\Events\SendAuditReport;
 use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use App\Http\Controllers\Iframes\TimelineController;
@@ -358,7 +359,8 @@ class SendAuditReportListener extends AbstractListener
                     return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
 
-                $list = implode("\n", cywise_compress_log_buffer($events->toArray()));
+                $logs = implode("\n", cywise_compress_log_buffer($events->toArray()));
+                $memos = empty($collection) ? MemosProvider::provide($user) : 'None.';
                 $prompt = "
                     You are a Cybersecurity expert working as a SOC operator. 
                     Analyze the following security events to determine if any of them could indicate a compromise on the server {$server->name} ({$server->ip()}).
@@ -369,7 +371,13 @@ class SendAuditReportListener extends AbstractListener
                     - reasoning: brief explanation of the verdict
                     - suggested_action: recommended next step
                     
-                    {$list}
+                    # Security Events
+
+                    {$logs}
+
+                    # Notes
+                    
+                    {$memos}
                 ";
                 $answer = LlmsProvider::provide($prompt);
 
