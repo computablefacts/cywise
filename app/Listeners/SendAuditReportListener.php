@@ -366,6 +366,12 @@ class SendAuditReportListener extends AbstractListener
                     {$list}
                 ";
                 $answer = LlmsProvider::provide($prompt);
+
+                Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): " . json_encode([
+                        "prompt" => $prompt,
+                        "answer" => $answer,
+                    ]));
+
                 $matches = null;
                 preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
                 $answer = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
