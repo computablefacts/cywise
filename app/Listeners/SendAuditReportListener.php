@@ -265,12 +265,18 @@ class SendAuditReportListener extends AbstractListener
         $high = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 
-        $medium = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
-            ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
-
-        $low = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityLow()->get())
-            ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
-
+        if ($high->count() < 10) {
+            $medium = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
+                ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
+        } else {
+            $medium = collect();
+        }
+        if ($high->count() + $medium->count() < 10) {
+            $low = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityLow()->get())
+                ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
+        } else {
+            $low = collect();
+        }
         return $high
             ->concat($medium)
             ->concat($low)
