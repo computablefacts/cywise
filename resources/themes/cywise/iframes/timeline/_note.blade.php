@@ -25,6 +25,9 @@
       <button class="show-replies" title="{{ __('Delete') }}" onclick="deleteNote('{{ $note->id }}')">
         <span class="bp4-icon bp4-icon-trash"></span>
       </button>
+      @foreach(json_decode($attributes['scopes'] ?? "[]") as $scope)
+      <span class="lozenge new d-inline-flex align-items-center" style="margin-top: 16px;">{{ $scope }}</span>
+      @endforeach
     </div>
   </div>
 </li>

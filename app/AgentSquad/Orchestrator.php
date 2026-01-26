@@ -9,6 +9,7 @@ use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\MemosProvider;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
+use App\Http\Procedures\NotesProcedure;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -124,7 +125,7 @@ class Orchestrator
             'COT' => $cot,
             'ACTIONS' => $actions,
             'INPUT' => $input,
-            'MEMOS' => MemosProvider::provide($user),
+            'MEMOS' => MemosProvider::provide($user, NotesProcedure::SCOPE_IS_ORCHESTRATOR),
         ]);
         $messages[] = [
             'role' => RoleEnum::USER->value,
