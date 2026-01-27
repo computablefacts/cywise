@@ -15,6 +15,7 @@ use App\AgentSquad\Providers\PromptsProvider;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
 use App\Enums\RoleEnum;
+use App\Http\Procedures\NotesProcedure;
 use App\Models\Chunk;
 use App\Models\ChunkTag;
 use App\Models\File;
@@ -154,7 +155,7 @@ The action's input must use the same language as the user's input: if the user a
         }
 
         // Fill context & answer question
-        $memos = empty($collection) ? MemosProvider::provide($user) : '';
+        $memos = empty($collection) ? MemosProvider::provide($user, NotesProcedure::SCOPE_IS_CYBERBUDDY) : '';
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
         $prompt = PromptsProvider::provide('default_answer_question', [
             'LANGUAGE' => $json['lang'],

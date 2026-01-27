@@ -8,6 +8,7 @@ use App\Events\SendAuditReport;
 use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Procedures\EventsProcedure;
+use App\Http\Procedures\NotesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Mail\MailCoachSimpleEmail;
 use App\Models\Alert;
@@ -360,7 +361,7 @@ class SendAuditReportListener extends AbstractListener
                 }
 
                 $logs = implode("\n", cywise_compress_log_buffer($events->toArray()));
-                $memos = empty($collection) ? MemosProvider::provide($user) : 'None.';
+                $memos = empty($collection) ? MemosProvider::provide($user, NotesProcedure::SCOPE_IS_SOC_OPERATOR) : 'None.';
                 $prompt = "
                     You are a Cybersecurity expert working as a SOC operator. 
                     Analyze the following security events to determine if any of them could indicate a compromise on the server {$server->name} ({$server->ip()}).
