@@ -341,12 +341,11 @@ class EndVulnsScanListener extends AbstractListener
     {
         /** @var Asset $asset */
         $asset = $port->scan->asset;
-
         $assetTags = $asset->tags->pluck('tag')->toArray();
         $portTags = $port->tags->pluck('tag')->toArray();
         $tags = array_unique(array_merge($assetTags, $portTags));
-
         $technology = 'unknown';
+
         if (!empty($port->service) && $port->service !== 'unknown') {
             $technology = $port->service;
         }
@@ -367,18 +366,22 @@ class EndVulnsScanListener extends AbstractListener
 
         if ($category === 'file_exposed') {
             if (preg_match('/url\s*:(?:http?:\/\/)?([^\s<>"\']+)/i', $context['vulnerability'], $matches)) {
+
                 $url = Str::contains($matches[0], 'url :') ? Str::after($matches[0], ':') : $matches[1];
-                $url = trim($url);
+                $url = Str::trim($url);
                 $context['exposed_url'] = $url;
 
                 try {
                     $response = Http::withOptions(['verify' => false])->timeout(10)->get($url);
                     if ($response->successful()) {
                         $context['file_content'] = Str::limit($response->body(), 4000);
-                        $serverHeader = strtolower($response->header('Server', ''));
-                        $poweredBy = strtolower($response->header('X-Powered-By', ''));
-                        if (Str::contains($serverHeader, 'nginx')) $context['technology'] = 'nginx';
-                        elseif (Str::contains($serverHeader, 'apache') || Str::contains($poweredBy, 'apache')) $context['technology'] = 'apache';
+                        $serverHeader = Str::lower($response->header('Server', ''));
+                        $poweredBy = Str::lower($response->header('X-Powered-By', ''));
+                        if (Str::contains($serverHeader, 'nginx')) {
+                            $context['technology'] = 'nginx';
+                        } elseif (Str::contains($serverHeader, 'apache') || Str::contains($poweredBy, 'apache')) {
+                            $context['technology'] = 'apache';
+                        }
                     }
                 } catch (\Exception $e) {
                     Log::warning("Impossible de fetch le fichier exposé: " . $e->getMessage());
@@ -427,7 +430,7 @@ class EndVulnsScanListener extends AbstractListener
                 'TYPE' => $alertType
             ]);
             $fpResult = LlmsProvider::provide($fpPrompt);
-            if (Str::contains(strtolower($fpResult), '<is_false_positive>true</is_false_positive>')) {
+            if (Str::contains(Str::lower($fpResult), '<is_false_positive>true</is_false_positive>')) {
                 return "Faux positif" . $fpResult;
             }
         }
