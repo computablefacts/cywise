@@ -11,6 +11,7 @@ Ton rôle est d'analyser l'alerte et de fournir une documentation complète sur 
 <port>{port}</port>
 <protocol>{protocol}</protocol>
 <type>{type}</type>
+<tags>{tags}</tags>
 <title>{title}</title>
 <description>{vulnerability}</description>
 </vulnerability>

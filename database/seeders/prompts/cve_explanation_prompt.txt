@@ -10,6 +10,7 @@ Tu dois analyser une vulnérabilité CVE et fournir des explications détaillée
 <ip>{ip}</ip>
 <port>{port}</port>
 <protocol>{protocol}</protocol>
+<tags>{tags}</tags>
 <type>{type}</type>
 <title>{title}</title>
 <cve_id>{cve_id}</cve_id>

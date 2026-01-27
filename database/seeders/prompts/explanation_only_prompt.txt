@@ -9,6 +9,7 @@ Tu dois analyser une vulnérabilité et fournir des explications détaillées su
 <port>{port}</port>
 <protocol>{protocol}</protocol>
 <type>{type}</type>
+<tags>{tags}</tags>
 <title>{title}</title>
 <cve_id>{cve_id}</cve_id>
 <description>{vulnerability}</description>

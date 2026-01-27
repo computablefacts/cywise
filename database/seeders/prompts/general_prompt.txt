@@ -10,6 +10,7 @@ Tu travailles pour une equipe SecOps qui doit corriger des vulnerabilites detect
 <protocol>{protocol}</protocol>
 <type>{type}</type>
 <technology>{technology}</technology>
+<tags>{tags}</tags>
 <title>{title}</title>
 <cve_id>{cve_id}</cve_id>
 <description>

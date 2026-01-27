@@ -5,6 +5,7 @@ Titre : {title}
 Description : {vulnerability}
 Serveur : {ip}:{port}
 Technologie détectée : {technology}
+Tags de contexte : {tags}
 
 RÈGLES DU SCRIPT BASH :
 1. Le script doit commencer par `#!/bin/bash` et `set -e`.
@@ -15,6 +16,7 @@ RÈGLES DU SCRIPT BASH :
    - IP/Domaine : {ip}
    - Port : {port}
 5. Le script doit être robuste et vérifier si les fichiers de configuration existent avant de les modifier.
+6. Utilise les tags pour adapter le contexte si nécessaire : {tags}.
 
 RÈGLES DE RÉPONSE :
 - Retourne UNIQUEMENT le script bash.

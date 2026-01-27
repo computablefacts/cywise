@@ -9,6 +9,7 @@ Un fichier exposé a été détecté sur un serveur. Tu dois fournir une documen
 <port>{port}</port>
 <protocol>{protocol}</protocol>
 <type>{type}</type>
+<tags>{tags}</tags>
 <title>{title}</title>
 <description>{vulnerability}</description>
 </vulnerability>
