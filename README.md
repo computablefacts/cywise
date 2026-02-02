@@ -123,6 +123,7 @@ En cours de rédaction.
 # Liens utiles
 
 - Vous pouvez accéder <a href="https://www.cywise.io" target="_blank">ici</a> à la version SaaS de Cywise.
+- Vous pouvez accéder <a href="https://www.cywise.io/changelog" target="_blank">ici</a> au changelog de la version SaaS de Cywise.
 - Vous pouvez
   accéder <a href="https://www.youtube.com/playlist?list=PLu1f_CSMJyoIf6yx9CUI2oWLZQhi5P8QO" target="_blank">ici</a> à
   quelques vidéos de démonstration.
