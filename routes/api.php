@@ -203,7 +203,6 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\ScheduledTasksProcedure::class,
             \App\Http\Procedures\ServersProcedure::class,
             \App\Http\Procedures\TablesProcedure::class,
-            \App\Http\Procedures\TheCyberBriefProcedure::class,
             \App\Http\Procedures\TracesProcedure::class,
             \App\Http\Procedures\UsersProcedure::class,
             \App\Http\Procedures\VulnerabilitiesProcedure::class,
