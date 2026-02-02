@@ -38,7 +38,7 @@ RUN npm run build
 #
 # PHP configuration
 #
-FROM alpine:latest as php_configuration
+FROM alpine:latest AS php_configuration
 
 RUN mkdir -p /php-config
 
