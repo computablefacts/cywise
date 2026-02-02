@@ -2,7 +2,8 @@
 
 namespace App\Http\Procedures;
 
-use App\Helpers\LlmProvider;
+use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\WebpagesProvider;
 use App\Http\Requests\JsonRpcRequest;
 use Illuminate\Support\Str;
 use Sajya\Server\Attributes\RpcMethod;
@@ -33,15 +34,11 @@ class TheCyberBriefProcedure extends Procedure
         $text = $params['url_or_text'] ?? '';
         $prompt = $params['prompt'] ?? '';
         $model = $params['model'] ?? 'gpt-4o';
-        // $temperature = $request->float('temperature', 0.7);
-        $content = LlmProvider::download($text);
-        $response = (new LlmProvider(LlmProvider::OPEN_AI))->execute(Str::replace('[TEXT]', $content, $prompt), $model);
+        $content = WebpagesProvider::isHyperlink($text) ? WebpagesProvider::provide($text) : $text;
+        $response = LlmsProvider::provide(Str::replace('[TEXT]', $content, $prompt), $model);
 
-        if (isset($response['choices'][0]['message']['content'])) {
-            return [
-                "summary" => $response['choices'][0]['message']['content'],
-            ];
-        }
-        throw new \Exception('An error occurred while summarizing the text or webpage.');
+        return [
+            "summary" => $response,
+        ];
     }
 }

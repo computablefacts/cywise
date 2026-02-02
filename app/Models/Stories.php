@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\WebpagesProvider;
 use App\Enums\LanguageEnum;
-use App\Helpers\LlmProvider;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -62,15 +63,13 @@ class Stories extends Model
         $summarizeFr = $language === LanguageEnum::FRENCH && (!$this->teaser_fr || !$this->opener_fr || !$this->why_it_matters_fr);
         if ($summarizeEn || $summarizeFr) {
 
-            $response = $this->summary($language);
+            $news = WebpagesProvider::isHyperlink($this->news) ? WebpagesProvider::provide($this->news) : $this->news;
+            $brief = LlmsProvider::provide($this->prompt($language, $news));
 
-            if (!isset($response['choices'][0]['message']['content'])) {
+            if (empty($brief)) {
                 return [];
             }
-
-            $brief = $response['choices'][0]['message']['content'];
-
-            if (LlmProvider::isHyperlink($this->news)) {
+            if (WebpagesProvider::isHyperlink($this->news)) {
                 $this->hyperlink = Str::limit(trim($this->news), 500);
                 $this->website = Str::before(Str::after($this->news, '://'), '/');
             }
@@ -107,12 +106,6 @@ class Stories extends Model
             'why_it_matters' => $language === LanguageEnum::FRENCH ? $this->why_it_matters_fr : $this->why_it_matters,
             'go_deeper' => $language === LanguageEnum::FRENCH ? $this->go_deeper_fr : $this->go_deeper,
         ];
-    }
-
-    private function summary(LanguageEnum $language): array
-    {
-        $news = LlmProvider::download($this->news);
-        return (new LlmProvider(LlmProvider::OPEN_AI))->execute($this->prompt($language, $news));
     }
 
     private function prompt(LanguageEnum $language, string $news): string
