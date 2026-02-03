@@ -96,6 +96,16 @@ class CywiseSeeder extends Seeder
             'group' => 'Site',
         ]);
         Setting::updateOrCreate([
+            'key' => 'site.github',
+        ], [
+            'display_name' => 'GitHub',
+            'value' => 'https://github.com/computablefacts/cywise/',
+            'details' => '',
+            'type' => 'text',
+            'order' => 1,
+            'group' => 'Site',
+        ]);
+        Setting::updateOrCreate([
             'key' => 'site.linkedin',
         ], [
             'display_name' => 'LinkedIn',
