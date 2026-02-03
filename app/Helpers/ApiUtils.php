@@ -35,29 +35,6 @@ class ApiUtils
         ]);
     }
 
-    public function delete_collection(string $collectionName): array
-    {
-        return $this->post('/delete_collection', [
-            'collection_name' => $collectionName
-        ]);
-    }
-
-    public function import_chunks(array $chunks, string $collectionName): array
-    {
-        return $this->post('/import_chunks', [
-            'chunks' => $chunks,
-            'collection_name' => $collectionName
-        ]);
-    }
-
-    public function delete_chunks(array $uids, string $collectionName): array
-    {
-        return $this->post('/delete_chunks', [
-            'collection_name' => $collectionName,
-            'uids' => $uids
-        ]);
-    }
-
     private function post($endpoint, $json): array
     {
         $url = Config::get('towerify.cyberbuddy.api') . $endpoint;
