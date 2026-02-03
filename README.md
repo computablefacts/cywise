@@ -184,7 +184,9 @@ les paramètres :
 - login : demo@mydomain.com
 - mot de passe : DemoPass2026
 
-### Scanner de vulnérabilités
+### Protéger ce qui est accessible sur internet
+
+#### Scanner de vulnérabilités
 
 Depuis le [tableau de bord](http://localhost:17801/dashboard), vous pouvez
 ajouter un domaine ou une adresse IP et demander à Cywise de la surveiller.
@@ -205,27 +207,33 @@ menu **Timelines > Vulnérabilités**.
 > Vous ne devez scanner que des domaines ou des adresses IP dont vous êtes
 > le propriétaire.
 
-### Hardening
+### Protéger les actifs internes de l'entreprise
+
+#### Hardening
 
 En cours de rédaction.
 
-### Agents
+#### Agents
 
 En cours de rédaction.
 
-### Métriques
+#### Métriques
 
 Vous pouvez accéder aux métriques en cliquant sur le menu **Timelines > Métriques**.
 
-### CyberBuddy
+### Accompagner les utilisateurs
+
+#### CyberBuddy
 
 En cours de rédaction.
 
-### CyberScribe
+#### CyberScribe
 
 En cours de rédaction.
 
-### Single Sign-On (SSO)
+### Divers
+
+#### Single Sign-On (SSO)
 
 En cours de rédaction.
 
