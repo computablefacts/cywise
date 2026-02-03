@@ -127,6 +127,7 @@ test('email subject reflects vulnerabilities severity', function ($alertLevel, $
 test('email body contains summary section', function () {
     Mail::fake();
 
+    Config::set('towerify.freshdesk.from_email', 'jdoe@example.com');
     asTenant1User();
     $user = tenant1User();
     $user->update(['gets_audit_report' => true]);
