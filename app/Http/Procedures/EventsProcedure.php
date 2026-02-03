@@ -45,7 +45,7 @@ class EventsProcedure extends Procedure
             $minDate = Carbon::createFromFormat('Y-m-d', $params['window'][0])->startOfDay();
             $maxDate = Carbon::createFromFormat('Y-m-d', $params['window'][1])->endOfDay();
         } else {
-            $minDate = Carbon::now()->subDays(3)->startOfDay();
+            $minDate = Carbon::now()->subDays(2)->startOfDay();
             $maxDate = Carbon::now()->endOfDay();
         }
 
