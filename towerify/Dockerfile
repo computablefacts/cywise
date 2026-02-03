@@ -183,6 +183,7 @@ elif [[ "$role" = "scheduler" ]]; then
         echo "Apply Seeders..."
         (cd /var/www/html && php artisan db:seed --class=CywiseSeeder)
     fi
+    touch /tmp/scheduler_init_done
     echo "Launch schedule:run every minute..."
     while [[ true ]]
     do
