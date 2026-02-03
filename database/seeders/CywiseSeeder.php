@@ -40,6 +40,7 @@ class CywiseSeeder extends Seeder
         $this->setupCyberFrameworks();
         $this->setupCyberBuddy();
         $this->updateAccountsData();
+        $this->setupEnvironment();
     }
 
     private function setupConfig(): void
@@ -864,5 +865,20 @@ class CywiseSeeder extends Seeder
     {
         $yaml = file_get_contents('https://raw.githubusercontent.com/wazuh/wazuh-agent/refs/heads/main/etc/ruleset/sca/applications/web_vulnerabilities.yml');
         return Yaml::parse($yaml);
+    }
+
+    private function setupEnvironment(): void
+    {
+        $environment = app()->environment();
+        $environmentSeederClass = 'Database\\Seeders\\Cywise' . ucfirst($environment) . 'Seeder';
+
+        if (class_exists($environmentSeederClass)) {
+            $seeder = new $environmentSeederClass();
+            $seeder->run();
+
+            $this->command->info("Seeder {$environmentSeederClass} pour l'environnement {$environment} exécuté avec succès.");
+        } else {
+            $this->command->warn("Aucun seeder trouvé pour l'environnement {$environment} ({$environmentSeederClass}).");
+        }
     }
 }
