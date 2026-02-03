@@ -198,7 +198,7 @@ En cours de rédaction.
 
 ### Métriques
 
-En cours de rédaction.
+Vous pouvez accéder aux métriques en cliquant sur le menu **Timelines > Métriques**.
 
 ### CyberBuddy
 
