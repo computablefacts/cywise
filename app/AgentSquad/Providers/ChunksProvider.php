@@ -14,7 +14,7 @@ class ChunksProvider
         if ($collections->isEmpty() || empty($language) || empty($keywords)) {
             return collect();
         }
-        return \Cache::remember('chunks_provider_' . md5($collections->pluck('id')->implode('_') . "{$language}{$keywords}"), 7 * 24 * 60, function () use ($collections, $language, $keywords, $take) {
+        return \Cache::remember('chunks_provider_' . md5($collections->pluck('id')->implode('_') . "{$language}{$keywords}"), now()->addDays(7), function () use ($collections, $language, $keywords, $take) {
             try {
                 $start = microtime(true);
                 $chunks = Chunk::search("{$language}:{$keywords}")

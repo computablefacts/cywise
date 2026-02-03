@@ -47,7 +47,7 @@ class Vector extends Model
 
     public static function isSupportedByMariaDb(): bool
     {
-        return \Illuminate\Support\Facades\Cache::remember("is_vector_supported", 7 * 24 * 60, function () {
+        return \Illuminate\Support\Facades\Cache::remember("is_vector_supported", now()->addDays(120), function () {
             try {
                 $version = DB::select('SELECT VERSION() as version')[0]->version;
 

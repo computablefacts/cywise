@@ -931,7 +931,7 @@ EOT;
 
     public static function operatingSystem(int $serverId): ?object
     {
-        return \Cache::remember('os_infos_' . $serverId, now()->addHours(24), function () use ($serverId) {
+        return \Cache::remember('os_infos_' . $serverId, now()->addDays(7), function () use ($serverId) {
             return collect(DB::select("
                 SELECT DISTINCT 
                     ynh_osquery.ynh_server_id,
