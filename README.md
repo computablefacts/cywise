@@ -127,7 +127,107 @@ marché (OAuth 2.0, SAML, OpenID Connect), pour vous permettre de contrôler les
 
 # Installation
 
+## Pré-requis
+
+- Un ordinateur sous linux
+- Avoir installé [Docker](https://www.docker.com/)
+- Avoir installé [git](https://git-scm.com/)
+
+## Récupérer ce dépôt de code
+
+Récupérez notre dépôt de code grâce à la commande :
+
+```bash
+git clone https://github.com/computablefacts/cywise.git
+```
+
+Puis placez-vous dans le répertoire nouvellement créé :
+
+```bash
+cd cywise
+```
+
+> [!NOTE]
+> Toutes les commandes ci-après fonctionnent si elles sont lancées depuis ce
+> répertoire.
+
+Assurez-vous que nos scripts de gestion de la stack sont bien exécutables en
+lançant la commande :
+
+```bash
+chmod +x ./stack*
+```
+
+## Démarrage
+
+Notre application consiste en plusieurs services Docker assemblés grâce à une
+stack [docker compose](https://docs.docker.com/compose).
+
+Vous pouvez démarrer la stack grâce à la commande :
+
+```bash
+./stack-start.sh
+```
+
+> [!NOTE]
+> Ce script va créer un fichier `.env` avec les paramètres par défaut 
+> (principalement issus de `.env.example`) puis démarrer la stack.
+>
+> Comptez environ 15 minutes lors du premier démarrage.
+
+## Utilisation de Cywise
+
+Après démarrage de la stack, vous pouvez accéder à l'interface en utilisant
+les paramètres :
+
+- URL : [http://localhost:17801](http://localhost:17801)
+- login : demo@mydomain.com
+- mot de passe : DemoPass2026
+
+### Scanner de vulnérabilités
+
 En cours de rédaction.
+
+### Hardening
+
+En cours de rédaction.
+
+### Agents
+
+En cours de rédaction.
+
+### Métriques
+
+En cours de rédaction.
+
+### CyberBuddy
+
+En cours de rédaction.
+
+### CyberScribe
+
+En cours de rédaction.
+
+### Single Sign-On (SSO)
+
+En cours de rédaction.
+
+## Arrêt
+
+Vous pouvez arrêter la stack grâce à la commande :
+
+```bash
+./stack-stop.sh
+```
+
+## Suppression
+
+Vous pouvez supprimer l'intégralité de la stack y compris toutes les données
+associées grâce à la commande :
+
+```bash
+./stack-destroy.sh
+```
 
 # Liens utiles
 
