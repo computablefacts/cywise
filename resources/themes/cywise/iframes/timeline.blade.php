@@ -33,7 +33,7 @@
     width: 100%;
   }
 
-  .new-comment input {
+  .new-comment input:not([type=checkbox]):not([type=radio]) {
     border: 1px solid var(--c-grey-200);
     border-radius: 6px;
     height: 48px;
@@ -41,19 +41,19 @@
     width: 100%;
   }
 
-  .new-comment input::-moz-placeholder {
+  .new-comment input:not([type=checkbox]):not([type=radio])::-moz-placeholder {
     color: var(--c-grey-300);
   }
 
-  .new-comment input:-ms-input-placeholder {
+  .new-comment input:not([type=checkbox]):not([type=radio]):-ms-input-placeholder {
     color: var(--c-grey-300);
   }
 
-  .new-comment input::placeholder {
+  .new-comment input:not([type=checkbox]):not([type=radio])::placeholder {
     color: var(--c-grey-300);
   }
 
-  .new-comment input:focus {
+  .new-comment input:not([type=checkbox]):not([type=radio]):focus {
     border-color: var(--c-grey-300);
     outline: 0;
     box-shadow: 0 0 0 4px var(--c-grey-100);
@@ -433,6 +433,20 @@
             </span>
             <div class="new-comment">
               <input type="text" placeholder="{{ __('Add a note... (press Enter to submit)') }}"/>
+              <div class="mt-2 d-inline-flex align-items-center">
+                <div class="d-inline-flex align-items-center">
+                  <input class="note-scope" type="checkbox" id="scopeCyberBuddy" value="CyberBuddy" checked>
+                  <label class="p-2" for="scopeCyberBuddy">CyberBuddy</label>
+                </div>
+                <div class="d-inline-flex align-items-center">
+                  <input class="note-scope" type="checkbox" id="scopeSOC" value="SOC Operator">
+                  <label class="p-2" for="scopeSOC">SOC Operator</label>
+                </div>
+                <div class="d-inline-flex align-items-center">
+                  <input class="mr-2 note-scope" type="checkbox" id="scopeOrchestrator" value="Orchestrator">
+                  <label class="p-2" for="scopeOrchestrator">Orchestrator</label>
+                </div>
+              </div>
             </div>
           </li>
         </ol>
@@ -523,7 +537,14 @@
 
       if (elInputField.value.trim() !== '') {
 
-        createNoteApiCall(elInputField.value.trim(), (response) => {
+        const scopes = Array.from(document.querySelectorAll('.note-scope:checked')).map(cb => cb.value);
+
+        if (scopes.length === 0) {
+          toaster.toastError("{{ __('Please select at least one scope.') }}");
+          return;
+        }
+
+        createNoteApiCall(elInputField.value.trim(), scopes, (response) => {
 
           elInputField.value = null;
           const elNote = (new DOMParser()).parseFromString(response.html, 'text/html');

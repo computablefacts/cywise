@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Iframes;
 
 use App\Helpers\JosianeClient;
-use App\Helpers\Messages;
 use App\Http\Controllers\Controller;
 use App\Http\Procedures\EventsProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
@@ -20,7 +19,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -352,23 +350,19 @@ class TimelineController extends Controller
 
     private function events(?int $serverId = null): array
     {
-        $cutOffTime = Carbon::now()->startOfDay()->subDays(3);
-        $servers = YnhServer::query()
-            ->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))
-            ->get();
-        $events = Messages::get($servers, $cutOffTime, [
-            Messages::AUTHENTICATION_AND_SSH_ACTIVITY,
-            // Messages::SERVICES_AND_SCHEDULED_TASKS,
-            Messages::SHELL_HISTORY_AND_ROOT_COMMANDS,
-            Messages::PACKAGES,
-            Messages::USERS_AND_GROUPS,
+        $request = new JsonRpcRequest([
+            'server_id' => $serverId,
+            'min_score' => 0,
+            'max_score' => 0,
         ]);
+        $request->setUserResolver(fn() => Auth::user());
+        $events = (new EventsProcedure())->list($request)['events'];
 
         return [
             'nb_events' => $events->count(),
-            'items' => $events->map(function (array $msg) {
+            'items' => $events->map(function (YnhOsquery $event) {
 
-                $timestamp = $msg['timestamp'];
+                $timestamp = $event->calendar_time->utc()->format('Y-m-d H:i:s');;
                 $date = Str::before($timestamp, ' ');
                 $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
 
@@ -379,13 +373,8 @@ class TimelineController extends Controller
                     'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._event', [
                         'date' => $date,
                         'time' => $time,
-                        'msg' => $msg,
+                        'event' => $event,
                     ])->render(),
-                    '_server' => Cache::remember("server_{$msg['ip']}_{$msg['server']}", now()->addHours(3), function () use ($msg) {
-                        return YnhServer::where('name', $msg['server'])
-                            ->where('ip_address', $msg['ip'])
-                            ->first();
-                    }),
                 ];
             }),
         ];

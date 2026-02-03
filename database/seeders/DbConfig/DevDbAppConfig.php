@@ -28,23 +28,14 @@ class DevDbAppConfig implements DbAppConfigInterface
             'towerify.cyberbuddy.api_username' => 'gr',
             'encrypted:towerify.cyberbuddy.api_password' => 'fkJ0MDfsZMVpzON#_RFmJerW4CAPYCTKlpwjvRg==',
 
-            'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
-            'encrypted:towerify.deepseek.api_key' => 'RSS1ZtHV!uSg4Gvr_T3wUdZm/sso1lWLb4CpCPlVa5b6EXjRE0CWwvl2LkNWJmm6Mx9eXuOb8i53Z04Yd',
-
             'towerify.deepinfra.api' => 'https://api.deepinfra.com/v1/openai',
             'encrypted:towerify.deepinfra.api_key' => 'ooLU?YcpQj6rQXmB_/qXKpsXygqXJDpGWtkCPJxANYwPAQbIxTN49ZE0Ipqr/CpeDUSXuBZh9PtyqH8Ck',
-
-            'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
-            'encrypted:towerify.gemini.api_key' => 'a#juOq4apsMBq&99_iNHi4IdBsswBlkIhwNBYbYNx23AvT6rLsY3kETOang8cka4qANAeASVv9VQYJPEn',
 
             'array:towerify.telescope.whitelist.usernames' => 'demo,csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
             'array:towerify.telescope.whitelist.domains' => 'towerify.io,computablefacts.com,hdwsec.fr,mncc.fr',
 
             'array:towerify.performa.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
             'array:towerify.performa.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
-
-            'towerify.openai.api' => 'https://api.openai.com/v1',
-            'encrypted:towerify.openai.api_key' => '6dbLxUYdsOQiFRcp_xgdMdae7nL5B8uULLU+G3QpXRga0i0qQwPIurAV7T3t/b7WtVn/9etjY6/tFavJfwt9dl5NW2ZHvSIVgKXukMNqQ6k/ZcH1qh9flUu9s2BCW7/YOQJ3hYNAxEanCVglXqazkirUbFwiO5wcsSvg99N0nCoRYVAJNj3/loI8ADfREkYRKEIENyoGNvv7hpPQSvRaGqhE7FR7K7PPzkt84y3FbcR/YJk4IlCRJ7TC1mzA=',
 
             'encrypted:towerify.scrapfly.api_key' => '2xXcLYRIKdjFlDL&_fhu7isCCrP20g0iuchgOj/CJIIdGKVq/fpk7lSkcDJiQxLcPkZHfjz5/pf5S3AqI',
 

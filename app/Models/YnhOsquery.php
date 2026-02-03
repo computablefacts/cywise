@@ -3,14 +3,12 @@
 namespace App\Models;
 
 use App\Enums\OsqueryPlatformEnum;
-use App\Helpers\Messages;
 use App\Http\Procedures\OsqueryRulesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -931,85 +929,37 @@ Generate-OsqueryJson -Name "memory_available_snapshot" -Columns \$(Get-MemoryMet
 EOT;
     }
 
-    public static function osInfos(Collection $servers): Collection
+    public static function operatingSystem(int $serverId): ?object
     {
-        // {
-        //      "arch":"x86_64",
-        //      "build":null,
-        //      "codename":"bullseye",
-        //      "major":"11",
-        //      "minor":"0",
-        //      "name":"Debian GNU\/Linux",
-        //      "patch":"0",
-        //      "platform":"debian",
-        //      "platform_like":null,
-        //      "version":"11 (bullseye)"
-        // }
-        return $servers->isEmpty() ? collect() : collect(DB::select("
-            SELECT DISTINCT 
-                ynh_osquery.ynh_server_id,
-                ynh_servers.name AS ynh_server_name,
-                TIMESTAMP(ynh_osquery.calendar_time - SECOND(ynh_osquery.calendar_time)) AS `timestamp`,
-                json_unquote(json_extract(ynh_osquery.columns, '$.arch')) AS architecture,
-                json_unquote(json_extract(ynh_osquery.columns, '$.codename')) AS codename,
-                CAST(json_unquote(json_extract(ynh_osquery.columns, '$.major')) AS INTEGER) AS major_version,
-                CAST(json_unquote(json_extract(ynh_osquery.columns, '$.minor')) AS INTEGER) AS minor_version,
-                json_unquote(json_extract(ynh_osquery.columns, '$.platform')) AS os,
-                CASE
-                  WHEN json_unquote(json_extract(ynh_osquery.columns, '$.patch')) = 'null' THEN NULL
-                  ELSE CAST(json_unquote(json_extract(ynh_osquery.columns, '$.patch')) AS INTEGER)
-                END AS patch_version
-            FROM ynh_osquery
-            INNER JOIN (
-              SELECT 
-                ynh_server_id, MAX(calendar_time) AS calendar_time 
-              FROM ynh_osquery 
-              WHERE name = 'os_version'
-              GROUP BY ynh_server_id
-            ) AS t ON t.ynh_server_id = ynh_osquery.ynh_server_id AND t.calendar_time = ynh_osquery.calendar_time
-            INNER JOIN ynh_servers ON ynh_servers.id = ynh_osquery.ynh_server_id
-            WHERE ynh_osquery.name = 'os_version'
-            AND ynh_osquery.ynh_server_id IN ({$servers->pluck('id')->join(',')})
-            ORDER BY timestamp DESC
-        "));
-    }
-
-    public static function suspiciousEvents(Collection $servers, Carbon $cutOffTime): Collection
-    {
-        return Messages::get($servers, $cutOffTime, [
-            Messages::AUTHENTICATION_AND_SSH_ACTIVITY,
-            Messages::USERS_AND_GROUPS,
-            Messages::PACKAGES,
-            Messages::SUID_BIN,
-            Messages::LD_PRELOAD,
-            Messages::KERNEL_MODULES,
-        ]);
-    }
-
-    /** @deprecated */
-    public static function suspiciousMetrics(Collection $servers, Carbon $cutOffTime): Collection
-    {
-        return $servers->map(function (YnhServer $server) use ($cutOffTime) {
-
-            /** @var YnhOsquery $metric */
-            $metric = YnhOsquery::where('calendar_time', '>=', $cutOffTime)
-                ->where('name', 'disk_available_snapshot')
-                ->where('ynh_server_id', $server->id)
-                ->orderBy('calendar_time', 'desc')
-                ->first();
-
-            if ($metric && $metric->columns['%_available'] <= 20) {
-                return [
-                    'id' => $metric->id,
-                    'timestamp' => $metric->calendar_time->format('Y-m-d H:i:s'),
-                    'server' => $metric->server->name,
-                    'ip' => $metric->server->ip(),
-                    'message' => "Il vous reste {$metric->columns['%_available']}% d'espace disque disponible, soit {$metric->columns['space_left_gb']} Gb.",
-                ];
-            }
-            return [];
-        })
-            ->filter(fn(array $metric) => count($metric) >= 1);
+        return \Cache::remember('os_infos_' . $serverId, now()->addHours(24), function () use ($serverId) {
+            return collect(DB::select("
+                SELECT DISTINCT 
+                    ynh_osquery.ynh_server_id,
+                    ynh_servers.name AS ynh_server_name,
+                    TIMESTAMP(ynh_osquery.calendar_time - SECOND(ynh_osquery.calendar_time)) AS `timestamp`,
+                    json_unquote(json_extract(ynh_osquery.columns, '$.arch')) AS architecture,
+                    json_unquote(json_extract(ynh_osquery.columns, '$.codename')) AS codename,
+                    CAST(json_unquote(json_extract(ynh_osquery.columns, '$.major')) AS INTEGER) AS major_version,
+                    CAST(json_unquote(json_extract(ynh_osquery.columns, '$.minor')) AS INTEGER) AS minor_version,
+                    json_unquote(json_extract(ynh_osquery.columns, '$.platform')) AS os,
+                    CASE
+                      WHEN json_unquote(json_extract(ynh_osquery.columns, '$.patch')) = 'null' THEN NULL
+                      ELSE CAST(json_unquote(json_extract(ynh_osquery.columns, '$.patch')) AS INTEGER)
+                    END AS patch_version
+                FROM ynh_osquery
+                INNER JOIN (
+                  SELECT 
+                    ynh_server_id, MAX(calendar_time) AS calendar_time 
+                  FROM ynh_osquery 
+                  WHERE name = 'os_version'
+                  GROUP BY ynh_server_id
+                ) AS t ON t.ynh_server_id = ynh_osquery.ynh_server_id AND t.calendar_time = ynh_osquery.calendar_time
+                INNER JOIN ynh_servers ON ynh_servers.id = ynh_osquery.ynh_server_id
+                WHERE ynh_osquery.name = 'os_version'
+                AND ynh_osquery.ynh_server_id = {$serverId}
+                ORDER BY timestamp DESC
+            "))->firstOrFail();
+        });
     }
 
     public function rule(): BelongsTo
@@ -1022,6 +972,11 @@ EOT;
         return $this->belongsTo(YnhServer::class, 'ynh_server_id', 'id');
     }
 
+    public function isSnapshot(): bool
+    {
+        return $this->action === 'snapshot';
+    }
+
     public function isAdded(): bool
     {
         return $this->action === 'added';
@@ -1030,5 +985,199 @@ EOT;
     public function isRemoved(): bool
     {
         return $this->action === 'removed';
+    }
+
+    public function logLine(): string
+    {
+        // Attributes server_name, server_ip_address, comments and score are loaded by EventsProcedure::list
+        $criticality = $this->score ?? 0;
+        $time = $this->calendar_time->utc()->format('Y-m-d H:i:s');
+        $message = $this->message();
+        return empty($message) ? '' : "{$time} - {$this->server_name} (ip address: {$this->server_ip_address}) - {$message} (criticality: {$criticality})";
+    }
+
+    public function message(): string
+    {
+        $msg = '';
+        if ($this->score > 0) { // IoC
+            $msg = $this->comments;
+        } else { // Standard security event
+            if ($this->name === 'last') {
+                $username = $this->columns['username'] === 'null' ? null : $this->columns['username'] ?? null;
+                if ($this->isAdded()) {
+                    $msg = "L'utilisateur {$username} s'est connecté au serveur.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "L'utilisateur {$username} s'est déconnecté du serveur.";
+                }
+            } else if ($this->name === 'shell_history') {
+                $username = $this->columns['username'] === 'null' ? null : $this->columns['username'] ?? null;
+                if ($this->isAdded()) {
+                    $msg = "L'utilisateur {$username} a lancé la commande {$this->columns['command']}.";
+                }
+            } else if ($this->name === 'users') {
+                $username = $this->columns['username'] === 'null' ? null : $this->columns['username'] ?? null;
+                if ($this->isAdded()) {
+                    $home = empty($this->columns['directory']) ? "" : " ({$this->columns['directory']})";
+                    $msg = "L'utilisateur {$username}{$home} a été créé.";
+                }
+                if ($this->isRemoved()) {
+                    $home = empty($this->columns['directory']) ? "" : " ({$this->columns['directory']})";
+                    $msg = "L'utilisateur {$username}{$home} a été supprimé.";
+                }
+            } else if ($this->name === 'groups') {
+                if ($this->isAdded()) {
+                    $msg = "Le groupe {$this->columns['groupname']} a été créé.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le groupe {$this->columns['groupname']} a été supprimé.";
+                }
+            } else if ($this->name === 'authorized_keys') {
+                if ($this->isAdded()) {
+                    $msg = "Une clef SSH a été ajoutée au trousseau {$this->columns['key_file']}.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Une clef SSH a été supprimée du trousseau {$this->columns['key_file']}.";
+                }
+            } else if ($this->name === 'user_ssh_keys') {
+                $username = $this->columns['username'] === 'null' ? null : $this->columns['username'] ?? null;
+                if ($this->isAdded()) {
+                    $msg = "L'utilisateur {$username} a créé une clef SSH ({$this->columns['path']}).";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "L'utilisateur {$username} a supprimé une clef SSH ({$this->columns['path']}).";
+                }
+            } else if ($this->name === 'etc_hosts') {
+                if ($this->isAdded()) {
+                    $msg = "L'hôte {$this->columns['hostnames']} redirige vers {$this->columns['address']}.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "L'hôte {$this->columns['hostnames']} ne redirige plus vers {$this->columns['address']}.";
+                }
+            } else if ($this->name === 'etc_services') {
+                if ($this->isAdded()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['comment']}) écoute sur le port {$this->columns['port']} ({$this->columns['protocol']}).";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['comment']}) n'écoute plus sur le port {$this->columns['port']} ({$this->columns['protocol']}).";
+                }
+            } else if ($this->name === 'interface_addresses') {
+                if ($this->isAdded()) {
+                    $msg = "L'interface réseau {$this->columns['interface']} ({$this->columns['address']}) a été ajoutée.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "L'interface réseau {$this->columns['interface']} ({$this->columns['address']}) a été supprimée.";
+                }
+            } else if ($this->name === 'suid_bin') {
+                if ($this->isAdded()) {
+                    $msg = "Les privilèges du binaire {$this->columns['path']} ont été élevés.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Les privilèges du binaire {$this->columns['path']} ont été abaissés.";
+                }
+            } else if ($this->name === 'kernel_modules') {
+                if ($this->isAdded()) {
+                    $msg = "Le module {$this->columns['name']} a été ajouté au noyau.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le module {$this->columns['name']} a été enlevé du noyau.";
+                }
+            } else if ($this->name === 'processes') {
+                if ($this->isAdded()) {
+                    $msg = "Le processus {$this->columns['name']} est lancé.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le processus {$this->columns['name']} est arrêté.";
+                }
+            } else if ($this->name === 'ld_preload_snapshot') {
+                if ($this->isSnapshot()) {
+                    $msg = "Le binaire {$this->columns['path']} utilise la variable d'environnement LD_PRELOAD={$this->columns['value']}.";
+                }
+            } else if ($this->name === 'process_listening_port') {
+                if ($this->isAdded()) {
+                    $msg = "Le processus {$this->columns['path']} écoute à l'adresse {$this->columns['address']}:{$this->columns['port']}.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le processus {$this->columns['path']} n'écoute plus à l'adresse {$this->columns['address']}:{$this->columns['port']}.";
+                }
+            } else if ($this->name === 'open_sockets') {
+                if ($this->isAdded()) {
+                    $process = empty($this->columns['path']) ? "{$this->columns['pid']}" : "{$this->columns['path']} ($this->columns['pid'])";
+                    $msg = "Le processus {$process} a une connexion ouverte de {$this->columns['local_address']}:{$this->columns['local_port']} vers {$this->columns['remote_address']}:{$this->columns['remote_port']}.";
+                }
+                if ($this->isRemoved()) {
+                    $process = empty($this->columns['path']) ? "{$this->columns['pid']}" : "{$this->columns['path']} ($this->columns['pid'])";
+                    $msg = "Le processus {$process} n'a plus de connexion ouverte de {$this->columns['local_address']}:{$this->columns['local_port']} vers {$this->columns['remote_address']}:{$this->columns['remote_port']}.";
+                }
+            } else if ($this->name === 'startup_items') {
+                if ($this->isAdded()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['type']}) a été ajouté.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['type']}) a été supprimé.";
+                }
+            } else if ($this->name === 'services') {
+                if ($this->isAdded()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['service_type']}) a été ajouté.";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le service {$this->columns['name']} ({$this->columns['service_type']}) a été supprimé.";
+                }
+            } else if ($this->name === 'crontab') {
+                if ($this->isAdded()) {
+                    $cron = "{$this->columns['minute']} {$this->columns['hour']} {$this->columns['day_of_month']} {$this->columns['month']} {$this->columns['day_of_week']}";
+                    $msg = "La tâche planifiée {$this->columns['command']} ({$cron}) a été ajoutée au fichier {$this->columns['path']}.";
+                }
+                if ($this->isRemoved()) {
+                    $cron = "{$this->columns['minute']} {$this->columns['hour']} {$this->columns['day_of_month']} {$this->columns['month']} {$this->columns['day_of_week']}";
+                    $msg = "La tâche planifiée {$this->columns['command']} ({$cron}) a été supprimée du fichier {$this->columns['path']}.";
+                }
+            } else if ($this->name === 'scheduled_tasks') {
+                if ($this->isAdded()) {
+                    $schedule = "last_run={$this->columns['last_run_time']}, next_run={$this->columns['next_run_time']}";
+                    $msg = "La tâche planifiée {$this->columns['action']} ({$schedule}) a été ajoutée.";
+                }
+                if ($this->isRemoved()) {
+                    $schedule = "last_run={$this->columns['last_run_time']}, next_run={$this->columns['next_run_time']}";
+                    $msg = "La tâche planifiée {$this->columns['action']} ({$schedule}) a été supprimée.";
+                }
+            } else if ($this->name === 'win_packages' ||
+                $this->name === 'deb_packages' ||
+                $this->name === 'portage_packages' ||
+                $this->name === 'npm_packages' ||
+                $this->name === 'python_packages' ||
+                $this->name === 'rpm_packages' ||
+                $this->name === 'homebrew_packages' ||
+                $this->name === 'chocolatey_packages') {
+                $type = match ($this->name) {
+                    'win_packages' => 'win',
+                    'deb_packages' => 'deb',
+                    'portage_packages' => 'portage',
+                    'npm_packages' => 'npm',
+                    'python_packages' => 'python',
+                    'rpm_packages' => 'rpm',
+                    'homebrew_packages' => 'homebrew',
+                    'chocolatey_packages' => 'chocolatey',
+                    default => 'unknown',
+                };
+                if ($this->isAdded()) {
+                    $os = YnhOsquery::operatingSystem($this->ynh_server_id);
+                    if (!$os) {
+                        $cves = '';
+                    } else {
+                        $cves = YnhCve::appCves($os->os, $os->codename, $this->columns['name'], $this->columns['version'])
+                            ->pluck('cve')
+                            ->unique()
+                            ->join(', ');
+                    }
+                    $warning = empty($cves) ? '' : "Attention, ce paquet est vulnérable: {$cves}.";
+                    $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} ({$type}) a été installé. {$warning}";
+                }
+                if ($this->isRemoved()) {
+                    $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} ({$type}) a été désinstallé.";
+                }
+            }
+        }
+        return $msg;
     }
 }

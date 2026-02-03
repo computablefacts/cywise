@@ -8,7 +8,6 @@ use App\Events\CreateAsset;
 use App\Events\CreateBackup;
 use App\Events\DeleteAsset;
 use App\Events\PullServerInfos;
-use App\Helpers\Messages;
 use App\Helpers\SshKeyPair;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
@@ -365,7 +364,7 @@ class ServersProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Retrieve the security events for a specific server over the past 10 days.",
+        description: "Retrieve the security events for a specific server over the past 5 days.",
         params: [
             "server_id" => "The server id.",
         ],
@@ -379,11 +378,14 @@ class ServersProcedure extends Procedure
             'server_id' => 'required|integer|exists:ynh_servers,id',
         ]);
 
-        /** @var YnhServer $server */
-        $server = YnhServer::where('id', $params['server_id'])->firstOrFail();
+        $minDate = Carbon::now()->utc()->startOfDay()->subDays(5);
+        $maxDate = Carbon::now()->utc()->endOfDay();
+        $request = JsonRpcRequest::createFrom($request);
+        $request->merge([
+            'min_score' => 0,
+            'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')],
+        ]);
 
-        return [
-            'events' => Messages::get(collect([$server]), Carbon::now()->subDays(10)),
-        ];
+        return (new EventsProcedure())->list($request);
     }
 }

@@ -28,23 +28,14 @@ class LocalDbAppConfig implements DbAppConfigInterface
             'towerify.cyberbuddy.api_username' => 'gr',
             // 'encrypted:towerify.cyberbuddy.api_password' => '',
 
-            'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
-            // 'encrypted:towerify.deepseek.api_key' => '',
-
             'towerify.deepinfra.api' => 'https://api.deepinfra.com/v1/openai',
             // 'encrypted:towerify.deepinfra.api_key' => '',
-
-            'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
-            // 'encrypted:towerify.gemini.api_key' => '',
 
             'array:towerify.telescope.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
             'array:towerify.telescope.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
 
             'array:towerify.performa.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
             'array:towerify.performa.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
-
-            'towerify.openai.api' => 'https://api.openai.com/v1',
-            // 'encrypted:towerify.openai.api_key' => '',
 
             // 'encrypted:towerify.scrapfly.api_key' => '',
 

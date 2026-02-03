@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\AgentSquad\Providers\LlmsProvider;
 use App\Models\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -41,7 +42,6 @@ class ClickhouseUtils
             N'utilise pas de ` dans ta réponse.
         ";
 
-        $response = (new LlmProvider(LlmProvider::OPEN_AI))->execute($prompt);
-        return $response['choices'][0]['message']['content'] ?? '';
+        return LlmsProvider::provide($prompt);
     }
 }

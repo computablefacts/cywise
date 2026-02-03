@@ -24,6 +24,7 @@
         <th>{{ __('Username') }}</th>
         <th>{{ __('Email') }}</th>
         <th>{{ __('Audit Report') }}</th>
+        <th>{{ __('Send audit report') }}</th>
       </tr>
       </thead>
       <tbody>
@@ -45,9 +46,14 @@
         <td>
           <input type="checkbox" data-user-id="{{ $user->id }}" {{ $user->gets_audit_report ? 'checked' : '' }}>
         </td>
+        <td>
+          <button class="btn btn-sm btn-primary send-audit-report" data-user-id="{{ $user->id }}">
+            {{ __('Send') }}
+          </button>
+        </td>
       </tr>
       <tr>
-        <td colspan="4" class="pt-0">
+        <td colspan="5" class="pt-0">
           @foreach(collect($user->roles->all())->sortBy('name') as $role)
           <span class="lozenge information">{{ $role->name }}</span>
           @endforeach
@@ -68,6 +74,14 @@
     checkbox.addEventListener('change',
       (event) => toggleGetsAuditReportApiCall(event.target.getAttribute('data-user-id'),
         response => toaster.toastSuccess(response.msg)));
+  });
+
+  document.querySelectorAll('.send-audit-report').forEach((button) => {
+    button.addEventListener('click',
+      (event) => {
+        const userId = event.currentTarget.getAttribute('data-user-id');
+        sendAuditReportApiCall(userId, response => toaster.toastSuccess(response.msg));
+      });
   });
 
 </script>

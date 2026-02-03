@@ -28,23 +28,14 @@ class ProdDbAppConfig implements DbAppConfigInterface
             'towerify.cyberbuddy.api_username' => 'gr',
             'encrypted:towerify.cyberbuddy.api_password' => 'J8l!aJd8EI7iwkgz_txIvvdR02JEPqOaOxK9N7A==',
 
-            'towerify.deepseek.api' => 'https://api.deepseek.com/v1',
-            'encrypted:towerify.deepseek.api_key' => 'It&C5lRsI!Dq1IsX_ea+wX+Mz22wW95wY1cjq56mDp76lxfeLNrz40RSfe5n9eqflr8lz/TyDsmcqnygh',
-
             'towerify.deepinfra.api' => 'https://api.deepinfra.com/v1/openai',
             'encrypted:towerify.deepinfra.api_key' => '2sb?kbsVy4yE3gFw_xNKSEzcwSsF2E8gHmym8okt84QGYCy9T9Sp0e7u3PvkTO/C9z1qEebGyHaJ8Sj3V',
-
-            'towerify.gemini.api' => 'https://generativelanguage.googleapis.com/v1beta/openai',
-            'encrypted:towerify.gemini.api_key' => 'bYg2zlwYpWlULSJ9_boRGCkKbpzTr5NHeZ9ZBqaCkeaCmK2/lpr8mFLCuPcUNvKPlesCldGWo4L7Mb9rc',
 
             'array:towerify.telescope.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
             'array:towerify.telescope.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
 
             'array:towerify.performa.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
             'array:towerify.performa.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',
-
-            'towerify.openai.api' => 'https://api.openai.com/v1',
-            'encrypted:towerify.openai.api_key' => 'Tg2yWb33U2tIItmd_IU0txV/5KxNv9+bwBnqkMVYujizOT2ErSz59maW2/r71cKbi5KxikqLZ5D6U+AdreucHfXdxd4LN7ZgX8LGI/V2J1qgagPa/xEValIH34MoGeJEIUN11zaKIyBpp2YYV++iQAkGgI9wdjcYGWtr6EjZZELv9tw8OiSrW1GzEf8O7Z86bHiE7DYqxX//3caIzba7ASNMbdAEclXAnMjZa5JstmPEiyU4U6+B5zCTc4ok=',
 
             'encrypted:towerify.scrapfly.api_key' => '!jr0dNpdZSWuc5cg_BVlBZwoXazqe4LuXvFWaO6+Vnv/wYQx8751JOkXHyLT+4pPsJhbFHC55pwpdhgMI',
 
@@ -62,7 +53,7 @@ class ProdDbAppConfig implements DbAppConfigInterface
             'towerify.stripe.plans.essential.features' => 'Scan de vulnérabilités, Honeypots pré-configurés, Adresses emails internes compromises, Charte informatique, Cyberbuddy, 15 jours gratuits, Assistance par tickets (réponse sous 48h)',
             'towerify.stripe.plans.essential.monthly_price' => '90',
             'towerify.stripe.plans.essential.monthly_price_id' => 'price_1S6SqODHRqrzgOLGBGYEnrDd',
-            'towerify.stripe.plans.essential.yearly_price' => '360',
+            'towerify.stripe.plans.essential.yearly_price' => '900',
             'towerify.stripe.plans.essential.yearly_price_id' => 'price_1S6SrODHRqrzgOLGvt9xmhXM',
             'towerify.stripe.plans.essential.onetime_price' => null,
             'towerify.stripe.plans.essential.onetime_price_id' => null,
@@ -72,7 +63,7 @@ class ProdDbAppConfig implements DbAppConfigInterface
             'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI (Politique de Sécurité des Systèmes d\'Information), 15 jours gratuits, Assistance par tickets (réponse sous 24h)',
             'towerify.stripe.plans.standard.monthly_price' => '270',
             'towerify.stripe.plans.standard.monthly_price_id' => 'price_1S6SxODHRqrzgOLG2qXK0Ygm',
-            'towerify.stripe.plans.standard.yearly_price' => '1080',
+            'towerify.stripe.plans.standard.yearly_price' => '2700',
             'towerify.stripe.plans.standard.yearly_price_id' => 'price_1S6Sy7DHRqrzgOLGhPQ7RQSc',
             'towerify.stripe.plans.standard.onetime_price' => null,
             'towerify.stripe.plans.standard.onetime_price_id' => null,
@@ -82,7 +73,7 @@ class ProdDbAppConfig implements DbAppConfigInterface
             'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Standard, CyberBuddy via Teams, SSO (Single Sign-On), Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sous 6h)',
             'towerify.stripe.plans.premium.monthly_price' => '810',
             'towerify.stripe.plans.premium.monthly_price_id' => 'price_1S6T7qDHRqrzgOLG1FZrhRlZ',
-            'towerify.stripe.plans.premium.yearly_price' => '3240',
+            'towerify.stripe.plans.premium.yearly_price' => '8100',
             'towerify.stripe.plans.premium.yearly_price_id' => 'price_1S6T8aDHRqrzgOLGzVZgXpP7',
             'towerify.stripe.plans.premium.onetime_price' => null,
             'towerify.stripe.plans.premium.onetime_price_id' => null,

@@ -70,9 +70,6 @@
   @if(!$tab || $tab === 'settings')
   <x-server :server="$server"/>
   @endif
-  @if(!$tab || $tab === 'events')
-  <x-events :server="$server"/>
-  @endif
   @if($tab === 'backups')
   <x-backups :server="$server"/>
   @endif

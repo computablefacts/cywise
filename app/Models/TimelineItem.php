@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Helpers\ApiUtilsFacade as ApiUtils2;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -159,11 +158,12 @@ class TimelineItem extends Model
         return self::fetchItems($ownedBy, 'leak', $createdAtOrAfter, $createdAtOrBefore, $flags, $ands);
     }
 
-    public static function createNote(User $user, string $body, string $subject = ''): TimelineItem
+    public static function createNote(User $user, string $body, string $subject = '', array $scopes = []): TimelineItem
     {
         return self::createItem($user->id, 'note', Carbon::now(), 0, [
             'body' => Str::limit(trim($body), 10000 - 3, '...'),
             'subject' => Str::limit(trim($subject), 10000 - 3, '...'),
+            'scopes' => json_encode($scopes),
         ]);
     }
 

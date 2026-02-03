@@ -2,6 +2,7 @@
 
 namespace App\Http\Procedures;
 
+use App\Events\SendAuditReport;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
 use Sajya\Server\Attributes\RpcMethod;
@@ -47,6 +48,38 @@ class UsersProcedure extends Procedure
 
         return [
             "msg" => "The user {$user->name} settings have been updated."
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Immediately send the weekly email report to a given user.",
+        params: [
+            "user_id" => "The user id.",
+        ],
+        result: [
+            "msg" => "A success message.",
+        ]
+    )]
+    public function sendAuditReport(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+        ]);
+
+        /** @var User $loggedInUser */
+        $loggedInUser = $request->user();
+
+        /** @var User $user */
+        $user = User::query()
+            ->where('id', '=', $params['user_id'])
+            ->when($loggedInUser->tenant_id, fn($query) => $query->where('tenant_id', '=', $loggedInUser->tenant_id))
+            ->when($loggedInUser->customer_id, fn($query) => $query->where('customer_id', '=', $loggedInUser->customer_id))
+            ->first();
+
+        SendAuditReport::dispatch($user);
+
+        return [
+            "msg" => "The email report has been sent to the user {$user->name}."
         ];
     }
 }

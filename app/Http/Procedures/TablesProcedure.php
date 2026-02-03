@@ -7,7 +7,6 @@ use App\Events\ImportVirtualTable;
 use App\Helpers\ClickhouseClient;
 use App\Helpers\ClickhouseLocal;
 use App\Helpers\ClickhouseUtils;
-use App\Helpers\LlmProvider;
 use App\Helpers\TableStorage;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Table;
@@ -369,7 +368,7 @@ class TablesProcedure extends Procedure
             throw new \Exception('The query generation has failed.');
         }
         return [
-            'query' => LlmProvider::cleanSqlQuery($query),
+            'query' => Str::rtrim($query, ';'),
         ];
     }
 

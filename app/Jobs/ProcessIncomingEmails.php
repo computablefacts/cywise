@@ -2,9 +2,10 @@
 
 namespace App\Jobs;
 
+use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\PromptsProvider;
+use App\AgentSquad\Providers\WebpagesProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
-use App\Http\Procedures\TheCyberBriefProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Mail\SimpleEmail;
 use App\Models\Collection;
@@ -46,7 +47,6 @@ class ProcessIncomingEmails implements ShouldQueue
     {
         preg_match_all(self::URL_PATTERN, $text, $matches);
         $urls = array_values(array_unique(array_map('html_entity_decode', $matches[0])));
-        $tcb = new TheCyberBriefProcedure();
         /** @var User $user */
         $user = Auth::user();
         $prompt = PromptsProvider::provide('default_summarize');
@@ -70,12 +70,8 @@ class ProcessIncomingEmails implements ShouldQueue
                     ];
                 } else {
                     try {
-                        $request = new JsonRpcRequest([
-                            'url_or_text' => $url,
-                            'prompt' => $prompt,
-                        ]);
-                        $request->setUserResolver(fn() => $user);
-                        $summary = $tcb->summarize($request)['summary'] ?? '';
+                        $content = WebpagesProvider::isHyperlink($url) ? WebpagesProvider::provide($url) : $url;
+                        $summary = LlmsProvider::provide(Str::replace('[TEXT]', $content, $prompt));
                         $result[] = [
                             'url' => $url,
                             'summary' => empty($summary) ? "{$url} could not be accessed or summarized." : $summary,

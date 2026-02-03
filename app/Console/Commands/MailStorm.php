@@ -70,6 +70,7 @@ class MailStorm extends Command
         $body = Str::trim(file_get_contents($body));
 
         collect(explode("\n", file_get_contents($emails)))
+            ->lazy()
             ->map(function (string $line) {
                 $parts = explode("\t", Str::trim($line));
                 return [

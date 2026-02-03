@@ -14,10 +14,15 @@ class NotesProcedure extends Procedure
 {
     public static string $name = 'notes';
 
+    public const SCOPE_IS_ORCHESTRATOR = 'Orchestrator';
+    public const SCOPE_IS_CYBERBUDDY = 'CyberBuddy';
+    public const SCOPE_IS_SOC_OPERATOR = 'SOC Operator';
+
     #[RpcMethod(
         description: "Add a note to the timeline.",
         params: [
-            'note' => 'The note content.'
+            'note' => 'The note content.',
+            'scopes' => 'An optional set of scopes associated with the note.'
         ],
         result: [
             "msg" => "A success message.",
@@ -27,11 +32,14 @@ class NotesProcedure extends Procedure
     {
         $params = $request->validate([
             'note' => 'required|string|min:1|max:1000',
+            'scopes' => 'nullable|array|min:0|max:3',
+            'scopes.*' => 'string|in:CyberBuddy,Orchestrator,SOC Operator',
         ]);
 
         /** @var User $user */
         $user = $request->user();
-        $item = TimelineItem::createNote($user, $params['note']);
+        $scopes = $params['scopes'] ?? [NotesProcedure::SCOPE_IS_CYBERBUDDY];
+        $item = TimelineItem::createNote($user, $params['note'], '', $scopes);
 
         // Transform URLs provided by the user into notes
         ProcessIncomingEmails::extractAndSummarizeHyperlinks($params['note']);

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @property int id
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property ?string level
  * @property ?string title
  * @property ?string vulnerability
+ * @property ?string ai_remediation
  * @property ?string remediation
  * @property ?string cve_id
  * @property ?string cve_cvss
@@ -36,6 +38,7 @@ class Alert extends Model
         'type',
         'vulnerability',
         'remediation',
+        'ai_remediation',
         'level',
         'uid',
         'cve_id',

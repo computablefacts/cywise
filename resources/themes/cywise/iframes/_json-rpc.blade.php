@@ -28,7 +28,7 @@
   };
 
   function executeJsonRpcApiCall(method, params = {}, onSuccess = onSuccessDefault, onError = onErrorDefault,
-    onFinally = onFinallyDefault) {
+                                 onFinally = onFinallyDefault) {
     axios.post('/api/v2/private/endpoint', {
       jsonrpc: "2.0", id: "1", method: method, params: params,
     }, {
@@ -121,8 +121,8 @@
       {server_id: serverId, user_id: userId, permission: permission});
   }
 
-  function createNoteApiCall(note, onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('notes@create', {note: note}, onSuccess);
+  function createNoteApiCall(note, scopes = [], onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('notes@create', {note: note, scopes: scopes}, onSuccess);
   }
 
   function deleteNoteApiCall(noteId, onSuccess = onSuccessDefault) {
@@ -208,7 +208,7 @@
   }
 
   function saveTemplateApiCall(templateId, isModel, name, blocks, onSuccess = onSuccessDefault,
-    onFinally = onFinallyDefault) {
+                               onFinally = onFinallyDefault) {
     executeJsonRpcApiCall('cyberscribe@saveTemplate',
       {template_id: templateId, is_model: isModel, name: name, blocks: blocks}, onSuccess, onErrorDefault, onFinally);
   }
@@ -223,7 +223,7 @@
   }
 
   function listAwsBucketContentApiCall(region, access_key_id, secret_access_key, input_folder, output_folder,
-    onSuccess = onSuccessDefault) {
+                                       onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('tables@listBucketContent', {
       'storage': 's3',
       'region': region,
@@ -249,7 +249,7 @@
   }
 
   function listAwsFileContentApiCall(region, access_key_id, secret_access_key, input_folder, output_folder, tables,
-    onSuccess = onSuccessDefault) {
+                                     onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('tables@listFileContent', {
       'storage': 's3',
       'region': region,
@@ -262,7 +262,7 @@
   }
 
   function listAzureFileContentApiCall(connection_string, input_folder, output_folder, tables,
-    onSuccess = onSuccessDefault) {
+                                       onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('tables@listFileContent', {
       'storage': 'azure',
       'connection_string': connection_string,
@@ -278,7 +278,7 @@
   }
 
   function importAwsFileApiCall(region, access_key_id, secret_access_key, input_folder, output_folder, tables,
-    updatable, copy, deduplicate, description, onSuccess = onSuccessDefault) {
+                                updatable, copy, deduplicate, description, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('tables@import', {
       'storage': 's3',
       'region': region,
@@ -295,7 +295,7 @@
   }
 
   function importAzureFileApiCall(connection_string, input_folder, output_folder, tables, updatable, copy, deduplicate,
-    description, onSuccess = onSuccessDefault) {
+                                  description, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('tables@import', {
       'storage': 'azure',
       'connection_string': connection_string,
@@ -332,6 +332,10 @@
 
   function toggleGetsAuditReportApiCall(userId, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('users@toggleGetsAuditReport', {user_id: userId}, onSuccess);
+  }
+
+  function sendAuditReportApiCall(userId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('users@sendAuditReport', {user_id: userId}, onSuccess);
   }
 
   function deletePromptApiCall(promptId) {
@@ -371,7 +375,7 @@
   }
 
   function createOsqueryRuleApiCall(name, description, category, platform, interval, is_ioc, score, query,
-    onSuccess = onSuccessDefault) {
+                                    onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('osquery@create', {
       name: name,
       description: description,
@@ -389,7 +393,7 @@
   }
 
   function createOssecRuleApiCall(name, description, rationale, remediation, platform, rule,
-    onSuccess = onSuccessDefault) {
+                                  onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('ossec@create', {
       name: name,
       description: description,
