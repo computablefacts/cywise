@@ -116,6 +116,15 @@ connaissances vérifiées et des bonnes pratiques reconnues. Une expertise acces
 Systèmes d'Information (PSSI) ? CyberScribe, notre éditeur intelligent, vous accompagne pas à pas pour rédiger des
 documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence artificielle.
 
+## Autre
+
+### Single Sign-On (SSO)
+
+:white_check_mark: auto-hébergé :white_check_mark: SaaS
+
+**En 2026, le SSO n'est plus une option.** Cywise intègre un module SSO moderne, compatible avec les standards du
+marché (OAuth 2.0, SAML, OpenID Connect), pour vous permettre de contrôler les accès de manière unifiée.
+
 # Installation
 
 En cours de rédaction.
@@ -123,7 +132,8 @@ En cours de rédaction.
 # Liens utiles
 
 - Vous pouvez accéder <a href="https://www.cywise.io" target="_blank">ici</a> à la version SaaS de Cywise.
-- Vous pouvez accéder <a href="https://www.cywise.io/changelog" target="_blank">ici</a> au changelog de la version SaaS de Cywise.
+- Vous pouvez accéder <a href="https://www.cywise.io/changelog" target="_blank">ici</a> au changelog de la version SaaS
+  de Cywise.
 - Vous pouvez
   accéder <a href="https://www.youtube.com/playlist?list=PLu1f_CSMJyoIf6yx9CUI2oWLZQhi5P8QO" target="_blank">ici</a> à
   quelques vidéos de démonstration.
