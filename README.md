@@ -116,7 +116,7 @@ connaissances vérifiées et des bonnes pratiques reconnues. Une expertise acces
 Systèmes d'Information (PSSI) ? CyberScribe, notre éditeur intelligent, vous accompagne pas à pas pour rédiger des
 documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence artificielle.
 
-## Autre
+## Divers
 
 ### Single Sign-On (SSO)
 
