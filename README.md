@@ -186,7 +186,24 @@ les paramètres :
 
 ### Scanner de vulnérabilités
 
-En cours de rédaction.
+Depuis le [tableau de bord](http://localhost:17801/dashboard), vous pouvez
+ajouter un domaine ou une adresse IP et demander à Cywise de la surveiller.
+
+Cywise va alors scanner cet actif pour rechercher les éventuelles
+vulnérabilités.
+
+Comptez environ 5 minutes avant de voir le résultat du scan.
+
+Vous pouvez rafraichir la page du tableau de bord pour voir combien de
+vulnérabilités Cywise a découvert. Elles sont réparties dans les 3 catégories
+de criticité Haute, Moyenne et Basse.
+
+Vous pouvez également retrouver la liste des vulnérabilités en cliquant sur le
+menu **Timelines > Vulnérabilités**.
+
+> [!WARNING]
+> Vous ne devez scanner que des domaines ou des adresses IP dont vous êtes
+> le propriétaire.
 
 ### Hardening
 
