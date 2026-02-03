@@ -30,17 +30,9 @@ return [
         'api_username' => env('CB_API_USERNAME'),
         'api_password' => env('CB_API_PASSWORD'),
     ],
-    'deepseek' => [
-        'api' => env('DEEPSEEK_API', 'https://api.deepseek.com/v1'),
-        'api_key' => env('DEEPSEEK_API_KEY'),
-    ],
     'deepinfra' => [
         'api' => env('DEEPINFRA_API', 'https://api.deepinfra.com/v1/openai'),
         'api_key' => env('DEEPINFRA_API_KEY'),
-    ],
-    'gemini' => [
-        'api' => env('GEMINI_API', 'https://generativelanguage.googleapis.com/v1beta/openai'),
-        'api_key' => env('GEMINI_API_KEY'),
     ],
     'telescope' => [
         'whitelist' => [
@@ -58,10 +50,6 @@ return [
         'email' => env('ADMIN_EMAIL'),
         'username' => env('ADMIN_USERNAME'),
         'password' => env('ADMIN_PASSWORD'),
-    ],
-    'openai' => [
-        'api' => env('OPENAI_API', 'https://api.openai.com/v1'),
-        'api_key' => env('OPENAI_API_KEY'),
     ],
     'scrapfly' => [
         'api_key' => env('SCRAPFLY_API_KEY'),
