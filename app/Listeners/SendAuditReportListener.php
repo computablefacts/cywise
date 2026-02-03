@@ -41,7 +41,7 @@ class SendAuditReportListener extends AbstractListener
         $isOnboarding = $event->isOnboarding;
         $user = $event->user;
         $user->actAs(); // otherwise the tenant will not be properly set
-        $from = 'cyberbuddy@cywise.io'; // config('towerify.freshdesk.from_email');
+        $from = config('towerify.freshdesk.from_email');
         $to = $user->email;
 
         if (!$user->gets_audit_report) {

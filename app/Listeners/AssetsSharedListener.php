@@ -21,7 +21,7 @@ class AssetsSharedListener extends AbstractListener
 
         $sender = $event->owner;
         $sender->actAs(); // otherwise the tenant will not be properly set
-        $from = 'cyberbuddy@cywise.io'; // config('towerify.freshdesk.from_email');
+        $from = config('towerify.freshdesk.from_email');
         $recipient = $event->recipient;
         $to = $recipient->email;
 
