@@ -207,10 +207,10 @@ class User extends WaveUser
 
             // Cleanup
             $this->dropPrompt('default_assistant');
+            $this->dropPrompt('default_chat');
 
             // Default prompts
             $this->setupPrompts('default_answer_question', 'seeders/prompts/default_answer_question.txt');
-            $this->setupPrompts('default_chat', 'seeders/prompts/default_chat.txt');
             $this->setupPrompts('default_chat_history', 'seeders/prompts/default_chat_history.txt');
             $this->setupPrompts('default_debugger', 'seeders/prompts/default_debugger.txt');
             $this->setupPrompts('default_hypothetical_questions', 'seeders/prompts/default_hypothetical_questions.txt');

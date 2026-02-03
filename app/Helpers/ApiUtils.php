@@ -3,7 +3,6 @@
 namespace App\Helpers;
 
 use App\Models\Collection;
-use App\Models\Prompt;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -176,25 +175,6 @@ class ApiUtils
             'title' => $title,
             'prompt' => Str::replace("\r", "", $prompt)
         ]);
-    }
-
-    /** @deprecated */
-    public function chat_manual_demo(string $historyKey, ?string $collection, string $question, bool $fallbackOnNextCollection = false): array
-    {
-        /** @var User $user */
-        $user = Auth::user();
-        if ($user) {
-            /** @var Prompt $prompt */
-            $prompt = Prompt::where('created_by', $user->id)->where('name', 'default_chat')->firstOrfail();
-            /** @var Prompt $promptHistory */
-            $promptHistory = Prompt::where('created_by', $user->id)->where('name', 'default_chat_history')->firstOrfail();
-        } else {
-            /** @var Prompt $prompt */
-            $prompt = Prompt::where('name', 'default_chat')->firstOrfail();
-            /** @var Prompt $promptHistory */
-            $promptHistory = Prompt::where('name', 'default_chat_history')->firstOrfail();
-        }
-        return $this->chat_manual($question, $collection, $historyKey, $prompt->template, $promptHistory->template, 10, 'fr', $fallbackOnNextCollection);
     }
 
     public function chat_manual(string $question, ?string $collectionName, string $historyKey, string $prompt, string $historyPrompt, int $maxDocsUsed = 10, string $lang = 'en', bool $fallbackOnNextCollection = false): array
