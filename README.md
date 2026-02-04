@@ -109,7 +109,7 @@ résultats de vos scans. CyberBuddy, notre assistant virtuel, vous guide en temp
 connaissances vérifiées et des bonnes pratiques reconnues. Une expertise accessible, où que vous soyez.
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé API.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API.
 
 ### CyberScribe
 
@@ -120,7 +120,7 @@ Systèmes d'Information (PSSI) ? CyberScribe, notre éditeur intelligent, vous a
 documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence artificielle.
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé API.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API.
 
 ## Divers
 
