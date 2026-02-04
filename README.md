@@ -124,6 +124,16 @@ documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence
 
 ## Divers
 
+### Fond documentaire
+
+:white_check_mark: auto-hébergé :white_check_mark: SaaS
+
+**Intégrez votre fond documentaire (Charte Informatique, PSSI, etc.) à CyberBuddy.** Offrez à vos équipes un accès
+instantané et intuitif à l'information. Il leur suffit de poser une question en langage naturel, comme « CyberBuddy,
+quelles sont les règles de télétravail dans notre PSSI ? », pour obtenir une réponse précise, extraite directement de
+vos ressources internes. Une manière simple et efficace de diffuser vos bonnes pratiques et de faciliter l'accès à
+l'information au quotidien.
+
 ### Single Sign-On (SSO)
 
 :white_check_mark: auto-hébergé :white_check_mark: SaaS
@@ -176,7 +186,7 @@ Vous pouvez démarrer la stack grâce à la commande :
 ```
 
 > [!NOTE]
-> Ce script va créer un fichier `.env` avec les paramètres par défaut 
+> Ce script va créer un fichier `.env` avec les paramètres par défaut
 > (principalement issus de `.env.example`) puis démarrer la stack.
 >
 > Comptez environ 15 minutes lors du premier démarrage.
@@ -244,7 +254,7 @@ Quelques minutes après avoir fait la commande sur votre serveur, vous devriez
 voir apparaître des événements en cliquant sur le menu **Timelines > Évènements**.
 
 Si certains événements semblent suspects à Cywise, d'après ses règles expertes,
-vous pourrez les voir en cliquant sur le menu 
+vous pourrez les voir en cliquant sur le menu
 **Timelines > Indicateurs de compromission**.
 
 #### Métriques
@@ -253,30 +263,31 @@ Vous pouvez accéder aux métriques en cliquant sur le menu **Timelines > Métri
 
 ### Accompagner les utilisateurs
 
-Pour activer CyberBuddy et CyberScribe, vous devez avoir une clé API chez 
+Pour activer CyberBuddy et CyberScribe, vous devez avoir une clé API chez
 [deepinfra](https://deepinfra.com/).
 
 Vous devez mettre en place cette clé dans Cywise.
 
 1. Arrêtez la stack avec la commande `./stack-stop.sh`.
 2. Modifier le fichier `.env` pour ajouter la clé :
+
   ```env
   DEEPINFRA_API_KEY=<your_api_key>
   ```
+
 3. Redémarrez la stack avec la commande `./stack-start.sh`.
 
 #### CyberBuddy
 
 Vous pouvez accéder à CyberBuddy en cliquant sur le menu **CyberBuddy**.
 
-Vous pouvez lui poser des questions sur vos assets, les vulnérabilités 
+Vous pouvez lui poser des questions sur vos assets, les vulnérabilités
 détectées, etc.
 
 Exemples de questions :
 
 - Dis moi quel est mon serveur le plus vulnérable ?
 - Quelle vulnérabilité dois-je corriger en priorité ?
-
 
 #### CyberScribe
 
