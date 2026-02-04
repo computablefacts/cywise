@@ -17,7 +17,7 @@ class ChunksProvider2
         if ($collections->isEmpty() || empty($language) || empty($input)) {
             return collect();
         }
-        return \Cache::remember('chunks_provider2_' . md5($collections->pluck('id')->implode('_') . "{$language}{$input}"), 7 * 24 * 60, function () use ($collections, $language, $input, $take) {
+        return \Cache::remember('chunks_provider2_' . md5($collections->pluck('id')->implode('_') . "{$language}{$input}"), now()->addDays(7), function () use ($collections, $language, $input, $take) {
             try {
                 $start = microtime(true);
                 if (Vector::isSupportedByMariaDb()) {

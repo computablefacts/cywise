@@ -60,23 +60,6 @@ class CyberBuddyProcedure extends Procedure
         if (!$conversation) {
             throw new \Exception("{$threadId} is an invalid thread id.");
         }
-//        if (count($conversation->thread()) <= 0) {
-//
-//            $timestamp = Carbon::now();
-//
-//            // Load the prompt
-//            /** @var Prompt $prompt */
-//            $prompt = Prompt::where('created_by', $user->id)->where('name', 'default_assistant')->firstOrfail();
-//            $prompt->template = Str::replace('{DATE}', $timestamp->format('Y-m-d'), $prompt->template);
-//            $prompt->template = Str::replace('{TIME}', $timestamp->format('H:i'), $prompt->template);
-//
-//            // Set a conversation-wide prompt
-//            $conversation->dom = json_encode(array_merge($conversation->thread(), [[
-//                'role' => RoleEnum::DEVELOPER->value,
-//                'content' => $prompt->template,
-//                'timestamp' => Carbon::now()->toIso8601ZuluString(),
-//            ]]));
-//        }
 
         // Transform URLs provided by the user into notes
         ProcessIncomingEmails::extractAndSummarizeHyperlinks($question);

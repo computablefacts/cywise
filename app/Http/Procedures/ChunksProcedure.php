@@ -2,11 +2,9 @@
 
 namespace App\Http\Procedures;
 
-use App\Helpers\ApiUtilsFacade as ApiUtils;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Chunk;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -78,31 +76,14 @@ class ChunksProcedure extends Procedure
             throw new \Exception("The chunk cannot be found.");
         }
 
+        // Remove index entries and vectors
+        $chunk->unsearchable();
+        $chunk->vectors()->delete();
+
+        // Update chunk
         $chunk->text = $params['value'];
-        $chunk->save();
-
-        $response = ApiUtils::delete_chunks([$chunk->is_deleted], $chunk->collection->name);
-
-        if ($response['error']) {
-            Log::error($response['error_details']);
-            throw new \Exception('The chunk has been saved but the embeddings could not be deleted.');
-        }
-
         $chunk->is_embedded = false;
-        $chunk->save();
-
-        $response = ApiUtils::import_chunks([[
-            'uid' => (string)$chunk->id,
-            'text' => $chunk->text,
-            'tags' => $chunk->tags()->pluck('tag')->toArray(),
-        ]], $chunk->collection->name);
-
-        if ($response['error']) {
-            Log::error($response['error_details']);
-            throw new \Exception('The chunk has been saved but the embeddings could not be updated.');
-        }
-
-        $chunk->is_embedded = true;
+        $chunk->is_deleted = false;
         $chunk->save();
 
         return [

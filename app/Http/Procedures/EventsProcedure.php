@@ -6,7 +6,6 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
 use Carbon\Carbon;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -45,11 +44,23 @@ class EventsProcedure extends Procedure
             $minDate = Carbon::createFromFormat('Y-m-d', $params['window'][0])->startOfDay();
             $maxDate = Carbon::createFromFormat('Y-m-d', $params['window'][1])->endOfDay();
         } else {
-            $minDate = Carbon::now()->subDays(3)->startOfDay();
+            $minDate = Carbon::now()->subDays(2)->startOfDay();
             $maxDate = Carbon::now()->endOfDay();
         }
 
-        $servers = YnhServer::query()->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))->get();
+        // Load servers
+        $servers = YnhServer::query()
+            ->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))
+            ->get();
+
+        // Load dismissed markers
+        $dismissed = YnhOsquery::select(['ynh_server_id', 'ynh_osquery_rule_id'])
+            ->where('dismissed', true)
+            ->whereIn('ynh_server_id', $servers->pluck('id'))
+            ->distinct()
+            ->get();
+
+        // Load events
         $events = YnhOsquery::select([
             DB::raw('ynh_servers.name AS server_name'),
             DB::raw('ynh_servers.ip_address AS server_ip_address'),
@@ -59,24 +70,16 @@ class EventsProcedure extends Procedure
         ])
             ->join('ynh_osquery_rules', 'ynh_osquery_rules.id', '=', 'ynh_osquery.ynh_osquery_rule_id')
             ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
-            ->where('ynh_osquery_rules.enabled', true)
             ->where('ynh_osquery.calendar_time', '>=', $minDate)
             ->where('ynh_osquery.calendar_time', '<=', $maxDate)
             ->whereIn('ynh_osquery.ynh_server_id', $servers->pluck('id'))
-            ->whereNotExists(function (Builder $query) {
-                $query->select(DB::raw(1))
-                    ->from('v_dismissed')
-                    ->whereColumn('ynh_server_id', '=', 'ynh_osquery.ynh_server_id')
-                    ->whereColumn('name', '=', 'ynh_osquery.name')
-                    ->whereColumn('action', '=', 'ynh_osquery.action')
-                    ->whereColumn('columns_uid', '=', 'ynh_osquery.columns_uid')
-                    ->havingRaw('count(1) >= 3');
-            })
+            ->where('ynh_osquery_rules.enabled', true)
             ->where('ynh_osquery_rules.score', '>=', $minScore)
             ->where('ynh_osquery_rules.score', '<=', $maxScore);
 
-        if ($minScore > 0) {
-            $events = $events->where('ynh_osquery_rules.is_ioc', true);
+        if ($dismissed->isNotEmpty()) {
+            $tuples = $dismissed->map(fn(object $item) => "({$item->ynh_server_id}, {$item->ynh_osquery_rule_id})")->implode(',');
+            $events = $events->whereRaw("(ynh_server_id, ynh_osquery_rule_id) NOT IN ({$tuples})");
         }
         return [
             'events' => $events->orderBy('calendar_time', 'desc')->get(),

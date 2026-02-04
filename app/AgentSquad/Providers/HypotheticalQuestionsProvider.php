@@ -8,7 +8,7 @@ class HypotheticalQuestionsProvider
 {
     public static function provide(string $language, string $text, string $prompt = 'default_hypothetical_questions'): array
     {
-        return \Cache::remember('hypothetical_questions_provider_' . md5($language . $text . $prompt), 7 * 24 * 60, function () use ($language, $text, $prompt) {
+        return \Cache::remember('hypothetical_questions_provider_' . md5($language . $text . $prompt), now()->addDays(7), function () use ($language, $text, $prompt) {
             try {
                 $start = microtime(true);
                 $prompt = PromptsProvider::provide($prompt, [

@@ -45,7 +45,6 @@ class YnhOsqueryFactory extends Factory
             'counter' => $this->faker->numberBetween(1, 10),
             'numerics' => 0,
             'columns' => $columnsJson,
-            'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             'action' => 'snapshot',
         ];
     }
@@ -58,7 +57,6 @@ class YnhOsqueryFactory extends Factory
                 'name' => 'last',
                 'action' => $this->faker->randomElement(['added', 'removed']),
                 'columns' => $columns,
-                'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             ];
         });
     }
@@ -71,7 +69,6 @@ class YnhOsqueryFactory extends Factory
                 'name' => 'authorized_keys',
                 'action' => $this->faker->randomElement(['added', 'removed']),
                 'columns' => $columns,
-                'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             ];
         });
     }
@@ -89,7 +86,6 @@ class YnhOsqueryFactory extends Factory
                 'name' => 'user_ssh_keys',
                 'action' => $this->faker->randomElement(['added', 'removed']),
                 'columns' => $columns,
-                'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             ];
         });
     }
@@ -106,7 +102,6 @@ class YnhOsqueryFactory extends Factory
                 'name' => 'users',
                 'action' => $this->faker->randomElement(['added', 'removed']),
                 'columns' => $columns,
-                'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             ];
         });
     }
@@ -120,7 +115,6 @@ class YnhOsqueryFactory extends Factory
                 'name' => 'groups',
                 'action' => $this->faker->randomElement(['added', 'removed']),
                 'columns' => $columns,
-                'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             ];
         });
     }
@@ -138,7 +132,6 @@ class YnhOsqueryFactory extends Factory
                 'name' => 'npm_packages', // Other package types exist like win_packages, python_packages, etc
                 'action' => $this->faker->randomElement(['added', 'removed']),
                 'columns' => $columns,
-                'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             ];
         });
     }
@@ -152,7 +145,6 @@ class YnhOsqueryFactory extends Factory
                 'name' => 'suid_bin',
                 'action' => $this->faker->randomElement(['added', 'removed']),
                 'columns' => $columns,
-                'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             ];
         });
     }
@@ -169,7 +161,6 @@ class YnhOsqueryFactory extends Factory
                 'name' => 'ld_preload',
                 'action' => 'snapshot',
                 'columns' => $columns,
-                'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             ];
         });
     }
@@ -183,7 +174,6 @@ class YnhOsqueryFactory extends Factory
                 'name' => 'kernel_modules',
                 'action' => $this->faker->randomElement(['added', 'removed']),
                 'columns' => $columns,
-                'columns_uid' => YnhOsquery::computeColumnsUid($columns),
             ];
         });
     }

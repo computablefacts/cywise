@@ -28,7 +28,6 @@ use Illuminate\Support\Facades\DB;
  * @property string action
  * @property bool packed
  * @property bool dismissed
- * @property ?string columns_uid
  * @property ?int ynh_osquery_rule_id
  */
 class YnhOsquery extends Model
@@ -49,7 +48,6 @@ class YnhOsquery extends Model
         'counter',
         'numerics',
         'columns',
-        'columns_uid',
         'action',
         'packed',
         'dismissed',
@@ -64,20 +62,6 @@ class YnhOsquery extends Model
         'updated_at' => 'datetime',
         'dismissed' => 'boolean',
     ];
-
-    public static function computeColumnsUid(array $json): string
-    {
-        ksort($json);
-        $uid = '';
-        foreach ($json as $key => $value) {
-            if (is_array($value)) {
-                $uid .= ($key . ':' . self::computeColumnsUid($value) . ';');
-            } else {
-                $uid .= ($key . ':' . $value . ';');
-            }
-        }
-        return md5($uid);
-    }
 
     /** @deprecated */
     public static function configLogParserLinux(YnhServer $server): string
@@ -931,7 +915,7 @@ EOT;
 
     public static function operatingSystem(int $serverId): ?object
     {
-        return \Cache::remember('os_infos_' . $serverId, now()->addHours(24), function () use ($serverId) {
+        return \Cache::remember('os_infos_' . $serverId, now()->addDays(7), function () use ($serverId) {
             return collect(DB::select("
                 SELECT DISTINCT 
                     ynh_osquery.ynh_server_id,

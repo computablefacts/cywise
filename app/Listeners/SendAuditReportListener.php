@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\MemosProvider;
+use App\AgentSquad\Providers\PromptsProvider;
 use App\Events\SendAuditReport;
 use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use App\Http\Controllers\Iframes\TimelineController;
@@ -41,7 +42,7 @@ class SendAuditReportListener extends AbstractListener
         $isOnboarding = $event->isOnboarding;
         $user = $event->user;
         $user->actAs(); // otherwise the tenant will not be properly set
-        $from = 'cyberbuddy@cywise.io'; // config('towerify.freshdesk.from_email');
+        $from = config('towerify.freshdesk.from_email');
         $to = $user->email;
 
         if (!$user->gets_audit_report) {
@@ -362,24 +363,12 @@ class SendAuditReportListener extends AbstractListener
 
                 $logs = implode("\n", cywise_compress_log_buffer($events->toArray()));
                 $memos = empty($collection) ? MemosProvider::provide($user, NotesProcedure::SCOPE_IS_SOC_OPERATOR) : 'None.';
-                $prompt = "
-                    You are a Cybersecurity expert working as a SOC operator. 
-                    Analyze the following security events to determine if any of them could indicate a compromise on the server {$server->name} ({$server->ip()}).
-                    Focus on 'intent' rather than just keywords.
-                    Return a single JSON object with the following attributes:
-                    - activity: NORMAL, SUSPECT, ANORMAL
-                    - confidence: 0.0 to 1.0 confidence score
-                    - reasoning: brief explanation of the verdict
-                    - suggested_action: recommended next step
-                    
-                    # Security Events
-
-                    {$logs}
-
-                    # Notes
-                    
-                    {$memos}
-                ";
+                $prompt = PromptsProvider::provide('default_soc_operator', [
+                    'SERVER_NAME' => $server->name,
+                    'SERVER_IP_ADDRESS' => $server->ip(),
+                    'LOGS' => $logs,
+                    'MEMOS' => $memos,
+                ]);
                 $answer = LlmsProvider::provide($prompt);
 
                 Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): " . json_encode([

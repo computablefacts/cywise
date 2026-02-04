@@ -10,7 +10,7 @@ class EmbeddingsProvider
 {
     public static function provide(string $text, array $metadata = []): ?Vector
     {
-        return \Cache::remember('embeddings_provider_' . md5($text), 7 * 24 * 60, function () use ($text, $metadata) {
+        return \Cache::remember('embeddings_provider_' . md5($text), now()->addDays(7), function () use ($text, $metadata) {
             try {
                 $start = microtime(true);
                 $embedding = self::callDeepInfra($text)['data'][0]['embedding'] ?? [];

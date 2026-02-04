@@ -205,14 +205,18 @@ class User extends WaveUser
         try {
             Log::debug("[{$this->email}] Updating user's prompts...");
 
+            // Cleanup
+            $this->dropPrompt('default_assistant');
+            $this->dropPrompt('default_chat');
+            $this->dropPrompt('default_chat_history');
+            $this->dropPrompt('default_debugger');
+
+            // Default prompts
             $this->setupPrompts('default_answer_question', 'seeders/prompts/default_answer_question.txt');
-            $this->setupPrompts('default_assistant', 'seeders/prompts/default_assistant.txt');
-            $this->setupPrompts('default_chat', 'seeders/prompts/default_chat.txt');
-            $this->setupPrompts('default_chat_history', 'seeders/prompts/default_chat_history.txt');
-            $this->setupPrompts('default_debugger', 'seeders/prompts/default_debugger.txt');
             $this->setupPrompts('default_hypothetical_questions', 'seeders/prompts/default_hypothetical_questions.txt');
             $this->setupPrompts('default_orchestrator', 'seeders/prompts/default_orchestrator.txt');
             $this->setupPrompts('default_reformulate_question', 'seeders/prompts/default_reformulate_question.txt');
+            $this->setupPrompts('default_soc_operator', 'seeders/prompts/default_soc_operator.txt');
             $this->setupPrompts('default_summarize', 'seeders/prompts/default_summarize.txt');
 
             // Remediation prompts
@@ -277,7 +281,16 @@ class User extends WaveUser
         return "tid0-cid0";
     }
 
-    private function setupPrompts(string $name, string $root)
+    private function dropPrompt(string $name): void
+    {
+        /** @var Prompt $prompt */
+        $prompt = Prompt::query()
+            ->where('created_by', $this->id)
+            ->where('name', $name)
+            ->delete();
+    }
+
+    private function setupPrompts(string $name, string $root): void
     {
         $newPrompt = File::get(database_path($root));
 
