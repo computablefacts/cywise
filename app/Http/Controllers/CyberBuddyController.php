@@ -357,7 +357,7 @@ class CyberBuddyController extends Controller
 
     public function uploadOneFile(Request $request)
     {
-        if (!Auth::user()->canUseCyberBuddy()) {
+        if (!Auth::user()->canCall('cyberbuddy', 'ask')) {
             response()->json([
                 'error' => 'Missing permission.',
                 'urls_success' => [],
@@ -404,7 +404,7 @@ class CyberBuddyController extends Controller
 
     public function uploadManyFiles(Request $request)
     {
-        if (!Auth::user()->canUseCyberBuddy()) {
+        if (!Auth::user()->canCall('cyberbuddy', 'ask')) {
             response()->json([
                 'error' => 'Missing permission.',
                 'urls_success' => [],
