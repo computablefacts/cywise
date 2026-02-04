@@ -209,13 +209,37 @@ menu **Timelines > Vulnérabilités**.
 
 ### Protéger les actifs internes de l'entreprise
 
+Afin que Cywise reçoivent les événements des actifs que vous voulez protéger,
+vous devez exécuter, avec votre compte administrateur, la commande affichée
+sur le tableau de bord dans l'encadré
+**Vous souhaitez protéger un nouveau serveur ?**.
+
+Copiez la commande après avoir choisi l'OS de votre machine, Linux ou Windows,
+puis exécutez la.
+
+Par exemple, pour une machine sous linux, la commande ressemble à :
+
+```bash
+curl -s "http://localhost:17801/setup/script?api_token=1|cmxxx75&server_ip=$(curl -s ipinfo.io | jq -r '.ip')&server_name=$(hostname)" | bash
+```
+
+> [!NOTE]
+> Dans le cadre de la démo, Cywise est accessible uniquement sur localhost
+> donc le seul serveur que vous pouvez protéger est la machine sur laquelle
+> vous avez démarré la stack.
+
 #### Hardening
 
 En cours de rédaction.
 
 #### Agents
 
-En cours de rédaction.
+Quelques minutes après avoir fait la commande sur votre serveur, vous devriez
+voir apparaître des événements en cliquant sur le menu **Timelines > Évènements**.
+
+Si certains événements semblent suspects à Cywise, d'après ses règles expertes,
+vous pourrez les voir en cliquant sur le menu 
+**Timelines > Indicateurs de compromission**.
 
 #### Métriques
 
