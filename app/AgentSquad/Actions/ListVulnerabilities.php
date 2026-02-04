@@ -6,7 +6,6 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
@@ -117,21 +116,9 @@ For example:
                     $cve = "**Note.** Cette vulnérabilité a pour identifiant [{$alert->cve_id}](https://nvd.nist.gov/vuln/detail/{$alert->cve_id}).";
                 }
 
-                $result = ApiUtils2::translate($alert->vulnerability);
+                $vulnerability = $alert->translated('vulnerability');
+                $remediation = $alert->translated('remediation');
 
-                if ($result['error'] !== false) {
-                    $vulnerability = $alert->vulnerability;
-                } else {
-                    $vulnerability = $result['response'];
-                }
-
-                $result = ApiUtils2::translate($alert->remediation);
-
-                if ($result['error'] !== false) {
-                    $remediation = $alert->remediation;
-                } else {
-                    $remediation = $result['response'];
-                }
                 return "
 ### {$alert->title} {$level}
 

@@ -5,8 +5,8 @@ namespace App\Listeners;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\MemosProvider;
 use App\AgentSquad\Providers\PromptsProvider;
+use App\AgentSquad\Providers\TranslationsProvider;
 use App\Events\SendAuditReport;
-use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Procedures\EventsProcedure;
 use App\Http\Procedures\NotesProcedure;
@@ -300,22 +300,8 @@ class SendAuditReportListener extends AbstractListener
                     $cve = "<p><b>Note.</b> Cette vulnérabilité a pour identifiant <a href=\"https://nvd.nist.gov/vuln/detail/{$alert->cve_id}\">{$alert->cve_id}</a>.</p>";
                 }
 
-                $result = ApiUtils2::translate($alert->vulnerability ?? '');
-
-                if ($result['error'] !== false) {
-                    $vulnerability = $alert->vulnerability;
-                } else {
-                    $vulnerability = $result['response'];
-                }
-
-                $result = ApiUtils2::translate($alert->remediation ?? '');
-
-                if ($result['error'] !== false) {
-                    $remediation = $alert->remediation;
-                } else {
-                    $remediation = $result['response'];
-                }
-
+                $vulnerability = $alert->translated('vulnerability');
+                $remediation = $alert->translated('remediation');
                 $link = route('iframes.assets') . "#aid-{$alert->asset()->id}";
 
                 return "
@@ -405,21 +391,9 @@ class SendAuditReportListener extends AbstractListener
                     return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
 
-                $result = ApiUtils2::translate($json['reasoning']);
+                $reasoning = TranslationsProvider::provide($json['reasoning']);
+                $suggestedAction = TranslationsProvider::provide($json['suggested_action']);
 
-                if ($result['error'] !== false) {
-                    $reasoning = $json['reasoning'];
-                } else {
-                    $reasoning = $result['response'];
-                }
-
-                $result = ApiUtils2::translate($json['suggested_action']);
-
-                if ($result['error'] !== false) {
-                    $suggestedAction = $json['suggested_action'];
-                } else {
-                    $suggestedAction = $result['response'];
-                }
                 return "<li>L'activité sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} est <b>{$json['activity']}E</b>.<ul>
                     <li><b>Indice de confiance (0=faible, 1=haute) :</b> {$json['confidence']}</li>
                     <li><b>Raisonnement :</b> {$reasoning}</li>

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Helpers\ApiUtilsFacade as ApiUtils2;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -46,37 +45,9 @@ class TimelineItem extends Model
     {
         $asset = $alert->asset();
         $port = $alert->port;
-
-        if (empty($alert->title)) {
-            $title = '';
-        } else {
-            $result = ApiUtils2::translate($alert->title, 'fr');
-            if ($result['error'] !== false) {
-                $title = $alert->title;
-            } else {
-                $title = $result['response'];
-            }
-        }
-        if (empty($alert->vulnerability)) {
-            $vulnerability = '';
-        } else {
-            $result = ApiUtils2::translate($alert->vulnerability, 'fr');
-            if ($result['error'] !== false) {
-                $vulnerability = $alert->vulnerability;
-            } else {
-                $vulnerability = $result['response'];
-            }
-        }
-        if (empty($alert->remediation)) {
-            $remediation = '';
-        } else {
-            $result = ApiUtils2::translate($alert->remediation, 'fr');
-            if ($result['error'] !== false) {
-                $remediation = $alert->remediation;
-            } else {
-                $remediation = $result['response'];
-            }
-        }
+        $title = $alert->translated('title');
+        $vulnerability = $alert->translated('vulnerability');
+        $remediation = $alert->translated('remediation');
         return self::createItem($user->id, 'alert', Carbon::now(), 0, [
 
             // Ids

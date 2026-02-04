@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslatableAttributes;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * @property int id
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Log;
  */
 class Alert extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslatableAttributes;
 
     protected $table = 'am_alerts';
 
@@ -73,7 +73,7 @@ class Alert extends Model
     {
         /** @var array $ips */
         $ips = config('towerify.adversarymeter.ip_addresses');
-        $cveId = trim(Str::upper($this->cve_id));
+        $cveId = Str::trim(Str::upper($this->cve_id));
         $events = HoneypotEvent::query()
             ->join('am_honeypots', 'am_honeypots.id', '=', 'am_honeypots_events.honeypot_id')
             ->where('am_honeypots_events.event', 'cve_tested')
@@ -105,7 +105,7 @@ class Alert extends Model
     {
         return $this->level === 'Low';
     }
-    
+
     public function isUnverified(): bool
     {
         return $this->level === 'High (unverified)';
