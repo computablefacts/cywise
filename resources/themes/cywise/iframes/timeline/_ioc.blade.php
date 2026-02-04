@@ -11,6 +11,8 @@
     <div class="timeline-item-description">
       <span>
         <b>{{ $ioc['first']['ioc']->server_name }} ({{ $ioc['first']['ioc']->server_ip_address }})</b> - {{ $ioc['first']['ioc']->comments }} {{ $ioc['first']['level'] }}
+        @php $firstId = $ioc['first']['ioc']->id; @endphp
+        (<a href="#" onclick="dismissEvent('{{ $firstId }}')">{{ __('dismiss') }}</a>)
       </span>
     </div>
     <pre class="comment mb-0">{{ json_encode($ioc['first']['ioc']->columns, JSON_PRETTY_PRINT) }}</pre>
@@ -45,6 +47,8 @@
     <div class="timeline-item-description">
       <span>
         <b>{{ $ioc['last']['ioc']->server_name }} ({{ $ioc['last']['ioc']->server_ip_address }})</b> - {{ $ioc['last']['ioc']->comments }} {{ $ioc['last']['level'] }}
+        @php $lastId = $ioc['last']['ioc']->id; @endphp
+        (<a href="#" onclick="dismissEvent('{{ $lastId }}')">{{ __('dismiss') }}</a>)
       </span>
     </div>
     <pre class="comment mb-0">{{ json_encode($ioc['last']['ioc']->columns, JSON_PRETTY_PRINT) }}</pre>

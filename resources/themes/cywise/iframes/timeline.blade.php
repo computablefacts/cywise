@@ -600,7 +600,7 @@
 
   /* EVENTS */
 
-  const dismissEvent = (eventId) => dismissEventApiCall(eventId);
+  const dismissEvent = (eventId) => dismissEventApiCall(eventId, () => toaster.toastSuccess("{{ __('Hide events like this for this server in the timeline.') }}"));
 
   /* VULNERABILITIES */
 

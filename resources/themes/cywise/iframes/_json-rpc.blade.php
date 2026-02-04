@@ -133,8 +133,8 @@
     executeJsonRpcApiCall('vulnerabilities@toggleVisibility', {uid: uid, type: type, title: title});
   }
 
-  function dismissEventApiCall(eventId) {
-    executeJsonRpcApiCall('events@dismiss', {event_id: eventId});
+  function dismissEventApiCall(eventId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('events@dismiss', {event_id: eventId}, onSuccess);
   }
 
   function createAssetApiCall(asset, monitor, onSuccess = onSuccessDefault) {
