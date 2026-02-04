@@ -7,7 +7,7 @@ use App\AgentSquad\Providers\PromptsProvider;
 use App\AgentSquad\Providers\WebpagesProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\MailCoachSimpleEmail;
+use App\Mail\SimpleEmail;
 use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\File;
@@ -235,7 +235,7 @@ class ProcessIncomingEmails implements ShouldQueue
         $body = Str::before($body, '<br><br><b>Sources :</b>'); // remove sources
         $body = preg_replace("/\[((\d+,?)+)]/", "", $body); // remove references
 
-        MailCoachSimpleEmail::sendEmail(
+        SimpleEmail::sendEmail(
             "Re: {$subject}",
             "CyberBuddy vous répond !",
             $body,

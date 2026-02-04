@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\AssetsShared;
-use App\Mail\MailCoachSimpleEmail;
+use App\Mail\SimpleEmail;
 use Illuminate\Auth\Passwords\PasswordBroker;
 
 class AssetsSharedListener extends AbstractListener
@@ -58,7 +58,7 @@ class AssetsSharedListener extends AbstractListener
         $body[] = '</td></tr>';
         $body[] = '</tbody></table>';
 
-        MailCoachSimpleEmail::sendEmail($subject, $title, implode("\n", $body), $to, $from);
+        SimpleEmail::sendEmail($subject, $title, implode("\n", $body), $to, $from);
 
     }
 

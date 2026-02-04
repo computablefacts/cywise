@@ -1,11 +1,10 @@
 <?php
 
 return [
-    'website' => env('WEBSITE_URL'),
     'freshdesk' => [
         'widget_id' => env('FRESHDESK_ID'),
-        'to_email' => env('FRESHDESK_TO_EMAIL'),
-        'from_email' => env('FRESHDESK_FROM_EMAIL'),
+        'to_email' => env('FRESHDESK_TO_EMAIL', 'support@mydomain.com'),
+        'from_email' => env('FRESHDESK_FROM_EMAIL', 'support@mydomain.com'),
     ],
     'reports' => [
         'url' => env('REPORTS_URL'),
@@ -101,10 +100,6 @@ return [
         'username' => env('CH_USERNAME'),
         'password' => env('CH_PASSWORD'),
         'database' => env('CH_DATABASE'),
-    ],
-    'sendgrid' => [
-        'api' => env('SENDGRID_API'),
-        'api_key' => env('SENDGRID_API_KEY'),
     ],
     'josianne' => [
         'host' => env('JOSIANNE_HOST'),

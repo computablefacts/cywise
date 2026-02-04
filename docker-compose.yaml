@@ -1,0 +1,252 @@
+services:
+  app:
+    image: cywise-app:latest
+    build:
+      context: .
+      dockerfile: towerify/Dockerfile
+    ports:
+      - target: 80
+        published: 17801
+    env_file:
+      - .env
+    environment:
+      - LOG_CHANNEL=stderr
+      - DB_HOST=mariadb
+    volumes:
+      - ./data/scout:/var/www/html/storage/scout
+    depends_on:
+      scheduler:
+        condition: service_healthy
+
+  scheduler:
+    image: cywise-app:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - CONTAINER_ROLE=scheduler
+      - LOG_CHANNEL=stderr
+      - DB_HOST=mariadb
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/scheduler_init_done"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  queue:
+    image: cywise-app:latest
+    env_file:
+      - .env
+    environment:
+      - CONTAINER_ROLE=queue
+      - LOG_CHANNEL=stderr
+      - DB_HOST=mariadb
+    depends_on:
+      scheduler:
+        condition: service_healthy
+
+  queue-low:
+    image: cywise-app:latest
+    env_file:
+      - .env
+    environment:
+      - CONTAINER_ROLE=queue
+      - QUEUE_NAME=low
+      - LOG_CHANNEL=stderr
+      - DB_HOST=mariadb
+    depends_on:
+      scheduler:
+        condition: service_healthy
+
+  queue-medium:
+    image: cywise-app:latest
+    env_file:
+      - .env
+    environment:
+      - CONTAINER_ROLE=queue
+      - QUEUE_NAME=medium
+      - LOG_CHANNEL=stderr
+      - DB_HOST=mariadb
+    depends_on:
+      scheduler:
+        condition: service_healthy
+
+  queue-critical:
+    image: cywise-app:latest
+    env_file:
+      - .env
+    environment:
+      - CONTAINER_ROLE=queue
+      - QUEUE_NAME=critical
+      - LOG_CHANNEL=stderr
+      - DB_HOST=mariadb
+    depends_on:
+      scheduler:
+        condition: service_healthy
+
+  queue-scout:
+    image: cywise-app:latest
+    env_file:
+      - .env
+    environment:
+      - CONTAINER_ROLE=queue
+      - QUEUE_NAME=scout
+      - LOG_CHANNEL=stderr
+      - DB_HOST=mariadb
+    volumes:
+      - ./data/scout:/var/www/html/storage/scout
+    depends_on:
+      scheduler:
+        condition: service_healthy
+
+  mariadb:
+    image: mariadb:11
+    ports:
+      - target: 3306
+        published: 17806
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  performa:
+    image: performa-app:latest
+    build:
+      context: ./performa
+      dockerfile: towerify/Dockerfile
+    ports:
+      - target: 5511
+        published: 17802
+    env_file:
+      - .env
+    volumes:
+      - ./data/performa:/app/data
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"  # Port SMTP
+      - target: 8025
+        published: 17803 # Interface web
+
+  clickhouse-server:
+    image: clickhouse/clickhouse-server:25.8
+    volumes:
+      - ./data/clickhouse:/var/lib/clickhouse
+    environment:
+      CLICKHOUSE_DB: ${CH_DATABASE}
+      CLICKHOUSE_USER: ${CH_USERNAME}
+      CLICKHOUSE_PASSWORD: ${CH_PASSWORD}
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  sentinel-api:
+    image: computablefacts/sentinel-api:latest
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: 1
+      REDIS_URL: redis://redis:6379/
+    restart: always
+    depends_on:
+      - sentinel-redis
+      - sentinel-wappalyzer
+      - sentinel-splash
+
+  sentinel-wrq:
+    image: computablefacts/sentinel-wrq:latest
+    env_file:
+      - .env
+    environment:
+      OPENOBSERVE_HOST: http://openobserve:5080
+      PYTHONUNBUFFERED: 1
+      REDIS_URL: redis://redis:6379/
+      SETTINGS_FILE: settings
+    restart: always
+    depends_on:
+      - sentinel-api
+      - sentinel-redis
+      - sentinel-wappalyzer
+
+  sentinel-wrq-nuclei:
+    image: computablefacts/sentinel-wrq:latest
+    env_file:
+      - .env
+    environment:
+      OPENOBSERVE_HOST: http://openobserve:5080
+      PYTHONUNBUFFERED: 1
+      REDIS_URL: redis://redis:6379/
+      SETTINGS_FILE: settings_nuclei
+    restart: always
+    depends_on:
+      - sentinel-api
+      - sentinel-redis
+      - sentinel-wappalyzer
+
+  sentinel-rq-dashboard:
+    image: cjlapao/rq-dashboard:latest
+    hostname: rq-dashboard
+    ports:
+      - target: 9181
+        published: 17804
+    restart: always
+    env_file:
+      - .env
+    environment:
+      RQ_DASHBOARD_REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - sentinel-redis
+
+  sentinel-openobserve:
+    image: public.ecr.aws/zinclabs/openobserve:latest
+    hostname: openobserve
+    ports:
+      - target: 5080
+        published: 17805
+    env_file:
+      - .env
+    environment:
+      ZO_DATA_DIR: "/data"
+      # ZO_WEB_URL: "http://localhost:8043/"
+      # ZO_BASE_URI: "/"
+    volumes:
+      - "./data/openobserve_data:/data"
+
+  sentinel-redis:
+    image: redis:bookworm
+    hostname: redis
+    restart: always
+    command: redis-server --loglevel notice
+    volumes:
+      - "./data/redis_data:/data"
+
+  sentinel-mongodb:
+    image: mongo:8.0.0
+    hostname: mongodb
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - "./data/mongo_data:/data/db"
+
+  sentinel-wappalyzer:
+    image: ghcr.io/hunter-io/wappalyzer-api:4.3.0
+    hostname: wappalyzer
+
+  sentinel-splash:
+    image: scrapinghub/splash:3.5
+    hostname: splash

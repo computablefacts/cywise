@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Spatie\MailcoachMailer\Concerns\UsesMailcoachMail;
 
-class MailCoachSimpleEmail extends Mailable
+class SimpleEmail extends Mailable
 {
     use Queueable, SerializesModels, UsesMailcoachMail;
 
@@ -21,9 +21,9 @@ class MailCoachSimpleEmail extends Mailable
     public static function sendEmail(string $subject, string $htmlTitle, string $htmlBody, ?string $to = null, ?string $from = null): void
     {
         try {
-            Mail::mailer('mailcoach')
+            Mail::mailer()
                 ->to($to ?? config('towerify.freshdesk.to_email'))
-                ->send(new MailCoachSimpleEmail($subject, $htmlTitle, $htmlBody, $from));
+                ->send(new SimpleEmail($subject, $htmlTitle, $htmlBody, $from));
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
@@ -54,6 +54,17 @@ class MailCoachSimpleEmail extends Mailable
      */
     public function build()
     {
+        return match (config('mail.default')) {
+            'mailcoach' => $this->buildMailcoach(),
+            default     => $this->buildStandard(), // Tous les autres
+        };
+    }
+
+    /**
+     * Build for Mailcoach (remote template).
+     */
+    protected function buildMailcoach(): self
+    {
         return $this
             ->from($this->emailFrom, 'support')
             ->mailcoachMail('default', [
@@ -61,6 +72,21 @@ class MailCoachSimpleEmail extends Mailable
                 'title' => $this->htmlTitle,
                 'content' => $this->htmlBody,
             ])
-            ->faking(app()->environment('local', 'dev'));
+            ->faking(! app()->environment('prod', 'production'));
+    }
+
+    /**
+     * Build standard (local Blade template).
+     */
+    protected function buildStandard(): self
+    {
+        return $this
+            ->from($this->emailFrom, 'support')
+            ->subject($this->emailSubject)
+            ->view('emails.simple_email', [
+                'subject' => $this->emailSubject,
+                'title' => $this->htmlTitle,
+                'content' => $this->htmlBody,
+            ]);
     }
 }

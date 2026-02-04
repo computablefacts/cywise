@@ -127,7 +127,180 @@ marché (OAuth 2.0, SAML, OpenID Connect), pour vous permettre de contrôler les
 
 # Installation
 
+## Pré-requis
+
+- Un ordinateur sous linux
+- Avoir installé [Docker](https://www.docker.com/)
+- Avoir installé [git](https://git-scm.com/)
+
+## Récupérer ce dépôt de code
+
+Récupérez notre dépôt de code grâce à la commande :
+
+```bash
+git clone https://github.com/computablefacts/cywise.git
+```
+
+Puis placez-vous dans le répertoire nouvellement créé :
+
+```bash
+cd cywise
+```
+
+> [!NOTE]
+> Toutes les commandes ci-après fonctionnent si elles sont lancées depuis ce
+> répertoire.
+
+Assurez-vous que nos scripts de gestion de la stack sont bien exécutables en
+lançant la commande :
+
+```bash
+chmod +x ./stack*
+```
+
+## Démarrage
+
+Notre application consiste en plusieurs services Docker assemblés grâce à une
+stack [docker compose](https://docs.docker.com/compose).
+
+Vous pouvez démarrer la stack grâce à la commande :
+
+```bash
+./stack-start.sh
+```
+
+> [!NOTE]
+> Ce script va créer un fichier `.env` avec les paramètres par défaut 
+> (principalement issus de `.env.example`) puis démarrer la stack.
+>
+> Comptez environ 15 minutes lors du premier démarrage.
+
+## Utilisation de Cywise
+
+Après démarrage de la stack, vous pouvez accéder à l'interface en utilisant
+les paramètres :
+
+- URL : [http://localhost:17801](http://localhost:17801)
+- login : demo@mydomain.com
+- mot de passe : DemoPass2026
+
+### Protéger ce qui est accessible sur internet
+
+#### Scanner de vulnérabilités
+
+Depuis le [tableau de bord](http://localhost:17801/dashboard), vous pouvez
+ajouter un domaine ou une adresse IP et demander à Cywise de la surveiller.
+
+Cywise va alors scanner cet actif pour rechercher les éventuelles
+vulnérabilités.
+
+Comptez environ 5 minutes avant de voir le résultat du scan.
+
+Vous pouvez rafraichir la page du tableau de bord pour voir combien de
+vulnérabilités Cywise a découvert. Elles sont réparties dans les 3 catégories
+de criticité Haute, Moyenne et Basse.
+
+Vous pouvez également retrouver la liste des vulnérabilités en cliquant sur le
+menu **Timelines > Vulnérabilités**.
+
+> [!WARNING]
+> Vous ne devez scanner que des domaines ou des adresses IP dont vous êtes
+> le propriétaire.
+
+### Protéger les actifs internes de l'entreprise
+
+Afin que Cywise reçoivent les événements des actifs que vous voulez protéger,
+vous devez exécuter, avec votre compte administrateur, la commande affichée
+sur le tableau de bord dans l'encadré
+**Vous souhaitez protéger un nouveau serveur ?**.
+
+Copiez la commande après avoir choisi l'OS de votre machine, Linux ou Windows,
+puis exécutez la.
+
+Par exemple, pour une machine sous linux, la commande ressemble à :
+
+```bash
+curl -s "http://localhost:17801/setup/script?api_token=1|cmxxx75&server_ip=$(curl -s ipinfo.io | jq -r '.ip')&server_name=$(hostname)" | bash
+```
+
+> [!NOTE]
+> Dans le cadre de la démo, Cywise est accessible uniquement sur localhost
+> donc le seul serveur que vous pouvez protéger est la machine sur laquelle
+> vous avez démarré la stack.
+
+#### Hardening
+
 En cours de rédaction.
+
+#### Agents
+
+Quelques minutes après avoir fait la commande sur votre serveur, vous devriez
+voir apparaître des événements en cliquant sur le menu **Timelines > Évènements**.
+
+Si certains événements semblent suspects à Cywise, d'après ses règles expertes,
+vous pourrez les voir en cliquant sur le menu 
+**Timelines > Indicateurs de compromission**.
+
+#### Métriques
+
+Vous pouvez accéder aux métriques en cliquant sur le menu **Timelines > Métriques**.
+
+### Accompagner les utilisateurs
+
+Pour activer CyberBuddy et CyberScribe, vous devez avoir une clé API chez 
+[deepinfra](https://deepinfra.com/).
+
+Vous devez mettre en place cette clé dans Cywise.
+
+1. Arrêtez la stack avec la commande `./stack-stop.sh`.
+2. Modifier le fichier `.env` pour ajouter la clé :
+  ```env
+  DEEPINFRA_API_KEY=<your_api_key>
+  ```
+3. Redémarrez la stack avec la commande `./stack-start.sh`.
+
+#### CyberBuddy
+
+Vous pouvez accéder à CyberBuddy en cliquant sur le menu **CyberBuddy**.
+
+Vous pouvez lui poser des questions sur vos assets, les vulnérabilités 
+détectées, etc.
+
+Exemples de questions :
+
+- Dis moi quel est mon serveur le plus vulnérable ?
+- Quelle vulnérabilité dois-je corriger en priorité ?
+
+
+#### CyberScribe
+
+Vous pouvez accéder à CyberScribe en cliquant sur le menu **CyberScribe**.
+
+Choisissez un modèle dans la liste puis commencez à écrire votre charte
+informatique ou votre PSSI avec son aide.
+
+### Divers
+
+#### Single Sign-On (SSO)
+
+En cours de rédaction.
+
+## Arrêt
+
+Vous pouvez arrêter la stack grâce à la commande :
+
+```bash
+./stack-stop.sh
+```
+
+## Suppression
+
+Vous pouvez supprimer l'intégralité de la stack y compris toutes les données
+associées grâce à la commande :
+
+```bash
+./stack-destroy.sh
+```
 
 # Liens utiles
 

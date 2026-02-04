@@ -1,4 +1,5 @@
 /.phpunit.cache
+/data
 /bootstrap/cache
 /node_modules
 /public/hot

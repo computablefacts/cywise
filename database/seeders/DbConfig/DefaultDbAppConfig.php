@@ -7,10 +7,6 @@ class DefaultDbAppConfig implements DbAppConfigInterface
     public function getParams(): array
     {
         return [
-            'towerify.cyberbuddy.api' => 'https://dev.generic-rag.dev02.towerify.io',
-            'towerify.cyberbuddy.api_username' => 'wrong',
-            'towerify.cyberbuddy.api_password' => 'wrong',
-
             'towerify.stripe.plans.essential.name' => 'Essentiel',
             'towerify.stripe.plans.essential.description' => null,
             'towerify.stripe.plans.essential.features' => '',

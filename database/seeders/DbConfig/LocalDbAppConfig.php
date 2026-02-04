@@ -7,8 +7,6 @@ class LocalDbAppConfig implements DbAppConfigInterface
     public function getParams(): array
     {
         return [
-            'towerify.website' => 'http://127.0.0.1:8000',
-
             'towerify.freshdesk.widget_id' => '',
             'towerify.freshdesk.to_email' => 'support@computablefacts.freshdesk.com',
             'towerify.freshdesk.from_email' => 'support@cywise.io',
@@ -80,9 +78,6 @@ class LocalDbAppConfig implements DbAppConfigInterface
             'towerify.clickhouse.username' => '',
             'towerify.clickhouse.password' => '',
             'towerify.clickhouse.database' => '',
-
-            'towerify.sendgrid.api' => 'https://api.sendgrid.com/v3/mail/send',
-            // 'encrypted:towerify.sendgrid.api_key' => '',
 
             'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
             'towerify.josianne.username' => 'cywise',

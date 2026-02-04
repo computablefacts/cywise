@@ -14,7 +14,7 @@
   - [Modalités d'exercice](#modalites-d-exercice)
   - [Modification de la politique de confidentialité](#modification-de-la-politique-de-confidentialite)
 
-Dernière mise à jour le 16/07/2025.
+Dernière mise à jour le 14/01/2026.
 
 # <a name="ml">Mentions légales</a>
 
@@ -138,11 +138,10 @@ La Société s'appuie sur les outils suivants :
 
 - [Stripe](https://stripe.com/). Notre passerelle de paiement est opérée par le service Stripe. Pour plus
   d'informations, veuillez consulter la Politique de Confidentialité de Stripe Inc.
-- [SendGrid](https://sendgrid.com/). C'est l'outil que La Société utilise pour envoyer des courriers électroniques,
-  qu'il s'agisse de messages d'information liés au service ou de communications à visée commerciale. SendGrid ne
+- [Mailcoach](https://www.mailcoach.app/). C'est l'outil que La Société utilise pour envoyer des courriers électroniques,
+  qu'il s'agisse de messages d'information liés au service ou de communications à visée commerciale. Mailcoach ne
   recueille pas d'informations directement, mais traite la liste des destinataires (adresses e-mail) auxquels nous
-  envoyons des communications. Pour plus d'informations, veuillez consulter la Politique de Confidentialité de SendGrid
-  Inc.
+  envoyons des communications. Pour plus d'informations, veuillez consulter la Politique de Confidentialité de Mailcoach.
 - [Freshdesk](https://www.freshworks.com/fr/freshdesk/). C'est l'outil de ticketing que La Société utilise.
   Freshdesk ne recueille pas d'informations directement, mais traite la liste des destinataires (adresses e-mail) avec
   lesquels nous échangeons. Pour plus d'informations, veuillez consulter la Politique de Confidentialité de Freshworks.

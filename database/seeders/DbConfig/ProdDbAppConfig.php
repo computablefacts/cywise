@@ -7,8 +7,6 @@ class ProdDbAppConfig implements DbAppConfigInterface
     public function getParams(): array
     {
         return [
-            'towerify.website' => 'https://www.cywise.io',
-
             'towerify.freshdesk.widget_id' => '44000004635',
             'towerify.freshdesk.to_email' => 'support@computablefacts.freshdesk.com',
             'towerify.freshdesk.from_email' => 'support@cywise.io',
@@ -84,9 +82,6 @@ class ProdDbAppConfig implements DbAppConfigInterface
             'towerify.clickhouse.username' => '',
             'towerify.clickhouse.password' => '',
             'towerify.clickhouse.database' => '',
-
-            'towerify.sendgrid.api' => 'https://api.sendgrid.com/v3/mail/send',
-            'encrypted:towerify.sendgrid.api_key' => 'ER#lce&UYg1jjqfV_cQGMmDoFVpnNgr9T9BWc5mp2JvXIrVLN9n1Hs9AR+6MwdZTX6a6kO+nq8Z7tPSiq23q4PruzEYvgkdjZYXrGCtkbRkbv2Zh+7JndbEZxjcc=',
 
             'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
             'towerify.josianne.username' => 'cywise',

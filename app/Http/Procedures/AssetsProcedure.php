@@ -9,7 +9,7 @@ use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
 use App\Http\Requests\JsonRpcRequest;
 use App\Listeners\CreateAssetListener;
 use App\Listeners\DeleteAssetListener;
-use App\Mail\MailCoachSimpleEmail;
+use App\Mail\SimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\AssetTag;
@@ -70,7 +70,7 @@ class AssetsProcedure extends Procedure
         $response = ApiUtils::discover_public($domain);
         try {
             if (($response['fallback'] ?? false) === true) {
-                MailCoachSimpleEmail::sendEmail("Cywise : No subdomain for {$domain}", "No subdomain for {$domain}", "Please, investigate.");
+                SimpleEmail::sendEmail("Cywise : No subdomain for {$domain}", "No subdomain for {$domain}", "Please, investigate.");
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());

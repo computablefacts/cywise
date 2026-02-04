@@ -42,7 +42,7 @@ use App\Http\Controllers\Iframes\UsersInvitationController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
-use App\Mail\MailCoachPerformaRequested;
+use App\Mail\PerformaRequested;
 use App\Models\YnhServer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
@@ -51,6 +51,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Spatie\Health\Http\Controllers\HealthCheckJsonResultsController;
 use Spatie\Health\Http\Controllers\HealthCheckResultsController;
 use Spatie\Health\Http\Controllers\SimpleHealthCheckController;
 use Wave\Facades\Wave;
@@ -91,6 +92,7 @@ Route::get('/cyber-advisor', [\App\Http\Controllers\ToolsController::class, 'cyb
  */
 Route::get('check-health', [SimpleHealthCheckController::class, '__invoke']);
 Route::get('check-health/ui', [HealthCheckResultsController::class, '__invoke'])->middleware('auth');
+Route::get('check-health/json', [HealthCheckJsonResultsController::class, '__invoke'])->middleware('auth.basic');
 
 // Cywise routes
 Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
@@ -196,7 +198,7 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
 
     // Send a Performa setup request if the tenant does not have a Performa domain yet
     if (!$user->performa_domain || !$user->performa_secret) {
-        MailCoachPerformaRequested::sendEmail();
+        PerformaRequested::sendEmail();
     }
 
     // 1. In the browser, go to "https://app.towerify.io" and login using your user account

@@ -36,6 +36,42 @@ RUN npm install --verbose
 RUN npm run build
 
 #
+# PHP configuration
+#
+FROM alpine:latest AS php_configuration
+
+RUN mkdir -p /php-config
+
+# Max execution time (default=30)
+RUN echo "max_execution_time=120" > /php-config/max-execution-time.ini
+# Memory Limit (default=128M)
+RUN echo "memory_limit=12288M" > /php-config/max-limit.ini
+# POST max size (default=8M)
+RUN echo "post_max_size=50M" >> /php-config/max-limit.ini
+# Upload max file size (default=2M)
+RUN echo "upload_max_filesize=50M" >> /php-config/max-limit.ini
+# Set maximum length of log_errors (default=1024)
+RUN echo "log_errors_max_len=16384" >> /php-config/max-limit.ini
+
+# Setup opcache. See https://www.php.net/manual/fr/opcache.configuration.php for details
+RUN echo "opcache.enable=1" > /php-config/opcache.ini
+RUN echo "opcache.revalidate_freq=0" >> /php-config/opcache.ini
+RUN echo "opcache.validate_timestamps=0" >> /php-config/opcache.ini
+RUN echo "opcache.max_accelerated_files=20000" >> /php-config/opcache.ini
+RUN echo "opcache.memory_consumption=256" >> /php-config/opcache.ini
+RUN echo "opcache.max_wasted_percentage=10" >> /php-config/opcache.ini
+RUN echo "opcache.interned_strings_buffer=16" >> /php-config/opcache.ini
+RUN echo "opcache.fast_shutdown=1" >> /php-config/opcache.ini
+
+# Time Zone (default=UTC)
+RUN echo "date.timezone=UTC" > /php-config/date_timezone.ini
+
+# Disable expose PHP (default=1)
+# Value 0 remove the HTTP header: "X-Powered-By : PHP/N.N.N"
+RUN echo "expose_php=0" > /php-config/expose-php.ini
+
+
+#
 # Application
 #
 FROM php:8.4-apache AS final
@@ -81,34 +117,7 @@ RUN install-php-extensions \
 # PHP configuration
 # Use the default production configuration
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-
-# Max execution time (default=30)
-RUN echo "max_execution_time=120" > $PHP_INI_DIR/conf.d/max-execution-time.ini
-# Memory Limit (default=128M)
-RUN echo "memory_limit=12288M" > $PHP_INI_DIR/conf.d/max-limit.ini
-# POST max size (default=8M)
-RUN echo "post_max_size=50M" >> $PHP_INI_DIR/conf.d/max-limit.ini
-# Upload max file size (default=2M)
-RUN echo "upload_max_filesize=50M" >> $PHP_INI_DIR/conf.d/max-limit.ini
-# Set maximum length of log_errors (default=1024)
-RUN echo "log_errors_max_len=16384" >> $PHP_INI_DIR/conf.d/max-limit.ini
-
-# Setup opcache. See https://www.php.net/manual/fr/opcache.configuration.php for details
-RUN echo "opcache.enable=1" > $PHP_INI_DIR/conf.d/opcache.ini
-RUN echo "opcache.revalidate_freq=0" >> $PHP_INI_DIR/conf.d/opcache.ini
-RUN echo "opcache.validate_timestamps=0" >> $PHP_INI_DIR/conf.d/opcache.ini
-RUN echo "opcache.max_accelerated_files=20000" >> $PHP_INI_DIR/conf.d/opcache.ini
-RUN echo "opcache.memory_consumption=256" >> $PHP_INI_DIR/conf.d/opcache.ini
-RUN echo "opcache.max_wasted_percentage=10" >> $PHP_INI_DIR/conf.d/opcache.ini
-RUN echo "opcache.interned_strings_buffer=16" >> $PHP_INI_DIR/conf.d/opcache.ini
-RUN echo "opcache.fast_shutdown=1" >> $PHP_INI_DIR/conf.d/opcache.ini
-
-# Time Zone (default=UTC)
-RUN echo "date.timezone=UTC" > $PHP_INI_DIR/conf.d/date_timezone.ini
-
-# Disable expose PHP (default=1)
-# Value 0 remove the HTTP header: "X-Powered-By : PHP/N.N.N"
-RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/expose-php.ini
+COPY --from=php_configuration /php-config/* $PHP_INI_DIR/conf.d/
 
 # Copy application files
 # See .dockerignore to know which files and directories are excluded
@@ -174,6 +183,7 @@ elif [[ "$role" = "scheduler" ]]; then
         echo "Apply Seeders..."
         (cd /var/www/html && php artisan db:seed --class=CywiseSeeder)
     fi
+    touch /tmp/scheduler_init_done
     echo "Launch schedule:run every minute..."
     while [[ true ]]
     do
