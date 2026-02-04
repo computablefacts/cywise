@@ -2,20 +2,36 @@
 
 namespace App\Helpers;
 
+use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\PromptsProvider;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ApiUtils
 {
-    public function translate(string $text, string $lang = 'fr', string $prompt = ''): array
+    private const string MODEL_TRANSLATE = 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo';
+
+    public function translate(string $text, string $lang = 'fr'): array
     {
-        return $this->post('/translate', [
-            'model_name' => 'default',
-            'prompt' => $prompt,
-            'text' => $text,
-            'lang' => $lang,
+        $prompt = PromptsProvider::provide('default_translate', [
+            'TEXT' => $text,
+            'LANG' => $lang,
         ]);
+
+        $answer = LlmsProvider::provide($prompt, self::MODEL_TRANSLATE);
+
+        return $answer === '' ?
+        [
+            'error' => true,
+            'error_details' => "Unable to translate $text in $lang language.",
+            'response' => $text,
+        ] :
+        [
+            'error' => false,
+            'error_details' => '',
+            'response' => $answer,
+        ];
     }
 
     public function whisper(string $url, string $lang = 'fr')
