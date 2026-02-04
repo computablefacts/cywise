@@ -34,7 +34,7 @@ services:
       test: ["CMD-SHELL", "test -f /tmp/scheduler_init_done"]
       interval: 10s
       timeout: 5s
-      retries: 20
+      retries: 60
 
   queue:
     image: cywise-app:latest
