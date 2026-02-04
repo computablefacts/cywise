@@ -261,7 +261,16 @@ Vous devez mettre en place cette clé dans Cywise.
 
 #### CyberBuddy
 
-En cours de rédaction.
+Vous pouvez accéder à CyberBuddy en cliquant sur le menu **CyberBuddy**.
+
+Vous pouvez lui poser des questions sur vos assets, les vulnérabilités 
+détectées, etc.
+
+Exemples de questions :
+
+- Dis moi quel est mon serveur le plus vulnérable ?
+- Quelle vulnérabilité dois-je corriger en priorité ?
+
 
 #### CyberScribe
 
