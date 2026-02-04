@@ -102,7 +102,7 @@ une infrastructure stable, un élément clé pour une cybersécurité robuste.
 
 ### CyberBuddy
 
-:bangbang: auto-hébergé :white_check_mark: SaaS
+:white_check_mark: auto-hébergé :white_check_mark: SaaS
 
 **Votre expert en cybersécurité, disponible 24/7.** Avec Cywise, posez toutes vos questions sur la cybersécurité ou les
 résultats de vos scans. CyberBuddy, notre assistant virtuel, vous guide en temps réel en s'appuyant sur des bases de
@@ -113,7 +113,7 @@ connaissances vérifiées et des bonnes pratiques reconnues. Une expertise acces
 
 ### CyberScribe
 
-:bangbang: auto-hébergé :white_check_mark: SaaS
+:white_check_mark: auto-hébergé :white_check_mark: SaaS
 
 **Rédaction assistée de vos documents cyber.** Besoin de créer une Charte Informatique ou une Politique de Sécurité des
 Systèmes d'Information (PSSI) ? CyberScribe, notre éditeur intelligent, vous accompagne pas à pas pour rédiger des
