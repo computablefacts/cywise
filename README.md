@@ -247,6 +247,18 @@ Vous pouvez accéder aux métriques en cliquant sur le menu **Timelines > Métri
 
 ### Accompagner les utilisateurs
 
+Pour activer CyberBuddy et CyberScribe, vous devez avoir une clé API chez 
+[deepinfra](https://deepinfra.com/).
+
+Vous devez mettre en place cette clé dans Cywise.
+
+1. Arrêtez la stack avec la commande `./stack-stop.sh`.
+2. Modifier le fichier `.env` pour ajouter la clé :
+  ```env
+  DEEPINFRA_API_KEY=<your_api_key>
+  ```
+3. Redémarrez la stack avec la commande `./stack-start.sh`.
+
 #### CyberBuddy
 
 En cours de rédaction.
