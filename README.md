@@ -274,7 +274,10 @@ Exemples de questions :
 
 #### CyberScribe
 
-En cours de rédaction.
+Vous pouvez accéder à CyberScribe en cliquant sur le menu **CyberScribe**.
+
+Choisissez un modèle dans la liste puis commencez à écrire votre charte
+informatique ou votre PSSI avec son aide.
 
 ### Divers
 
