@@ -14,6 +14,25 @@ class VulnerabilitiesProcedure extends Procedure
     public static string $name = 'vulnerabilities';
 
     #[RpcMethod(
+        description: "Compute the number of high, medium and low vulnerabilities for a given user.",
+        params: [],
+        result: [
+            "high" => "The number of vulnerabilities with criticality high.",
+            "medium" => "The number of vulnerabilities with criticality medium.",
+            "low" => "The number of vulnerabilities with criticality low.",
+        ],
+    )]
+    public function counts(JsonRpcRequest $request): array
+    {
+        $assets = Asset::query()->where('is_monitored', true)->get();
+        return [
+            'high' => $assets->map(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->count())->sum(),
+            'medium' => $assets->map(fn(Asset $asset) => $asset->alertsWithCriticalityMedium()->count())->sum(),
+            'low' => $assets->map(fn(Asset $asset) => $asset->alertsWithCriticalityLow()->count())->sum(),
+        ];
+    }
+
+    #[RpcMethod(
         description: "List the user's vulnerabilities.",
         params: [
             "asset_id" => "The asset id (optional).",

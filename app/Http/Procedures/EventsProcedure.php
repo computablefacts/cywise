@@ -20,11 +20,45 @@ class EventsProcedure extends Procedure
     public static string $name = 'events';
 
     #[RpcMethod(
+        description: "Compute the number of high, medium and low IoCs for a given user.",
+        params: [],
+        result: [
+            "high" => "The number of IoCs with criticality high.",
+            "medium" => "The number of IoCs with criticality medium.",
+            "low" => "The number of IoCs with criticality low.",
+        ],
+    )]
+    public function counts(JsonRpcRequest $request): array
+    {
+        // Load servers
+        $servers = YnhServer::all();
+
+        // Load events
+        $events = YnhOsquery::select([
+            DB::raw('ynh_servers.name AS server_name'),
+            DB::raw('ynh_servers.ip_address AS server_ip_address'),
+            'ynh_osquery_rules.score',
+            'ynh_osquery_rules.comments',
+            'ynh_osquery.*'
+        ])
+            ->join('ynh_osquery_rules', 'ynh_osquery_rules.id', '=', 'ynh_osquery.ynh_osquery_rule_id')
+            ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
+            ->whereIn('ynh_osquery.ynh_server_id', $servers->pluck('id'))
+            ->where('ynh_osquery_rules.enabled', true);
+
+        return [
+            'high' => $events->where('score', '>=', 75)->where('score', '<=', 100)->count(),
+            'medium' => $events->where('score', '>=', 50)->where('score', '<=', 74)->count(),
+            'low' => $events->where('score', '>=', 25)->where('score', '<=', 49)->count(),
+        ];
+    }
+
+    #[RpcMethod(
         description: "List collected events.",
         params: [
-            "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise.",
-            "max_score" => "An optional maximum score to filter events by.",
-            "server_id" => "An optional server id to filter events by.",
+            "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise. (required|integer|min:0|max:100)",
+            "max_score" => "An optional maximum score to filter events by. (nullable|integer|min:0|max:100)",
+            "server_id" => "An optional server id to filter events by. (nullable|integer|exists:ynh_servers,id)",
             "window" => "An optional window of time [min_date, max_date] to filter events by."
         ],
         result: [

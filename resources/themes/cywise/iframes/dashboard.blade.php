@@ -16,11 +16,11 @@
           </div>
           <div class="col">
             <div class="h5 mb-0">
-              <b>{{ $nb_monitored + $nb_monitorable }}</b>
+              <b>{{ $nb_monitored + $nb_monitorable }}</b> {{ __('assets') }}
             </div>
             <div class="text-muted">
               <a href="{{ route('iframes.assets') }}" class="link">
-                {{ __('Assets') }}
+                {{ __('Saved') }}
               </a>
             </div>
           </div>
@@ -41,11 +41,11 @@
           </div>
           <div class="col">
             <div class="h5 mb-0">
-              <b>{{ $nb_monitored }}</b>
+              <b>{{ $nb_monitored }}</b> {{ __('assets') }}
             </div>
             <div class="text-muted">
               <a href="{{ route('iframes.assets', [ 'status' => 'monitored' ]) }}" class="link">
-                {{ __('Assets Monitored') }}
+                {{ __('Monitored') }}
               </a>
             </div>
           </div>
@@ -66,11 +66,11 @@
           </div>
           <div class="col">
             <div class="h5 mb-0">
-              <b>{{ $nb_monitorable }}</b>
+              <b>{{ $nb_monitorable }}</b> {{ __('assets') }}
             </div>
             <div class="text-muted">
               <a href="{{ route('iframes.assets', [ 'status' => 'monitorable' ]) }}" class="link">
-                {{ __('Assets Monitorable') }}
+                {{ __('Monitorable') }}
               </a>
             </div>
           </div>
@@ -95,7 +95,7 @@
           </div>
           <div class="col">
             <div class="h5 mb-0">
-              <b>{{ $nb_high }}</b>
+              <b>{{ $nb_vulns_high }}</b> {{ __('vulnerabilities') }}
             </div>
             <div class="text-muted">
               <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'high' ]) }}" class="link">
@@ -120,7 +120,7 @@
           </div>
           <div class="col">
             <div class="h5 mb-0">
-              <b>{{ $nb_medium }}</b>
+              <b>{{ $nb_vulns_medium }}</b> {{ __('vulnerabilities') }}
             </div>
             <div class="text-muted">
               <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'medium' ]) }}" class="link">
@@ -145,7 +145,7 @@
           </div>
           <div class="col">
             <div class="h5 mb-0">
-              <b>{{ $nb_low }}</b>
+              <b>{{ $nb_vulns_low }}</b> {{ __('vulnerabilities') }}
             </div>
             <div class="text-muted">
               <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'low' ]) }}" class="link">
@@ -159,6 +159,85 @@
   </div>
 </div>
 <!-- VULNERABILITIES : END -->
+<!-- IoCs : BEGIN -->
+<div class="row pt-3">
+  <div class="col">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-content-center">
+              <span class="bg-red text-white avatar">
+                <span class="bp4-icon bp4-icon-issue"></span>
+              </span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="h5 mb-0">
+              <b>{{ $nb_iocs_high }}</b> {{ __('IoCs') }}
+            </div>
+            <div class="text-muted">
+              <a href="{{ route('iframes.ioc', [ 'level' => 'high' ]) }}" class="link">
+                {{ __('High') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col ps-0">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-content-center">
+              <span class="bg-orange text-white avatar">
+                <span class="bp4-icon bp4-icon-issue"></span>
+              </span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="h5 mb-0">
+              <b>{{ $nb_iocs_medium }}</b> {{ __('IoCs') }}
+            </div>
+            <div class="text-muted">
+              <a href="{{ route('iframes.ioc', [ 'level' => 'medium' ]) }}" class="link">
+                {{ __('Medium') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col ps-0">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="d-flex align-content-center">
+              <span class="bg-green text-white avatar">
+                <span class="bp4-icon bp4-icon-issue"></span>
+              </span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="h5 mb-0">
+              <b>{{ $nb_iocs_low }}</b> {{ __('IoCs') }}
+            </div>
+            <div class="text-muted">
+              <a href="{{ route('iframes.ioc', [ 'level' => 'low' ]) }}" class="link">
+                {{ __('Low') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- IoCs : END -->
 <!-- CYBERTODO : BEGIN -->
 @if(count($todo) > 0)
 <div class="row pt-3">

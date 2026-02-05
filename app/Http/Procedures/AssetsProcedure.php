@@ -361,6 +361,22 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
+        description: "Compute the number of monitored and monitorable assets for a given user.",
+        params: [],
+        result: [
+            "monitored" => "The number of monitored assets.",
+            "monitorable" => "The number of monitorable assets.",
+        ],
+    )]
+    public function counts(JsonRpcRequest $request): array
+    {
+        return [
+            'monitored' => Asset::query()->where('is_monitored', true)->count(),
+            'monitorable' => Asset::query()->where('is_monitored', false)->count(),
+        ];
+    }
+
+    #[RpcMethod(
         description: "List the user's assets.",
         params: [
             "type" => "The type of asset to list: domain or ip_address. (string|nullable|in:domain,ip_address)",

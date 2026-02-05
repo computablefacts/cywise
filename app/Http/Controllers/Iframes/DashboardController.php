@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Iframes;
 
 use App\Http\Controllers\Controller;
 use App\Http\Procedures\AssetsProcedure;
+use App\Http\Procedures\EventsProcedure;
 use App\Http\Procedures\HoneypotsProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
@@ -19,18 +20,36 @@ class DashboardController extends Controller
     {
         $procedure = new AssetsProcedure();
 
-        $request->replace(['is_monitored' => true]);
-        $nbMonitored = count($procedure->list(JsonRpcRequest::createFrom($request))['assets'] ?? []);
+        $counts = $procedure->counts(JsonRpcRequest::createFrom($request));
+        $nbMonitored = $counts['monitored'];
+        $nbMonitorable = $counts['monitorable'];
 
-        $request->replace(['is_monitored' => false]);
-        $nbMonitorable = count($procedure->list(JsonRpcRequest::createFrom($request))['assets'] ?? []);
+        $procedure = new EventsProcedure();
+
+        $counts = $procedure->counts(JsonRpcRequest::createFrom($request));
+        $nbIocsHigh = $counts['high'];
+        $nbIocsMedium = $counts['medium'];
+        $nbIocsLow = $counts['low'];
 
         $procedure = new VulnerabilitiesProcedure();
 
-        $alerts = $procedure->list(JsonRpcRequest::createFrom($request));
-        $nbHigh = count($alerts['high'] ?? []);
-        $nbMedium = count($alerts['medium'] ?? []);
-        $nbLow = count($alerts['low'] ?? []);
+        $counts = $procedure->counts(JsonRpcRequest::createFrom($request));
+        $nbVulnsHigh = $counts['high'];
+        $nbVulnsMedium = $counts['medium'];
+        $nbVulnsLow = $counts['low'];
+
+        $req = JsonRpcRequest::createFrom($request);
+        $req->merge(['level' => 'high']);
+        $alerts = $procedure->list($req)['high'];
+
+        if ($alerts->count() < 5) {
+            $req->merge(['level' => 'medium']);
+            $alerts = $alerts->concat($procedure->list($req)['medium']);
+        }
+        if ($alerts->count() < 5) {
+            $req->merge(['level' => 'low']);
+            $alerts = $alerts->concat($procedure->list($req)['low']);
+        }
 
         $leaks = TimelineController::fetchLeaks($request->user())
             ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
@@ -38,24 +57,21 @@ class DashboardController extends Controller
             ->reverse()
             ->take(10);
 
-        $todo = collect($alerts['high'] ?? [])
-            ->concat($alerts['medium'] ?? [])
-            ->concat($alerts['low'] ?? [])
-            ->sortBy(function (Alert $alert) {
-                if ($alert->isCritical()) {
-                    return 0;
-                }
-                if ($alert->isHigh()) {
-                    return 1;
-                }
-                if ($alert->isMedium()) {
-                    return 2;
-                }
-                if ($alert->isLow()) {
-                    return 3;
-                }
-                return 4;
-            })
+        $todo = $alerts->sortBy(function (Alert $alert) {
+            if ($alert->isCritical()) {
+                return 0;
+            }
+            if ($alert->isHigh()) {
+                return 1;
+            }
+            if ($alert->isMedium()) {
+                return 2;
+            }
+            if ($alert->isLow()) {
+                return 3;
+            }
+            return 4;
+        })
             ->values()
             ->take(5);
 
@@ -100,9 +116,12 @@ class DashboardController extends Controller
         return view('theme::iframes.dashboard', [
             'nb_monitored' => $nbMonitored,
             'nb_monitorable' => $nbMonitorable,
-            'nb_high' => $nbHigh,
-            'nb_medium' => $nbMedium,
-            'nb_low' => $nbLow,
+            'nb_vulns_high' => $nbVulnsHigh,
+            'nb_vulns_medium' => $nbVulnsMedium,
+            'nb_vulns_low' => $nbVulnsLow,
+            'nb_iocs_high' => $nbIocsHigh,
+            'nb_iocs_medium' => $nbIocsMedium,
+            'nb_iocs_low' => $nbIocsLow,
             'todo' => $todo,
             'leaks' => $leaks,
             'honeypots' => $honeypots,
