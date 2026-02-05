@@ -6,7 +6,6 @@ use App\Enums\SshTraceStateEnum;
 use App\Events\ConfigureHost;
 use App\Events\CreateAsset;
 use App\Events\DeleteAsset;
-use App\Events\PullServerInfos;
 use App\Helpers\SshKeyPair;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
@@ -294,39 +293,6 @@ class ServersProcedure extends Procedure
             ];
         }
         throw new \Exception('An error occurred');
-    }
-
-    #[RpcMethod(
-        description: "Pull the server's information.",
-        params: [
-            "server_id" => "The server id.",
-        ],
-        result: [
-            "msg" => "A success message.",
-        ]
-    )]
-    public function pullServerInfos(JsonRpcRequest $request): array
-    {
-        $params = $request->validate([
-            'server_id' => 'required|integer|exists:ynh_servers,id',
-        ]);
-
-        /** @var YnhServer $server */
-        $server = YnhServer::where('id', $params['server_id'])->firstOrFail();
-
-        if ($server->isFrozen()) {
-            throw new \Exception("The server configuration is frozen.");
-        }
-
-        $uid = Str::random(10);
-        $ssh = $server->sshConnection($uid, Auth::user());
-        $ssh->newTrace(SshTraceStateEnum::PENDING, "The server infos are being pulled!");
-
-        PullServerInfos::dispatch($uid, Auth::user(), $server);
-
-        return [
-            "msg" => "The server infos are being pulled!"
-        ];
     }
 
     #[RpcMethod(

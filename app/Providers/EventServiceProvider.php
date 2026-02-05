@@ -17,7 +17,6 @@ use App\Events\IngestHoneypotsEvents;
 use App\Events\ProcessLogalertPayload;
 use App\Events\ProcessLogalertPayloadEx;
 use App\Events\ProcessLogparserPayload;
-use App\Events\PullServerInfos;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Events\SendAuditReport;
@@ -45,7 +44,6 @@ use App\Listeners\RebuildPackagesListListener;
 use App\Listeners\SendAuditReportListener;
 use App\Listeners\StartAssetsDiscoverListener;
 use App\Listeners\StoreLoginTime;
-use App\Listeners\UpdateServerInfosListener;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -61,9 +59,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         ConfigureHost::class => [
             ConfigureHostListener::class,
-        ],
-        PullServerInfos::class => [
-            UpdateServerInfosListener::class,
         ],
         ProcessLogalertPayload::class => [
             ProcessLogalertPayloadListener::class,

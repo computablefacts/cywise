@@ -72,11 +72,6 @@
     executeJsonRpcApiCall('invitations@send', {id: invitationId});
   }
 
-  function pullServerInfosApiCall(serverId, onFinally = onFinallyDefault) {
-    executeJsonRpcApiCall('servers@pullServerInfos', {server_id: serverId}, onSuccessDefault, onErrorDefault,
-      onFinally);
-  }
-
   function testSshConnectionApiCall(serverId, ip, port, username) {
     executeJsonRpcApiCall('servers@testSshConnection', {server_id: serverId, ip: ip, port: port, username: username});
   }
