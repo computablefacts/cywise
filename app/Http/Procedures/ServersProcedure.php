@@ -3,12 +3,10 @@
 namespace App\Http\Procedures;
 
 use App\Enums\SshTraceStateEnum;
-use App\Events\ConfigureHost;
 use App\Events\CreateAsset;
 use App\Events\DeleteAsset;
 use App\Helpers\SshKeyPair;
 use App\Http\Requests\JsonRpcRequest;
-use App\Models\User;
 use App\Models\YnhDomain;
 use App\Models\YnhServer;
 use Carbon\Carbon;
@@ -25,42 +23,28 @@ class ServersProcedure extends Procedure
 
     #[RpcMethod(
         description: "Create a single server.",
-        params: [
-            "order_id" => "The order id (optional).",
-        ],
+        params: [],
         result: [
             "server" => "A server object.",
         ]
     )]
     public function create(JsonRpcRequest $request): array
     {
-        $params = $request->validate([
-            'order_id' => 'integer|min:0',
+        $keys = new SshKeyPair();
+        $keys->init();
+
+        $server = YnhServer::create([
+            'name' => '',
+            'user_id' => Auth::user()->id,
+            'ssh_public_key' => $keys->publicKey(),
+            'ssh_private_key' => $keys->privateKey(),
+            'ynh_order_id' => null,
+            'secret' => Str::random(30),
         ]);
 
-        $orderId = $params['order_id'] ?? 0;
-        $server = null;
+        $server->name = "YNH{$server->id}";
+        $server->save();
 
-        if ($orderId > 0) {
-            $server = YnhServer::where('ynh_order_id', $orderId)->first();
-        }
-        if (!$server) {
-
-            $keys = new SshKeyPair();
-            $keys->init();
-
-            $server = YnhServer::create([
-                'name' => '',
-                'user_id' => Auth::user()->id,
-                'ssh_public_key' => $keys->publicKey(),
-                'ssh_private_key' => $keys->privateKey(),
-                'ynh_order_id' => $orderId === 0 ? null : $orderId,
-                'secret' => Str::random(30),
-            ]);
-
-            $server->name = "YNH{$server->id}";
-            $server->save();
-        }
         return [
             "server" => $server
         ];
@@ -99,12 +83,6 @@ class ServersProcedure extends Procedure
             $ssh->newTrace(SshTraceStateEnum::IN_PROGRESS, 'Stopping asset monitoring...');
             DeleteAsset::dispatch(Auth::user(), $server->ip());
             $ssh->newTrace(SshTraceStateEnum::DONE, 'Asset monitoring stopped.');
-
-            $server->sshEnableAdminConsole($ssh);
-
-            // TODO : remove fail2ban's whitelisted IPs
-            // TODO : re-open closed ports
-            // See ConfigureHostListener for details
         }
 
         $server->delete();
@@ -166,7 +144,7 @@ class ServersProcedure extends Procedure
             throw new \Exception("The 'dig' command is unavailable.");
         }
 
-        $ip = trim($process->getOutput());
+        $ip = Str::trim($process->getOutput());
 
         if (!$ip) {
             $cmd = $process->getCommandLine();
@@ -189,9 +167,6 @@ class ServersProcedure extends Procedure
 
         CreateAsset::dispatch($server->user()->first(), $server->ip(), true, [$server->name]);
 
-        /** @var User $user */
-        $user = Auth::user();
-
         if (!$principal) {
             $server->domains()->save(YnhDomain::updateOrCreate([
                 'ynh_server_id' => $server->id,
@@ -204,13 +179,6 @@ class ServersProcedure extends Procedure
             ]));
             CreateAsset::dispatch($server->user()->first(), $params['domain'], true, [$server->name]);
         }
-
-        $uid = Str::random(10);
-        $ssh = $server->sshConnection($uid, $user);
-        $ssh->newTrace(SshTraceStateEnum::PENDING, "Your host is being configured!");
-
-        ConfigureHost::dispatch($uid, $user, $server);
-
         return [
             "msg" => "Your host is being configured!"
         ];

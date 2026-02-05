@@ -5,7 +5,6 @@ namespace App\Providers;
 use App\Events\AssetsShared;
 use App\Events\BeginPortsScan;
 use App\Events\BeginVulnsScan;
-use App\Events\ConfigureHost;
 use App\Events\CreateAsset;
 use App\Events\DeleteAsset;
 use App\Events\EndPortsScan;
@@ -24,7 +23,6 @@ use App\Events\StartAssetsDiscover;
 use App\Listeners\AssetsSharedListener;
 use App\Listeners\BeginPortsScanListener;
 use App\Listeners\BeginVulnsScanListener;
-use App\Listeners\ConfigureHostListener;
 use App\Listeners\CreateAssetListener;
 use App\Listeners\DeleteAssetListener;
 use App\Listeners\EndPortsScanListener;
@@ -57,9 +55,6 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        ConfigureHost::class => [
-            ConfigureHostListener::class,
-        ],
         ProcessLogalertPayload::class => [
             ProcessLogalertPayloadListener::class,
         ],
