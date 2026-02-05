@@ -89,8 +89,8 @@
     executeJsonRpcApiCall('servers@executeShellCommand', {server_id: serverId, cmd: cmd}, onSuccess);
   }
 
-  function getServerMessagesApiCall(serverId) {
-    executeJsonRpcApiCall('servers@messages', {server_id: serverId});
+  function getServerEventsApiCall(serverId) {
+    executeJsonRpcApiCall('servers@events', {server_id: serverId});
   }
 
   function createNoteApiCall(note, scopes = [], onSuccess = onSuccessDefault) {

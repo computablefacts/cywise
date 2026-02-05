@@ -296,7 +296,7 @@ class ServersProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Retrieve the security events for a specific server over the past 5 days.",
+        description: "Retrieve the security events and IoCs for a specific server over the past 5 days.",
         params: [
             "server_id" => "The server id.",
         ],
@@ -304,7 +304,7 @@ class ServersProcedure extends Procedure
             "events" => "An array of security events.",
         ]
     )]
-    public function messages(JsonRpcRequest $request): array
+    public function events(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'server_id' => 'required|integer|exists:ynh_servers,id',
