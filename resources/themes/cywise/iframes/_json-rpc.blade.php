@@ -98,29 +98,6 @@
     executeJsonRpcApiCall('servers@messages', {server_id: serverId});
   }
 
-  function installAppApiCall(serverId, orderId) {
-    executeJsonRpcApiCall('applications@installApp', {server_id: serverId, order_id: orderId});
-  }
-
-  function uninstallAppApiCall(serverId, applicationId) {
-    executeJsonRpcApiCall('applications@uninstallApp', {server_id: serverId, application_id: applicationId});
-  }
-
-  function addUserPermissionApiCall(serverId, userId, permission) {
-    executeJsonRpcApiCall('applications@addUserPermission',
-      {server_id: serverId, user_id: userId, permission: permission});
-  }
-
-  function removeUserPermissionApiCall(serverId, userId, permission) {
-    executeJsonRpcApiCall('applications@removeUserPermission',
-      {server_id: serverId, user_id: userId, permission: permission});
-  }
-
-  function addTowerifyUserPermissionApiCall(serverId, userId, permission) {
-    executeJsonRpcApiCall('applications@addTowerifyUserPermission',
-      {server_id: serverId, user_id: userId, permission: permission});
-  }
-
   function createNoteApiCall(note, scopes = [], onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('notes@create', {note: note, scopes: scopes}, onSuccess);
   }

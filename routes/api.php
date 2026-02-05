@@ -184,7 +184,6 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
         })->name('rpc.docs');
 
         Route::rpc('/endpoint', [
-            \App\Http\Procedures\ApplicationsProcedure::class,
             \App\Http\Procedures\AssetsProcedure::class,
             \App\Http\Procedures\ChunksProcedure::class,
             \App\Http\Procedures\CollectionsProcedure::class,
