@@ -7,7 +7,6 @@ use App\Events\BeginPortsScan;
 use App\Events\BeginVulnsScan;
 use App\Events\ConfigureHost;
 use App\Events\CreateAsset;
-use App\Events\CreateBackup;
 use App\Events\DeleteAsset;
 use App\Events\EndPortsScan;
 use App\Events\EndVulnsScan;
@@ -28,7 +27,6 @@ use App\Listeners\BeginPortsScanListener;
 use App\Listeners\BeginVulnsScanListener;
 use App\Listeners\ConfigureHostListener;
 use App\Listeners\CreateAssetListener;
-use App\Listeners\CreateBackupListener;
 use App\Listeners\DeleteAssetListener;
 use App\Listeners\EndPortsScanListener;
 use App\Listeners\EndVulnsScanListener;
@@ -44,7 +42,6 @@ use App\Listeners\ProcessLogalertPayloadListenerEx;
 use App\Listeners\ProcessLogparserPayloadListener;
 use App\Listeners\RebuildLatestEventsCacheListener;
 use App\Listeners\RebuildPackagesListListener;
-use App\Listeners\RemoveUserPermissionListener;
 use App\Listeners\SendAuditReportListener;
 use App\Listeners\StartAssetsDiscoverListener;
 use App\Listeners\StoreLoginTime;
@@ -64,9 +61,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         ConfigureHost::class => [
             ConfigureHostListener::class,
-        ],
-        CreateBackup::class => [
-            CreateBackupListener::class,
         ],
         PullServerInfos::class => [
             UpdateServerInfosListener::class,
