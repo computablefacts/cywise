@@ -383,7 +383,7 @@ class CyberBuddyController extends Controller
 
         if (!$collection) {
             if (!IsValidCollectionName::test($collectionName)) {
-                return response()->json(['error' => 'Invalid collection name.'], 500);
+                return response()->json(['error' => 'Invalid collection name. Must contain only lowercase letters, numbers, and dashes.'], 500);
             }
             $collection = \App\Models\Collection::create(['name' => $collectionName]);
         }
@@ -430,7 +430,7 @@ class CyberBuddyController extends Controller
 
         if (!$collection) {
             if (!IsValidCollectionName::test($collectionName)) {
-                return response()->json(['error' => 'Invalid collection name.'], 500);
+                return response()->json(['error' => 'Invalid collection name. Must contain only lowercase letters, numbers, and dashes.'], 500);
             }
             $collection = \App\Models\Collection::create(['name' => $collectionName]);
         }

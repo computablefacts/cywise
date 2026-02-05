@@ -11,6 +11,8 @@
       console.error('Error:', error);
       if (error.response && error.response.data && error.response.data.message) {
         toaster.toastError(error.response.data.message);
+      } else if (error.response && error.response.data && error.response.data.error) {
+        toaster.toastError(error.response.data.error);
       } else {
         toaster.toastError("{{ __('An error occurred. Try again in a moment or contact the support.') }}");
       }
