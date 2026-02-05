@@ -143,7 +143,7 @@ class EventsProcedure extends Procedure
             "if the request is 'Analyze security events for server 1', the input should be {\"server_id\":1}",
             "if the request is 'Is there any suspicious activity on server 163.172.82.3?', the input should be {\"ip_address\":\"163.172.82.3\"}",
         ],
-        ai_result: "The SOC Operator for server {\$result['server_name']} ({\$result['server_ip_address']}) indicates that the activity is {\$result['activity']}.\n{\$result['report']}"
+        ai_result: "The SOC Operator analyzed server {\$result['server_name']} ({\$result['server_ip_address']}) and indicates that the activity is {\$result['activity']}.\n{\$result['report']}"
     )]
     public function socOperator(JsonRpcRequest $request): array
     {
