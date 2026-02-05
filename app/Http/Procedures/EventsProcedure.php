@@ -2,12 +2,17 @@
 
 namespace App\Http\Procedures;
 
+use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\MemosProvider;
+use App\AgentSquad\Providers\PromptsProvider;
+use App\AgentSquad\Providers\TranslationsProvider;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Sajya\Server\Attributes\RpcMethod;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Sajya\Server\Procedure;
 
 class EventsProcedure extends Procedure
@@ -24,7 +29,17 @@ class EventsProcedure extends Procedure
         ],
         result: [
             "events" => "The list of events over the last 3 days.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'List recent security events', the input should be {\"min_score\":0}",
+            "If the request is 'List recent security events excluding indicators of compromise (IoCs)', the input should be {\"max_score\":0}",
+            "if the request is 'Show IoCs for server 1', the input should be {\"min_score\":1,\"server_id\":1}",
+            "If the request is 'Show suspicious events for server 1', the input should be {\"min_score\":1,\"max_score\":24,\"server_id\":1}",
+            "If the request is 'Show low severity events for server 1', the input should be {\"min_score\":25,\"max_score\":49,\"server_id\":1}",
+            "If the request is 'Show medium severity events for server 1', the input should be {\"min_score\":50,\"max_score\":74,\"server_id\":1}",
+            "If the request is 'Show high severity events for server 1', the input should be {\"min_score\":75,\"server_id\":1}",
+        ],
+        ai_result: "@json(\$result['events'])"
     )]
     public function list(JsonRpcRequest $request): array
     {
@@ -108,6 +123,181 @@ class EventsProcedure extends Procedure
 
         return [
             "msg" => "The event has been dismissed!",
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Analyze security events and IoCs for a given server to detect suspicious activity.",
+        params: [
+            "server_id" => "The server id.",
+            "ip_address" => "If the server id is not specified, the server IP address."
+        ],
+        result: [
+            "activity" => "The activity status: UNKNOWN, NORMAL, SUSPICIOUS, or ANORMAL.",
+            "confidence" => "The confidence score between 0 (low) to 1 (high).",
+            "reasoning" => "The reasoning behind the analysis.",
+            "suggested_action" => "The suggested action to take.",
+            "report" => "A full text report in Markdown format.",
+        ],
+        ai_examples: [
+            "if the request is 'Analyze security events for server 1', the input should be {\"server_id\":1}",
+            "if the request is 'Is there any suspicious activity on server 163.172.82.3?', the input should be {\"ip_address\":\"163.172.82.3\"}",
+        ],
+        ai_result: "The SOC Operator for server {\$result['server_name']} ({\$result['server_ip_address']}) indicates that the activity is {\$result['activity']}.\n{\$result['report']}"
+    )]
+    public function socOperator(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'server_id' => 'integer|required_without:ip_address|prohibits:ip_address|exists:ynh_servers,id',
+            'ip_address' => 'string|required_without:server_id|prohibits:server_id|min:4|max:15|exists:ynh_servers,ip_address'
+        ]);
+
+        if (isset($params['server_id'])) {
+            $server = YnhServer::where('id', $params['server_id'])->firstOrFail();
+        } else {
+            $server = YnhServer::where('ip_address', $params['ip_address'])->firstOrFail();
+        }
+
+        $user = $request->user();
+        $minDate = Carbon::now()->utc()->startOfDay()->subWeek();
+        $maxDate = Carbon::now()->utc()->endOfDay();
+
+        Log::debug("Building SOC operator report for server {$server->name} ({$server->ip()})...");
+
+        $eventRequest = new JsonRpcRequest([
+            'min_score' => 0, // Load both security events and IoCs
+            'server_id' => $server->id,
+            'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')]
+        ]);
+        $eventRequest->setUserResolver(fn() => $user);
+        $events = $this->list($eventRequest)['events']
+            ->map(fn(YnhOsquery $event) => $event->logLine())
+            ->filter(fn(string $logLine) => !empty($logLine))
+            ->sort() // Reorder events from the oldest to the newest
+            ->values();
+
+        if ($events->isEmpty()) {
+            Log::debug("No notable events found for server {$server->name} ({$server->ip()})");
+            return [
+                'server_name' => $server->name,
+                'server_ip_address' => $server->ip(),
+                'activity' => 'NORMAL',
+                'confidence' => 1,
+                'reasoning' => "Aucun événement notable n'a été trouvé.",
+                'suggested_action' => "Aucune action requise.",
+                'report' => "Il n'y a eu aucun événement notable sur le serveur {$server->name} d'adresse IP {$server->ip()} ces derniers jours.",
+            ];
+        }
+
+        $logs = implode("\n", cywise_compress_log_buffer($events->toArray()));
+        $memos = MemosProvider::provide($user, NotesProcedure::SCOPE_IS_SOC_OPERATOR);
+        $prompt = PromptsProvider::provide('default_soc_operator', [
+            'SERVER_NAME' => $server->name,
+            'SERVER_IP_ADDRESS' => $server->ip(),
+            'LOGS' => $logs,
+            'MEMOS' => $memos,
+        ]);
+        $answer = LlmsProvider::provide($prompt);
+
+        Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): " . json_encode([
+                "prompt" => $prompt,
+                "answer" => $answer,
+            ]));
+
+        $matches = null;
+        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
+        $answer = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
+        $json = json_decode($answer, true);
+
+        if (empty($json)) {
+            Log::error('Failed to parse SOC operator answer (json): ' . $answer);
+            return [
+                'server_name' => $server->name,
+                'server_ip_address' => $server->ip(),
+                'activity' => 'UNKNOWN',
+                'confidence' => 1,
+                'reasoning' => "Unknown.",
+                'suggested_action' => "None.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (le JSON est invalide).",
+            ];
+        }
+        if (!isset($json['activity']) || !in_array($json['activity'], ['NORMAL', 'SUSPICIOUS', 'ANORMAL'])) {
+            Log::error('Failed to parse SOC operator answer (activity): ' . $answer);
+            return [
+                'server_name' => $server->name,
+                'server_ip_address' => $server->ip(),
+                'activity' => 'UNKNOWN',
+                'confidence' => 1,
+                'reasoning' => "Unknown.",
+                'suggested_action' => "None.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (l'attribut 'activity' est invalide).",
+            ];
+        }
+        if (!isset($json['confidence']) || !is_numeric($json['confidence']) || $json['confidence'] < 0 || $json['confidence'] > 1) {
+            Log::error('Failed to parse SOC operator answer (confidence): ' . $answer);
+            return [
+                'server_name' => $server->name,
+                'server_ip_address' => $server->ip(),
+                'activity' => 'UNKNOWN',
+                'confidence' => 1,
+                'reasoning' => "Unknown.",
+                'suggested_action' => "None.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (l'attribut 'confidence' est invalide).",
+            ];
+        }
+        if (!isset($json['reasoning']) || !is_string($json['reasoning'])) {
+            Log::error('Failed to parse SOC operator answer (reasoning): ' . $answer);
+            return [
+                'server_name' => $server->name,
+                'server_ip_address' => $server->ip(),
+                'activity' => 'UNKNOWN',
+                'confidence' => 1,
+                'reasoning' => "Unknown.",
+                'suggested_action' => "None.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (l'attribut 'reasoning' est invalide).",
+            ];
+        }
+        if (!isset($json['suggested_action']) || !is_string($json['suggested_action'])) {
+            Log::error('Failed to parse SOC operator answer (suggested_action): ' . $answer);
+            return [
+                'server_name' => $server->name,
+                'server_ip_address' => $server->ip(),
+                'activity' => 'UNKNOWN',
+                'confidence' => 1,
+                'reasoning' => "Unknown.",
+                'suggested_action' => "None.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (l'attribut 'suggested_action' est invalide).",
+            ];
+        }
+
+        $reasoning = TranslationsProvider::provide($json['reasoning']);
+        $suggestedAction = TranslationsProvider::provide($json['suggested_action']);
+
+        if ($json['activity'] === "NORMAL") {
+            return [
+                'server_name' => $server->name,
+                'server_ip_address' => $server->ip(),
+                'activity' => $json['activity'],
+                'confidence' => $json['confidence'],
+                'reasoning' => $reasoning,
+                'suggested_action' => $suggestedAction,
+                'report' => "Il n'y a eu aucun événement notable sur le serveur **{$server->name}** d'adresse IP {$server->ip()} ces derniers jours.",
+            ];
+        }
+
+        $report = "L'activité sur le serveur **{$server->name}** d'adresse IP {$server->ip()} est **{$json['activity']}E**.\n\n";
+        $report .= "- **Indice de confiance (0=faible, 1=haute) :** {$json['confidence']}\n";
+        $report .= "- **Raisonnement :** {$reasoning}\n";
+        $report .= "- **Action suggérée :** {$suggestedAction}";
+
+        return [
+            'server_name' => $server->name,
+            'server_ip_address' => $server->ip(),
+            'activity' => $json['activity'],
+            'confidence' => $json['confidence'],
+            'reasoning' => $reasoning,
+            'suggested_action' => $suggestedAction,
+            'report' => $report,
         ];
     }
 }

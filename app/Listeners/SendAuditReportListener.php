@@ -2,27 +2,21 @@
 
 namespace App\Listeners;
 
-use App\AgentSquad\Providers\LlmsProvider;
-use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\Providers\PromptsProvider;
-use App\AgentSquad\Providers\TranslationsProvider;
 use App\Events\SendAuditReport;
 use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Procedures\EventsProcedure;
-use App\Http\Procedures\NotesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Mail\SimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\TimelineItem;
 use App\Models\User;
-use App\Models\YnhOsquery;
 use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Parsedown;
 
 class SendAuditReportListener extends AbstractListener
 {
@@ -321,85 +315,26 @@ class SendAuditReportListener extends AbstractListener
 
     private function buildSectionIoCs(User $user): string
     {
-        $minDate = Carbon::now()->utc()->startOfDay()->subDays(2);
-        $maxDate = Carbon::now()->utc()->endOfDay();
         $activity = YnhServer::select('ynh_servers.*')
             ->whereRaw("ynh_servers.is_ready = true")
             ->orderBy('ynh_servers.name')
             ->get()
-            ->map(function (YnhServer $server) use ($user, $minDate, $maxDate) {
+            ->map(function (YnhServer $server) use ($user) {
 
-                Log::debug("Building SOC operator report for server {$server->name} ({$server->ip()})...");
-
-                $request = new JsonRpcRequest([
-                    'min_score' => 0, // Load both security events and IoCs
-                    'server_id' => $server->id,
-                    'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')]
-                ]);
+                $request = new JsonRpcRequest(['server_id' => $server->id]);
                 $request->setUserResolver(fn() => $user);
-                $events = (new EventsProcedure())->list($request)['events']
-                    ->map(fn(YnhOsquery $event) => $event->logLine())
-                    ->filter(fn(string $logLine) => !empty($logLine))
-                    ->sort() // Reorder events from the oldest to the newest
-                    ->values();
+                $result = (new EventsProcedure())->socOperator($request);
 
-                if ($events->isEmpty()) {
-                    Log::debug("No notable events found for server {$server->name} ({$server->ip()})");
+                if ($result['activity'] === 'UNKNOWN') {
+                    return "<li>L'opérateur SOC a rencontré une erreur lors de l'analyse du serveur <b>{$server->name}</b> d'adresse IP {$server->ip()}.</li>";
+                }
+                if ($result['activity'] === 'NORMAL') {
                     return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
 
-                $logs = implode("\n", cywise_compress_log_buffer($events->toArray()));
-                $memos = empty($collection) ? MemosProvider::provide($user, NotesProcedure::SCOPE_IS_SOC_OPERATOR) : 'None.';
-                $prompt = PromptsProvider::provide('default_soc_operator', [
-                    'SERVER_NAME' => $server->name,
-                    'SERVER_IP_ADDRESS' => $server->ip(),
-                    'LOGS' => $logs,
-                    'MEMOS' => $memos,
-                ]);
-                $answer = LlmsProvider::provide($prompt);
+                $html = (new Parsedown)->text($result['report']);
 
-                Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): " . json_encode([
-                        "prompt" => $prompt,
-                        "answer" => $answer,
-                    ]));
-
-                $matches = null;
-                preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
-                $answer = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
-                $json = json_decode($answer, true);
-
-                if (empty($json)) {
-                    Log::error('Failed to parse SOC operator answer (json): ' . $answer);
-                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (le JSON est invalide).</li>";
-                }
-                if (!isset($json['activity']) || !in_array($json['activity'], ['NORMAL', 'SUSPICIOUS', 'ANORMAL'])) {
-                    Log::error('Failed to parse SOC operator answer (activity): ' . $answer);
-                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'activity' est invalide).</li>";
-                }
-                if (!isset($json['confidence']) || !is_numeric($json['confidence']) || $json['confidence'] < 0 || $json['confidence'] > 1) {
-                    Log::error('Failed to parse SOC operator answer (confidence): ' . $answer);
-                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'confidence' est invalide).</li>";
-                }
-                if (!isset($json['reasoning']) || !is_string($json['reasoning'])) {
-                    Log::error('Failed to parse SOC operator answer (reasoning): ' . $answer);
-                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'reasoning' est invalide).</li>";
-                }
-                if (!isset($json['suggested_action']) || !is_string($json['suggested_action'])) {
-                    Log::error('Failed to parse SOC operator answer (suggested_action): ' . $answer);
-                    return "<li>L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} (l'attribut 'suggested_action' est invalide).</li>";
-                }
-                if ($json['activity'] === "NORMAL") {
-                    return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
-                }
-
-                $reasoning = TranslationsProvider::provide($json['reasoning']);
-                $suggestedAction = TranslationsProvider::provide($json['suggested_action']);
-
-                return "<li>L'activité sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} est <b>{$json['activity']}E</b>.<ul>
-                    <li><b>Indice de confiance (0=faible, 1=haute) :</b> {$json['confidence']}</li>
-                    <li><b>Raisonnement :</b> {$reasoning}</li>
-                    <li><b>Action suggérée :</b> {$suggestedAction}</li>
-                </ul></li>";
+                return "<li>{$html}</li>";
             })
             ->filter(fn(string $event) => !empty($event))
             ->sort()
@@ -408,7 +343,7 @@ class SendAuditReportListener extends AbstractListener
         Log::debug("SOC operator report: " . json_encode(['activity' => $activity]));
 
         return $activity->isEmpty() ? '' : "
-            <h3>Activité & Indicateurs de compromission (IoCs)</h3>
+            <h3>Analyse de l'activité des serveurs</h3>
             <ul>{$activity->implode('')}</ul>
         ";
     }

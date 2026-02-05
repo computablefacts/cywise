@@ -13,13 +13,40 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 use Symfony\Component\Process\Process;
 
 class ServersProcedure extends Procedure
 {
     public static string $name = 'servers';
+
+    #[RpcMethod(
+        description: "List servers where an agent has been deployed.",
+        params: [],
+        result: [],
+        ai_examples: [
+            "if the request is 'List all servers', the input should be {}",
+            "if the request is 'What are my servers?', the input should be {}",
+        ],
+        ai_result: "@json(\$result['servers'])"
+    )]
+    public function list(JsonRpcRequest $request): array
+    {
+        return [
+            "servers" => YnhServer::query()
+                ->where('created_by', $request->user()->id)
+                ->orderBy('name')
+                ->get()
+                ->map(fn(YnhServer $server) => [
+                    'id' => $server->id,
+                    'created_at' => $server->created_at->utc()->format('Y-m-d H:i:s'),
+                    'name' => $server->name,
+                    'ip_address' => $server->ip(),
+                ])
+                ->values()
+                ->all(),
+        ];
+    }
 
     #[RpcMethod(
         description: "Create a single server.",
