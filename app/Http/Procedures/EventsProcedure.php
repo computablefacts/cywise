@@ -129,7 +129,7 @@ class EventsProcedure extends Procedure
     #[RpcMethod(
         description: "Analyze security events and IoCs for a given server to detect suspicious activity.",
         params: [
-            "server_id" => "The server id.",
+            "server_id" => "If the IP address is not specified, the server id.",
             "ip_address" => "If the server id is not specified, the server IP address."
         ],
         result: [
