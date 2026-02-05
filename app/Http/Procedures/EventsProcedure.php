@@ -129,8 +129,8 @@ class EventsProcedure extends Procedure
     #[RpcMethod(
         description: "Analyze security events and IoCs for a given server to detect suspicious activity.",
         params: [
-            "server_id" => "If the IP address is not specified, the server id.",
-            "ip_address" => "If the server id is not specified, the server IP address."
+            "server_id" => "If the IP address is not specified, the server id. (integer|required_without:ip_address|prohibits:ip_address|exists:ynh_servers,id)",
+            "ip_address" => "If the server id is not specified, the server IP address. (string|required_without:server_id|prohibits:server_id|min:4|max:15|exists:ynh_servers,ip_address)"
         ],
         result: [
             "activity" => "The activity status: UNKNOWN, NORMAL, SUSPICIOUS, or ANORMAL.",
@@ -143,7 +143,7 @@ class EventsProcedure extends Procedure
             "if the request is 'Analyze security events for server 1', the input should be {\"server_id\":1}",
             "if the request is 'Is there any suspicious activity on server 163.172.82.3?', the input should be {\"ip_address\":\"163.172.82.3\"}",
         ],
-        ai_result: "The SOC Operator analyzed server {\$result['server_name']} ({\$result['server_ip_address']}) and indicates that the activity is {\$result['activity']}.\n{\$result['report']}"
+        ai_result: "{{ \$result['report'] }}"
     )]
     public function socOperator(JsonRpcRequest $request): array
     {
