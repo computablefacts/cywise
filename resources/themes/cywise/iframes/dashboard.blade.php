@@ -239,7 +239,6 @@
 </div>
 <!-- IoCs : END -->
 <!-- CYBERTODO : BEGIN -->
-@if(count($todo) > 0)
 <div class="row pt-3">
   <div class="col">
     <div class="card">
@@ -281,8 +280,43 @@
       </div>
     </div>
   </div>
+  <div class="col ps-0">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title">
+          {!! __('Your 5 most critical indicators of compromise (IoCs) to investigate!') !!}
+        </h6>
+        @if(count($investigate) <= 0)
+        <div class="card-text">
+          {{ __('Good job! No indicators of compromise (IoCs) to investigate.') }}
+        </div>
+        @else
+        <div class="card-text">
+          @foreach($investigate as $item)
+          <div class="d-flex justify-content-start align-items-center mb-2">
+            @if($item->score >= 75)
+            <span class="dot-red"></span>
+            @elseif ($item->score >= 50)
+            <span class="dot-orange"></span>
+            @elseif($item->score >= 25)
+            <span class="dot-green"></span>
+            @else
+            <span class="dot-blue"></span>
+            @endif
+            &nbsp;<a href="{{ route('iframes.ioc') }}#eid-{{ $item->id }}" class="link text-truncate">
+              {{ $item->server_name }}
+            </a>
+          </div>
+          <div class="d-flex justify-content-start align-items-center text-truncate mb-3">
+            {{ $item->comments }}
+          </div>
+          @endforeach
+        </div>
+        @endif
+      </div>
+    </div>
+  </div>
 </div>
-@endif
 <!-- CYBERTODO : END -->
 <!-- LEAKS : BEGIN -->
 @if(count($leaks) > 0)
@@ -352,7 +386,7 @@
         @else
         <div class="card-text mb-3">
           <table
-            class="charts-css column hide-data show-primary-axis show-3-secondary-axes data-spacing-1 multiple stacked">
+              class="charts-css column hide-data show-primary-axis show-3-secondary-axes data-spacing-1 multiple stacked">
             <thead>
             <tr>
               <th scope="col">{{ __('Date') }}</th>

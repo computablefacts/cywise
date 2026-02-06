@@ -31,6 +31,14 @@ class DashboardController extends Controller
         $nbIocsMedium = $counts['medium'];
         $nbIocsLow = $counts['low'];
 
+        $req = JsonRpcRequest::createFrom($request);
+        $req->merge(['min_score' => 25]);
+        $iocs = $procedure->list($req)['events'];
+        $investigate = $iocs->sortBy([
+            ['score', 'desc'],
+            ['calendar_time', 'desc'],
+        ])->values()->take(5);
+
         $procedure = new VulnerabilitiesProcedure();
 
         $counts = $procedure->counts(JsonRpcRequest::createFrom($request));
@@ -123,6 +131,7 @@ class DashboardController extends Controller
             'nb_iocs_medium' => $nbIocsMedium,
             'nb_iocs_low' => $nbIocsLow,
             'todo' => $todo,
+            'investigate' => $investigate,
             'leaks' => $leaks,
             'honeypots' => $honeypots,
             'most_recent_honeypot_events' => $mostRecentHoneypotEvents,
