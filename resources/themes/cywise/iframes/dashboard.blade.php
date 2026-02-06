@@ -268,11 +268,13 @@
             </a>
           </div>
           <div class="d-flex justify-content-start align-items-center text-truncate mb-3">
-            @if(empty($item->cve_id))
-            {{ $item->title }}
-            @else
-            {{ $item->cve_id }}&nbsp;/&nbsp;{{ $item->title }}
-            @endif
+            <div style="text-overflow: ellipsis;overflow: hidden;">
+              @if(empty($item->cve_id))
+              {{ $item->title }}
+              @else
+              {{ $item->cve_id }}&nbsp;/&nbsp;{{ $item->title }}
+              @endif
+            </div>
           </div>
           @endforeach
         </div>
@@ -280,7 +282,7 @@
       </div>
     </div>
   </div>
-  <div class="col ps-0">
+  <div class="col col-6 ps-0">
     <div class="card">
       <div class="card-body">
         <h6 class="card-title">
@@ -308,7 +310,9 @@
             </a>
           </div>
           <div class="d-flex justify-content-start align-items-center text-truncate mb-3">
-            {{ $item->comments }}
+            <div style="text-overflow: ellipsis;overflow: hidden;">
+              {{ $item->comments }}
+            </div>
           </div>
           @endforeach
         </div>
