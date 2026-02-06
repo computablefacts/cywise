@@ -52,9 +52,18 @@ class EventsProcedure extends Procedure
             ->where('ynh_osquery_rules.enabled', true);
 
         return [
-            'high' => $events->where('ynh_osquery_rules.score', '>=', 75)->where('ynh_osquery_rules.score', '<=', 100)->count(),
-            'medium' => $events->where('ynh_osquery_rules.score', '>=', 50)->where('ynh_osquery_rules.score', '<=', 74)->count(),
-            'low' => $events->where('ynh_osquery_rules.score', '>=', 25)->where('ynh_osquery_rules.score', '<=', 49)->count(),
+            'high' => $events->clone()
+                ->where('ynh_osquery_rules.score', '>=', 75)
+                ->where('ynh_osquery_rules.score', '<=', 100)
+                ->count(),
+            'medium' => $events->clone()
+                ->where('ynh_osquery_rules.score', '>=', 50)
+                ->where('ynh_osquery_rules.score', '<=', 74)
+                ->count(),
+            'low' => $events->clone()
+                ->where('ynh_osquery_rules.score', '>=', 25)
+                ->where('ynh_osquery_rules.score', '<=', 49)
+                ->count(),
         ];
     }
 
