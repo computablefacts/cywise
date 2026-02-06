@@ -153,7 +153,9 @@ class EndVulnsScanListener extends AbstractListener
             ->filter(fn(?array $alert) => $alert !== null)
             ->each(function (array $alert) use ($port) {
                 try {
-                    Alert::updateOrCreate([
+
+                    /** @var Alert $a */
+                    $a = Alert::updateOrCreate([
                         'port_id' => $port->id,
                         'uid' => trim($alert['values'][7])
                     ], [
@@ -170,6 +172,12 @@ class EndVulnsScanListener extends AbstractListener
                         'title' => trim($alert['values'][12]),
                         'flarum_slug' => null, // TODO : remove?
                     ]);
+
+                    // Cache translations
+                    $a->translated('title');
+                    $a->translated('vulnerability');
+                    $a->translated('remediation');
+
                 } catch (\Exception $exception) {
                     Log::error($exception);
                     Log::error($alert);
@@ -206,7 +214,8 @@ class EndVulnsScanListener extends AbstractListener
                     $title = trim($alert['title'] ?? '');
                     $aiRemediation = $this->generateAiRemediation($port, $alert);
 
-                    Alert::updateOrCreate([
+                    /** @var Alert $a */
+                    $a = Alert::updateOrCreate([
                         'port_id' => $port->id,
                         'uid' => $uid
                     ], [
@@ -224,6 +233,12 @@ class EndVulnsScanListener extends AbstractListener
                         'title' => $title,
                         'flarum_slug' => null, // TODO : remove?
                     ]);
+
+                    // Cache translations
+                    $a->translated('title');
+                    $a->translated('vulnerability');
+                    $a->translated('remediation');
+
                 } catch (\Exception $exception) {
                     Log::error($exception);
                     Log::error($alert);
