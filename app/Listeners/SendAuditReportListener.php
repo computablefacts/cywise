@@ -145,7 +145,7 @@ class SendAuditReportListener extends AbstractListener
 
     private function buildSummary(User $user, Collection $assets): string
     {
-        $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->startOfDay()->subDay())
+        $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->startOfDay()->subWeek())
             ->count();
 
         $nbLeaks = TimelineController::fetchLeaks($user)
