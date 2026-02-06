@@ -49,10 +49,25 @@ class SendAuditReportListener extends AbstractListener
             return;
         }
 
+        Log::debug("Building audit report to {$user->email}...");
+        Log::debug("Loading IoCs for {$user->email}...");
+
         $iocs = $this->buildSectionIoCs($user);
+
+        Log::debug("Loading summary for {$user->email}...");
+
         $summary = $this->buildSummary($user, $assets);
+
+        Log::debug("Loading leaks for {$user->email}...");
+
         $leaks = $this->buildSectionLeaks($user);
+
+        Log::debug("Loading vulnerabilities for {$user->email}...");
+
         $vulns = $this->buildSectionVulns($assets);
+
+        Log::debug("Assembling audit report for {$user->email}...");
+
         $subject = $this->buildEmailSubject($user, $assets);
         $body = ['<table cellspacing="0" cellpadding="0" style="margin: auto;"><tbody>'];
         $body[] = '<tr><td style="font-size: 28px; text-align: center;">Bonjour !</td></tr>';
@@ -66,6 +81,9 @@ class SendAuditReportListener extends AbstractListener
         $body[] = $iocs;
 
         if ($isOnboarding) {
+
+            Log::debug("Adding onboarding CTA for {$user->email}...");
+
             $body[] = '<p>Pour découvrir comment corriger vos vulnérabilités et renforcer la sécurité de votre infrastructure, finalisez votre inscription à Cywise :</p>';
             $body[] = '</td></tr>';
             $body[] = $this->buildEmailCta($user);
@@ -77,6 +95,8 @@ class SendAuditReportListener extends AbstractListener
         $body[] = '<p>CyberBuddy</p>';
         $body[] = '</td></tr>';
         $body[] = '</tbody></table>';
+
+        Log::debug("Sending audit report to {$user->email}...");
 
         SimpleEmail::sendEmail($subject, '', implode("\n", $body), $to, $from);
     }
