@@ -1,5 +1,6 @@
 .?*/*
 ./towerify/*/*.tar.gz
+./data
 ./node_modules
 ./public/hot
 ./public/storage
