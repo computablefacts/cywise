@@ -39,6 +39,7 @@ use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Controllers\Iframes\TracesController;
 use App\Http\Controllers\Iframes\UsersController;
 use App\Http\Controllers\Iframes\UsersInvitationController;
+use App\Http\Controllers\Iframes\WebsiteController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
@@ -492,6 +493,8 @@ Route::get('/files/download/{secret}', '\App\Http\Controllers\CyberBuddyControll
 Route::post('/files/one', '\App\Http\Controllers\CyberBuddyController@uploadOneFile')->middleware('auth:sanctum');
 
 Route::post('/files/many', '\App\Http\Controllers\CyberBuddyController@uploadManyFiles')->middleware('auth:sanctum');
+
+Route::get('/website', [WebsiteController::class, '__invoke'])->name('iframes.website');
 
 Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class])->prefix('iframes')->name('iframes.')->group(function () {
     Route::get('/analyze', [AnalyzeController::class, '__invoke'])->name('analyze');

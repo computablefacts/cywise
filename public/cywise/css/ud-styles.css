@@ -689,7 +689,7 @@ p {
   font-weight: 700;
   font-size: 42px;
   line-height: 55px;
-  text-transform: capitalize;
+  /* text-transform: capitalize; */
   color: var(--heading-color);
   margin-bottom: 20px;
 }
