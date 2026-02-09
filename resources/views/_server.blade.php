@@ -70,39 +70,8 @@
   @if(!$tab || $tab === 'settings')
   <x-server :server="$server"/>
   @endif
-  @if($tab === 'backups')
-  <x-backups :server="$server"/>
-  @endif
-  @if($tab === 'traces')
-  <div class="row mb-2">
-    <div class="col-12">
-      <x-pending-actions :server="$server"/>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-12">
-      <x-traces :server="$server"/>
-    </div>
-  </div>
-  <script>
-    setTimeout(() => window.location.reload(), 15000);
-  </script>
-  @endif
-  @if(Auth::user()->canManageServers() && $tab === 'shell')
-  <x-shell :server="$server"/>
-  @endif
   @if($tab === 'domains')
   <x-domains :server="$server"/>
-  @endif
-  @if($tab === 'applications')
-  <div class="row">
-    <div class="col-12">
-      <x-applications-ready-to-be-deployed :server="$server"/>
-    </div>
-  </div>
-  @endif
-  @if($tab === 'interdependencies')
-  <x-interdependencies :server="$server"/>
   @endif
 </div>
 @endsection
