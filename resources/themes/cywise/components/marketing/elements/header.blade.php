@@ -28,6 +28,7 @@
     "
     :class="{ 'border-gray-200/60 bg-white/90 border-b backdrop-blur-lg' : scrolled, 'border-transparent border-b bg-transparent translate-y-0' : !scrolled }"
     class="box-content sticky top-0 z-50 w-full h-24"
+    style="background-color: white !important;"
 >
     <div
         x-show="showOverlay"
