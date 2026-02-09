@@ -28,6 +28,17 @@
 
 ---
 
+# Pourquoi une version open source et auto-hébergée de Cywise ?
+
+Chez Cywise, nous croyons que la cybersécurité doit être accessible, transparente et adaptable à tous les
+environnements, y compris les plus sensibles.
+
+La **version auto-hébergée** de Cywise vous permet de scanner et sécuriser votre **réseau interne** (serveurs locaux,
+équipements non exposés), là où la version SaaS se limite aux infrastructures accessibles depuis Internet.
+
+Cette solution est idéale pour les entreprises souhaitant renforcer la sécurité de leur infrastructure complète, y
+compris les **segments isolés du web**, tout en gardant un contrôle total sur leurs données et leur environnement.
+
 # Fonctionnalités
 
 Cywise intègre toutes les fonctionnalités essentielles aux TPE et PME.
