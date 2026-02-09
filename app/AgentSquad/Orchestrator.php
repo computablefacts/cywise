@@ -70,6 +70,9 @@ class Orchestrator
 
     private function processInput(User $user, string $threadId, array $messages, string $input, array $chainOfThought = [], int $depth = 0): AbstractAnswer
     {
+        if (count($messages) > 5) { // Reduce the number of messages to avoid hitting the API limit on the number of tokens
+            $messages = array_slice($messages, -5);
+        }
         if ($depth >= 3) {
 
             Log::warning("Too many iterations: $depth");
@@ -94,18 +97,15 @@ class Orchestrator
 
                 $answer = $this->agents[$nextAction]->execute($user, $threadId, $messages, $input);
 
-                /* if ($answer->failure()) {
-                    $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", 'An error occurred. Returning to the user.');
+                if ($answer->failure()) {
+                    // $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", 'An error occurred. Returning to the user.');
                     $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
                     $answer->setChainOfThought($chainOfThought);
                     return $answer;
-                } */
-
-                $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", strip_tags($answer->markdown()));
-                $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
-
+                }
                 if ($answer->final()) {
 
+                    $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
                     $answer->setChainOfThought($chainOfThought);
                     $markdown = Str::trim(Str::replace('I_DONT_KNOW', '', $answer->markdown()));
 
@@ -114,6 +114,8 @@ class Orchestrator
                     }
                     return $answer;
                 }
+
+                $chainOfThought[] = new ThoughtActionObservation('Orchestrator bypass.', "{$nextAction}[{$input}]", strip_tags($answer->markdown()));
             }
         }
 
@@ -188,17 +190,14 @@ class Orchestrator
         $answer = $this->agents[$json['action_name']]->execute($user, $threadId, $messages, $json['action_input']);
 
         if ($answer->failure()) {
-            $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An error occurred. Returning to the user.');
+            // $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", 'An error occurred. Returning to the user.');
             $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
             $answer->setChainOfThought($chainOfThought);
             return $answer;
         }
-
-        $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", strip_tags($answer->markdown()));
-        $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
-
         if ($answer->final()) {
 
+            $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
             $answer->setChainOfThought($chainOfThought);
             $markdown = Str::trim(Str::replace('I_DONT_KNOW', '', $answer->markdown()));
 
@@ -207,6 +206,9 @@ class Orchestrator
             }
             return $answer;
         }
+
+        $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", strip_tags($answer->markdown()));
+
         return $this->processInput($user, $threadId, $messages, $input, $chainOfThought, $depth + 1);
     }
 }
