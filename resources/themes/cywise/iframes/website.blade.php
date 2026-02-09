@@ -10,10 +10,10 @@
   <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/ico"/>
 
   <!-- ===== All CSS files ===== -->
-  <link rel="stylesheet" href="{{ asset('cywise/css/bootstrap.min.css') }}"/>
-  <link rel="stylesheet" href="{{ asset('cywise/css/animate.css') }}"/>
-  <link rel="stylesheet" href="{{ asset('cywise/css/lineicons.css') }}"/>
-  <link rel="stylesheet" href="{{ asset('cywise/css/ud-styles.css') }}"/>
+  <link rel="stylesheet" href="{{ asset('cywise/css/website/bootstrap.min.css') }}"/>
+  <link rel="stylesheet" href="{{ asset('cywise/css/website/animate.css') }}"/>
+  <link rel="stylesheet" href="{{ asset('cywise/css/website/lineicons.css') }}"/>
+  <link rel="stylesheet" href="{{ asset('cywise/css/website/ud-styles.css') }}"/>
 
 </head>
 <body>
@@ -48,12 +48,12 @@
         <div class="ud-hero-image wow fadeInUp" data-wow-delay=".25s">
           <img src="{{ asset('cywise/img/screenshot.png') }}" alt="hero-image"/>
           <img
-              src="{{ asset('cywise/img/hero/dotted-shape.svg') }}"
+              src="{{ asset('cywise/img/website/hero/dotted-shape.svg') }}"
               alt="shape"
               class="shape shape-1"
           />
           <img
-              src="{{ asset('cywise/img/hero/dotted-shape.svg') }}"
+              src="{{ asset('cywise/img/website/hero/dotted-shape.svg') }}"
               alt="shape"
               class="shape shape-2"
           />
@@ -199,7 +199,7 @@
         </div>
       </div>
       <div class="ud-about-image">
-        <img src="{{ asset('cywise/img/about/about-image.svg') }}" alt="about-image"/>
+        <img src="{{ asset('cywise/img/website/about/about-image.svg') }}" alt="about-image"/>
       </div>
     </div>
   </div>
@@ -257,7 +257,7 @@
 <!-- ====== FAQ Start ====== -->
 <section id="faq" class="ud-faq">
   <div class="shape">
-    <img src="{{ asset('cywise/img/faq/shape.svg') }}" alt=""/>
+    <img src="{{ asset('cywise/img/website/faq/shape.svg') }}" alt=""/>
   </div>
   <div class="container">
     <div class="row">
@@ -411,7 +411,7 @@
           </div>
           <div class="ud-testimonial-info">
             <div class="ud-testimonial-image">
-              <img src="{{ asset('cywise/img/testimonials/author-01.png') }}" alt="author"/>
+              <img src="{{ asset('cywise/img/website/testimonials/author-01.png') }}" alt="author"/>
             </div>
             <div class="ud-testimonial-meta">
               <h4>Sabo Masties</h4>
@@ -437,7 +437,7 @@
           </div>
           <div class="ud-testimonial-info">
             <div class="ud-testimonial-image">
-              <img src="{{ asset('cywise/img/testimonials/author-02.png') }}" alt="author"/>
+              <img src="{{ asset('cywise/img/website/testimonials/author-02.png') }}" alt="author"/>
             </div>
             <div class="ud-testimonial-meta">
               <h4>Margin Gesmu</h4>
@@ -463,7 +463,7 @@
           </div>
           <div class="ud-testimonial-info">
             <div class="ud-testimonial-image">
-              <img src="{{ asset('cywise/img/testimonials/author-03.png') }}" alt="author"/>
+              <img src="{{ asset('cywise/img/website/testimonials/author-03.png') }}" alt="author"/>
             </div>
             <div class="ud-testimonial-meta">
               <h4>William Smith</h4>
@@ -481,19 +481,19 @@
           </div>
           <div class="ud-brands-logo">
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/brands/ayroui.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/website/brands/ayroui.svg') }}" alt=""/>
             </div>
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/brands/uideck.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/website/brands/uideck.svg') }}" alt=""/>
             </div>
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/brands/graygrids.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/website/brands/graygrids.svg') }}" alt=""/>
             </div>
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/brands/lineicons.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/website/brands/lineicons.svg') }}" alt=""/>
             </div>
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/brands/ecommerce-html.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/website/brands/ecommerce-html.svg') }}" alt=""/>
             </div>
           </div>
         </div>
@@ -510,9 +510,9 @@
 <!-- ====== Back To Top End ====== -->
 
 <!-- ====== All Javascript Files ====== -->
-<script src="{{ asset('cywise/js/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ asset('cywise/js/wow.min.js') }}"></script>
-<script src="{{ asset('cywise/js/main.js') }}"></script>
+<script src="{{ asset('cywise/js/website/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('cywise/js/website/wow.min.js') }}"></script>
+<script src="{{ asset('cywise/js/website/main.js') }}"></script>
 <script>
 
   // ==== for menu scroll

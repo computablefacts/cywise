@@ -18,7 +18,6 @@
 
     <script>
       const elFooter = document.getElementsByTagName('footer')[0];
-      console.log(elFooter);
       if (elFooter) {
         elFooter.classList.remove('pt-10');
       }
