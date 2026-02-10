@@ -310,7 +310,7 @@ $premiumFeatures = explode(',', $premium->features);
           <div class="ud-pricing-body">
             <ul>
               @foreach($essentielFeatures as $feature)
-              <li>{{ $feature }}</li>
+              <li>{!! $feature !!}</li>
               @endforeach
             </ul>
           </div>
@@ -338,7 +338,7 @@ $premiumFeatures = explode(',', $premium->features);
           <div class="ud-pricing-body">
             <ul>
               @foreach($standardFeatures as $feature)
-              <li>{{ $feature }}</li>
+              <li>{!! $feature !!}</li>
               @endforeach
             </ul>
           </div>
@@ -365,7 +365,7 @@ $premiumFeatures = explode(',', $premium->features);
           <div class="ud-pricing-body">
             <ul>
               @foreach($premiumFeatures as $feature)
-              <li>{{ $feature }}</li>
+              <li>{!! $feature !!}</li>
               @endforeach
             </ul>
           </div>
