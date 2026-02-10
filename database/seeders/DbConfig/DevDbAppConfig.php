@@ -46,7 +46,7 @@ class DevDbAppConfig implements DbAppConfigInterface
 
             'towerify.stripe.plans.essential.name' => 'Essentiel',
             'towerify.stripe.plans.essential.description' => 'L\'offre la plus adaptée aux TPE.',
-            'towerify.stripe.plans.essential.features' => 'Scan de vulnérabilités, Surveillance des fuites de données, Honeypots, Bulletin d\'information, CyberTodo, CyberBuddy, CyberScribe, Assistance par tickets (réponse sous 72h)',
+            'towerify.stripe.plans.essential.features' => 'Scanner de vulnérabilités, Bulletin d\'information, CyberTodo, CyberBuddy, CyberScribe, Assistance par tickets (réponse sous 72h)',
             'towerify.stripe.plans.essential.monthly_price' => '150',
             'towerify.stripe.plans.essential.monthly_price_id' => 'dummy_price_essentiel',
             'towerify.stripe.plans.essential.yearly_price' => '1500',
@@ -56,7 +56,7 @@ class DevDbAppConfig implements DbAppConfigInterface
 
             'towerify.stripe.plans.standard.name' => 'Standard',
             'towerify.stripe.plans.standard.description' => 'L\'offre la plus adaptée aux PME.',
-            'towerify.stripe.plans.standard.features' => '<b>Tout ce qui est dans Essentiel</b>, Scripts de remédiation, Hardening, Agents, Métriques, Assistance par tickets (réponse sous 48h)',
+            'towerify.stripe.plans.standard.features' => '<b>Tout ce qui est dans Essentiel</b>, Scripts de remédiation, Surveillance des fuites de données, Honeypots, Hardening, Agents, Métriques, Assistance par tickets (réponse sous 48h)',
             'towerify.stripe.plans.standard.monthly_price' => '400',
             'towerify.stripe.plans.standard.monthly_price_id' => 'dummy_price_standard',
             'towerify.stripe.plans.standard.yearly_price' => '4000',
