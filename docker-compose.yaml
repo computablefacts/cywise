@@ -9,9 +9,6 @@ services:
         published: 17801
     env_file:
       - .env
-    environment:
-      - LOG_CHANNEL=stderr
-      - DB_HOST=mariadb
     volumes:
       - ./data/scout:/var/www/html/storage/scout
     depends_on:
@@ -25,8 +22,6 @@ services:
       - .env
     environment:
       - CONTAINER_ROLE=scheduler
-      - LOG_CHANNEL=stderr
-      - DB_HOST=mariadb
     depends_on:
       mariadb:
         condition: service_healthy
@@ -42,8 +37,6 @@ services:
       - .env
     environment:
       - CONTAINER_ROLE=queue
-      - LOG_CHANNEL=stderr
-      - DB_HOST=mariadb
     depends_on:
       scheduler:
         condition: service_healthy
@@ -55,8 +48,6 @@ services:
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=low
-      - LOG_CHANNEL=stderr
-      - DB_HOST=mariadb
     depends_on:
       scheduler:
         condition: service_healthy
@@ -68,8 +59,6 @@ services:
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=medium
-      - LOG_CHANNEL=stderr
-      - DB_HOST=mariadb
     depends_on:
       scheduler:
         condition: service_healthy
@@ -81,8 +70,6 @@ services:
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=critical
-      - LOG_CHANNEL=stderr
-      - DB_HOST=mariadb
     depends_on:
       scheduler:
         condition: service_healthy
@@ -94,8 +81,6 @@ services:
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=scout
-      - LOG_CHANNEL=stderr
-      - DB_HOST=mariadb
     volumes:
       - ./data/scout:/var/www/html/storage/scout
     depends_on:
