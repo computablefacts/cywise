@@ -73,8 +73,7 @@
           <span>Fonctionnalités</span>
           <h2>Protégez ce qui est accessible sur internet</h2>
           <p>
-            Cywise intègre toutes les fonctionnalités essentielles aux TPE et PME pour sécuriser leur infrastructure
-            exposée.
+            3 technologies complémentaires pour une protection complète !
           </p>
         </div>
       </div>
@@ -127,6 +126,9 @@
       <div class="col-lg-12">
         <div class="ud-section-title">
           <h2>Protégez vos actifs internes</h2>
+          <p>
+            3 outils pour anticiper les problèmes !
+          </p>
         </div>
       </div>
     </div>
@@ -139,8 +141,9 @@
           <div class="ud-feature-content">
             <h3 class="ud-feature-title">Hardening</h3>
             <p class="ud-feature-desc">
-              Renforcez la sécurité de vos serveurs Linux et Windows grâce à un audit complet et l'application de
-              référentiels reconnus.
+              Renforcez la sécurité de vos serveurs Linux et Windows. Détectez rapidement tout écart de configuration de
+              vos
+              machines.
             </p>
           </div>
         </div>
@@ -187,7 +190,7 @@
           <h2>CyberBuddy & CyberScribe</h2>
           <p>
             Votre expert en cybersécurité, disponible 24/7. CyberBuddy vous guide en temps réel en s'appuyant sur des
-            bases de connaissances vérifiées.
+            bases de connaissances vérifiées (NIST, ANSSI, etc.)
           </p>
           <p>
             CyberScribe vous accompagne pas à pas pour rédiger des documents clairs et conformes (Charte Informatique,
@@ -312,30 +315,13 @@ $premiumFeatures = explode(',', $premium->features);
     </div>
     <div class="row">
       <div class="col-lg-6">
-        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".1s">
-          <div class="accordion">
-            <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                  <span class="icon flex-shrink-0">
-                    <i class="lni lni-chevron-down"></i>
-                  </span>
-              <span>Qu'est-ce que le Fond Documentaire ?</span>
-            </button>
-            <div id="collapseOne" class="accordion-collapse collapse">
-              <div class="ud-faq-body">
-                Il permet d'intégrer vos propres documents (Charte Informatique, PSSI) à CyberBuddy. Vos équipes
-                peuvent alors poser des questions en langage naturel et obtenir des réponses extraites directement de
-                vos ressources internes.
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="ud-single-faq wow fadeInUp" data-wow-delay=".15s">
           <div class="accordion">
             <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
                   <span class="icon flex-shrink-0">
                     <i class="lni lni-chevron-down"></i>
                   </span>
-              <span>Cywise supporte-t-il le SSO ?</span>
+              <span>Cywise supporte-t-il le Single Sign-On ?</span>
             </button>
             <div id="collapseTwo" class="accordion-collapse collapse">
               <div class="ud-faq-body">
@@ -355,8 +341,25 @@ $premiumFeatures = explode(',', $premium->features);
             </button>
             <div id="collapseThree" class="accordion-collapse collapse">
               <div class="ud-faq-body">
-                La plupart de nos modules sont disponibles en version auto-hébergée (SaaS) ou installables sur votre
-                propre infrastructure, vous offrant un contrôle total sur vos données de sécurité.
+                Cywise est disponible en version <a href="{{ route('register') }}" target="_blank">SaaS</a> ou <a
+                    href="https://github.com/computablefacts/cywise" target="_blank">auto-hébergée</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".1s">
+          <div class="accordion">
+            <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                  <span class="icon flex-shrink-0">
+                    <i class="lni lni-chevron-down"></i>
+                  </span>
+              <span>J'ai déjà une une PSSI, puis-je l'importer dans Cywise ?</span>
+            </button>
+            <div id="collapseOne" class="accordion-collapse collapse">
+              <div class="ud-faq-body">
+                Oui, Cywise vous permet d'intégrer vos propres documents (Charte Informatique, Charte IA, PSSI, etc.) à
+                CyberBuddy. Vos équipes peuvent alors poser des questions en langage naturel et obtenir des réponses
+                extraites directement de vos ressources internes.
               </div>
             </div>
           </div>
@@ -374,7 +377,8 @@ $premiumFeatures = explode(',', $premium->features);
             <div id="collapseFour" class="accordion-collapse collapse">
               <div class="ud-faq-body">
                 Le hardening (ou durcissement) consiste à optimiser la configuration de vos serveurs pour réduire leur
-                surface d'attaque. Cywise utilise des règles OSSEC pour auditer et renforcer vos machines.
+                surface d'attaque. Cywise utilise des règles <a href="https://www.ossec.net/" target="_blank">OSSEC</a>
+                écrites par nos experts pour auditer et renforcer vos machines.
               </div>
             </div>
           </div>
@@ -389,8 +393,9 @@ $premiumFeatures = explode(',', $premium->features);
             </button>
             <div id="collapseFive" class="accordion-collapse collapse">
               <div class="ud-faq-body">
-                Nous utilisons des agents basés sur Osquery pour collecter les événements de sécurité en temps réel.
-                Des règles expertes analysent ces comportements pour identifier toute menace dès son apparition.
+                Nous utilisons <a href="https://osquery.io/" target="_blank">Osquery</a> pour collecter les événements
+                de sécurité de vos machines en temps réel. Des règles écrites par nos experts analysent ces
+                comportements pour identifier toute menace dès son apparition.
               </div>
             </div>
           </div>
@@ -401,12 +406,13 @@ $premiumFeatures = explode(',', $premium->features);
                   <span class="icon flex-shrink-0">
                     <i class="lni lni-chevron-down"></i>
                   </span>
-              <span>CyberBuddy est-il disponible hors ligne ?</span>
+              <span>Qu'est-ce qu'un "Honeypot" ?</span>
             </button>
             <div id="collapseSix" class="accordion-collapse collapse">
               <div class="ud-faq-body">
-                CyberBuddy nécessite une connexion internet. Dans la version auto-hébergée, vous pouvez configurer
-                votre propre clé d'API pour activer les fonctionnalités d'intelligence artificielle.
+                Un honeypot est un leurre conçu pour attirer les cyberattaquants et analyser leurs méthodes. Nos
+                honeypots permettent d'identifier en temps réel les attaques en cours, de vérifier si votre entreprise
+                est ciblée et d'évaluer les risques pour votre infrastructure, sans l'exposer directement.
               </div>
             </div>
           </div>
@@ -443,7 +449,8 @@ $premiumFeatures = explode(',', $premium->features);
           </div>
           <div class="ud-testimonial-content">
             <p>
-              "Cywise est le meilleur produit que j’aie vu en matière de détection de vulnérabilités de qualité, sans faux positifs."
+              "Cywise est le meilleur produit que j'aie vu en matière de détection de vulnérabilités de qualité, sans
+              faux positifs."
             </p>
           </div>
           <div class="ud-testimonial-info">
@@ -497,7 +504,7 @@ $premiumFeatures = explode(',', $premium->features);
             <p>
               "La solution a amélioré notre visibilité des périmètres exposés et internes. Nous avons été notifiés
               automatiquement des vulnérabilités à corriger. Rien de critique, heureusement. Depuis, nous sommes alertés
-              dès qu’un changement important est détecté. En somme l’idéal pour une PME comme la nôtre."
+              dès qu'un changement important est détecté. En somme l'idéal pour une PME comme la nôtre."
             </p>
           </div>
           <div class="ud-testimonial-info">
