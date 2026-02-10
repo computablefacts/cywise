@@ -587,10 +587,9 @@ $premiumFeatures = explode(',', $premium->features);
       <div class="col-xl-8 col-lg-7">
         <div class="ud-contact-content-wrapper">
           <div class="ud-contact-title">
-            <span>CONTACTEZ-NOUS</span>
+            <span style="text-transform: uppercase">Échangeons ensemble</span>
             <h2>
-              Échangeons ensemble !<br>
-              Partagez-nous vos problématiques cyber.
+              N'hésitez pas à nous partager<br>vos problématiques cyber !
             </h2>
           </div>
           <div class="ud-contact-info-wrapper">
@@ -609,7 +608,7 @@ $premiumFeatures = explode(',', $premium->features);
               </div>
               <div class="ud-info-meta">
                 <h5>Besoin d'aide ?</h5>
-                <p><a href="mailto:contact@cywise.io" class="__cf_email__">contact@cywise.io</a></p>
+                <p>Utilisez le formulaire ci-contre pour nous contacter !</p>
               </div>
             </div>
           </div>
@@ -618,7 +617,7 @@ $premiumFeatures = explode(',', $premium->features);
       <div class="col-xl-4 col-lg-5">
         <div class="ud-contact-form-wrapper wow fadeInUp" data-wow-delay=".2s">
           <h3 class="ud-contact-form-title">Envoyez-nous un message</h3>
-          <form class="ud-contact-form">
+          <form class="ud-contact-form" id="ud-contact-form">
             <div class="ud-form-group">
               <label for="fullName">Nom*</label>
               <input type="text" name="fullName" placeholder="John Doe"/>
@@ -629,7 +628,7 @@ $premiumFeatures = explode(',', $premium->features);
             </div>
             <div class="ud-form-group">
               <label for="phone">Téléphone*</label>
-              <input type="text" name="phone" placeholder="+33 6 12 54 52 11"/>
+              <input type="text" name="phone" placeholder="+33 x xx xx xx xx"/>
             </div>
             <div class="ud-form-group">
               <label for="message">Message*</label>
@@ -639,6 +638,7 @@ $premiumFeatures = explode(',', $premium->features);
               <button type="submit" class="ud-main-btn">
                 {{ __('Send') }}
               </button>
+              <div id="contact-status" class="small mt-2"></div>
             </div>
           </form>
         </div>
@@ -767,6 +767,56 @@ $premiumFeatures = explode(',', $premium->features);
   }
 
   window.document.addEventListener("scroll", onScroll);
+
+  // ==== contact form submit
+  document.addEventListener('DOMContentLoaded', function () {
+
+    const form = document.getElementById('ud-contact-form');
+    const status = document.getElementById('contact-status');
+
+    if (!form) {
+      return;
+    }
+
+    function setStatus(text, ok) {
+      if (!status) {
+        return;
+      }
+      status.textContent = text || '';
+      status.style.color = ok ? '#0a7e07' : '#b00020';
+    }
+
+    form.addEventListener('submit', async function (e) {
+
+      e.preventDefault();
+      setStatus('Envoi en cours...', true);
+
+      const payload = {
+        fullName: form.querySelector('input[name="fullName"]').value.trim(),
+        email: form.querySelector('input[name="email"]').value.trim(),
+        phone: form.querySelector('input[name="phone"]').value.trim(),
+        message: form.querySelector('textarea[name="message"]').value.trim(),
+      };
+      try {
+        const resp = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || data.ok === false) {
+          throw new Error(data.message || 'Une erreur est survenue.');
+        }
+        setStatus(data.message || 'Message envoyé, merci !', true);
+        form.reset();
+      } catch (err) {
+        setStatus(err.message || 'Impossible d\'envoyer le message pour le moment.', false);
+      }
+    });
+  });
 </script>
 </body>
 </html>

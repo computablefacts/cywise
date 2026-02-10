@@ -4,6 +4,7 @@ use App\Events\BeginVulnsScan;
 use App\Events\EndPortsScan;
 use App\Events\EndVulnsScan;
 use App\Http\Controllers\TablesUploadController;
+use App\Mail\SimpleEmail;
 use App\Models\Asset;
 use App\Models\Honeypot;
 use App\Models\Port;
@@ -32,6 +33,30 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Wave::api();
+
+// Public contact form endpoint
+Route::post('/contact', function (\Illuminate\Http\Request $request) {
+
+    $params = $request->validate([
+        'fullName' => ['required', 'string', 'min:2', 'max:100'],
+        'email' => ['required', 'email:rfc,dns', 'max:100'],
+        'phone' => ['nullable', 'string', 'max:50'],
+        'message' => ['required', 'string', 'min:5', 'max:1000'],
+    ]);
+
+    SimpleEmail::sendEmail(
+        "{$params['email']} vous a contacté !",
+        '',
+        "<b>Fullname:</b> {$params['fullName']}<br><b>Email:</b> {$params['email']}<br><b>Phone:</b> {$params['phone']}<br><b>Message:</b> {$params['message']}",
+        null,
+        $params['email']
+    );
+
+    return response()->json([
+        'ok' => true,
+        'message' => 'Votre message a bien été envoyé. Nous vous répondrons rapidement.'
+    ]);
+})->middleware(['throttle:20,1']);
 
 // Posts Example API Route
 Route::group(['middleware' => 'auth:api'], function () {
