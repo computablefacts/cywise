@@ -44,11 +44,12 @@ class ClickhouseClient
         $username = config('towerify.clickhouse.username');
         $password = config('towerify.clickhouse.password');
         $database = config('towerify.clickhouse.database');
+        $extraParameters = config('towerify.clickhouse.client_extra_parameters', '--secure');
         /** @var User $user */
         $user = \Auth::user();
         $tenant = $user ? "_{$user->tenant_id}" : '_0';
         $query = "CREATE DATABASE IF NOT EXISTS {$database}{$tenant}";
-        $cmd = "clickhouse-client --host '{$host}' --secure --user '{$username}' --password '{$password}' --query \"{$query}\"";
+        $cmd = "clickhouse-client --host '{$host}' {$extraParameters} --user '{$username}' --password '{$password}' --query \"{$query}\"";
 
         self::$executeQueryLastError = null;
         $process = Process::fromShellCommandline($cmd);
@@ -114,9 +115,10 @@ class ClickhouseClient
         $username = config('towerify.clickhouse.username');
         $password = config('towerify.clickhouse.password');
         $database = config('towerify.clickhouse.database');
+        $extraParameters = config('towerify.clickhouse.client_extra_parameters', '--secure');
         /** @var User $user */
         $user = \Auth::user();
         $tenant = $user ? "_{$user->tenant_id}" : '_0';
-        return "clickhouse-client --host '{$host}' --secure --user '{$username}' --password '{$password}' --database '{$database}{$tenant}' --query \"{$query}\"";
+        return "clickhouse-client --host '{$host}' {$extraParameters} --user '{$username}' --password '{$password}' --database '{$database}{$tenant}' --query \"{$query}\"";
     }
 }
