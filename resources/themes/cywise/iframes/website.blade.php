@@ -580,6 +580,74 @@ $premiumFeatures = explode(',', $premium->features);
 </section>
 <!-- ====== Testimonials End ====== -->
 
+<!-- ====== Contact Start ====== -->
+<section id="contact" class="ud-contact">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-xl-8 col-lg-7">
+        <div class="ud-contact-content-wrapper">
+          <div class="ud-contact-title">
+            <span>CONTACTEZ-NOUS</span>
+            <h2>
+              Échangeons ensemble !<br>
+              Partagez-nous vos problématiques cyber.
+            </h2>
+          </div>
+          <div class="ud-contact-info-wrapper">
+            <div class="ud-single-info">
+              <div class="ud-info-icon">
+                <i class="lni lni-map-marker"></i>
+              </div>
+              <div class="ud-info-meta">
+                <h5>Notre adresse</h5>
+                <p>178 boulevard Haussmann<br>75008 Paris<br>France</p>
+              </div>
+            </div>
+            <div class="ud-single-info">
+              <div class="ud-info-icon">
+                <i class="lni lni-envelope"></i>
+              </div>
+              <div class="ud-info-meta">
+                <h5>Besoin d'aide ?</h5>
+                <p><a href="mailto:contact@cywise.io" class="__cf_email__">contact@cywise.io</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-4 col-lg-5">
+        <div class="ud-contact-form-wrapper wow fadeInUp" data-wow-delay=".2s">
+          <h3 class="ud-contact-form-title">Envoyez-nous un message</h3>
+          <form class="ud-contact-form">
+            <div class="ud-form-group">
+              <label for="fullName">Nom*</label>
+              <input type="text" name="fullName" placeholder="John Doe"/>
+            </div>
+            <div class="ud-form-group">
+              <label for="email">Email*</label>
+              <input type="email" name="email" placeholder="example@yourmail.com"/>
+            </div>
+            <div class="ud-form-group">
+              <label for="phone">Téléphone*</label>
+              <input type="text" name="phone" placeholder="+33 6 12 54 52 11"/>
+            </div>
+            <div class="ud-form-group">
+              <label for="message">Message*</label>
+              <textarea name="message" rows="1" placeholder="saisissez votre message ici"></textarea>
+            </div>
+            <div class="ud-form-group mb-0">
+              <button type="submit" class="ud-main-btn">
+                {{ __('Send') }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ====== Contact End ====== -->
+
 <!-- ====== Back To Top Start ====== -->
 <a href="javascript:void(0)" class="back-to-top">
   <i class="lni lni-chevron-up"> </i>
