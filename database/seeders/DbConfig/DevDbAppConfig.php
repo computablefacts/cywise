@@ -49,8 +49,8 @@ class DevDbAppConfig implements DbAppConfigInterface
             'towerify.stripe.plans.essential.features' => 'Scan de vulnérabilités, Honeypots pré-configurés, Adresses emails internes compromises, Charte informatique, Cyberbuddy, 15 jours gratuits, Assistance par tickets (réponse sous 48h)',
             'towerify.stripe.plans.essential.monthly_price' => '150',
             'towerify.stripe.plans.essential.monthly_price_id' => 'dummy_price_essentiel',
-            'towerify.stripe.plans.essential.yearly_price' => null,
-            'towerify.stripe.plans.essential.yearly_price_id' => null,
+            'towerify.stripe.plans.essential.yearly_price' => '1500',
+            'towerify.stripe.plans.essential.yearly_price_id' => 'dummy_price_essentiel',
             'towerify.stripe.plans.essential.onetime_price' => null,
             'towerify.stripe.plans.essential.onetime_price_id' => null,
 
@@ -59,8 +59,8 @@ class DevDbAppConfig implements DbAppConfigInterface
             'towerify.stripe.plans.standard.features' => 'Tout ce qui est dans Essentiel, Agent, Honeypots sur des domaines spécifiques, Adresses emails de l\'écosystème compromises, Règles de Hardening par référentiel Cyber, PSSI (Politique de Sécurité des Systèmes d\'Information), 15 jours gratuits, Assistance par tickets (réponse sous 24h)',
             'towerify.stripe.plans.standard.monthly_price' => '400',
             'towerify.stripe.plans.standard.monthly_price_id' => 'dummy_price_standard',
-            'towerify.stripe.plans.standard.yearly_price' => null,
-            'towerify.stripe.plans.standard.yearly_price_id' => null,
+            'towerify.stripe.plans.standard.yearly_price' => '4000',
+            'towerify.stripe.plans.standard.yearly_price_id' => 'dummy_price_standard',
             'towerify.stripe.plans.standard.onetime_price' => null,
             'towerify.stripe.plans.standard.onetime_price_id' => null,
 
@@ -69,8 +69,8 @@ class DevDbAppConfig implements DbAppConfigInterface
             'towerify.stripe.plans.premium.features' => 'Tout ce qui est dans Standard, CyberBuddy via Teams, SSO (Single Sign-On), Référentiels additionnels, 15 jours gratuits, Assistance par tickets (réponse sous 6h)',
             'towerify.stripe.plans.premium.monthly_price' => '600',
             'towerify.stripe.plans.premium.monthly_price_id' => 'dummy_price_premium',
-            'towerify.stripe.plans.premium.yearly_price' => null,
-            'towerify.stripe.plans.premium.yearly_price_id' => null,
+            'towerify.stripe.plans.premium.yearly_price' => '6000',
+            'towerify.stripe.plans.premium.yearly_price_id' => 'dummy_price_premium',
             'towerify.stripe.plans.premium.onetime_price' => null,
             'towerify.stripe.plans.premium.onetime_price_id' => null,
 
