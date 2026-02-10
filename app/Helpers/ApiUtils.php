@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\AgentSquad\Providers\AudioToTextProvider;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\PromptsProvider;
 use Illuminate\Support\Facades\Config;
@@ -36,10 +37,19 @@ class ApiUtils
 
     public function whisper(string $url, string $lang = 'fr')
     {
-        return $this->post('/api/whisper', [
-            'url' => $url,
-            'lang' => $lang,
-        ]);
+        $answer = AudioToTextProvider::provide($url, $lang);
+
+        return $answer === '' ?
+        [
+            'error' => true,
+            'error_details' => "Error transforming audio into text.",
+            'text' => '',
+        ] :
+        [
+            'error' => false,
+            'error_details' => '',
+            'text' => $answer,
+        ];
     }
 
     public function file_input(string $client, string $url, ?string $filename = null): array
