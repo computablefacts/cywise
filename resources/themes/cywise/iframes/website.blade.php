@@ -191,10 +191,8 @@
           </p>
           <p>
             CyberScribe vous accompagne pas à pas pour rédiger des documents clairs et conformes (Charte Informatique,
-            PSSI) grâce à l'intelligence artificielle.
+            Charte IA, Politique de Sécurité des Systèmes d'Information) grâce à l'intelligence artificielle.
           </p>
-          <p class="text-xs text-gray-600 mt-2">Note: en auto‑hébergé, fournissez votre propre clé d'API pour activer
-            ces fonctionnalités.</p>
           <a href="{{ route('register') }}" class="ud-main-btn">Essayer gratuitement</a>
         </div>
       </div>
@@ -207,16 +205,23 @@
 <!-- ====== About End ====== -->
 
 <!-- ====== Pricing Start ====== -->
+@php
+$essentiel = \Wave\Plan::where('name', 'Essentiel')->where('active', 1)->firstOrFail();
+$standard = \Wave\Plan::where('name', 'Standard')->where('active', 1)->firstOrFail();
+$premium = \Wave\Plan::where('name', 'Premium')->where('active', 1)->firstOrFail();
+$essentielFeatures = explode(',', $essentiel->features);
+$standardFeatures = explode(',', $standard->features);
+$premiumFeatures = explode(',', $premium->features);
+@endphp
 <section id="pricing" class="ud-pricing">
   <div class="container">
     <div class="row">
       <div class="col-lg-12">
         <div class="ud-section-title mx-auto text-center">
-          <span>Pricing</span>
-          <h2>Our Pricing Plans</h2>
+          <span>Tarifs</span>
+          <h2>Nos offres</h2>
           <p>
-            There are many variations of passages of Lorem Ipsum available
-            but the majority have suffered alteration in some form.
+            Des solutions adaptées à chaque besoin.
           </p>
         </div>
       </div>
@@ -225,46 +230,40 @@
       <div class="col-lg-4 col-md-6 col-sm-10">
         <div class="ud-single-pricing first-item wow fadeInUp" data-wow-delay=".15s">
           <div class="ud-pricing-header">
-            <h3>STARTING FROM</h3>
-            <h4>$ 19.99/mo</h4>
+            <h3>{{ \Str::upper($essentiel->name) }}</h3>
+            <h4>{{ $essentiel->monthly_price }} {{ $essentiel->currency }}/mois</h4>
           </div>
           <div class="ud-pricing-body">
             <ul>
-              <li>5 User</li>
-              <li>All UI components</li>
-              <li>Lifetime access</li>
-              <li>Free updates</li>
-              <li>Use on 1 (one) project</li>
-              <li>4 Months support</li>
+              @foreach($essentielFeatures as $feature)
+              <li>{{ $feature }}</li>
+              @endforeach
             </ul>
           </div>
           <div class="ud-pricing-footer">
-            <a href="javascript:void(0)" class="ud-main-btn ud-border-btn">
-              Purchase Now
+            <a href="/settings/subscription" class="ud-main-btn ud-border-btn">
+              {{ __('Subscribe >') }}
             </a>
           </div>
         </div>
       </div>
       <div class="col-lg-4 col-md-6 col-sm-10">
         <div class="ud-single-pricing active wow fadeInUp" data-wow-delay=".1s">
-          <span class="ud-popular-tag">POPULAR</span>
+          <span class="ud-popular-tag">POPULAIRE</span>
           <div class="ud-pricing-header">
-            <h3>STARTING FROM</h3>
-            <h4>$ 30.99/mo</h4>
+            <h3>{{ \Str::upper($standard->name) }}</h3>
+            <h4>{{ $standard->monthly_price }} {{ $standard->currency }}/mois</h4>
           </div>
           <div class="ud-pricing-body">
             <ul>
-              <li>5 User</li>
-              <li>All UI components</li>
-              <li>Lifetime access</li>
-              <li>Free updates</li>
-              <li>Use on 1 (one) project</li>
-              <li>4 Months support</li>
+              @foreach($standardFeatures as $feature)
+              <li>{{ $feature }}</li>
+              @endforeach
             </ul>
           </div>
           <div class="ud-pricing-footer">
-            <a href="javascript:void(0)" class="ud-main-btn ud-white-btn">
-              Purchase Now
+            <a href="/settings/subscription" class="ud-main-btn ud-white-btn">
+              {{ __('Subscribe >') }}
             </a>
           </div>
         </div>
@@ -272,22 +271,19 @@
       <div class="col-lg-4 col-md-6 col-sm-10">
         <div class="ud-single-pricing last-item wow fadeInUp" data-wow-delay=".15s">
           <div class="ud-pricing-header">
-            <h3>STARTING FROM</h3>
-            <h4>$ 70.99/mo</h4>
+            <h3>{{ \Str::upper($premium->name) }}</h3>
+            <h4>{{ $premium->monthly_price }} {{ $premium->currency }}/mois</h4>
           </div>
           <div class="ud-pricing-body">
             <ul>
-              <li>5 User</li>
-              <li>All UI components</li>
-              <li>Lifetime access</li>
-              <li>Free updates</li>
-              <li>Use on 1 (one) project</li>
-              <li>4 Months support</li>
+              @foreach($premiumFeatures as $feature)
+              <li>{{ $feature }}</li>
+              @endforeach
             </ul>
           </div>
           <div class="ud-pricing-footer">
-            <a href="javascript:void(0)" class="ud-main-btn ud-border-btn">
-              Purchase Now
+            <a href="/settings/subscription" class="ud-main-btn ud-border-btn">
+              {{ __('Subscribe >') }}
             </a>
           </div>
         </div>
@@ -309,7 +305,7 @@
           <span>FAQ</span>
           <h2>Questions fréquentes</h2>
           <p>
-            Retrouvez les réponses aux questions les plus courantes sur Cywise.
+            Nos réponses aux questions les plus courantes sur Cywise.
           </p>
         </div>
       </div>
@@ -427,16 +423,40 @@
     <div class="row">
       <div class="col-lg-12">
         <div class="ud-section-title mx-auto text-center">
-          <span>Testimonials</span>
-          <h2>What our Customers Says</h2>
+          <span>Témoignages</span>
+          <h2>Ce qu'ils en disent</h2>
           <p>
-            There are many variations of passages of Lorem Ipsum available
-            but the majority have suffered alteration in some form.
+            Nos clients partagent leur expérience.
           </p>
         </div>
       </div>
     </div>
     <div class="row">
+      <div class="col-lg-4 col-md-6">
+        <div class="ud-single-testimonial wow fadeInUp" data-wow-delay=".2s">
+          <div class="ud-testimonial-ratings">
+            <i class="lni lni-star-filled"></i>
+            <i class="lni lni-star-filled"></i>
+            <i class="lni lni-star-filled"></i>
+            <i class="lni lni-star-filled"></i>
+            <i class="lni lni-star-filled"></i>
+          </div>
+          <div class="ud-testimonial-content">
+            <p>
+              "Cywise est le meilleur produit que j’aie vu en matière de détection de vulnérabilités de qualité, sans faux positifs."
+            </p>
+          </div>
+          <div class="ud-testimonial-info">
+            <div class="ud-testimonial-image">
+              <img src="{{ asset('cywise/img/logo-cac40.png') }}" alt="CAC40"/>
+            </div>
+            <div class="ud-testimonial-meta">
+              <h4>Julien B.</h4>
+              <p>CISO d'un groupe du CAC40</p>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="col-lg-4 col-md-6">
         <div class="ud-single-testimonial wow fadeInUp" data-wow-delay=".1s">
           <div class="ud-testimonial-ratings">
@@ -448,17 +468,18 @@
           </div>
           <div class="ud-testimonial-content">
             <p>
-              “Our members are so impressed. It's intuitive. It's clean.
-              It's distraction free. If you're building a community.
+              "Avec Cywise, nous avons vu produire une PSSI claire et complète pour notre client en quelques jours au
+              lieu de plusieurs semaines. Un vrai game changer aussi bien en terme de temps qu'en terme de qualité et de
+              suivi."
             </p>
           </div>
           <div class="ud-testimonial-info">
             <div class="ud-testimonial-image">
-              <img src="{{ asset('cywise/img/website/testimonials/author-01.png') }}" alt="author"/>
+              <img src="{{ asset('cywise/img/logo-ackero.jpg') }}" alt="Ackero"/>
             </div>
             <div class="ud-testimonial-meta">
-              <h4>Sabo Masties</h4>
-              <p>Founder @UIdeck</p>
+              <h4>Augustin B.</h4>
+              <p>Co-fondateur d'Ackero </p>
             </div>
           </div>
         </div>
@@ -474,43 +495,18 @@
           </div>
           <div class="ud-testimonial-content">
             <p>
-              “Our members are so impressed. It's intuitive. It's clean.
-              It's distraction free. If you're building a community.
+              "La solution a amélioré notre visibilité des périmètres exposés et internes. Nous avons été notifiés
+              automatiquement des vulnérabilités à corriger. Rien de critique, heureusement. Depuis, nous sommes alertés
+              dès qu’un changement important est détecté. En somme l’idéal pour une PME comme la nôtre."
             </p>
           </div>
           <div class="ud-testimonial-info">
             <div class="ud-testimonial-image">
-              <img src="{{ asset('cywise/img/website/testimonials/author-02.png') }}" alt="author"/>
+              <img src="{{ asset('cywise/img/logo-oppscience.png') }}" alt="Oppscience"/>
             </div>
             <div class="ud-testimonial-meta">
-              <h4>Margin Gesmu</h4>
-              <p>Founder @Lineicons</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-6">
-        <div class="ud-single-testimonial wow fadeInUp" data-wow-delay=".2s">
-          <div class="ud-testimonial-ratings">
-            <i class="lni lni-star-filled"></i>
-            <i class="lni lni-star-filled"></i>
-            <i class="lni lni-star-filled"></i>
-            <i class="lni lni-star-filled"></i>
-            <i class="lni lni-star-filled"></i>
-          </div>
-          <div class="ud-testimonial-content">
-            <p>
-              “Our members are so impressed. It's intuitive. It's clean.
-              It's distraction free. If you're building a community.
-            </p>
-          </div>
-          <div class="ud-testimonial-info">
-            <div class="ud-testimonial-image">
-              <img src="{{ asset('cywise/img/website/testimonials/author-03.png') }}" alt="author"/>
-            </div>
-            <div class="ud-testimonial-meta">
-              <h4>William Smith</h4>
-              <p>Founder @GrayGrids</p>
+              <h4>Sylvain M.</h4>
+              <p>RSSI d'Oppscience</p>
             </div>
           </div>
         </div>
@@ -520,23 +516,23 @@
       <div class="col-lg-12">
         <div class="ud-brands wow fadeInUp" data-wow-delay=".2s">
           <div class="ud-title">
-            <h6>Trusted and Used by</h6>
+            <h6>Utilisé et approuvé par</h6>
           </div>
           <div class="ud-brands-logo">
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/website/brands/ayroui.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/logo-ista.png') }}" alt="ISTA"/>
             </div>
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/website/brands/uideck.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/logo-hdwsec.jpeg') }}" alt="HDW Sec"/>
             </div>
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/website/brands/graygrids.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/logo-elephantastic.png') }}" alt="Elephantastic"/>
             </div>
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/website/brands/lineicons.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/logo-mindtechnologies.png') }}" alt="Netemedia"/>
             </div>
             <div class="ud-single-logo">
-              <img src="{{ asset('cywise/img/website/brands/ecommerce-html.svg') }}" alt=""/>
+              <img src="{{ asset('cywise/img/logo-netemedia.png') }}" alt="Netemedia"/>
             </div>
           </div>
         </div>
