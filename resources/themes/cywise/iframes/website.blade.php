@@ -402,22 +402,6 @@ $premiumFeatures = explode(',', $premium->features);
       <div class="col-lg-6">
         <div class="ud-single-faq wow fadeInUp" data-wow-delay=".2s">
           <div class="accordion">
-            <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-                  <span class="icon flex-shrink-0">
-                    <i class="lni lni-chevron-down"></i>
-                  </span>
-              <span>Cywise supporte-t-il le Single Sign-On ?</span>
-            </button>
-            <div id="collapseTwo" class="accordion-collapse collapse">
-              <div class="ud-faq-body">
-                Oui, Cywise intègre un module SSO moderne compatible avec les standards du marché (OAuth 2.0, SAML,
-                OpenID Connect) pour un contrôle des accès unifié.
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".2s">
-          <div class="accordion">
             <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseThree">
                   <span class="icon flex-shrink-0">
                     <i class="lni lni-chevron-down"></i>
@@ -428,6 +412,24 @@ $premiumFeatures = explode(',', $premium->features);
               <div class="ud-faq-body">
                 Cywise est disponible en version <a href="{{ route('register') }}" target="_blank">SaaS</a> ou <a
                     href="https://github.com/computablefacts/cywise" target="_blank">auto-hébergée</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".2s">
+          <div class="accordion">
+            <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                  <span class="icon flex-shrink-0">
+                    <i class="lni lni-chevron-down"></i>
+                  </span>
+              <span>Puis-je scanner mon réseau interne avec Cywise ?</span>
+            </button>
+            <div id="collapseTwo" class="accordion-collapse collapse">
+              <div class="ud-faq-body">
+                Il n'est pas possible de scanner votre réseau interne avec la version <a href="{{ route('register') }}"
+                                                                                         target="_blank">SaaS</a> de
+                Cywise. Cependant, la version <a href="https://github.com/computablefacts/cywise" target="_blank">auto-hébergée</a>
+                de Cywise vous permet de la faire !
               </div>
             </div>
           </div>
