@@ -70,14 +70,14 @@
                                     <div class="w-auto divide-y divide-zinc-100">
                                         <a href="/" class="block text-sm p-7 hover:bg-neutral-100 group">
                                             <span class="block mb-1 font-medium text-black">
-                                              Assistant Cyber
+                                              {{ config('app.name') }}
                                             </span>
                                             <span class="block font-light leading-5 opacity-50">
                                               Surveillez vos sites web et serveurs exposés sur internet.
                                             </span>
                                         </a>
                                     </div>
-                                    <div class="w-auto divide-y divide-zinc-100">
+                                    <!-- <div class="w-auto divide-y divide-zinc-100">
                                         <a href="{{ route('pssi') }}" class="block text-sm p-7 hover:bg-neutral-100">
                                             <span class="block mb-1 font-medium text-black">
                                               PSSI
@@ -86,7 +86,7 @@
                                               Créez simplement une Politique de Sécurité des Systèmes d'Information.
                                             </span>
                                         </a>
-                                    </div>
+                                    </div> -->
                                     <div class="w-auto divide-y divide-zinc-100">
                                         <a href="{{ route('pentest') }}" class="block text-sm p-7 hover:bg-neutral-100">
                                             <span class="block mb-1 font-medium text-black">
