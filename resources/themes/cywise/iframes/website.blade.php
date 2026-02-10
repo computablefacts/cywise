@@ -249,9 +249,9 @@ $premiumFeatures = explode(',', $premium->features);
                     data-year="{{ $essentiel->yearly_price }}">
                 {{ $essentiel->monthly_price }}
               </span> {{ $essentiel->currency }} <span class="price-period"></span>
+              <p class="price-equivalent text-muted small"
+                 style="font-size: 0.8rem; margin-top: 5px; min-height: 1.2rem;"></p>
             </h4>
-            <p class="price-equivalent text-muted small"
-               style="font-size: 0.8rem; margin-top: 5px; min-height: 1.2rem;"></p>
           </div>
           <div class="ud-pricing-body">
             <ul>
@@ -277,9 +277,9 @@ $premiumFeatures = explode(',', $premium->features);
                     data-year="{{ $standard->yearly_price }}">
                 {{ $standard->monthly_price }}
               </span> {{ $standard->currency }} <span class="price-period"></span>
+              <p class="price-equivalent text-muted small"
+                 style="font-size: 0.8rem; margin-top: 5px; min-height: 1.2rem; color: white !important;"></p>
             </h4>
-            <p class="price-equivalent text-muted small"
-               style="font-size: 0.8rem; margin-top: 5px; min-height: 1.2rem;"></p>
           </div>
           <div class="ud-pricing-body">
             <ul>
@@ -304,9 +304,9 @@ $premiumFeatures = explode(',', $premium->features);
                     data-year="{{ $premium->yearly_price }}">
                 {{ $premium->monthly_price }}
               </span> {{ $premium->currency }} <span class="price-period"></span>
+              <p class="price-equivalent text-muted small"
+                 style="font-size: 0.8rem; margin-top: 5px; min-height: 1.2rem;"></p>
             </h4>
-            <p class="price-equivalent text-muted small"
-               style="font-size: 0.8rem; margin-top: 5px; min-height: 1.2rem;"></p>
           </div>
           <div class="ud-pricing-body">
             <ul>
@@ -617,7 +617,7 @@ $premiumFeatures = explode(',', $premium->features);
           amountEl.textContent = y;
           periodEl.textContent = ' / an';
           if (y > 0) {
-            const monthlyEquiv = (y / 12).toFixed(2);
+            const monthlyEquiv = (y / 12).toFixed(0);
             equivalentEl.textContent = `soit ${monthlyEquiv} € / mois`;
           } else {
             equivalentEl.textContent = '';
@@ -626,7 +626,7 @@ $premiumFeatures = explode(',', $premium->features);
           amountEl.textContent = m;
           periodEl.textContent = ' / mois';
           if (m > 0) {
-            const yearlyEquiv = (m * 12).toFixed(2);
+            const yearlyEquiv = (m * 12).toFixed(0);
             equivalentEl.textContent = `soit ${yearlyEquiv} € / an`;
           } else {
             equivalentEl.textContent = '';
