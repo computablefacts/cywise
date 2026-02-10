@@ -1,5 +1,5 @@
 <!-- Section 1 -->
-<footer class="pt-10">
+<footer class="pt-10 hidden md:block">
   <x-container>
     <!--
     @if(!Request::is('/'))
