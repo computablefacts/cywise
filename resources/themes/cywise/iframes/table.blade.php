@@ -378,7 +378,10 @@
       if (event.target && event.target.id === 'upload-table') {
         event.preventDefault();
         event.stopPropagation();
-        moveToNextStep = uploadTables();
+        if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
+          console.log('patrick');
+          moveToNextStep = uploadTables();
+        }
       } else if (event.target && event.target.id === 'get-columns') {
         event.preventDefault();
         event.stopPropagation();
