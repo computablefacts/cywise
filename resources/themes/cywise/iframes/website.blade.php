@@ -400,7 +400,7 @@ $premiumFeatures = explode(',', $premium->features);
     </div>
     <div class="row">
       <div class="col-lg-6">
-        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".15s">
+        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".2s">
           <div class="accordion">
             <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
                   <span class="icon flex-shrink-0">
@@ -432,7 +432,7 @@ $premiumFeatures = explode(',', $premium->features);
             </div>
           </div>
         </div>
-        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".1s">
+        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".2s">
           <div class="accordion">
             <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseOne">
                   <span class="icon flex-shrink-0">
@@ -449,26 +449,7 @@ $premiumFeatures = explode(',', $premium->features);
             </div>
           </div>
         </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".1s">
-          <div class="accordion">
-            <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour">
-                  <span class="icon flex-shrink-0">
-                    <i class="lni lni-chevron-down"></i>
-                  </span>
-              <span>Qu'est-ce que le "Hardening" ?</span>
-            </button>
-            <div id="collapseFour" class="accordion-collapse collapse">
-              <div class="ud-faq-body">
-                Le hardening (ou durcissement) consiste à optimiser la configuration de vos serveurs pour réduire leur
-                surface d'attaque. Cywise utilise des règles <a href="https://www.ossec.net/" target="_blank">OSSEC</a>
-                écrites par nos experts pour auditer et renforcer vos machines.
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".15s">
+        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".2s">
           <div class="accordion">
             <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFive">
                   <span class="icon flex-shrink-0">
@@ -481,6 +462,25 @@ $premiumFeatures = explode(',', $premium->features);
                 Nous utilisons <a href="https://osquery.io/" target="_blank">Osquery</a> pour collecter les événements
                 de sécurité de vos machines en temps réel. Des règles écrites par nos experts analysent ces
                 comportements pour identifier toute menace dès son apparition.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".2s">
+          <div class="accordion">
+            <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                  <span class="icon flex-shrink-0">
+                    <i class="lni lni-chevron-down"></i>
+                  </span>
+              <span>Qu'est-ce que le "Hardening" ?</span>
+            </button>
+            <div id="collapseFour" class="accordion-collapse collapse">
+              <div class="ud-faq-body">
+                Le hardening (ou durcissement) consiste à optimiser la configuration de vos serveurs pour réduire leur
+                surface d'attaque. Cywise utilise des règles <a href="https://www.ossec.net/" target="_blank">OSSEC</a>
+                écrites par nos experts pour auditer et renforcer vos machines.
               </div>
             </div>
           </div>
@@ -498,6 +498,43 @@ $premiumFeatures = explode(',', $premium->features);
                 Un honeypot est un leurre conçu pour attirer les cyberattaquants et analyser leurs méthodes. Nos
                 honeypots permettent d'identifier en temps réel les attaques en cours, de vérifier si votre entreprise
                 est ciblée et d'évaluer les risques pour votre infrastructure, sans l'exposer directement.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".2s">
+          <div class="accordion">
+            <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseSeven">
+                  <span class="icon flex-shrink-0">
+                    <i class="lni lni-chevron-down"></i>
+                  </span>
+              <span>Comment les fuites de données révèlent-elles des adresses e-mails internes compromises ?</span>
+            </button>
+            <div id="collapseSeven" class="accordion-collapse collapse">
+              <div class="ud-faq-body">
+                Les fuites révèlent si des identifiants professionnels de votre organisation circulent dans des bases
+                piratées. Cela permet d'anticiper les risques (phishing, usurpation) et de sécuriser les comptes
+                concernés.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ud-single-faq wow fadeInUp" data-wow-delay=".2s">
+          <div class="accordion">
+            <button class="ud-faq-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapseHeight">
+                  <span class="icon flex-shrink-0">
+                    <i class="lni lni-chevron-down"></i>
+                  </span>
+              <span>En quoi les fuites de données aident-elles à détecter les comptes utilisant des mots de passe compromis ?</span>
+            </button>
+            <div id="collapseHeight" class="accordion-collapse collapse">
+              <div class="ud-faq-body">
+                La plupart de nos fuites de données contiennent des triplets (identifiant, mot de passe, site web
+                d'utilisation). En croisant les sites web concernés avec vos propres domaines, nous vous permettons
+                d'identifier rapidement les connexions suspectes à votre infrastructure. Cette analyse proactive vous
+                permet de bloquer les comptes compromis avant toute exploitation malveillante, d'imposer une
+                réinitialisation des mots de passe aux utilisateurs exposés et de renforcer la surveillance des comptes
+                les plus vulnérables.
               </div>
             </div>
           </div>
