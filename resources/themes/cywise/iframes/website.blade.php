@@ -142,8 +142,7 @@
             <h3 class="ud-feature-title">Hardening</h3>
             <p class="ud-feature-desc">
               Renforcez la sécurité de vos serveurs Linux et Windows. Détectez rapidement tout écart de configuration de
-              vos
-              machines.
+              vos machines.
             </p>
           </div>
         </div>
@@ -176,8 +175,63 @@
           </div>
         </div>
       </div>
+      <div class="row mt-5">
+        <div class="col-lg-12">
+          <div class="ud-section-title">
+            <h2>Pilotez votre sécurité en continu</h2>
+            <p>
+              3 outils pour agir vite et efficacement !
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xl-4 col-lg-4 col-sm-6">
+          <div class="ud-single-feature wow fadeInUp" data-wow-delay=".1s">
+            <div class="ud-feature-icon">
+              <i class="lni lni-bullhorn"></i>
+            </div>
+            <div class="ud-feature-content">
+              <h3 class="ud-feature-title">Bulletin d'information</h3>
+              <p class="ud-feature-desc">
+                Recevez un rapport hebdomadaire clair et priorisé directement dans votre boîte mail ou intégrez un flux
+                JSON à vos outils de sécurité (SIEM, SOC, etc.). Les vulnérabilités critiques sont mises en avant pour
+                une action immédiate.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-sm-6">
+          <div class="ud-single-feature wow fadeInUp" data-wow-delay=".15s">
+            <div class="ud-feature-icon">
+              <i class="lni lni-list"></i>
+            </div>
+            <div class="ud-feature-content">
+              <h3 class="ud-feature-title">CyberTodo</h3>
+              <p class="ud-feature-desc">
+                Créez des accès dédiés et sécurisés pour chaque prestataire, limités à leur périmètre. Supervisez
+                l'ensemble des vulnérabilités quels que soient les acteurs impliqués via une seule interface
+                centralisée.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-sm-6">
+          <div class="ud-single-feature wow fadeInUp" data-wow-delay=".15s">
+            <div class="ud-feature-icon">
+              <i class="lni lni-code"></i>
+            </div>
+            <div class="ud-feature-content">
+              <h3 class="ud-feature-title">Scripts de remédiation</h3>
+              <p class="ud-feature-desc">
+                Nous générons des scripts Bash (Linux) ou PowerShell (Windows) prêts à l'emploi, pour corriger vos
+                vulnérabilités sans intervention manuelle. Gain de temps, réduction des erreurs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 </section>
 <!-- ====== Features End ====== -->
 
