@@ -614,8 +614,8 @@
         listAwsBucketContentApiCall(elAwsRegion.el.value, elAwsAccessKeyId.el.value, elAwsSecretAccessKey.el.value,
           elAwsInputFolder.el.value, elAwsOutputFolder.el.value, onSuccess);
       } else if (elStorageType.el.selectedItem === AZURE_STORAGE.value) {
-        listAzureBucketContentApiCall(elAzureConnectionString.el.value, elAwsInputFolder.el.value,
-          elAwsOutputFolder.el.value, onSuccess);
+        listAzureBucketContentApiCall(elAzureConnectionString.el.value, elAzureInputFolder.el.value,
+          elAzureOutputFolder.el.value, onSuccess);
       } else if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
         listLocalBucketContentApiCall(onSuccess);
       } else {
@@ -668,8 +668,8 @@
       listAwsFileContentApiCall(elAwsRegion.el.value, elAwsAccessKeyId.el.value, elAwsSecretAccessKey.el.value,
         elAwsInputFolder.el.value, elAwsOutputFolder.el.value, tables, onSuccess);
     } else if (elStorageType.el.selectedItem === AZURE_STORAGE.value) {
-      listAzureFileContentApiCall(elAzureConnectionString.el.value, elAwsInputFolder.el.value,
-        elAwsOutputFolder.el.value, tables, onSuccess);
+      listAzureFileContentApiCall(elAzureConnectionString.el.value, elAzureInputFolder.el.value,
+        elAzureOutputFolder.el.value, tables, onSuccess);
     } else if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
       listLocalFileContentApiCall(tables, onSuccess);
     } else {
@@ -704,7 +704,7 @@
         elAwsInputFolder.el.value, elAwsOutputFolder.el.value, tables, updatable, copy, deduplicate, description,
         onSuccess);
     } else if (elStorageType.el.selectedItem === AZURE_STORAGE.value) {
-      importAzureFileApiCall(elAzureConnectionString.el.value, elAwsInputFolder.el.value, elAwsOutputFolder.el.value,
+      importAzureFileApiCall(elAzureConnectionString.el.value, elAzureInputFolder.el.value, elAzureOutputFolder.el.value,
         tables, updatable, copy, deduplicate, description, onSuccess);
     } else if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
       importLocalFileApiCall(tables, updatable, copy, deduplicate, description, onSuccess);
