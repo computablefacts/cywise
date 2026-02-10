@@ -1,0 +1,120 @@
+x-watch-dockerfile: &watch-dockerfile-rebuild
+  action: rebuild
+  path: towerify/Dockerfile
+x-watch-composer: &watch-composer-rebuild
+  action: rebuild
+  path: composer.json
+x-watch-package: &watch-package-rebuild
+  action: rebuild
+  path: package.json
+x-watch-config: &watch-config-restart
+  action: sync+restart
+  path: ./config
+  target: /var/www/html/config
+x-watch-env: &watch-env-restart
+  action: sync+restart
+  path: .env
+  target: /var/www/html/.env.temp
+x-watch-routes: &watch-routes-restart
+  action: sync+restart
+  path: ./routes
+  target: /var/www/html/routes
+x-watch-views: &watch-views-restart
+  action: sync+restart
+  path: ./resources/views
+  target: /var/www/html/resources/views
+x-watch-themes: &watch-themes-restart
+  action: sync+restart
+  path: ./resources/themes
+  target: /var/www/html/resources/themes
+x-watch-wave-views: &watch-wave-views-restart
+  action: sync+restart
+  path: ./wave/resources/views
+  target: /var/www/html/wave/resources/views
+x-watch-app-sync: &watch-app-sync
+  action: sync
+  path: ./app
+  target: /var/www/html/app
+
+x-common: &common
+  image: cywise-ui:local-build
+  build:
+    context: .
+    dockerfile: towerify/Dockerfile
+  restart: always
+  extra_hosts:
+    host.docker.internal: host-gateway
+  env_file:
+    - .env
+
+services:
+  app:
+    <<: *common
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+        - <<: *watch-routes-restart
+        - <<: *watch-views-restart
+        - <<: *watch-themes-restart
+        - <<: *watch-wave-views-restart
+
+  scheduler:
+    <<: *common
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+
+  queue:
+    <<: *common
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+
+  queue-low:
+    <<: *common
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+
+  queue-medium:
+    <<: *common
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+
+  queue-critical:
+    <<: *common
+    develop:
+      watch:
+        - <<: *watch-app-sync
+        - <<: *watch-dockerfile-rebuild
+        - <<: *watch-composer-rebuild
+        - <<: *watch-package-rebuild
+        - <<: *watch-env-restart
+        - <<: *watch-config-restart
+

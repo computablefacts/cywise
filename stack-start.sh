@@ -52,7 +52,10 @@ else
   echo "✅ Utilisation du fichier .env existant"
 fi
 
-docker compose up --build --detach
+# Définir les arguments par défaut pour docker compose up
+DOCKER_COMPOSE_ARGS=${DOCKER_COMPOSE_ARGS:-"up --build --detach"}
+
+docker compose $DOCKER_COMPOSE_ARGS
 
 echo -e "\nStack démarrée.\nVous pouvez maintenant accéder à :"
 echo -e "  • Cywise UI             : http://localhost:17801"
