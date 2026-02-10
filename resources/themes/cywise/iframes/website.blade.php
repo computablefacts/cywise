@@ -15,6 +15,52 @@
   <link rel="stylesheet" href="{{ asset('cywise/css/website/lineicons.css') }}"/>
   <link rel="stylesheet" href="{{ asset('cywise/css/website/ud-styles.css') }}"/>
 
+  <style>
+    /* Popup Cybercheck */
+    #cybercheck-popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #cybercheck-popup .cybercheck-modal {
+      background: #ffffff;
+      width: min(900px, 95vw);
+      height: min(80vh, 720px);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+    }
+
+    #cybercheck-popup .cybercheck-close {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.05);
+      border: 0;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    #cybercheck-popup .cybercheck-close:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    #cybercheck-popup .cybercheck-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  </style>
+
 </head>
 <body>
 
@@ -747,6 +793,15 @@ $premiumFeatures = explode(',', $premium->features);
 </a>
 <!-- ====== Back To Top End ====== -->
 
+<!-- ====== CyberCheck Popup Start ====== -->
+<div id="cybercheck-popup" aria-hidden="true" role="dialog" aria-label="Cybercheck">
+  <div class="cybercheck-modal">
+    <button id="cybercheck-close" class="cybercheck-close" aria-label="Fermer la fenêtre">×</button>
+    <iframe class="cybercheck-iframe" src="" data-src="{{ route('tools.cybercheck.init') }}" title="Cybercheck"></iframe>
+  </div>
+</div>
+<!-- ====== CyberCheck Popup End ====== -->
+
 <!-- ====== All Javascript Files ====== -->
 <script src="{{ asset('cywise/js/website/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('cywise/js/website/wow.min.js') }}"></script>
@@ -907,6 +962,48 @@ $premiumFeatures = explode(',', $premium->features);
         form.reset();
       } catch (err) {
         setStatus(err.message || 'Impossible d\'envoyer le message pour le moment.', false);
+      }
+    });
+  });
+
+  // ==== Affiche la popup après 15 secondes
+  document.addEventListener('DOMContentLoaded', function () {
+
+    let popup = document.getElementById('cybercheck-popup');
+
+    if (!popup) {
+      return;
+    }
+
+    let iframe = popup.querySelector('.cybercheck-iframe');
+    let closeBtn = document.getElementById('cybercheck-close');
+
+    function openPopup() {
+      if (iframe && iframe.dataset.src) {
+        iframe.src = iframe.dataset.src;
+      }
+      popup.style.display = 'flex';
+    }
+
+    function closePopup() {
+      popup.style.display = 'none';
+      if (iframe) {
+        iframe.src = '';
+      }
+    }
+
+    // Affichage différé après 15 secondes
+    setTimeout(openPopup, 15000);
+
+    // Fermeture via bouton "X"
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closePopup);
+    }
+
+    // Fermeture en cliquant sur l'overlay
+    popup.addEventListener('click', function (e) {
+      if (e.target === popup) {
+        closePopup();
       }
     });
   });
