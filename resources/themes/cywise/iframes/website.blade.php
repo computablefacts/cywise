@@ -229,12 +229,29 @@ $premiumFeatures = explode(',', $premium->features);
         </div>
       </div>
     </div>
+    <div class="ud-pricing-toggle text-center mb-4">
+      <div class="btn-group" role="group" aria-label="Choix de facturation">
+        <button type="button" id="billing-monthly" class="ud-main-btn ud-white-btn" style="margin-right:8px;">
+          Mensuel
+        </button>
+        <button type="button" id="billing-yearly" class="ud-main-btn ud-border-btn">
+          Annuel
+        </button>
+      </div>
+    </div>
     <div class="row g-0 align-items-center justify-content-center">
       <div class="col-lg-4 col-md-6 col-sm-10">
         <div class="ud-single-pricing first-item wow fadeInUp" data-wow-delay=".15s">
           <div class="ud-pricing-header">
             <h3>{{ \Str::upper($essentiel->name) }}</h3>
-            <h4>{{ $essentiel->monthly_price }} {{ $essentiel->currency }}/mois</h4>
+            <h4>
+              <span class="price-amount" data-month="{{ $essentiel->monthly_price }}"
+                    data-year="{{ $essentiel->yearly_price }}">
+                {{ $essentiel->monthly_price }}
+              </span> {{ $essentiel->currency }} <span class="price-period"></span>
+            </h4>
+            <p class="price-equivalent text-muted small"
+               style="font-size: 0.8rem; margin-top: 5px; min-height: 1.2rem;"></p>
           </div>
           <div class="ud-pricing-body">
             <ul>
@@ -255,7 +272,14 @@ $premiumFeatures = explode(',', $premium->features);
           <span class="ud-popular-tag">POPULAIRE</span>
           <div class="ud-pricing-header">
             <h3>{{ \Str::upper($standard->name) }}</h3>
-            <h4>{{ $standard->monthly_price }} {{ $standard->currency }}/mois</h4>
+            <h4>
+              <span class="price-amount" data-month="{{ $standard->monthly_price }}"
+                    data-year="{{ $standard->yearly_price }}">
+                {{ $standard->monthly_price }}
+              </span> {{ $standard->currency }} <span class="price-period"></span>
+            </h4>
+            <p class="price-equivalent text-muted small"
+               style="font-size: 0.8rem; margin-top: 5px; min-height: 1.2rem;"></p>
           </div>
           <div class="ud-pricing-body">
             <ul>
@@ -275,7 +299,14 @@ $premiumFeatures = explode(',', $premium->features);
         <div class="ud-single-pricing last-item wow fadeInUp" data-wow-delay=".15s">
           <div class="ud-pricing-header">
             <h3>{{ \Str::upper($premium->name) }}</h3>
-            <h4>{{ $premium->monthly_price }} {{ $premium->currency }}/mois</h4>
+            <h4>
+              <span class="price-amount" data-month="{{ $premium->monthly_price }}"
+                    data-year="{{ $premium->yearly_price }}">
+                {{ $premium->monthly_price }}
+              </span> {{ $premium->currency }} <span class="price-period"></span>
+            </h4>
+            <p class="price-equivalent text-muted small"
+               style="font-size: 0.8rem; margin-top: 5px; min-height: 1.2rem;"></p>
           </div>
           <div class="ud-pricing-body">
             <ul>
@@ -560,6 +591,71 @@ $premiumFeatures = explode(',', $premium->features);
 <script src="{{ asset('cywise/js/website/wow.min.js') }}"></script>
 <script src="{{ asset('cywise/js/website/main.js') }}"></script>
 <script>
+
+  // ==== for pricing
+  document.addEventListener('DOMContentLoaded', function () {
+
+    const monthlyBtn = document.getElementById('billing-monthly');
+    const yearlyBtn = document.getElementById('billing-yearly');
+
+    function setBilling(mode) {
+      document.querySelectorAll('#pricing .ud-single-pricing').forEach(function (card) {
+
+        const amountEl = card.querySelector('.price-amount');
+        const periodEl = card.querySelector('.price-period');
+        const equivalentEl = card.querySelector('.price-equivalent');
+        let m = parseFloat(amountEl.getAttribute('data-month'));
+        let y = parseFloat(amountEl.getAttribute('data-year'));
+
+        if (!m) {
+          m = 0;
+        }
+        if (!y) {
+          y = 0;
+        }
+        if (mode === 'yearly') {
+          amountEl.textContent = y;
+          periodEl.textContent = ' / an';
+          if (y > 0) {
+            const monthlyEquiv = (y / 12).toFixed(2);
+            equivalentEl.textContent = `soit ${monthlyEquiv} € / mois`;
+          } else {
+            equivalentEl.textContent = '';
+          }
+        } else {
+          amountEl.textContent = m;
+          periodEl.textContent = ' / mois';
+          if (m > 0) {
+            const yearlyEquiv = (m * 12).toFixed(2);
+            equivalentEl.textContent = `soit ${yearlyEquiv} € / an`;
+          } else {
+            equivalentEl.textContent = '';
+          }
+        }
+      });
+      if (mode === 'monthly') {
+        monthlyBtn.classList.add('ud-white-btn');
+        monthlyBtn.classList.remove('ud-border-btn');
+        yearlyBtn.classList.add('ud-border-btn');
+        yearlyBtn.classList.remove('ud-white-btn');
+      } else {
+        yearlyBtn.classList.add('ud-white-btn');
+        yearlyBtn.classList.remove('ud-border-btn');
+        monthlyBtn.classList.add('ud-border-btn');
+        monthlyBtn.classList.remove('ud-white-btn');
+      }
+    }
+
+    if (monthlyBtn && yearlyBtn) {
+      monthlyBtn.addEventListener('click', function () {
+        setBilling('monthly');
+      });
+      yearlyBtn.addEventListener('click', function () {
+        setBilling('yearly');
+      });
+      setBilling('monthly');
+    }
+  });
 
   // ==== for menu scroll
   const pageLink = document.querySelectorAll(".ud-menu-scroll");
