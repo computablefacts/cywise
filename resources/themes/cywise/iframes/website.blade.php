@@ -797,7 +797,8 @@ $premiumFeatures = explode(',', $premium->features);
 <div id="cybercheck-popup" aria-hidden="true" role="dialog" aria-label="Cybercheck">
   <div class="cybercheck-modal">
     <button id="cybercheck-close" class="cybercheck-close" aria-label="Fermer la fenêtre">×</button>
-    <iframe class="cybercheck-iframe" src="" data-src="{{ route('tools.cybercheck.init') }}" title="Cybercheck"></iframe>
+    <iframe class="cybercheck-iframe" src="" data-src="{{ route('tools.cybercheck.init') }}"
+            title="Cybercheck"></iframe>
   </div>
 </div>
 <!-- ====== CyberCheck Popup End ====== -->
@@ -972,6 +973,15 @@ $premiumFeatures = explode(',', $premium->features);
     let popup = document.getElementById('cybercheck-popup');
 
     if (!popup) {
+      return;
+    }
+
+    // Ne pas afficher la popup sur mobile
+    const isMobile = (
+      (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) ||
+      /Mobi|Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    );
+    if (isMobile) {
       return;
     }
 
