@@ -55,7 +55,7 @@ class AudioToTextProvider
     private static function callDeepInfra(string $audio, string $lang, int $timeoutInSeconds = 60): array
     {
         return self::post(
-            config('towerify.deepinfra.api') . '../inference/openai/whisper-large-v3-turbo',
+            config('towerify.deepinfra.api') . '/../inference/openai/whisper-large-v3-turbo',
             config('towerify.deepinfra.api_key'),
             $audio,
             $lang,
