@@ -241,7 +241,7 @@ Vous devez mettre en place cette clé dans Cywise.
 | queue-critical        |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
 | queue-scout           |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
 | mariadb               |                                                    |      :white_check_mark: [Publique][mariadb]      |      :white_check_mark: Oui      |
-| performa              | [http://localhost:17802/](http://localhost:17802/) |                   :x: Private                    |      :white_check_mark: Oui      |
+| performa              | [http://localhost:17802/](http://localhost:17802/) |                   :x: Privée                    |      :white_check_mark: Oui      |
 | mailpit               | [http://localhost:17803/](http://localhost:17803/) |      :white_check_mark: [Publique][mailpit]      |      :white_check_mark: Oui      |
 | clickhouse-server     |                                                    | :white_check_mark: [Publique][clickhouse-server] |      :white_check_mark: Oui      |
 | sentinel-api          |                                                    |   :white_check_mark: [Publique][sentinel-api]    |        :x: Non (à venir)         |
@@ -252,7 +252,7 @@ Vous devez mettre en place cette clé dans Cywise.
 | sentinel-redis        |                                                    |       :white_check_mark: [Publique][redis]       | :white_check_mark: Oui (AGPL v3) |
 | sentinel-mongodb      |                                                    |      :white_check_mark: [Publique][mongodb]      |  :white_check_mark: Oui (SSPL)   |
 | sentinel-wappalyzer   |                                                    |    :white_check_mark: [Publique][wappalyzer]     | :white_check_mark: Oui (GPL v3)  |
-| sentinel-splash       |                                                    |       :white_check_mark: [Publique][slash]       |   :white_check_mark: Oui (BSD)   |
+| sentinel-splash       |                                                    |       :white_check_mark: [Publique][splash]       |   :white_check_mark: Oui (BSD)   |
 
 [towerify]: https://hub.docker.com/r/computablefacts/towerify/tags
 [mariadb]: https://hub.docker.com/_/mariadb/tags
