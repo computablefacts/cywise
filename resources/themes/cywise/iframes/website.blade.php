@@ -711,6 +711,9 @@ $premiumFeatures = explode(',', $premium->features);
             <div class="ud-single-logo">
               <img src="{{ asset('cywise/img/logo-netemedia.png') }}" alt="Netemedia"/>
             </div>
+            <div class="ud-single-logo">
+              <img src="{{ asset('cywise/img/logo-idcapt.png') }}" alt="ID.capt"/>
+            </div>
           </div>
         </div>
       </div>
