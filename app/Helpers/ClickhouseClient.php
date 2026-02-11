@@ -44,7 +44,7 @@ class ClickhouseClient
         $username = config('towerify.clickhouse.username');
         $password = config('towerify.clickhouse.password');
         $database = config('towerify.clickhouse.database');
-        $extraParameters = config('towerify.clickhouse.client_extra_parameters', '--secure');
+        $extraParameters = config('towerify.clickhouse.client_extra_parameters');
         /** @var User $user */
         $user = \Auth::user();
         $tenant = $user ? "_{$user->tenant_id}" : '_0';
@@ -115,7 +115,7 @@ class ClickhouseClient
         $username = config('towerify.clickhouse.username');
         $password = config('towerify.clickhouse.password');
         $database = config('towerify.clickhouse.database');
-        $extraParameters = config('towerify.clickhouse.client_extra_parameters', '--secure');
+        $extraParameters = config('towerify.clickhouse.client_extra_parameters');
         /** @var User $user */
         $user = \Auth::user();
         $tenant = $user ? "_{$user->tenant_id}" : '_0';

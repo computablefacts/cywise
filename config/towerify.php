@@ -100,7 +100,7 @@ return [
         'username' => env('CH_USERNAME'),
         'password' => env('CH_PASSWORD'),
         'database' => env('CH_DATABASE'),
-        'client_extra_parameters' => env('CH_CLIENT_EXTRA_PARAMETERS')
+        'client_extra_parameters' => env('CH_CLIENT_EXTRA_PARAMETERS', '--secure')
     ],
     'josianne' => [
         'host' => env('JOSIANNE_HOST'),
