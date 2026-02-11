@@ -89,7 +89,6 @@
   btnSave.addEventListener('click', () => {
 
     const params = {
-      action_id: "{{ $action->id ?? 'null' }}",
       name: elName.value,
       description: elDescription.value,
       url: elUrl.value,
@@ -100,12 +99,7 @@
       examples: JSON.parse(editorExamples.getValue() || '[]')
     };
 
-    saveRemoteActionApiCall(params, (result) => {
-      toaster.toastSuccess("{{ __('The action has been saved.') }}");
-      if (!params.action_id && result.action_id) {
-        window.location.href = "{{ route('iframes.actions-editor') }}?action_id=" + result.action_id;
-      }
-    });
+    createRemoteActionApiCall(params, () => toaster.toastSuccess("{{ __('The action has been saved.') }}"));
   });
 
 </script>

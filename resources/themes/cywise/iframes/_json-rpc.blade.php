@@ -163,12 +163,12 @@
       onSuccess);
   }
 
-  function saveRemoteActionApiCall(params, onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('cyberbuddy@saveRemoteAction', params, onSuccess);
+  function createRemoteActionApiCall(params, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberbuddy@createRemoteAction', params, onSuccess);
   }
 
-  function deleteRemoteActionApiCall(id, onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('cyberbuddy@deleteRemoteAction', {action_id: id}, onSuccess);
+  function deleteRemoteActionApiCall(actionId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberbuddy@deleteRemoteAction', {action_id: actionId}, onSuccess);
   }
 
   function loadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault) {

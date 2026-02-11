@@ -46,7 +46,7 @@ class ActionsRegistry
     }
 
     /**
-     * Resolve enabled action classes for a user, considering user overrides first, then tenant-level, default=true.
+     * Only remote actions that are global (created_by is null) or created by a user in the same tenant are loaded.
      * @return array<AbstractAction>
      */
     public static function enabledFor(User $user): array

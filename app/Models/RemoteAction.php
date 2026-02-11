@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,12 +16,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property array payload_template
  * @property ?string response_template
  * @property ?array examples
+ * @property ?int created_by
  * @property ?\Illuminate\Support\Carbon created_at
  * @property ?\Illuminate\Support\Carbon updated_at
  */
 class RemoteAction extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTenant;
 
     protected $table = 'cb_remote_actions';
 
@@ -33,9 +35,11 @@ class RemoteAction extends Model
         'payload_template',
         'response_template',
         'examples',
+        'created_by',
     ];
 
     protected $casts = [
+        'created_by' => 'integer',
         'schema' => 'array',
         'headers' => 'array',
         'payload_template' => 'array',

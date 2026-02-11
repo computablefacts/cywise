@@ -197,9 +197,8 @@ class CyberBuddyProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Save a remote action.",
+        description: "Create a single remote action.",
         params: [
-            "action_id" => "An optional action identifier or null for new.",
             "name" => "The action name.",
             "description" => "The action description.",
             "url" => "The action URL.",
@@ -210,17 +209,16 @@ class CyberBuddyProcedure extends Procedure
             "examples" => "The action examples.",
         ],
         result: [
-            "id" => "The action identifier.",
-            "msg" => "A success message.",
+            "action" => "A remote action.",
         ]
     )]
-    public function saveRemoteAction(JsonRpcRequest $request): array
+    public function createRemoteAction(JsonRpcRequest $request): array
     {
+        $user = $request->user();
         $params = $request->validate([
-            'action_id' => 'nullable|integer|exists:cb_remote_actions,id',
-            'name' => 'required|string|min:2|max:255',
+            'name' => 'required|string|min:2|max:191|regex:/^[a-z]+[a-z0-9_]*[a-z0-9]+$/',
             'description' => 'required|string|min:2|max:2048',
-            'url' => 'required|url|max:2048',
+            'url' => 'required|string|max:2048',
             'headers' => 'nullable|array',
             'schema' => 'nullable|array',
             'payload_template' => 'nullable|array',
@@ -228,13 +226,34 @@ class CyberBuddyProcedure extends Procedure
             'examples' => 'nullable|array',
         ]);
 
-        $action = isset($params['action_id']) ? RemoteAction::findOrFail($params['action_id']) : new RemoteAction();
-        $action->fill($params);
-        $action->save();
+        /** @var RemoteAction $action */
+        $action = RemoteAction::where('name', $params['name'])->first();
 
+        if ($action) {
+            $action->name = $params['name'];
+            $action->description = $params['description'];
+            $action->url = $params['url'];
+            $action->headers = $params['headers'] ?? [];
+            $action->schema = $params['schema'] ?? [];
+            $action->payload_template = $params['payload_template'] ?? [];
+            $action->response_template = $params['response_template'] ?? '';
+            $action->examples = $params['examples'] ?? [];
+            $action->save();
+        } else {
+            $action = RemoteAction::create([
+                'name' => $params['name'],
+                'description' => $params['description'],
+                'url' => $params['url'],
+                'headers' => $params['headers'] ?? [],
+                'schema' => $params['schema'] ?? [],
+                'payload_template' => $params['payload_template'] ?? [],
+                'response_template' => $params['response_template'] ?? '',
+                'examples' => $params['examples'] ?? [],
+                'created_by' => $user->isCywiseAdmin() ? null : $user->id,
+            ]);
+        }
         return [
-            'action_id' => $action->id,
-            'msg' => __('Action saved.'),
+            'action' => $action,
         ];
     }
 
@@ -253,10 +272,18 @@ class CyberBuddyProcedure extends Procedure
             'action_id' => 'required|integer|exists:cb_remote_actions,id',
         ]);
 
-        RemoteAction::where('action_id', $params['action_id'])->delete();
+        $user = $request->user();
+
+        RemoteAction::where('id', $params['action_id'])
+            ->where(function ($query) use ($user) {
+                if (!$user->isCywiseAdmin()) {
+                    $query->whereIn('created_by', User::where('tenant_id', $user->tenant_id)->pluck('id'));
+                }
+            })
+            ->delete();
 
         return [
-            'msg' => __('Action deleted.'),
+            'msg' => __('The action has been removed!'),
         ];
     }
 }
