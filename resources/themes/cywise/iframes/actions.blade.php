@@ -20,20 +20,29 @@ $me = Auth::user();
 @endpush
 
 @section('content')
-<ul class="nav nav-tabs mt-3" role="tablist">
-  <li class="nav-item" role="presentation">
-    <a class="nav-link {{ isset($userSelected) ? '' : 'active' }}" id="simple-tab-0" data-bs-toggle="tab"
-       href="#tab-tenant" role="tab">
-      {{ __('Actions for all') }}
+<div class="row mt-3">
+  <div class="col-6">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a class="nav-link {{ isset($userSelected) ? '' : 'active' }}" id="simple-tab-0" data-bs-toggle="tab"
+           href="#tab-tenant" role="tab">
+          {{ __('Actions for all') }}
+        </a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link {{ isset($userSelected) ? 'active' : '' }}" id="simple-tab-1" data-bs-toggle="tab"
+           href="#tab-user" role="tab">
+          {{ __('User overrides') }}
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="col-6 text-end">
+    <a href="{{ route('iframes.actions-editor') }}">
+      {{ __('+ new') }}
     </a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a class="nav-link {{ isset($userSelected) ? 'active' : '' }}" id="simple-tab-1" data-bs-toggle="tab"
-       href="#tab-user" role="tab">
-      {{ __('User overrides') }}
-    </a>
-  </li>
-</ul>
+  </div>
+</div>
 <div class="tab-content" id="tab-content">
   <div class="tab-pane {{ isset($userSelected) ? '' : 'active' }}" id="tab-tenant" role="tabpanel">
     <div class="card mt-3">
@@ -51,7 +60,17 @@ $me = Auth::user();
                    name="actions[]"
                    value="{{ $actionName }}"
                    @checked($checked)>
-            <b>{{ $instance->name() }}</b> {{ $instance->isRemote() ? '(remote)' : '' }}
+            @if($instance->isRemote())
+            <a href="{{ route('iframes.actions-editor', ['action_id' => $instance->id()]) }}"
+               class="btn btn-sm btn-link py-0">
+              <b>{{ $instance->name() }}</b>
+            </a>
+            <span class="lozenge information">
+              remote
+            </span>
+            @else
+            <b>{{ $instance->name() }}</b>
+            @endif
           </label>
           <pre class="pre-light mb-3">{{ \Str::trim($instance->description()) }}</pre>
           @endforeach
@@ -94,7 +113,18 @@ $me = Auth::user();
                    name="actions[]"
                    value="{{ $actionName }}"
                    @checked($checked=== null ? ($tenantSettings[$actionName]->enabled ?? true) : $checked)>
-            <b>{{ $instance->name() }}</b> {{ $instance->isRemote() ? '(remote)' : '' }}
+            <b>{{ $instance->name() }}</b>
+            @if($instance->isRemote())
+            <a href="{{ route('iframes.actions-editor', ['action_id' => $instance->id()]) }}"
+               class="btn btn-sm btn-link py-0">
+              <b>{{ $instance->name() }}</b>
+            </a>
+            <span class="lozenge information">
+              remote
+            </span>
+            @else
+            <b>{{ $instance->name() }}</b>
+            @endif
           </label>
           <pre class="pre-light mb-3">{{ \Str::trim($instance->description()) }}</pre>
           @endforeach

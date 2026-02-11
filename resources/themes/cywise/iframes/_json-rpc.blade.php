@@ -163,6 +163,14 @@
       onSuccess);
   }
 
+  function saveRemoteActionApiCall(params, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberbuddy@saveRemoteAction', params, onSuccess);
+  }
+
+  function deleteRemoteActionApiCall(id, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('cyberbuddy@deleteRemoteAction', {action_id: id}, onSuccess);
+  }
+
   function loadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('frameworks@load', {framework_id: frameworkId}, onSuccess);
   }

@@ -18,6 +18,11 @@ class RemoteAction extends AbstractAction
 {
     private \App\Models\RemoteAction $action;
 
+    public function id(): ?int
+    {
+        return $this->action->id;
+    }
+
     public function isRemote(): bool
     {
         return true;

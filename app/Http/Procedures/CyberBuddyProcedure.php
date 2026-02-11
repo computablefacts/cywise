@@ -13,6 +13,7 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
 use App\Models\ActionSetting;
 use App\Models\Conversation;
+use App\Models\RemoteAction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -192,6 +193,70 @@ class CyberBuddyProcedure extends Procedure
         }
         return [
             'msg' => __('Settings saved.'),
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Save a remote action.",
+        params: [
+            "action_id" => "An optional action identifier or null for new.",
+            "name" => "The action name.",
+            "description" => "The action description.",
+            "url" => "The action URL.",
+            "headers" => "The action headers.",
+            "schema" => "The action schema.",
+            "payload_template" => "The action payload template.",
+            "response_template" => "The action response template.",
+            "examples" => "The action examples.",
+        ],
+        result: [
+            "id" => "The action identifier.",
+            "msg" => "A success message.",
+        ]
+    )]
+    public function saveRemoteAction(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'action_id' => 'nullable|integer|exists:cb_remote_actions,id',
+            'name' => 'required|string|min:2|max:255',
+            'description' => 'required|string|min:2|max:2048',
+            'url' => 'required|url|max:2048',
+            'headers' => 'nullable|array',
+            'schema' => 'nullable|array',
+            'payload_template' => 'nullable|array',
+            'response_template' => 'nullable|string',
+            'examples' => 'nullable|array',
+        ]);
+
+        $action = isset($params['action_id']) ? RemoteAction::findOrFail($params['action_id']) : new RemoteAction();
+        $action->fill($params);
+        $action->save();
+
+        return [
+            'action_id' => $action->id,
+            'msg' => __('Action saved.'),
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Delete a remote action.",
+        params: [
+            "action_id" => "The action identifier.",
+        ],
+        result: [
+            "msg" => "A success message.",
+        ]
+    )]
+    public function deleteRemoteAction(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'action_id' => 'required|integer|exists:cb_remote_actions,id',
+        ]);
+
+        RemoteAction::where('action_id', $params['action_id'])->delete();
+
+        return [
+            'msg' => __('Action deleted.'),
         ];
     }
 }

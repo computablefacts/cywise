@@ -27,6 +27,11 @@ abstract class AbstractAction
         return false;
     }
 
+    public function id(): ?int
+    {
+        return null;
+    }
+
     public abstract function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer;
 
     protected abstract function schema(): array;
