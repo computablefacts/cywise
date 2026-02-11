@@ -154,12 +154,23 @@ class Asset extends Model
         $ifTypes = $hiddenTypes->isEmpty() ? 'false' : "am_alerts.type IN ('{$hiddenTypes->join("','")}')";
         $ifTitles = $hiddenTitles->isEmpty() ? 'false' : "am_alerts.title IN ('{$hiddenTitles->join("','")}')";
         $case = "CASE WHEN {$ifUids} OR {$ifTypes} OR {$ifTitles} THEN true ELSE false END AS is_hidden";
-
-        return Alert::select('am_alerts.*', DB::raw($case))
+        $base = Alert::select('am_alerts.*', DB::raw($case))
             ->join('am_ports', 'am_ports.id', '=', 'am_alerts.port_id')
             ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
             ->join('am_assets', 'am_assets.cur_scan_id', '=', 'am_scans.ports_scan_id')
             ->where('am_assets.id', $this->id);
+
+        // Dedup alerts to keep only one alert per UID (or ID if UID is null)
+        $withRowNum = (clone $base)->select([
+            'am_alerts.*',
+            DB::raw($case),
+            DB::raw("ROW_NUMBER() OVER (PARTITION BY COALESCE(am_alerts.uid, CAST(am_alerts.id AS CHAR))) AS rn"),
+        ]);
+
+        return Alert::query()
+            ->fromSub($withRowNum, 'alerts_dedup')
+            ->select('alerts_dedup.*')
+            ->where('rn', 1);
     }
 
     /**
