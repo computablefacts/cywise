@@ -14,7 +14,7 @@ describe('cyberbuddy@createRemoteAction', function () {
 
         $result = $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@createRemoteAction', [
+            ->callProcedure('remoteactions@create', [
                 'name' => 'admin_remote_action',
                 'description' => 'Action created by admin',
                 'url' => 'https://example.com/hook',
@@ -58,7 +58,7 @@ describe('cyberbuddy@createRemoteAction', function () {
 
         $result = $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@createRemoteAction', [
+            ->callProcedure('remoteactions@create', [
                 'name' => 'tenant_remote_action',
                 'description' => 'Action created by tenant user',
                 'url' => 'https://example.com/hook',
@@ -82,7 +82,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
 
         $adminActionId = $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@createRemoteAction', [
+            ->callProcedure('remoteactions@create', [
                 'name' => 'admin_action_to_delete',
                 'description' => 'To be deleted by admin',
                 'url' => 'https://example.com/hook',
@@ -97,7 +97,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
 
         $tenantActionId = $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@createRemoteAction', [
+            ->callProcedure('remoteactions@create', [
                 'name' => 'tenant_action_to_delete',
                 'description' => 'To be deleted by admin',
                 'url' => 'https://example.com/hook',
@@ -113,7 +113,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
         // Admin deletes admin-created action
         $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@deleteRemoteAction', [
+            ->callProcedure('remoteactions@delete', [
                 'action_id' => $adminActionId,
             ])
             ->assertExactJsonStructure([
@@ -129,7 +129,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
         // Admin deletes tenant-created action
         $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@deleteRemoteAction', [
+            ->callProcedure('remoteactions@delete', [
                 'action_id' => $tenantActionId,
             ])
             ->assertExactJsonStructure([
@@ -151,7 +151,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
 
         $adminActionId = $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@createRemoteAction', [
+            ->callProcedure('remoteactions@create', [
                 'name' => 'admin_action_protected',
                 'description' => 'Admin created',
                 'url' => 'https://example.com/hook',
@@ -169,7 +169,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
 
         $tenant1Action1 = $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@createRemoteAction', [
+            ->callProcedure('remoteactions@create', [
                 'name' => 't1_action_one',
                 'description' => 'T1 user1',
                 'url' => 'https://example.com/hook',
@@ -181,7 +181,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
 
         $tenant1Action2 = $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@createRemoteAction', [
+            ->callProcedure('remoteactions@create', [
                 'name' => 't1_action_two',
                 'description' => 'T1 user2',
                 'url' => 'https://example.com/hook',
@@ -194,7 +194,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
 
         $tenant2Action = $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@createRemoteAction', [
+            ->callProcedure('remoteactions@create', [
                 'name' => 't2_action',
                 'description' => 'T2 user',
                 'url' => 'https://example.com/hook',
@@ -208,7 +208,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
         // Can delete own tenant actions (own and other user in same tenant)
         $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@deleteRemoteAction', [
+            ->callProcedure('remoteactions@delete', [
                 'action_id' => $tenant1Action1,
             ])
             ->assertExactJsonStructure([
@@ -223,7 +223,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
 
         $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@deleteRemoteAction', [
+            ->callProcedure('remoteactions@delete', [
                 'action_id' => $tenant1Action2,
             ])
             ->assertExactJsonStructure([
@@ -238,7 +238,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
         // Cannot delete admin-created action (created_by = null)
         $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@deleteRemoteAction', [
+            ->callProcedure('remoteactions@delete', [
                 'action_id' => $adminActionId,
             ])
             ->assertExactJsonStructure([
@@ -255,7 +255,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
         // Cannot delete other tenant's action
         $this
             ->setRpcRoute('v2.private.rpc.endpoint')
-            ->callProcedure('cyberbuddy@deleteRemoteAction', [
+            ->callProcedure('remoteactions@delete', [
                 'action_id' => $tenant2Action,
             ])
             ->assertExactJsonStructure([
@@ -265,7 +265,7 @@ describe('cyberbuddy@deleteRemoteAction', function () {
                     'msg',
                 ],
             ]);
-        
+
         // As current user (tenant1), other tenant's action is not visible anyway; verify it still exists by switching back to tenant2
         test()->actingAs($u3);
         expect(RemoteAction::find($tenant2Action))->not->toBeNull();

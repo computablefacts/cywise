@@ -157,7 +157,7 @@ $me = Auth::user();
       const scopeId = parseInt(form.querySelector('input[name="scope_id"]').value, 10);
       const actions = Array.from(form.querySelectorAll('input[name="actions[]"]:checked')).map(el => el.value);
 
-      saveActionSettingsApiCall(scopeType, scopeId, actions);
+      saveRemoteActionsSettingsApiCall(scopeType, scopeId, actions);
     });
   }
 

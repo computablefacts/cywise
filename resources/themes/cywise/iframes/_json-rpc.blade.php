@@ -158,17 +158,17 @@
     executeJsonRpcApiCall('cyberbuddy@delete', {conversation_id: conversationId}, onSuccess);
   }
 
-  function saveActionSettingsApiCall(scopeType, scopeId, actions, onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('cyberbuddy@saveActionSettings', {scope_type: scopeType, scope_id: scopeId, actions: actions},
+  function saveRemoteActionsSettingsApiCall(scopeType, scopeId, actions, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('remoteactions@saveSettings', {scope_type: scopeType, scope_id: scopeId, actions: actions},
       onSuccess);
   }
 
   function createRemoteActionApiCall(params, onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('cyberbuddy@createRemoteAction', params, onSuccess);
+    executeJsonRpcApiCall('remoteactions@create', params, onSuccess);
   }
 
   function deleteRemoteActionApiCall(actionId, onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('cyberbuddy@deleteRemoteAction', {action_id: actionId}, onSuccess);
+    executeJsonRpcApiCall('remoteactions@delete', {action_id: actionId}, onSuccess);
   }
 
   function loadFrameworkApiCall(frameworkId, onSuccess = onSuccessDefault) {
