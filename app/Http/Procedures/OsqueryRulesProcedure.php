@@ -56,13 +56,7 @@ class OsqueryRulesProcedure extends Procedure
         $name = $user->isCywiseAdmin() ? $params['name'] : "{$user->tenant_id}_cywise_{$params['name']}";
 
         /** @var ?YnhOsqueryRule $rule */
-        $rule = YnhOsqueryRule::where('name', $name)
-            ->where(function ($query) use ($user) {
-                if (!$user->isCywiseAdmin()) {
-                    $query->whereIn('created_by', User::where('tenant_id', $user->tenant_id)->pluck('id'));
-                }
-            })
-            ->first();
+        $rule = YnhOsqueryRule::where('name', $name)->first();
 
         if ($rule) {
             $rule->description = $params['description'];
