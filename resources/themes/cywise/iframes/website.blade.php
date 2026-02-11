@@ -119,7 +119,7 @@
           <span>Fonctionnalités</span>
           <h2>Protégez ce qui est accessible sur internet</h2>
           <p>
-            3 technologies complémentaires pour une protection complète !
+            3 technologies complémentaires pour une protection renforcée !
           </p>
         </div>
       </div>
