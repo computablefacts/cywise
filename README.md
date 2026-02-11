@@ -202,77 +202,17 @@ Vous pouvez démarrer la stack grâce à la commande :
 >
 > Comptez environ 15 minutes lors du premier démarrage.
 
-## Utilisation de Cywise
+## Arrêt
 
-Après démarrage de la stack, vous pouvez accéder à l'interface en utilisant
-les paramètres :
-
-- URL : [http://localhost:17801](http://localhost:17801)
-- login : demo@mydomain.com
-- mot de passe : DemoPass2026
-
-### Protéger ce qui est accessible sur internet
-
-#### Scanner de vulnérabilités
-
-Depuis le [tableau de bord](http://localhost:17801/dashboard), vous pouvez
-ajouter un domaine ou une adresse IP et demander à Cywise de la surveiller.
-
-Cywise va alors scanner cet actif pour rechercher les éventuelles
-vulnérabilités.
-
-Comptez environ 5 minutes avant de voir le résultat du scan.
-
-Vous pouvez rafraichir la page du tableau de bord pour voir combien de
-vulnérabilités Cywise a découvert. Elles sont réparties dans les 3 catégories
-de criticité Haute, Moyenne et Basse.
-
-Vous pouvez également retrouver la liste des vulnérabilités en cliquant sur le
-menu **Timelines > Vulnérabilités**.
-
-> [!WARNING]
-> Vous ne devez scanner que des domaines ou des adresses IP dont vous êtes
-> le propriétaire.
-
-### Protéger les actifs internes de l'entreprise
-
-Afin que Cywise reçoivent les événements des actifs que vous voulez protéger,
-vous devez exécuter, avec votre compte administrateur, la commande affichée
-sur le tableau de bord dans l'encadré
-**Vous souhaitez protéger un nouveau serveur ?**.
-
-Copiez la commande après avoir choisi l'OS de votre machine, Linux ou Windows,
-puis exécutez la.
-
-Par exemple, pour une machine sous linux, la commande ressemble à :
+Vous pouvez arrêter la stack grâce à la commande :
 
 ```bash
-curl -s "http://localhost:17801/setup/script?api_token=1|cmxxx75&server_ip=$(curl -s ipinfo.io | jq -r '.ip')&server_name=$(hostname)" | bash
+./stack-stop.sh
 ```
 
-> [!NOTE]
-> Dans le cadre de la démo, Cywise est accessible uniquement sur localhost
-> donc le seul serveur que vous pouvez protéger est la machine sur laquelle
-> vous avez démarré la stack.
+## Activation de certaines fonctionnalités
 
-#### Hardening
-
-En cours de rédaction.
-
-#### Agents
-
-Quelques minutes après avoir fait la commande sur votre serveur, vous devriez
-voir apparaître des événements en cliquant sur le menu **Timelines > Évènements**.
-
-Si certains événements semblent suspects à Cywise, d'après ses règles expertes,
-vous pourrez les voir en cliquant sur le menu
-**Timelines > Indicateurs de compromission**.
-
-#### Métriques
-
-Vous pouvez accéder aux métriques en cliquant sur le menu **Timelines > Métriques**.
-
-### Accompagner les utilisateurs
+### CyberBuddy et CyberScribe
 
 Pour activer CyberBuddy et CyberScribe, vous devez avoir une clé API chez
 [deepinfra](https://deepinfra.com/).
@@ -288,38 +228,44 @@ Vous devez mettre en place cette clé dans Cywise.
 
 3. Redémarrez la stack avec la commande `./stack-start.sh`.
 
-#### CyberBuddy
 
-Vous pouvez accéder à CyberBuddy en cliquant sur le menu **CyberBuddy**.
+## Images Docker utilisées
 
-Vous pouvez lui poser des questions sur vos assets, les vulnérabilités
-détectées, etc.
+| Service               | Local                                              |                      Image                       |           Open Source            |
+| :-------------------- | :------------------------------------------------- | :----------------------------------------------: | :------------------------------: |
+| app                   | [http://localhost:17801/](http://localhost:17801/) |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
+| scheduler             |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
+| queue                 |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
+| queue-low             |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
+| queue-medium          |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
+| queue-critical        |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
+| queue-scout           |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
+| mariadb               |                                                    |      :white_check_mark: [Publique][mariadb]      |      :white_check_mark: Oui      |
+| performa              | [http://localhost:17802/](http://localhost:17802/) |                   :x: Private                    |      :white_check_mark: Oui      |
+| mailpit               | [http://localhost:17803/](http://localhost:17803/) |      :white_check_mark: [Publique][mailpit]      |      :white_check_mark: Oui      |
+| clickhouse-server     |                                                    | :white_check_mark: [Publique][clickhouse-server] |      :white_check_mark: Oui      |
+| sentinel-api          |                                                    |   :white_check_mark: [Publique][sentinel-api]    |        :x: Non (à venir)         |
+| sentinel-wrq          |                                                    |   :white_check_mark: [Publique][sentinel-wrq]    |        :x: Non (à venir)         |
+| sentinel-wrq-nuclei   |                                                    |   :white_check_mark: [Publique][sentinel-wrq]    |        :x: Non (à venir)         |
+| sentinel-rq-dashboard | [http://localhost:17804/](http://localhost:17804/) |   :white_check_mark: [Publique][rq-dashboard]    |   :white_check_mark: Oui (MIT)   |
+| sentinel-openobserve  | [http://localhost:17805/](http://localhost:17805/) |    :white_check_mark: [Publique][openobserve]    | :white_check_mark: Oui (AGPL v3) |
+| sentinel-redis        |                                                    |       :white_check_mark: [Publique][redis]       | :white_check_mark: Oui (AGPL v3) |
+| sentinel-mongodb      |                                                    |      :white_check_mark: [Publique][mongodb]      |  :white_check_mark: Oui (SSPL)   |
+| sentinel-wappalyzer   |                                                    |    :white_check_mark: [Publique][wappalyzer]     | :white_check_mark: Oui (GPL v3)  |
+| sentinel-splash       |                                                    |       :white_check_mark: [Publique][slash]       |   :white_check_mark: Oui (BSD)   |
 
-Exemples de questions :
-
-- Dis moi quel est mon serveur le plus vulnérable ?
-- Quelle vulnérabilité dois-je corriger en priorité ?
-
-#### CyberScribe
-
-Vous pouvez accéder à CyberScribe en cliquant sur le menu **CyberScribe**.
-
-Choisissez un modèle dans la liste puis commencez à écrire votre charte
-informatique ou votre PSSI avec son aide.
-
-### Divers
-
-#### Single Sign-On (SSO)
-
-En cours de rédaction.
-
-## Arrêt
-
-Vous pouvez arrêter la stack grâce à la commande :
-
-```bash
-./stack-stop.sh
-```
+[towerify]: https://hub.docker.com/r/computablefacts/towerify/tags
+[mariadb]: https://hub.docker.com/_/mariadb/tags
+[mailpit]: https://hub.docker.com/r/axllent/mailpit/tags
+[clickhouse-server]: https://hub.docker.com/r/clickhouse/clickhouse-server/tags
+[sentinel-api]: https://hub.docker.com/r/computablefacts/sentinel-api/tags
+[sentinel-wrq]: https://hub.docker.com/r/computablefacts/sentinel-wrq/tags
+[rq-dashboard]: https://hub.docker.com/r/cjlapao/rq-dashboard/tags
+[openobserve]: https://gallery.ecr.aws/zinclabs/openobserve
+[redis]: https://hub.docker.com/_/redis
+[mongodb]: https://hub.docker.com/_/mongo/tags
+[wappalyzer]: https://github.com/hunter-io/wappalyzer-api/pkgs/container/wappalyzer-api
+[splash]: https://hub.docker.com/r/scrapinghub/splash/tags
 
 ## Suppression
 
@@ -329,6 +275,19 @@ associées grâce à la commande :
 ```bash
 ./stack-destroy.sh
 ```
+
+
+## Utilisation de Cywise
+
+Après démarrage de la stack, vous pouvez accéder à l'interface en utilisant
+les paramètres :
+
+- URL : [http://localhost:17801](http://localhost:17801)
+- login : demo@mydomain.com
+- mot de passe : DemoPass2026
+
+Pour l'utilisation de Cywise, repportez vous à la documentation dont le lien
+se trouve ci-dessous.
 
 # Liens utiles
 
