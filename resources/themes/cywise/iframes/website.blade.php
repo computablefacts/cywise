@@ -475,7 +475,7 @@ $premiumFeatures = explode(',', $premium->features);
                 Il n'est pas possible de scanner votre réseau interne avec la version <a href="{{ route('register') }}"
                                                                                          target="_blank">SaaS</a> de
                 Cywise. Cependant, la version <a href="https://github.com/computablefacts/cywise" target="_blank">auto-hébergée</a>
-                de Cywise vous permet de la faire !
+                de Cywise vous permet de le faire !
               </div>
             </div>
           </div>
@@ -619,7 +619,7 @@ $premiumFeatures = explode(',', $premium->features);
           </div>
           <div class="ud-testimonial-content">
             <p>
-              "Cywise est le meilleur produit que j'aie vu en matière de détection de vulnérabilités de qualité, sans
+              "Cywise est le meilleur produit que j'ai vu en matière de détection de vulnérabilités de qualité, sans
               faux positifs."
             </p>
           </div>
