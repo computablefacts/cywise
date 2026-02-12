@@ -118,3 +118,13 @@ services:
         - <<: *watch-env-restart
         - <<: *watch-config-restart
 
+  performa:
+    image: performa-app:local-build
+    build:
+      context: ./performa
+      dockerfile: towerify/Dockerfile
+
+  clickhouse-server:
+    ports:
+      - "8123:8123"
+      - "9000:9000"

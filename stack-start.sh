@@ -53,7 +53,7 @@ else
 fi
 
 # Définir les arguments par défaut pour docker compose up
-DOCKER_COMPOSE_ARGS=${DOCKER_COMPOSE_ARGS:-"up --build --detach"}
+DOCKER_COMPOSE_ARGS=${DOCKER_COMPOSE_ARGS:-"up --detach"}
 
 docker compose $DOCKER_COMPOSE_ARGS
 
