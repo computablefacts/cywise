@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\PromptsProvider;
 use App\Models\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -26,22 +27,17 @@ class ClickhouseUtils
 
     public static function promptToQuery(Collection $tables, string $question): string
     {
-        $schema = $tables->map(function (Table $table) {
-            $columns = collect($table->schema)->map(function ($column) {
-                return "- {$column['new_name']} ({$column['type']})";
-            })->join("\n");
-            return "Table: {$table->name}\nDescription: {$table->description}\nColonnes:\n{$columns}";
-        })->join("\n\n");
-
-        $prompt = "En utilisant le schéma de base de données suivant:
-            
-            {$schema}
-            
-            Génère une requête SQL ClickHouse pour répondre à la demande suivante: \"{$question}\".
-            Retourne uniquement la requête SQL, sans markdown et sans explications.
-            N'utilise pas de ` dans ta réponse.
-        ";
-
+        $prompt = PromptsProvider::provide('default_clickhouse_query_generation', [
+            'SCHEMA' => $tables
+                ->map(function (Table $table) {
+                    $columns = collect($table->schema)
+                        ->map(fn(array $column) => "- {$column['new_name']} ({$column['type']})")
+                        ->join("\n");
+                    return "Table: {$table->name}\nDescription: {$table->description}\nColonnes:\n{$columns}";
+                })
+                ->join("\n\n"),
+            'QUESTION' => $question,
+        ]);
         return LlmsProvider::provide($prompt);
     }
 }

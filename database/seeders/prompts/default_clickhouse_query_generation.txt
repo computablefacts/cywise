@@ -1,0 +1,7 @@
+En utilisant le schéma de base de données suivant:
+
+{SCHEMA}
+
+Génère une requête SQL ClickHouse pour répondre à la demande suivante : "{QUESTION}".
+Retourne uniquement la requête SQL, sans markdown et sans explications.
+N'utilise pas de ` dans ta réponse.
