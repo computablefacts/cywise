@@ -1,20 +1,13 @@
 <?php
 
-namespace App\Helpers;
+namespace App\AgentSquad\Providers;
 
-use App\AgentSquad\Providers\LlmsProvider;
-use App\AgentSquad\Providers\PromptsProvider;
 use App\Models\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-class ClickhouseUtils
+class SqlQueriesProvider
 {
-    private function __construct()
-    {
-        //
-    }
-
     public static function normalizeTableName(string $name): string
     {
         return Str::replace(['-', ' '], '_', Str::lower(Str::beforeLast(Str::afterLast($name, '/'), '.')));
@@ -25,7 +18,7 @@ class ClickhouseUtils
         return Str::upper(Str::replace([' '], '_', $name));
     }
 
-    public static function promptToQuery(Collection $tables, string $question): string
+    public static function provide(Collection $tables, string $question): string
     {
         $prompt = PromptsProvider::provide('default_clickhouse_query_generation', [
             'SCHEMA' => $tables

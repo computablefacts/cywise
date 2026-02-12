@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\AgentSquad\Providers\SqlQueriesProvider;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
@@ -36,7 +37,7 @@ class ClickhouseLocal
                 $line = trim($line);
                 return [
                     'old_name' => Str::beforeLast($line, "\t"),
-                    'new_name' => ClickhouseUtils::normalizeColumnName(Str::beforeLast($line, "\t")),
+                    'new_name' => SqlQueriesProvider::normalizeColumnName(Str::beforeLast($line, "\t")),
                     'type' => Str::replace("\'", "'", Str::afterLast($line, "\t")),
                 ];
             })

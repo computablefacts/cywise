@@ -2,11 +2,11 @@
 
 namespace App\Http\Procedures;
 
+use App\AgentSquad\Providers\SqlQueriesProvider;
 use App\Enums\StorageType;
 use App\Events\ImportVirtualTable;
 use App\Helpers\ClickhouseClient;
 use App\Helpers\ClickhouseLocal;
-use App\Helpers\ClickhouseUtils;
 use App\Helpers\TableStorage;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Table;
@@ -192,7 +192,7 @@ class TablesProcedure extends Procedure
                 ];
             }
 
-            $tableName = ClickhouseUtils::normalizeTableName($name);
+            $tableName = SqlQueriesProvider::normalizeTableName($name);
             /** @var Table $tbl */
             $tbl = Table::updateOrCreate([
                 'name' => $tableName,
@@ -359,10 +359,9 @@ class TablesProcedure extends Procedure
         $params = $request->validate([
             'prompt' => 'required|string|min:1|max:5000',
         ]);
-        /** @var User $user */
-        $user = Auth::user();
+
         $prompt = $params['prompt'];
-        $query = ClickhouseUtils::promptToQuery(Table::where('created_by', $user->id)->get(), $prompt);
+        $query = SqlQueriesProvider::provide(Table::all(), $prompt);
 
         if (empty($query)) {
             throw new \Exception('The query generation has failed.');

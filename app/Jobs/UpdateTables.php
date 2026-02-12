@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
+use App\AgentSquad\Providers\SqlQueriesProvider;
 use App\Events\ImportTable;
-use App\Helpers\ClickhouseUtils;
 use App\Helpers\TableStorage;
 use App\Models\Table;
 use App\Models\User;
@@ -40,7 +40,7 @@ class UpdateTables implements ShouldQueue
                 $disk = TableStorage::inDisk($table->credentials);
 
                 collect($disk->files())->filter(function ($file) use ($table) {
-                    return ClickhouseUtils::normalizeTableName($file) === $table->name;
+                    return SqlQueriesProvider::normalizeTableName($file) === $table->name;
                 })->filter(function ($file) use ($disk, $table) {
                     return (!$table->finished_at || Carbon::createFromTimestamp($disk->lastModified($file))->isAfter($table->finished_at));
                 })->each(function ($file) use ($user, $table) {

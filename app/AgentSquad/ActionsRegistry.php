@@ -3,6 +3,7 @@
 namespace App\AgentSquad;
 
 use App\AgentSquad\Actions\QueryKnowledgeBase;
+use App\AgentSquad\Actions\QueryTables;
 use App\Models\ActionSetting;
 use App\Models\User;
 
@@ -16,6 +17,7 @@ class ActionsRegistry
         // Add new actions here to make them configurable in the UI
         $classes = [
             QueryKnowledgeBase::class,
+            QueryTables::class,
         ];
 
         $map = [];

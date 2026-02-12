@@ -2,10 +2,10 @@
 
 namespace App\Listeners;
 
+use App\AgentSquad\Providers\SqlQueriesProvider;
 use App\Events\ImportTable;
 use App\Helpers\ClickhouseClient;
 use App\Helpers\ClickhouseLocal;
-use App\Helpers\ClickhouseUtils;
 use App\Helpers\TableStorage;
 use App\Models\Table;
 use Carbon\Carbon;
@@ -36,7 +36,7 @@ class ImportTableListener extends AbstractListener
         $clickhouseUsername = config('towerify.clickhouse.username');
         $clickhousePassword = config('towerify.clickhouse.password');
         $clickhouseDatabase = config('towerify.clickhouse.database');
-        $normalizedTableName = ClickhouseUtils::normalizeTableName($table);
+        $normalizedTableName = SqlQueriesProvider::normalizeTableName($table);
         $tableIn = TableStorage::inClickhouseTableFunction($credentials, $table);
         $uidSuffix = '_' . Str::random(10);
         $tableOut = TableStorage::outClickhouseTableFunction($credentials, $normalizedTableName, $uidSuffix);
@@ -79,7 +79,7 @@ class ImportTableListener extends AbstractListener
             if (!empty($tableDescription)) {
 
                 $prevColumnNames = collect($tableDescription)->map(fn(array $c) => $c['new_name'])->values()->all();
-                $newColumnNames = collect($columns)->map(fn(array $c) => ClickhouseUtils::normalizeColumnName($c['new_name']))->values()->all();
+                $newColumnNames = collect($columns)->map(fn(array $c) => SqlQueriesProvider::normalizeColumnName($c['new_name']))->values()->all();
                 $missing = collect($prevColumnNames)->diff($newColumnNames)->values()->all();
 
                 if (!empty($missing)) {

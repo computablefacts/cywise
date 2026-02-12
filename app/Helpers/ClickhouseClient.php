@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\AgentSquad\Providers\SqlQueriesProvider;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -79,7 +80,7 @@ class ClickhouseClient
                 $line = trim($line);
                 return [
                     'old_name' => Str::beforeLast($line, "\t"),
-                    'new_name' => ClickhouseUtils::normalizeColumnName(Str::beforeLast($line, "\t")),
+                    'new_name' => SqlQueriesProvider::normalizeColumnName(Str::beforeLast($line, "\t")),
                     'type' => Str::replace("\'", "'", Str::afterLast($line, "\t")),
                 ];
             })

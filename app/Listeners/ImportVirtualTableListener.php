@@ -2,9 +2,9 @@
 
 namespace App\Listeners;
 
+use App\AgentSquad\Providers\SqlQueriesProvider;
 use App\Events\ImportVirtualTable;
 use App\Helpers\ClickhouseClient;
-use App\Helpers\ClickhouseUtils;
 use App\Models\Table;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +25,7 @@ class ImportVirtualTableListener extends AbstractListener
 
         $user->actAs(); // otherwise the tenant will not be properly set
 
-        $tableName = ClickhouseUtils::normalizeTableName($table);
+        $tableName = SqlQueriesProvider::normalizeTableName($table);
         /** @var Table $tbl */
         $tbl = Table::updateOrCreate([
             'name' => $tableName,
