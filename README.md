@@ -178,8 +178,7 @@ cd cywise
 > Toutes les commandes ci-après fonctionnent si elles sont lancées depuis ce
 > répertoire.
 
-Assurez-vous que nos scripts de gestion de la stack sont bien exécutables en
-lançant la commande :
+Assurez-vous que nos scripts de gestion de la stack sont bien exécutables en lançant la commande :
 
 ```bash
 chmod +x ./stack*
@@ -197,8 +196,8 @@ Vous pouvez démarrer la stack grâce à la commande :
 ```
 
 > [!NOTE]
-> Ce script va créer un fichier `.env` avec les paramètres par défaut
-> (principalement issus de `.env.example`) puis démarrer la stack.
+> Ce script va créer un fichier `.env` avec les paramètres par défaut (principalement issus de `.env.example`) puis
+> démarrer la stack.
 >
 > Comptez environ 15 minutes lors du premier démarrage.
 
@@ -210,14 +209,70 @@ Vous pouvez arrêter la stack grâce à la commande :
 ./stack-stop.sh
 ```
 
+## Suppression
+
+Vous pouvez supprimer l'intégralité de la stack y compris toutes les données associées grâce à la commande :
+
+```bash
+./stack-destroy.sh
+```
+
+## Images Docker utilisées
+
+| Service               | Local                                              | Image                                            | Open Source                      |
+|:----------------------|:---------------------------------------------------|:-------------------------------------------------|:---------------------------------|
+| app                   | [http://localhost:17801/](http://localhost:17801/) | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
+| scheduler             |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
+| queue                 |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
+| queue-low             |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
+| queue-medium          |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
+| queue-critical        |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
+| queue-scout           |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
+| mariadb               |                                                    | :white_check_mark: [Publique][mariadb]           | :white_check_mark: Oui           |
+| performa              | [http://localhost:17802/](http://localhost:17802/) | :x: Privée                                       | :white_check_mark: Oui           |
+| mailpit               | [http://localhost:17803/](http://localhost:17803/) | :white_check_mark: [Publique][mailpit]           | :white_check_mark: Oui           |
+| clickhouse-server     |                                                    | :white_check_mark: [Publique][clickhouse-server] | :white_check_mark: Oui           |
+| sentinel-api          |                                                    | :white_check_mark: [Publique][sentinel-api]      | :x: Non (à venir)                |
+| sentinel-wrq          |                                                    | :white_check_mark: [Publique][sentinel-wrq]      | :x: Non (à venir)                |
+| sentinel-wrq-nuclei   |                                                    | :white_check_mark: [Publique][sentinel-wrq]      | :x: Non (à venir)                |
+| sentinel-rq-dashboard | [http://localhost:17804/](http://localhost:17804/) | :white_check_mark: [Publique][rq-dashboard]      | :white_check_mark: Oui (MIT)     |
+| sentinel-openobserve  | [http://localhost:17805/](http://localhost:17805/) | :white_check_mark: [Publique][openobserve]       | :white_check_mark: Oui (AGPL v3) |
+| sentinel-redis        |                                                    | :white_check_mark: [Publique][redis]             | :white_check_mark: Oui (AGPL v3) |
+| sentinel-mongodb      |                                                    | :white_check_mark: [Publique][mongodb]           | :white_check_mark: Oui (SSPL)    |
+| sentinel-wappalyzer   |                                                    | :white_check_mark: [Publique][wappalyzer]        | :white_check_mark: Oui (GPL v3)  |
+| sentinel-splash       |                                                    | :white_check_mark: [Publique][splash]            | :white_check_mark: Oui (BSD)     |
+
+[towerify]: https://hub.docker.com/r/computablefacts/towerify/tags
+
+[mariadb]: https://hub.docker.com/_/mariadb/tags
+
+[mailpit]: https://hub.docker.com/r/axllent/mailpit/tags
+
+[clickhouse-server]: https://hub.docker.com/r/clickhouse/clickhouse-server/tags
+
+[sentinel-api]: https://hub.docker.com/r/computablefacts/sentinel-api/tags
+
+[sentinel-wrq]: https://hub.docker.com/r/computablefacts/sentinel-wrq/tags
+
+[rq-dashboard]: https://hub.docker.com/r/cjlapao/rq-dashboard/tags
+
+[openobserve]: https://gallery.ecr.aws/zinclabs/openobserve
+
+[redis]: https://hub.docker.com/_/redis
+
+[mongodb]: https://hub.docker.com/_/mongo/tags
+
+[wappalyzer]: https://github.com/hunter-io/wappalyzer-api/pkgs/container/wappalyzer-api
+
+[splash]: https://hub.docker.com/r/scrapinghub/splash/tags
+
 ## Activation de certaines fonctionnalités
 
 ### CyberBuddy et CyberScribe
 
-Pour activer CyberBuddy et CyberScribe, vous devez avoir une clé API chez
-[deepinfra](https://deepinfra.com/).
+Pour activer CyberBuddy et CyberScribe, vous devez avoir créé une clé d'API chez [deepinfra](https://deepinfra.com/).
 
-Vous devez mettre en place cette clé dans Cywise.
+Vous devez ensuite mettre en place cette clé dans Cywise.
 
 1. Arrêtez la stack avec la commande `./stack-stop.sh`.
 2. Modifier le fichier `.env` pour ajouter la clé :
@@ -228,66 +283,15 @@ Vous devez mettre en place cette clé dans Cywise.
 
 3. Redémarrez la stack avec la commande `./stack-start.sh`.
 
+# Utilisation
 
-## Images Docker utilisées
-
-| Service               | Local                                              |                      Image                       |           Open Source            |
-| :-------------------- | :------------------------------------------------- | :----------------------------------------------: | :------------------------------: |
-| app                   | [http://localhost:17801/](http://localhost:17801/) |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
-| scheduler             |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
-| queue                 |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
-| queue-low             |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
-| queue-medium          |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
-| queue-critical        |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
-| queue-scout           |                                                    |     :white_check_mark: [Publique][towerify]      | :white_check_mark: Oui (AGPL v3) |
-| mariadb               |                                                    |      :white_check_mark: [Publique][mariadb]      |      :white_check_mark: Oui      |
-| performa              | [http://localhost:17802/](http://localhost:17802/) |                   :x: Privée                    |      :white_check_mark: Oui      |
-| mailpit               | [http://localhost:17803/](http://localhost:17803/) |      :white_check_mark: [Publique][mailpit]      |      :white_check_mark: Oui      |
-| clickhouse-server     |                                                    | :white_check_mark: [Publique][clickhouse-server] |      :white_check_mark: Oui      |
-| sentinel-api          |                                                    |   :white_check_mark: [Publique][sentinel-api]    |        :x: Non (à venir)         |
-| sentinel-wrq          |                                                    |   :white_check_mark: [Publique][sentinel-wrq]    |        :x: Non (à venir)         |
-| sentinel-wrq-nuclei   |                                                    |   :white_check_mark: [Publique][sentinel-wrq]    |        :x: Non (à venir)         |
-| sentinel-rq-dashboard | [http://localhost:17804/](http://localhost:17804/) |   :white_check_mark: [Publique][rq-dashboard]    |   :white_check_mark: Oui (MIT)   |
-| sentinel-openobserve  | [http://localhost:17805/](http://localhost:17805/) |    :white_check_mark: [Publique][openobserve]    | :white_check_mark: Oui (AGPL v3) |
-| sentinel-redis        |                                                    |       :white_check_mark: [Publique][redis]       | :white_check_mark: Oui (AGPL v3) |
-| sentinel-mongodb      |                                                    |      :white_check_mark: [Publique][mongodb]      |  :white_check_mark: Oui (SSPL)   |
-| sentinel-wappalyzer   |                                                    |    :white_check_mark: [Publique][wappalyzer]     | :white_check_mark: Oui (GPL v3)  |
-| sentinel-splash       |                                                    |       :white_check_mark: [Publique][splash]       |   :white_check_mark: Oui (BSD)   |
-
-[towerify]: https://hub.docker.com/r/computablefacts/towerify/tags
-[mariadb]: https://hub.docker.com/_/mariadb/tags
-[mailpit]: https://hub.docker.com/r/axllent/mailpit/tags
-[clickhouse-server]: https://hub.docker.com/r/clickhouse/clickhouse-server/tags
-[sentinel-api]: https://hub.docker.com/r/computablefacts/sentinel-api/tags
-[sentinel-wrq]: https://hub.docker.com/r/computablefacts/sentinel-wrq/tags
-[rq-dashboard]: https://hub.docker.com/r/cjlapao/rq-dashboard/tags
-[openobserve]: https://gallery.ecr.aws/zinclabs/openobserve
-[redis]: https://hub.docker.com/_/redis
-[mongodb]: https://hub.docker.com/_/mongo/tags
-[wappalyzer]: https://github.com/hunter-io/wappalyzer-api/pkgs/container/wappalyzer-api
-[splash]: https://hub.docker.com/r/scrapinghub/splash/tags
-
-## Suppression
-
-Vous pouvez supprimer l'intégralité de la stack y compris toutes les données
-associées grâce à la commande :
-
-```bash
-./stack-destroy.sh
-```
-
-
-## Utilisation de Cywise
-
-Après démarrage de la stack, vous pouvez accéder à l'interface en utilisant
-les paramètres :
+Après démarrage de la stack, vous pouvez accéder à l'interface en utilisant les paramètres :
 
 - URL : [http://localhost:17801](http://localhost:17801)
 - login : demo@mydomain.com
 - mot de passe : DemoPass2026
 
-Pour l'utilisation de Cywise, repportez vous à la documentation dont le lien
-se trouve ci-dessous.
+Pour l'utilisation de Cywise, reportez-vous à la documentation dont le lien se trouve ci-dessous.
 
 # Liens utiles
 
