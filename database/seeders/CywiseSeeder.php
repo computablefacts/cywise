@@ -548,7 +548,9 @@ class CywiseSeeder extends Seeder
             'assets@unmonitor',
             'events@list',
             'events@socOperator',
-            'servers@list'
+            'servers@list',
+            'users@toggleGetsAuditReport',
+            'users@sendAuditReport'
         ];
         $methods = $this->discoverProcedures();
 

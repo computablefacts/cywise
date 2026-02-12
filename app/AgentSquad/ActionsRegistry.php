@@ -6,7 +6,6 @@ use App\AgentSquad\Actions\CyberBuddy;
 use App\AgentSquad\Actions\ListScheduledTasks;
 use App\AgentSquad\Actions\ListVulnerabilities;
 use App\AgentSquad\Actions\ScheduleTask;
-use App\AgentSquad\Actions\ToggleUserGetsAuditReport;
 use App\AgentSquad\Actions\UnscheduleTask;
 use App\Models\ActionSetting;
 use App\Models\User;
@@ -22,7 +21,6 @@ class ActionsRegistry
         $classes = [
             CyberBuddy::class,
             ListVulnerabilities::class,
-            ToggleUserGetsAuditReport::class,
             ScheduleTask::class,
             UnscheduleTask::class,
             ListScheduledTasks::class,
