@@ -549,6 +549,7 @@ class CywiseSeeder extends Seeder
             'events@list',
             'events@socOperator',
             'scheduled-tasks@list',
+            'scheduled-tasks@toggle',
             'servers@list',
             'users@toggleGetsAuditReport',
             'users@sendAuditReport'

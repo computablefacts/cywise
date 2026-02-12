@@ -104,12 +104,19 @@ class ScheduledTasksProcedure extends Procedure
     #[RpcMethod(
         description: 'Pause or resume a scheduled task.',
         params: [
-            'task_id' => 'The scheduled task id.',
+            'task_id' => 'The scheduled task id. (required|integer|exists:cb_scheduled_tasks,id)',
             'enabled' => 'Optional boolean. If omitted, the flag will be toggled.'
         ],
         result: [
             'msg' => 'Success message.',
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'arrête la tâche 1234', the input should be '{\"task_id\":6789,\"enabled\":false}'",
+            "if the request is 'relance la tâche 456', the input should be '{\"task_id\":456,\"enabled\":true}'",
+            "if the request is 'stop la tâche 6789', the input should be '{\"task_id\":6789,\"enabled\":false}'",
+            "if the request is 'redémarre la tâche 19', the input should be '{\"task_id\":19,\"enabled\":true}'",
+        ],
+        ai_result: "@json(\$result['msg'])",
     )]
     public function toggle(JsonRpcRequest $request): array
     {
@@ -131,11 +138,15 @@ class ScheduledTasksProcedure extends Procedure
     #[RpcMethod(
         description: 'Delete a scheduled task.',
         params: [
-            'task_id' => 'The scheduled task id.',
+            'task_id' => 'The scheduled task id. (required|integer|exists:cb_scheduled_tasks,id)',
         ],
         result: [
             'msg' => 'Success message.'
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'supprime la tâche 1234', the input should be '{\"task_id\":6789}'",
+        ],
+        ai_result: "@json(\$result['msg'])",
     )]
     public function delete(JsonRpcRequest $request): array
     {
