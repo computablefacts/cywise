@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\AgentSquad\Actions\CyberBuddy;
+use App\AgentSquad\Actions\QueryKnowledgeBase;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Events\IngestFile;
@@ -213,7 +213,7 @@ class CyberBuddyController extends Controller
         ]);
         $collection = $params['collection'];
         $prompt = $params['prompt'];
-        $answer = (new CyberBuddy())->execute($request->user(), Str::random(10), [], "{$collection}:{$prompt}");
+        $answer = (new QueryKnowledgeBase())->execute($request->user(), Str::random(10), [], "{$collection}:{$prompt}");
         if ($answer->success()) {
             $answer = Str::before($answer->markdown(), '<br><br><b>Sources :</b>'); // remove sources
             return preg_replace("/\[((\d+,?)+)]/", "", $answer); // remove references

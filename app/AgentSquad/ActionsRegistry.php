@@ -2,7 +2,7 @@
 
 namespace App\AgentSquad;
 
-use App\AgentSquad\Actions\CyberBuddy;
+use App\AgentSquad\Actions\QueryKnowledgeBase;
 use App\Models\ActionSetting;
 use App\Models\User;
 
@@ -15,7 +15,7 @@ class ActionsRegistry
     {
         // Add new actions here to make them configurable in the UI
         $classes = [
-            CyberBuddy::class,
+            QueryKnowledgeBase::class,
         ];
 
         $map = [];

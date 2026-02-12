@@ -25,7 +25,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class CyberBuddy extends AbstractAction
+class QueryKnowledgeBase extends AbstractAction
 {
     protected function schema(): array
     {
