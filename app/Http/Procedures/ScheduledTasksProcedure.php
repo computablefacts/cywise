@@ -8,12 +8,47 @@ use App\Models\ScheduledTask;
 use Carbon\Carbon;
 use Cron\CronExpression;
 use Illuminate\Support\Str;
-use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
 class ScheduledTasksProcedure extends Procedure
 {
     public static string $name = 'scheduled-tasks';
+
+    #[RpcMethod(
+        description: 'List the scheduled tasks of the current user.',
+        params: [],
+        result: [
+            'tasks' => 'A list of tasks.',
+        ],
+        ai_examples: [
+            "if the request is 'list my scheduled tasks', the input should be {}",
+        ],
+        ai_result: "
+            @php
+                \$tasks = collect(\$result['tasks'] ?? [])->map(fn(array \$task) => (new \App\Models\ScheduledTask())->forceFill(\$task));
+            @endphp
+            @if(\$tasks->isEmpty())
+                No scheduled tasks found.
+            @else
+                Below is the list of your scheduled tasks:
+                @foreach(\$tasks as \$task)
+                @if(empty(\$task->trigger))
+                - {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}).
+                @else
+                - {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}.
+                @endif
+                @endforeach
+            @endif
+        ",
+    )]
+    public function list(JsonRpcRequest $request): array
+    {
+        return [
+            'tasks' => ScheduledTask::query()
+                ->where('created_by', $request->user()->id)
+                ->get(),
+        ];
+    }
 
     #[RpcMethod(
         description: 'Create a new scheduled task.',

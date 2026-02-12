@@ -3,7 +3,6 @@
 namespace App\AgentSquad;
 
 use App\AgentSquad\Actions\CyberBuddy;
-use App\AgentSquad\Actions\ListScheduledTasks;
 use App\AgentSquad\Actions\ListVulnerabilities;
 use App\AgentSquad\Actions\ScheduleTask;
 use App\AgentSquad\Actions\UnscheduleTask;
@@ -23,7 +22,6 @@ class ActionsRegistry
             ListVulnerabilities::class,
             ScheduleTask::class,
             UnscheduleTask::class,
-            ListScheduledTasks::class,
         ];
 
         $map = [];
