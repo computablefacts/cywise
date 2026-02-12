@@ -220,16 +220,16 @@ Vous pouvez supprimer l'intégralité de la stack y compris toutes les données 
 ## Images Docker utilisées
 
 | Service               | Local                                              | Image                                            | Open Source                      |
-|:----------------------|:---------------------------------------------------|:-------------------------------------------------|:---------------------------------|
-| app                   | [http://localhost:17801/](http://localhost:17801/) | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
-| scheduler             |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
-| queue                 |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
-| queue-low             |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
-| queue-medium          |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
-| queue-critical        |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
-| queue-scout           |                                                    | :white_check_mark: [Publique][towerify]          | :white_check_mark: Oui (AGPL v3) |
+| :-------------------- | :------------------------------------------------- | :----------------------------------------------- | :------------------------------- |
+| app                   | [http://localhost:17801/](http://localhost:17801/) | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
+| scheduler             |                                                    | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
+| queue                 |                                                    | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
+| queue-low             |                                                    | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
+| queue-medium          |                                                    | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
+| queue-critical        |                                                    | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
+| queue-scout           |                                                    | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
 | mariadb               |                                                    | :white_check_mark: [Publique][mariadb]           | :white_check_mark: Oui           |
-| performa              | [http://localhost:17802/](http://localhost:17802/) | :x: Privée                                       | :white_check_mark: Oui           |
+| performa              | [http://localhost:17802/](http://localhost:17802/) | :white_check_mark: [Publique][cywise-performa]   | :white_check_mark: Oui           |
 | mailpit               | [http://localhost:17803/](http://localhost:17803/) | :white_check_mark: [Publique][mailpit]           | :white_check_mark: Oui           |
 | clickhouse-server     |                                                    | :white_check_mark: [Publique][clickhouse-server] | :white_check_mark: Oui           |
 | sentinel-api          |                                                    | :white_check_mark: [Publique][sentinel-api]      | :x: Non (à venir)                |
@@ -242,17 +242,19 @@ Vous pouvez supprimer l'intégralité de la stack y compris toutes les données 
 | sentinel-wappalyzer   |                                                    | :white_check_mark: [Publique][wappalyzer]        | :white_check_mark: Oui (GPL v3)  |
 | sentinel-splash       |                                                    | :white_check_mark: [Publique][splash]            | :white_check_mark: Oui (BSD)     |
 
-[towerify]: https://hub.docker.com/r/computablefacts/towerify/tags
+[cywise]: https://hub.docker.com/r/computablefacts/cywise
 
-[mariadb]: https://hub.docker.com/_/mariadb/tags
+[mariadb]: https://hub.docker.com/_/mariadb
 
-[mailpit]: https://hub.docker.com/r/axllent/mailpit/tags
+[cywise-performa]: https://hub.docker.com/r/computablefacts/cywise-performa
 
-[clickhouse-server]: https://hub.docker.com/r/clickhouse/clickhouse-server/tags
+[mailpit]: https://hub.docker.com/r/axllent/mailpit
 
-[sentinel-api]: https://hub.docker.com/r/computablefacts/sentinel-api/tags
+[clickhouse-server]: https://hub.docker.com/r/clickhouse/clickhouse-server
 
-[sentinel-wrq]: https://hub.docker.com/r/computablefacts/sentinel-wrq/tags
+[sentinel-api]: https://hub.docker.com/r/computablefacts/sentinel-api
+
+[sentinel-wrq]: https://hub.docker.com/r/computablefacts/sentinel-wrq
 
 [rq-dashboard]: https://hub.docker.com/r/cjlapao/rq-dashboard/tags
 
@@ -260,11 +262,11 @@ Vous pouvez supprimer l'intégralité de la stack y compris toutes les données 
 
 [redis]: https://hub.docker.com/_/redis
 
-[mongodb]: https://hub.docker.com/_/mongo/tags
+[mongodb]: https://hub.docker.com/_/mongo
 
 [wappalyzer]: https://github.com/hunter-io/wappalyzer-api/pkgs/container/wappalyzer-api
 
-[splash]: https://hub.docker.com/r/scrapinghub/splash/tags
+[splash]: https://hub.docker.com/r/scrapinghub/splash
 
 ## Activation de certaines fonctionnalités
 
