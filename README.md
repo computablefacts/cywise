@@ -285,6 +285,28 @@ Vous devez ensuite mettre en place cette clé dans Cywise.
 
 3. Redémarrez la stack avec la commande `./stack-start.sh`.
 
+### Tables
+
+Afin de pouvoir importer des tables, vous devez avoir 2 buckets S3 chez AWS.
+Un bucket public, par exemple `mydomain-cywise-public`, et un bucket privé,
+par exemple `mydomain-cywise-private`.
+
+1. Arrêtez la stack avec la commande `./stack-stop.sh`.
+2. Modifier le fichier `.env` pour ajouter les clés :
+
+  ```env
+  # AWS Buckets
+  AWS_ACCESS_KEY_ID=AKIA...6R # Your access key
+  AWS_SECRET_ACCESS_KEY=TlX...FmA # Your secret key
+  AWS_DEFAULT_REGION=eu-west-3 # The region where you've created the buckets
+  AWS_USE_PATH_STYLE_ENDPOINT=false
+  AWS_BUCKET_PUBLIC=mydomain-towerify-public
+  AWS_BUCKET_PRIVATE=mydomain-towerify-private
+  ```
+
+3. Redémarrez la stack avec la commande `./stack-start.sh`.
+
+
 # Utilisation
 
 Après démarrage de la stack, vous pouvez accéder à l'interface en utilisant les paramètres :
