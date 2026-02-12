@@ -33,9 +33,13 @@ class ScheduledTasksProcedure extends Procedure
                 Below is the list of your scheduled tasks:
                 @foreach(\$tasks as \$task)
                 @if(empty(\$task->trigger))
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}).
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}). The last email has been sent at {{ \$task->last_email_sent_at->utc()->format('Y-m-d H:i:s') }} UTC.
                 @else
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}.
+                @if(\$task->cron === '* * * * *')
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}. The last email has been sent at {{ \$task->last_email_sent_at->utc()->format('Y-m-d H:i:s') }} UTC.
+                @else
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }} ({{ \$task->readableCron() }}). The last email has been sent at {{ \$task->last_email_sent_at->utc()->format('Y-m-d H:i:s') }} UTC.
+                @endif
                 @endif
                 @endforeach
             @endif
@@ -53,14 +57,21 @@ class ScheduledTasksProcedure extends Procedure
     #[RpcMethod(
         description: 'Create a new scheduled task.',
         params: [
-            'cron' => 'Cron expression (MIN HOUR DOM MON DOW).',
-            'trigger' => 'Optional condition that must evaluate to true to run the task.',
-            'task' => 'The task/instruction to execute when the schedule/trigger matches.',
+            'cron' => 'Cron expression MIN HOUR DOM MON DOW. (required|string)',
+            'trigger' => 'Optional condition that must evaluate to true to run the task. (nullable|string)',
+            'task' => 'The task/instruction to execute when the schedule/trigger matches. (required|string)',
         ],
         result: [
             'msg' => 'Success message.',
             'task_id' => 'The id of the created scheduled task.'
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'préviens-moi si www.example.com devient vulnérable', the input should be '{\"cron\":\"* * * * *\",\"trigger\":\"le site www.example.com est-il vulnérable ?\",\"task\":\"liste les vulnérabilités de www.example.com\"}'",
+            "if the request is 'envoie-moi un email tous les matins à 9h si www.example.com est vulnérable', the input should be '{\"cron\":\"0 9 * * *\",\"trigger\":\"le site www.example.com est-il vulnérable ?\",\"task\":\"liste les vulnérabilités de www.example.com\"}'",
+            "if the request is 'récapitule-moi tous les matins à 9h les vulnérabilités de www.example.com', the input should be '{\"cron\":\"0 9 * * *\",\"trigger\":null,\"task\":\"liste les vulnérabilités de www.example.com\"}'",
+            "if the request is 'préviens-moi si John Doe se connecte au serveur 145.242.34.179', the input should be '{\"cron\":\"* * * * *\",\"trigger\":\"John Doe s'est-il connecté au serveur 145.242.34.179 ?\",\"task\":\"John Doe s'est connecté au serveur 145.242.34.179\"}'"
+        ],
+        ai_result: "@json(\$result['msg'])",
     )]
     public function create(JsonRpcRequest $request): array
     {

@@ -4,7 +4,6 @@ namespace App\AgentSquad;
 
 use App\AgentSquad\Actions\CyberBuddy;
 use App\AgentSquad\Actions\ListVulnerabilities;
-use App\AgentSquad\Actions\ScheduleTask;
 use App\Models\ActionSetting;
 use App\Models\User;
 
@@ -19,7 +18,6 @@ class ActionsRegistry
         $classes = [
             CyberBuddy::class,
             ListVulnerabilities::class,
-            ScheduleTask::class,
         ];
 
         $map = [];
