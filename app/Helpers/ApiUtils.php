@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class ApiUtils
 {
-    private const string MODEL_TRANSLATE = 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo';
-
     public function translate(string $text, string $lang = 'fr'): array
     {
         $prompt = PromptsProvider::provide('default_translate', [
@@ -20,19 +18,19 @@ class ApiUtils
             'LANG' => $lang,
         ]);
 
-        $answer = LlmsProvider::provide($prompt, self::MODEL_TRANSLATE);
+        $answer = LlmsProvider::provide($prompt, 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo');
 
         return $answer === '' ?
-        [
-            'error' => true,
-            'error_details' => "Unable to translate $text in $lang language.",
-            'response' => $text,
-        ] :
-        [
-            'error' => false,
-            'error_details' => '',
-            'response' => $answer,
-        ];
+            [
+                'error' => true,
+                'error_details' => "Unable to translate $text in $lang language.",
+                'response' => $text,
+            ] :
+            [
+                'error' => false,
+                'error_details' => '',
+                'response' => $answer,
+            ];
     }
 
     public function whisper(string $url, string $lang = 'fr')
@@ -40,16 +38,16 @@ class ApiUtils
         $answer = AudioToTextProvider::provide($url, $lang);
 
         return $answer === '' ?
-        [
-            'error' => true,
-            'error_details' => "Error transforming audio into text.",
-            'text' => '',
-        ] :
-        [
-            'error' => false,
-            'error_details' => '',
-            'text' => $answer,
-        ];
+            [
+                'error' => true,
+                'error_details' => "Error transforming audio into text.",
+                'text' => '',
+            ] :
+            [
+                'error' => false,
+                'error_details' => '',
+                'text' => $answer,
+            ];
     }
 
     public function file_input(string $client, string $url, ?string $filename = null): array
