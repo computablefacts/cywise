@@ -78,10 +78,10 @@ class ProdDbAppConfig implements DbAppConfigInterface
             'towerify.stripe.plans.premium.onetime_price' => null,
             'towerify.stripe.plans.premium.onetime_price_id' => null,
 
-            'towerify.clickhouse.host' => '',
-            'towerify.clickhouse.username' => '',
-            'towerify.clickhouse.password' => '',
-            'towerify.clickhouse.database' => '',
+            'towerify.clickhouse.host' => 'clickhouse.computablefacts.com',
+            'towerify.clickhouse.username' => 'cywisengprod',
+            'encrypted:towerify.clickhouse.password' => '&k?DDrraEUP3ZyVD_6QdlNz7/95zYaFWNTHXchWk6DXkTIB5g0F7Lrov4/sI=',
+            'towerify.clickhouse.database' => 'cywise_ngprod',
 
             'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
             'towerify.josianne.username' => 'cywise',

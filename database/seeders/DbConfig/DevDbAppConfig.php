@@ -74,10 +74,10 @@ class DevDbAppConfig implements DbAppConfigInterface
             'towerify.stripe.plans.premium.onetime_price' => null,
             'towerify.stripe.plans.premium.onetime_price_id' => null,
 
-            'towerify.clickhouse.host' => '',
-            'towerify.clickhouse.username' => '',
-            'towerify.clickhouse.password' => '',
-            'towerify.clickhouse.database' => '',
+            'towerify.clickhouse.host' => 'clickhouse.computablefacts.com',
+            'towerify.clickhouse.username' => 'cywisengdev',
+            'encrypted:towerify.clickhouse.password' => 'ItPMAV4hUTob4663_ldQ+/6HwskcA4HFOSZuDcBaxFSlsqMAOcknfxM/WfKI=',
+            'towerify.clickhouse.database' => 'cywise_ngdev',
 
             'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
             'towerify.josianne.username' => 'cywise',
