@@ -32,7 +32,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: computablefacts/towerify
+          images: computablefacts/cywise
           flavor: |
             latest=false
           tags: |
@@ -53,5 +53,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=computablefacts/towerify:buildcache
-          cache-to: type=registry,ref=computablefacts/towerify:buildcache,mode=max
+          cache-from: type=registry,ref=computablefacts/cywise:buildcache
+          cache-to: type=registry,ref=computablefacts/cywise:buildcache,mode=max
