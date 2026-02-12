@@ -133,16 +133,15 @@ class Orchestrator
             'role' => RoleEnum::USER->value,
             'content' => $prompt,
         ];
-        $answer = LlmsProvider::provide($messages, $this->model);
+        $result = LlmsProvider::provideJson($messages, $this->model);
         array_pop($messages);
+        /** @var string $answer */
+        $answer = $result->raw;
+        /** @var array $json */
+        $json = $result->parsed;
 
         // Log::debug("[ORCHESTRATOR] Prompt: {$prompt}");
         // Log::debug("[ORCHESTRATOR] Answer: {$answer}");
-
-        $matches = null;
-        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
-        $answer = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
-        $json = json_decode($answer, true);
 
         if (!isset($json)) {
 

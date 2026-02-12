@@ -12,7 +12,6 @@ use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Sajya\Server\Procedure;
 
 class EventsProcedure extends Procedure
@@ -257,17 +256,16 @@ class EventsProcedure extends Procedure
             'LOGS' => $logs,
             'MEMOS' => $memos,
         ]);
-        $answer = LlmsProvider::provide($prompt);
+        $result = LlmsProvider::provideJson($prompt);
+        /** @var string $answer */
+        $answer = $result->raw;
+        /** @var array $json */
+        $json = $result->parsed;
 
         Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): " . json_encode([
                 "prompt" => $prompt,
                 "answer" => $answer,
             ]));
-
-        $matches = null;
-        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
-        $answer = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
-        $json = json_decode($answer, true);
 
         if (empty($json)) {
             Log::error('Failed to parse SOC operator answer (json): ' . $answer);

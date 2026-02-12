@@ -8,6 +8,18 @@ use Illuminate\Support\Str;
 
 class LlmsProvider
 {
+    public static function provideJson(string|array $messages, ?string $model = null, int $timeoutInSeconds = 60): object
+    {
+        $matches = null;
+        $string = self::provide($messages, $model, $timeoutInSeconds);
+        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $string, $matches);
+        $raw = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
+        return (object)[
+            'raw' => $raw,
+            'parsed' => json_decode($raw, true),
+        ];
+    }
+
     public static function provide(string|array $messages, ?string $model = null, int $timeoutInSeconds = 60): string
     {
         if (is_string($messages)) {

@@ -27,9 +27,6 @@ use Illuminate\Support\Str;
 
 class CyberBuddy extends AbstractAction
 {
-    private const string MODEL_REFORMULATE = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
-    private const string MODEL_ANSWER = 'deepseek-ai/DeepSeek-R1-0528-Turbo';
-
     protected function schema(): array
     {
         return [
@@ -81,13 +78,12 @@ The action's input must use the same language as the user's input: if the user a
             'role' => RoleEnum::USER->value,
             'content' => $prompt,
         ];
-        $answer = LlmsProvider::provide($messages, self::MODEL_REFORMULATE, 3 * 60);
+        $result = LlmsProvider::provideJson($messages, 'Qwen/Qwen3-Next-80B-A3B-Instruct', 3 * 60);
         array_pop($messages);
-
-        $matches = null;
-        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $answer, $matches);
-        $answer = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0]), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
-        $json = json_decode($answer, true);
+        /** @var string $answer */
+        $answer = $result->raw;
+        /** @var array $json */
+        $json = $result->parsed;
 
         if (!$json) {
             return new FailedAnswer(__("The answer is not a valid JSON: {$answer}"));
@@ -169,7 +165,7 @@ The action's input must use the same language as the user's input: if the user a
             'role' => RoleEnum::USER->value,
             'content' => $prompt,
         ];
-        $answer = LlmsProvider::provide($messages, self::MODEL_ANSWER, 120);
+        $answer = LlmsProvider::provide($messages, 'deepseek-ai/DeepSeek-R1-0528-Turbo', 120);
         array_pop($messages);
 
         return new SuccessfulAnswer($this->enhanceWithSources(strip_tags($answer)), [], !empty($answer));
