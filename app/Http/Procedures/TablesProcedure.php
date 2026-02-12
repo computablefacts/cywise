@@ -420,6 +420,7 @@ class TablesProcedure extends Procedure
 
     private function fixupLocalFiles(User $user, array $params): array
     {
+        $tenant_id = $user->tenant_id ?? 0;
         if ($params['storage'] === StorageType::AWS_S3->value && (
                 $params['region'] === 'local-region' ||
                 $params['access_key_id'] === 'local-access_key_id' ||
@@ -427,8 +428,8 @@ class TablesProcedure extends Procedure
             $params['region'] = config('filesystems.disks.tables-s3.region');
             $params['access_key_id'] = config('filesystems.disks.tables-s3.key');
             $params['secret_access_key'] = config('filesystems.disks.tables-s3.secret');
-            $params['input_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$user->tenant_id}/{$user->id}/";
-            $params['output_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$user->tenant_id}/";
+            $params['input_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$tenant_id}/{$user->id}/";
+            $params['output_folder'] = config('filesystems.disks.tables-s3.bucket') . "/" . config('app.env') . "/tables/{$tenant_id}/";
         }
         return $params;
     }
