@@ -554,7 +554,8 @@ class CywiseSeeder extends Seeder
             'scheduled-tasks@delete',
             'servers@list',
             'users@toggleGetsAuditReport',
-            'users@sendAuditReport'
+            'users@sendAuditReport',
+            'vulnerabilities@list',
         ];
         $methods = $this->discoverProcedures();
 

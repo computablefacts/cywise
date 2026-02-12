@@ -3,7 +3,6 @@
 namespace App\AgentSquad;
 
 use App\AgentSquad\Actions\CyberBuddy;
-use App\AgentSquad\Actions\ListVulnerabilities;
 use App\Models\ActionSetting;
 use App\Models\User;
 
@@ -17,7 +16,6 @@ class ActionsRegistry
         // Add new actions here to make them configurable in the UI
         $classes = [
             CyberBuddy::class,
-            ListVulnerabilities::class,
         ];
 
         $map = [];

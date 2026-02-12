@@ -6,7 +6,6 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\HiddenAlert;
-use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
 class VulnerabilitiesProcedure extends Procedure
@@ -35,21 +34,57 @@ class VulnerabilitiesProcedure extends Procedure
     #[RpcMethod(
         description: "List the user's vulnerabilities.",
         params: [
-            "asset_id" => "The asset id (optional).",
-            "level" => "The vulnerabilities criticality level (optional).",
-            "tld" => "The underlying asset TLD to match (optional).",
-            "tags" => "The underlying list of assets tags to match (optional).",
+            "asset_id" => "An optional asset id.",
+            "asset" => "An optional asset as a domain or an IP address. (nullable|string|prohibited_if:asset_id,true|min:1|max:191|exists:am_assets,asset)",
+            "level" => "An optional criticality level such as high, medium or low. (nullable|string|min:3|max:6|in:high,medium,low)",
+            "tld" => "An optional asset TLD to match. (nullable|string)",
+            "tags" => "An optional list of assets tags to match.",
         ],
         result: [
             "high" => "A list of vulnerabilities with critical severity.",
             "medium" => "A list of vulnerabilities with medium severity.",
             "low" => "A list of vulnerabilities with low severity.",
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'quelles sont mes vulnérabilités ?', the input should be '{}'",
+            "if the request is 'quelles sont mes vulnérabilités critiques ?', the input should be '{\"level\":\"high\"}'",
+            "if the request is 'quelles sont les vulnérabilités de example.com ?', the input should be '{\"tld\":\"example.com\"}'",
+            "if the request is 'quelles sont les vulnérabilités de www.example.com ?', the input should be '{\"asset\":\"www.example.com\"}'",
+            "if the request is 'quelles sont les vulnérabilités de criticité basse de blog.example.com ?', the input should be '{\"asset\":\"blog.example.com\",\"level\":\"low\"}'",
+            "if the request is 'quelles sont les vulnérabilités de criticité moyenne du serveur 192.168.1.1 ?', the input should be '{\"asset\":\"192.168.1.1\",\"level\":\"medium\"}'",
+        ],
+        ai_result: "
+            @foreach(\$result as \$key => \$value)
+            @if(!empty(\$value))
+            @php
+            \$alerts = collect(\$value ?? [])->map(fn(array \$event) => (new \App\Models\Alert())->forceFill(\$event));
+            @endphp
+            # Vulnerabilities of {{ \$key }} severity
+            @foreach(\$alerts as \$alert)
+            @php
+            if (empty(\$alert->cve_id)) {
+               \$cve = '';
+            } else {
+               \$cve = '**Note.** Cette vulnérabilité a pour identifiant [' . \$alert->cve_id . '](https://nvd.nist.gov/vuln/detail/' . \$alert->cve_id . ').';
+            }
+            \$vulnerability = \$alert->translated('vulnerability');
+            \$remediation = \$alert->translated('remediation');
+            @endphp
+            ## {{ \$alert->title }}
+            **Actif concerné.** L'actif concerné est {{ \$alert->asset()?->asset }} pointant vers le serveur {{ \$alert->port?->ip }}. Le port {{ \$alert->port?->port }} de ce serveur est ouvert et expose un service {{ \$alert->port?->service }} ({{ \$alert->port?->product }}).
+            **Description détaillée.** {{ \$vulnerability }}
+            **Remédiation.** {{ \$remediation }}
+            {{ \$cve }}
+            @endforeach
+            @endif
+            @endforeach
+        ",
     )]
     public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset_id' => 'nullable|integer|exists:am_assets,id',
+            'asset_id' => 'nullable|integer|prohibited_if:asset,true|exists:am_assets,id',
+            'asset' => 'nullable|string|prohibited_if:asset_id,true|min:1|max:191|exists:am_assets,asset',
             'level' => 'nullable|string|min:3|max:6|in:high,medium,low',
             'tld' => 'nullable|string',
             'tags' => 'nullable|array|min:1|max:10',
