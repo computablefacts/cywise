@@ -220,6 +220,7 @@ class User extends WaveUser
             $this->setupPrompts('default_summarize', 'seeders/prompts/default_summarize.txt');
             $this->setupPrompts('default_translate', 'seeders/prompts/default_translate.txt');
             $this->setupPrompts('default_clickhouse_query_generation', 'seeders/prompts/default_clickhouse_query_generation.txt');
+            $this->setupPrompts('default_cyberscribe', 'seeders/prompts/default_cyberscribe.txt');
 
             // Remediation prompts
             $this->setupPrompts('cve_explanation_prompt', 'seeders/prompts/cve_explanation_prompt.txt');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AgentSquad\Actions\CyberBuddy;
 use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Providers\PromptsProvider;
 use App\Events\IngestFile;
 use App\Models\Chunk;
 use App\Models\File;
@@ -233,22 +234,10 @@ class CyberBuddyController extends Controller
         $input = collect($params['q_and_a'] ?? [])
             ->map(fn(array $qa) => "Question: {$qa['question']}\nRéponse: {$qa['answer']}")
             ->join("\n\n");
-        $prompt = !empty($params['prompt']) ? $params['prompt'] : "
-            Tu es un expert en cybersécurité dont le rôle est d’aider à la rédaction d’une charte informatique.
-            
-            En se basant sur un exemple de rédaction (fourni entre les balises [EXAMPLE] et [/EXAMPLE]) rédige en te basant le plus possible sur l’exemple
-            un texte qui prend en compte les informations fournies dans la partie de questions/réponses fournie ci-après (entre les balises [QA] et [/QA])
-            Par exemple si le texte d’exemple suggère une clause mais que cela est en contradiction avec les données présentes dans la partie questions/réponses
-            alors modifie le texte pour prendre en compte ces données plutôt que ceux de l’exemple. Ne répond qu’avec le texte généré, sans ajouter de préambule explicatif.
-            Si la réponse a une question est vide ou NA ou / alors ne modifie pas le texte d’exemple sur les parties concernant cette question.
-            
-            [EXAMPLE]
-            {$template}
-            [/EXAMPLE]
-            [QA]
-            {$input}
-            [/QA]
-        ";
+        $prompt = !empty($params['prompt']) ? $params['prompt'] : PromptsProvider::provide('default_cyberscribe', [
+            'EXAMPLE' => $template,
+            'QA' => $input,
+        ]);
         return LlmsProvider::provide($prompt, 'deepseek-ai/DeepSeek-R1-0528-Turbo');
     }
 
