@@ -47,7 +47,7 @@ class ClickhouseClient
         $extraParameters = config('towerify.clickhouse.client_extra_parameters');
         /** @var User $user */
         $user = \Auth::user();
-        $tenant = $user ? "_{$user->tenant_id}" : '_0';
+        $tenant = ($user && $user->tenant_id) ? "_{$user->tenant_id}" : '_0';
         $query = "CREATE DATABASE IF NOT EXISTS {$database}{$tenant}";
         $cmd = "clickhouse-client --host '{$host}' {$extraParameters} --user '{$username}' --password '{$password}' --query \"{$query}\"";
 
@@ -118,7 +118,7 @@ class ClickhouseClient
         $extraParameters = config('towerify.clickhouse.client_extra_parameters');
         /** @var User $user */
         $user = \Auth::user();
-        $tenant = $user ? "_{$user->tenant_id}" : '_0';
+        $tenant = ($user && $user->tenant_id) ? "_{$user->tenant_id}" : '_0';
         return "clickhouse-client --host '{$host}' {$extraParameters} --user '{$username}' --password '{$password}' --database '{$database}{$tenant}' --query \"{$query}\"";
     }
 }
