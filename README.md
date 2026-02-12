@@ -306,8 +306,20 @@ par exemple `mydomain-cywise-private`.
 
 3. Redémarrez la stack avec la commande `./stack-start.sh`.
 
+## Travaux en cours
 
-# Utilisation
+Plusieurs fonctionnalités ne sont pas utilisables avec la stack pour le moment.
+Nous travaillons à les rendre accessibles.
+
+Notammement :
+
+* l'import de documents depuis **Gestion des données > Documents**
+* la protection d'un serveur (la stack étant accessible sur localhost par défaut)
+
+Si vous avez des difficultés à faire fonctionner notre stack, 
+[ouvrez un ticket](https://github.com/computablefacts/cywise/issues/new).
+
+## Utilisation
 
 Après démarrage de la stack, vous pouvez accéder à l'interface en utilisant les paramètres :
 
