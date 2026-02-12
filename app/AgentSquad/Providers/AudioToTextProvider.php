@@ -2,11 +2,10 @@
 
 namespace App\AgentSquad\Providers;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class AudioToTextProvider
+class AudioToTextProvider extends AbstractProvider
 {
     public static function provide(string $url, string $lang = 'fr'): string
     {
@@ -16,21 +15,29 @@ class AudioToTextProvider
             return '';
         }
 
+        $before = microtime(true);
+
         try {
-            $start = microtime(true);
             $response = self::callDeepInfra($audioBase64, $lang);
-            $stop = microtime(true);
             $answer = $response['text'] ?? '';
-            Log::debug("[AUDIO_TO_TEXT_PROVIDER] LLM api call took " . number_format($stop - $start, 3) . " seconds");
-            return $answer;
         } catch (\Exception $e) {
-            Log::debug("[AUDIO_TO_TEXT_PROVIDER] LLM api call failed");
             Log::error($e->getMessage());
-            return '';
+            $answer = null;
         }
+
+        $after = microtime(true);
+
+        if (isset($answer)) {
+            self::traceSuccess('audio-to-text', $before, $after);
+            return $answer;
+        }
+
+        self::traceError('audio-to-text', $before, $after);
+        return '';
     }
 
-    private static function downloadAndEncode(string $url) {
+    private static function downloadAndEncode(string $url)
+    {
         try {
             $response = Http::get($url);
 
@@ -49,7 +56,7 @@ class AudioToTextProvider
                 'exception' => $e
             ]);
             return null;
-        }        
+        }
     }
 
     private static function callDeepInfra(string $audio, string $lang, int $timeoutInSeconds = 60): array

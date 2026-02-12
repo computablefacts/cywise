@@ -2,54 +2,13 @@
 
 namespace App\Helpers;
 
-use App\AgentSquad\Providers\AudioToTextProvider;
-use App\AgentSquad\Providers\LlmsProvider;
-use App\AgentSquad\Providers\PromptsProvider;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/** @deprecated */
 class ApiUtils
 {
-    public function translate(string $text, string $lang = 'fr'): array
-    {
-        $prompt = PromptsProvider::provide('default_translate', [
-            'TEXT' => $text,
-            'LANG' => $lang,
-        ]);
-
-        $answer = LlmsProvider::provide($prompt, 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo');
-
-        return $answer === '' ?
-            [
-                'error' => true,
-                'error_details' => "Unable to translate $text in $lang language.",
-                'response' => $text,
-            ] :
-            [
-                'error' => false,
-                'error_details' => '',
-                'response' => $answer,
-            ];
-    }
-
-    public function whisper(string $url, string $lang = 'fr')
-    {
-        $answer = AudioToTextProvider::provide($url, $lang);
-
-        return $answer === '' ?
-            [
-                'error' => true,
-                'error_details' => "Error transforming audio into text.",
-                'text' => '',
-            ] :
-            [
-                'error' => false,
-                'error_details' => '',
-                'text' => $answer,
-            ];
-    }
-
     public function file_input(string $client, string $url, ?string $filename = null): array
     {
         return $this->post('/api/file-input', [

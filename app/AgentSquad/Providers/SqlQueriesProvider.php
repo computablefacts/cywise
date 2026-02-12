@@ -6,7 +6,7 @@ use App\Models\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-class SqlQueriesProvider
+class SqlQueriesProvider extends AbstractProvider
 {
     public static function normalizeTableName(string $name): string
     {
@@ -20,6 +20,8 @@ class SqlQueriesProvider
 
     public static function provide(Collection $tables, string $question): string
     {
+        $before = microtime(true);
+
         $prompt = PromptsProvider::provide('default_clickhouse_query_generation', [
             'SCHEMA' => $tables
                 ->map(function (Table $table) {
@@ -31,6 +33,12 @@ class SqlQueriesProvider
                 ->join("\n\n"),
             'QUESTION' => $question,
         ]);
-        return LlmsProvider::provide($prompt);
+
+        $answer = LlmsProvider::provide($prompt);
+
+        $after = microtime(true);
+
+        self::traceSuccess('sql-queries', $before, $after);
+        return $answer;
     }
 }

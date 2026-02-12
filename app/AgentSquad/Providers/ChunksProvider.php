@@ -6,7 +6,7 @@ use App\Models\Chunk;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
-class ChunksProvider
+class ChunksProvider extends AbstractProvider
 {
     /** @return Collection<Chunk> */
     public static function provide(Collection $collections, string $language, string $keywords, int $take = 50): Collection
@@ -15,20 +15,28 @@ class ChunksProvider
             return collect();
         }
         return \Cache::remember('chunks_provider_' . md5($collections->pluck('id')->implode('_') . "{$language}{$keywords}"), now()->addDays(7), function () use ($collections, $language, $keywords, $take) {
+
+            $before = microtime(true);
+
             try {
-                $start = microtime(true);
                 $chunks = Chunk::search("{$language}:{$keywords}")
                     ->whereIn('collection_id', $collections->pluck('id'))
                     ->take($take)
                     ->get();
-                $stop = microtime(true);
-                Log::debug("[CHUNKS_PROVIDER] Search for '{$language}:{$keywords}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
-                return $chunks;
             } catch (\Exception $e) {
-                Log::debug("[CHUNKS_PROVIDER] Search for '{$language}:{$keywords}' failed");
                 Log::error($e->getMessage());
-                return collect();
+                $chunks = null;
             }
+
+            $after = microtime(true);
+
+            if (isset($chunks)) {
+                self::traceSuccess('chunks', $before, $after);
+                return $chunks;
+            }
+
+            self::traceError('chunks', $before, $after);
+            return collect();
         });
     }
 }

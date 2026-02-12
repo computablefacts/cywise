@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class LlmsProvider
+class LlmsProvider extends AbstractProvider
 {
     public static function provideJson(string|array $messages, ?string $model = null, int $timeoutInSeconds = 60): object
     {
@@ -22,6 +22,10 @@ class LlmsProvider
 
     public static function provide(string|array $messages, ?string $model = null, int $timeoutInSeconds = 60): string
     {
+        $before = microtime(true);
+
+        $model = $model ?? 'Qwen/Qwen3-Next-80B-A3B-Instruct';
+
         if (is_string($messages)) {
             $messages = [[
                 'role' => 'user',
@@ -29,25 +33,30 @@ class LlmsProvider
             ]];
         }
         try {
-            $start = microtime(true);
             $response = self::callDeepInfra($messages, $model, $timeoutInSeconds);
-            $stop = microtime(true);
             $answer = $response['choices'][0]['message']['content'] ?? '';
             $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
             $answer = Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
-            Log::debug("[LLMS_PROVIDER] LLM api call took " . ((int)ceil($stop - $start)) . " seconds");
-            return $answer;
         } catch (\Exception $e) {
-            Log::debug("[LLMS_PROVIDER] LLM api call failed");
             Log::error($e->getMessage());
-            return '';
+            $answer = null;
         }
+
+        $after = microtime(true);
+
+        if (isset($answer)) {
+            self::traceSuccess('llms/' . Str::lower($model), $before, $after);
+            return $answer;
+        }
+
+        self::traceError('llms/' . Str::lower($model), $before, $after);
+        return '';
     }
 
-    private static function callDeepInfra(array $messages, ?string $model = null, int $timeoutInSeconds = 60): array
+    private static function callDeepInfra(array $messages, string $model, int $timeoutInSeconds = 60): array
     {
         return self::post(
-            config('towerify.deepinfra.api') . '/chat/completions', config('towerify.deepinfra.api_key'), $messages, $model ?? 'Qwen/Qwen3-Next-80B-A3B-Instruct', $timeoutInSeconds);
+            config('towerify.deepinfra.api') . '/chat/completions', config('towerify.deepinfra.api_key'), $messages, $model, $timeoutInSeconds);
     }
 
     private static function post(string $url, string $bearer, array $messages, string $model, int $timeoutInSeconds = 60): array

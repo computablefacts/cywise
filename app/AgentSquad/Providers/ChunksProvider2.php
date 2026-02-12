@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ChunksProvider2
+class ChunksProvider2 extends AbstractProvider
 {
     /** @return Collection<Chunk> */
     public static function provide(Collection $collections, string $language, string $input, int $take = 8): Collection
@@ -18,8 +18,10 @@ class ChunksProvider2
             return collect();
         }
         return \Cache::remember('chunks_provider2_' . md5($collections->pluck('id')->implode('_') . "{$language}{$input}"), now()->addDays(7), function () use ($collections, $language, $input, $take) {
+
+            $before = microtime(true);
+
             try {
-                $start = microtime(true);
                 if (Vector::isSupportedByMariaDb()) {
                     $embedding = json_encode(EmbeddingsProvider::provide($input)?->embedding() ?? []);
                     $chunks = collect(DB::select("
@@ -58,14 +60,20 @@ class ChunksProvider2
                             return $chunk;
                         });
                 }
-                $stop = microtime(true);
-                Log::debug("[CHUNKS_PROVIDER_2] Search for '$input' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
-                return $chunks;
             } catch (\Exception $e) {
-                Log::debug("[CHUNKS_PROVIDER_2] Search for '$input' failed");
                 Log::error($e->getMessage());
-                return collect();
+                $chunks = null;
             }
+
+            $after = microtime(true);
+
+            if (isset($chunks)) {
+                self::traceSuccess('chunks2', $before, $after);
+                return $chunks;
+            }
+
+            self::traceError('chunks2', $before, $after);
+            return collect();
         });
     }
 }

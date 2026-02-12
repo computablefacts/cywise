@@ -6,21 +6,28 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class WebpagesProvider
+class WebpagesProvider extends AbstractProvider
 {
     public static function provide(string $url, string $country = 'fr'): string
     {
+        $before = microtime(true);
+
         try {
-            $start = microtime(true);
             $answer = self::callScrapfly($url, $country);
-            $stop = microtime(true);
-            Log::debug("[WEBPAGES_PROVIDER] Crawler api call took " . ((int)ceil($stop - $start)) . " seconds");
-            return $answer;
         } catch (\Exception $e) {
-            Log::debug("[WEBPAGES_PROVIDER] Crawler api call failed");
             Log::error($e->getMessage());
-            return '';
+            $answer = null;
         }
+
+        $after = microtime(true);
+
+        if (isset($answer)) {
+            self::traceSuccess('webpages', $before, $after);
+            return $answer;
+        }
+
+        self::traceError('webpages', $before, $after);
+        return '';
     }
 
     public static function isHyperlink(string $text): bool

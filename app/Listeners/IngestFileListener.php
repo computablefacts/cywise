@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\AgentSquad\Providers\AudioToTextProvider;
 use App\Events\IngestFile;
 use App\Helpers\ApiUtilsFacade as ApiUtils;
 use App\Http\Controllers\CyberBuddyController;
@@ -93,15 +94,15 @@ class IngestFileListener extends AbstractListener
             // Speech-to-text
             if ($file->mime_type === 'audio/mpeg' || $file->mime_type === 'audio/wav') {
 
-                $response = ApiUtils::whisper($file->downloadUrl());
+                $text = AudioToTextProvider::provide($file->downloadUrl());
 
-                if ($response['error']) {
-                    throw new \Exception($response['error_details']);
+                if ($text === '') {
+                    throw new \Exception('Error transforming audio into text.');
                 }
 
                 // Write text to disk
                 $txtFilePath = "/tmp/{$file->name_normalized}.txt";
-                file_put_contents($txtFilePath, $response['text']);
+                file_put_contents($txtFilePath, $text);
 
                 // Move file to storage
                 $collection = $file->collection()->where('is_deleted', false)->first();

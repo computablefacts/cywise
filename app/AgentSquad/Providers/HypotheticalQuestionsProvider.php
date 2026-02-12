@@ -4,13 +4,15 @@ namespace App\AgentSquad\Providers;
 
 use Illuminate\Support\Facades\Log;
 
-class HypotheticalQuestionsProvider
+class HypotheticalQuestionsProvider extends AbstractProvider
 {
     public static function provide(string $language, string $text, string $prompt = 'default_hypothetical_questions'): array
     {
         return \Cache::remember('hypothetical_questions_provider_' . md5($language . $text . $prompt), now()->addDays(7), function () use ($language, $text, $prompt) {
+
+            $before = microtime(true);
+
             try {
-                $start = microtime(true);
                 $prompt = PromptsProvider::provide($prompt, [
                     'LANGUAGE' => $language,
                     'TEXT' => $text,
@@ -22,14 +24,20 @@ class HypotheticalQuestionsProvider
                     'language' => $language,
                     'embedding' => EmbeddingsProvider::provide($question)->embedding(),
                 ], $questions);
-                $stop = microtime(true);
-                Log::debug("[HYPOTHETICAL_QUESTIONS_PROVIDER] " . count($questions) . " questions have been generated in " . ((int)ceil($stop - $start)) . " seconds");
-                return $questions;
             } catch (\Exception $e) {
-                Log::debug("[HYPOTHETICAL_QUESTIONS_PROVIDER] Questions generation failed");
                 Log::error($e->getMessage());
-                return [];
+                $questions = null;
             }
+
+            $after = microtime(true);
+
+            if (isset($questions)) {
+                self::traceSuccess('hypothetical-questions', $before, $after);
+                return $questions;
+            }
+
+            self::traceError('hypothetical-questions', $before, $after);
+            return [];
         });
     }
 }
