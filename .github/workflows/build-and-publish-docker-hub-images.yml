@@ -45,7 +45,7 @@ jobs:
             type=sha,prefix=sha-,format=short
             type=sha,prefix=sha-,format=long
 
-      - name: Build and push image
+      - name: Build and push standard image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -55,3 +55,31 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=computablefacts/cywise:buildcache
           cache-to: type=registry,ref=computablefacts/cywise:buildcache,mode=max
+
+      - name: Extract metadata (tags, labels) for performa image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: computablefacts/cywise-performa
+          flavor: |
+            latest=false
+          tags: |
+            # set latest tag only for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=pep440,pattern={{version}}
+            type=pep440,pattern={{major}}.{{minor}}
+            type=pep440,pattern={{major}}
+            type=sha,prefix=sha-,format=short
+            type=sha,prefix=sha-,format=long
+
+      - name: Build and push performa image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./performa
+          file: ./performa/towerify/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=computablefacts/cywise-performa:buildcache
+          cache-to: type=registry,ref=computablefacts/cywise-performa:buildcache,mode=max
