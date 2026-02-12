@@ -33,9 +33,9 @@ class ScheduledTasksProcedure extends Procedure
                 Below is the list of your scheduled tasks:
                 @foreach(\$tasks as \$task)
                 @if(empty(\$task->trigger))
-                - {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}).
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}).
                 @else
-                - {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}.
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}.
                 @endif
                 @endforeach
             @endif
