@@ -33,7 +33,7 @@ class UsersProcedure extends Procedure
     {
         $params = $request->validate([
             'user_id' => 'nullable|prohibited_if:email,true|integer|exists:users,id',
-            'email' => 'nullable|prohibited_if:user_id,true|string|email|max:255|exists:users,email',
+            'email' => 'nullable|prohibited_if:user_id,true|string|email|max:191|exists:users,email',
             'gets_audit_report' => 'nullable|boolean',
         ]);
 
@@ -85,7 +85,7 @@ class UsersProcedure extends Procedure
     {
         $params = $request->validate([
             'user_id' => 'nullable|prohibited_if:email,true|integer|exists:users,id',
-            'email' => 'nullable|prohibited_if:user_id,true|string|email|max:255|exists:users,email',
+            'email' => 'nullable|prohibited_if:user_id,true|string|email|max:191|exists:users,email',
         ]);
 
         /** @var User $loggedInUser */
