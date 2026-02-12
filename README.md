@@ -220,7 +220,7 @@ Vous pouvez supprimer l'intégralité de la stack y compris toutes les données 
 ## Images Docker utilisées
 
 | Service               | Local                                              | Image                                            | Open Source                      |
-| :-------------------- | :------------------------------------------------- | :----------------------------------------------- | :------------------------------- |
+|:----------------------|:---------------------------------------------------|:-------------------------------------------------|:---------------------------------|
 | app                   | [http://localhost:17801/](http://localhost:17801/) | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
 | scheduler             |                                                    | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
 | queue                 |                                                    | :white_check_mark: [Publique][cywise]            | :white_check_mark: Oui (AGPL v3) |
@@ -287,9 +287,8 @@ Vous devez ensuite mettre en place cette clé dans Cywise.
 
 ### Tables
 
-Afin de pouvoir importer des tables, vous devez avoir 2 buckets S3 chez AWS.
-Un bucket public, par exemple `mydomain-cywise-public`, et un bucket privé,
-par exemple `mydomain-cywise-private`.
+Afin de pouvoir importer des tables, vous devez avoir 2 buckets S3 chez AWS. Un bucket public, par exemple
+`mydomain-cywise-public`, et un bucket privé, par exemple `mydomain-cywise-private`.
 
 1. Arrêtez la stack avec la commande `./stack-stop.sh`.
 2. Modifier le fichier `.env` pour ajouter les clés :
@@ -308,16 +307,14 @@ par exemple `mydomain-cywise-private`.
 
 ## Travaux en cours
 
-Plusieurs fonctionnalités ne sont pas utilisables avec la stack pour le moment.
-Nous travaillons à les rendre accessibles.
+Plusieurs fonctionnalités ne sont pas utilisables avec la stack pour le moment. Nous travaillons à les rendre
+accessibles. Notamment :
 
-Notammement :
+- [ ] l'import de documents depuis **Gestion des données > Documents**
+- [ ] le déploiement de l'agent sur un serveur (la stack étant accessible sur localhost par défaut)
 
-* l'import de documents depuis **Gestion des données > Documents**
-* la protection d'un serveur (la stack étant accessible sur localhost par défaut)
-
-Si vous avez des difficultés à faire fonctionner notre stack, 
-[ouvrez un ticket](https://github.com/computablefacts/cywise/issues/new).
+Si vous avez des difficultés à faire fonctionner notre
+stack, [ouvrez un ticket](https://github.com/computablefacts/cywise/issues/new).
 
 ## Utilisation
 
