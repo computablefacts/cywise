@@ -57,7 +57,7 @@ jobs:
           cache-to: type=registry,ref=computablefacts/cywise:buildcache,mode=max
 
       - name: Extract metadata (tags, labels) for performa image
-        id: meta
+        id: meta_performa
         uses: docker/metadata-action@v5
         with:
           images: computablefacts/cywise-performa
@@ -79,7 +79,7 @@ jobs:
           context: ./performa
           file: ./performa/towerify/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta_performa.outputs.tags }}
+          labels: ${{ steps.meta_performa.outputs.labels }}
           cache-from: type=registry,ref=computablefacts/cywise-performa:buildcache
           cache-to: type=registry,ref=computablefacts/cywise-performa:buildcache,mode=max
