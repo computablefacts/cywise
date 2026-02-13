@@ -1,7 +1,7 @@
 <?php
 
+use App\AgentSquad\Providers\TranslationsProvider;
 use App\Events\SendAuditReport;
-use App\Helpers\ApiUtilsFacade;
 use App\Listeners\SendAuditReportListener;
 use App\Mail\SimpleEmail;
 use App\Models\Alert;
@@ -13,6 +13,7 @@ use App\Models\Scan;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Mockery\MockInterface;
 
 test('listener ignores invalid event type', function () {
 
@@ -25,7 +26,6 @@ test('listener ignores invalid event type', function () {
 
     $listener = new SendAuditReportListener;
     $listener->handle(new \stdClass);
-
 });
 
 test('listener skips when user does not want audit report', function () {
@@ -93,8 +93,9 @@ test('email includes onboarding cta when isOnboarding is true', function () {
 test('email subject reflects vulnerabilities severity', function ($alertLevel, $expectedMailTitle) {
     Mail::fake();
 
-    ApiUtilsFacade::shouldReceive('translate')
-        ->andReturn(['error' => 'No translation available']);
+    $this->mock(TranslationsProvider::class, function (MockInterface $mock) {
+        $mock->shouldReceive('provide')->andReturn('');
+    });
 
     Config::set('towerify.freshdesk.from_email', 'jdoe@example.com');
     asTenant1User();
@@ -116,7 +117,6 @@ test('email subject reflects vulnerabilities severity', function ($alertLevel, $
         // dump($mail->__get('emailSubject'));
         return str_contains($mail->__get('emailSubject'), $expectedMailTitle);
     });
-
 })->with([
     'Critical' => ['Critical', 'vulnérabilités doivent être corrigées'],
     'High' => ['High', 'vulnérabilités doivent être corrigées'],
@@ -146,8 +146,9 @@ test('email body contains summary section', function () {
 test('email contains correct vulnerability counts and severity messages', function () {
     Mail::fake();
 
-    ApiUtilsFacade::shouldReceive('translate')
-        ->andReturn(['error' => 'No translation available']);
+    $this->mock(TranslationsProvider::class, function (MockInterface $mock) {
+        $mock->shouldReceive('provide')->andReturn('');
+    });
 
     Config::set('towerify.freshdesk.from_email', 'jdoe@example.com');
     asTenant1User();
@@ -190,14 +191,14 @@ test('email contains correct vulnerability counts and severity messages', functi
             && str_contains($htmlBody, '<b>3</b> vulnérabilités de criticité moyenne <b>devraient</b> être corrigées.')
             && str_contains($htmlBody, '<b>5</b> vulnérabilités de criticité basse ne posent pas un risque de sécurité immédiat.');
     });
-
 });
 
 test('email contains vulnerabilities from a shared asset', function () {
     Mail::fake();
 
-    ApiUtilsFacade::shouldReceive('translate')
-        ->andReturn(['error' => 'No translation available']);
+    $this->mock(TranslationsProvider::class, function (MockInterface $mock) {
+        $mock->shouldReceive('provide')->andReturn('');
+    });
 
     Config::set('towerify.freshdesk.from_email', 'jdoe@example.com');
     asTenant1User();
@@ -242,5 +243,4 @@ test('email contains vulnerabilities from a shared asset', function () {
             && str_contains($htmlBody, '<b>3</b> vulnérabilités de criticité moyenne <b>devraient</b> être corrigées.')
             && str_contains($htmlBody, '<b>5</b> vulnérabilités de criticité basse ne posent pas un risque de sécurité immédiat.');
     });
-
 })->todo('Must be completed');

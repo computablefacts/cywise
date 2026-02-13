@@ -14,6 +14,7 @@
     </testsuites>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="LOG_LEVEL" value="info"/>
         <env name="APP_KEY" value="base64:YZzRGIAPQgqSLZBJ7rILm7B05FfdvxSBaHVoQFzBuS0="/>
         <env name="ADMIN_EMAIL" value="qa@computablefacts.com"/>
         <env name="ADMIN_USERNAME" value="qa"/>
