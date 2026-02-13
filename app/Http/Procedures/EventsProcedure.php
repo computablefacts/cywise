@@ -69,9 +69,10 @@ class EventsProcedure extends Procedure
     #[RpcMethod(
         description: "List collected events.",
         params: [
-            "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise. (required|integer|min:0|max:100)",
-            "max_score" => "An optional maximum score to filter events by. (nullable|integer|min:0|max:100)",
-            "server_id" => "An optional server id to filter events by. (nullable|integer|exists:ynh_servers,id)",
+            "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise. (integer|required|min:0|max:100)",
+            "max_score" => "An optional maximum score to filter events by. (integer|nullable|min:0|max:100)",
+            "server_id" => "An optional server id to filter events by.",
+            "ip_address" => "An optional server IP address to filter events by. (string|nullable|min:4|max:15|exists:ynh_servers,ip_address)",
             "window" => "An optional window of time [min_date, max_date] to filter events by."
         ],
         result: [
@@ -80,11 +81,11 @@ class EventsProcedure extends Procedure
         ai_examples: [
             "if the request is 'List recent security events', the input should be {\"min_score\":0}",
             "If the request is 'List recent security events excluding indicators of compromise (IoCs)', the input should be {\"max_score\":0}",
-            "if the request is 'Show IoCs for server 1', the input should be {\"min_score\":1,\"server_id\":1}",
-            "If the request is 'Show suspicious events for server 1', the input should be {\"min_score\":1,\"max_score\":24,\"server_id\":1}",
-            "If the request is 'Show low severity events for server 1', the input should be {\"min_score\":25,\"max_score\":49,\"server_id\":1}",
-            "If the request is 'Show medium severity events for server 1', the input should be {\"min_score\":50,\"max_score\":74,\"server_id\":1}",
-            "If the request is 'Show high severity events for server 1', the input should be {\"min_score\":75,\"server_id\":1}",
+            "if the request is 'Show IoCs for server 192.168.0.38', the input should be {\"min_score\":1,\"ip_address\":\"192.168.0.38\"}",
+            "If the request is 'Show suspicious events for server 192.168.0.39', the input should be {\"min_score\":1,\"max_score\":24,\"ip_address\":\"192.168.0.39\"}",
+            "If the request is 'Show low severity events for server 192.168.0.40', the input should be {\"min_score\":25,\"max_score\":49,\"ip_address\":\"192.168.0.40\"}",
+            "If the request is 'Show medium severity events for server 192.168.0.41', the input should be {\"min_score\":50,\"max_score\":74,\"ip_address\":\"192.168.0.41\"}",
+            "If the request is 'Show high severity events for server 192.168.0.42', the input should be {\"min_score\":75,\"ip_address\":\"192.168.0.42\"}",
         ],
         ai_result: "
             @php
@@ -103,11 +104,12 @@ class EventsProcedure extends Procedure
     public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'min_score' => 'required|integer|min:0|max:100',
-            'max_score' => 'nullable|integer|min:0|max:100',
-            'server_id' => 'nullable|integer|exists:ynh_servers,id',
-            'window' => 'nullable|array|min:2|max:2',
-            'window.*' => 'required|date',
+            'min_score' => 'integer|required|min:0|max:100',
+            'max_score' => 'integer|nullable|min:0|max:100',
+            'server_id' => 'integer|nullable|prohibits:ip_address|exists:ynh_servers,id',
+            'ip_address' => 'string|nullable|prohibits:server_id|min:4|max:15|exists:ynh_servers,ip_address',
+            'window' => 'array|nullable|min:2|max:2',
+            'window.*' => 'date|required',
         ]);
 
         $serverId = $params['server_id'] ?? null;
@@ -123,9 +125,13 @@ class EventsProcedure extends Procedure
         }
 
         // Load servers
-        $servers = YnhServer::query()
-            ->when($serverId, fn($query, $serverId) => $query->where('id', $serverId))
-            ->get();
+        if (isset($params['server_id'])) {
+            $servers = YnhServer::where('id', $params['server_id'])->get();
+        } else if (isset($params['ip_address'])) {
+            $servers = YnhServer::where('ip_address', $params['ip_address'])->get();
+        } else {
+            $servers = YnhServer::all();
+        }
 
         // Load dismissed markers
         $dismissed = YnhOsquery::select(['ynh_server_id', 'ynh_osquery_rule_id'])
@@ -188,8 +194,8 @@ class EventsProcedure extends Procedure
     #[RpcMethod(
         description: "Analyze security events and IoCs for a given server to detect suspicious activity.",
         params: [
-            "server_id" => "If the IP address is not specified, the server id. (integer|required_without:ip_address|prohibits:ip_address|exists:ynh_servers,id)",
-            "ip_address" => "If the server id is not specified, the server IP address. (string|required_without:server_id|prohibits:server_id|min:4|max:15|exists:ynh_servers,ip_address)"
+            "server_id" => "If the IP address is not specified, the server id.",
+            "ip_address" => "If the server id is not specified, the server IP address. (string|min:4|max:15|exists:ynh_servers,ip_address)"
         ],
         result: [
             "activity" => "The activity status: UNKNOWN, NORMAL, SUSPICIOUS, or ANORMAL.",
@@ -199,7 +205,7 @@ class EventsProcedure extends Procedure
             "report" => "A full text report in Markdown format.",
         ],
         ai_examples: [
-            "if the request is 'Analyze security events for server 1', the input should be {\"server_id\":1}",
+            "if the request is 'Analyze security events for server 163.172.82.2', the input should be {\"ip_address\":\"163.172.82.2\"}",
             "if the request is 'Is there any suspicious activity on server 163.172.82.3?', the input should be {\"ip_address\":\"163.172.82.3\"}",
         ],
         ai_result: "{{ \$result['report'] }}"

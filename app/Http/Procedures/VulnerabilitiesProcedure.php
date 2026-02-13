@@ -35,9 +35,9 @@ class VulnerabilitiesProcedure extends Procedure
         description: "List the user's vulnerabilities.",
         params: [
             "asset_id" => "An optional asset id.",
-            "asset" => "An optional asset as a domain or an IP address. (nullable|string|prohibited_if:asset_id,true|min:1|max:191|exists:am_assets,asset)",
-            "level" => "An optional criticality level such as high, medium or low. (nullable|string|min:3|max:6|in:high,medium,low)",
-            "tld" => "An optional asset TLD to match. (nullable|string)",
+            "asset" => "An optional asset as a domain or an IP address. (string|nullable|min:1|max:191|exists:am_assets,asset)",
+            "level" => "An optional criticality level such as high, medium or low. (string|nullable|min:3|max:6|in:high,medium,low)",
+            "tld" => "An optional asset TLD to match. (string|nullable)",
             "tags" => "An optional list of assets tags to match.",
         ],
         result: [
@@ -83,11 +83,11 @@ class VulnerabilitiesProcedure extends Procedure
     public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'asset_id' => 'nullable|integer|prohibited_if:asset,true|exists:am_assets,id',
-            'asset' => 'nullable|string|prohibited_if:asset_id,true|min:1|max:191|exists:am_assets,asset',
-            'level' => 'nullable|string|min:3|max:6|in:high,medium,low',
-            'tld' => 'nullable|string',
-            'tags' => 'nullable|array|min:1|max:10',
+            'asset_id' => 'integer|nullable|prohibited_if:asset,true|exists:am_assets,id',
+            'asset' => 'string|nullable|prohibited_if:asset_id,true|min:1|max:191|exists:am_assets,asset',
+            'level' => 'string|nullable|min:3|max:6|in:high,medium,low',
+            'tld' => 'string|nullable',
+            'tags' => 'array|nullable|min:1|max:10',
             'tags.*' => 'string',
         ]);
 

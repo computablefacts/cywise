@@ -57,9 +57,9 @@ class ScheduledTasksProcedure extends Procedure
     #[RpcMethod(
         description: 'Create a new scheduled task.',
         params: [
-            'cron' => 'Cron expression MIN HOUR DOM MON DOW. (required|string)',
-            'trigger' => 'Optional condition that must evaluate to true to run the task. (nullable|string)',
-            'task' => 'The task/instruction to execute when the schedule/trigger matches. (required|string)',
+            'cron' => 'Cron expression MIN HOUR DOM MON DOW. (string|required)',
+            'trigger' => 'Optional condition that must evaluate to true to run the task. (string|nullable)',
+            'task' => 'The task/instruction to execute when the schedule/trigger matches. (string|required)',
         ],
         result: [
             'msg' => 'Success message.',
@@ -76,9 +76,9 @@ class ScheduledTasksProcedure extends Procedure
     public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'cron' => 'required|string',
-            'trigger' => 'nullable|string',
-            'task' => 'required|string',
+            'cron' => 'string|required',
+            'trigger' => 'string|nullable',
+            'task' => 'string|required',
         ]);
 
         if (!CronExpression::isValidExpression($params['cron'])) {
@@ -115,8 +115,8 @@ class ScheduledTasksProcedure extends Procedure
     #[RpcMethod(
         description: 'Pause or resume a scheduled task.',
         params: [
-            'task_id' => 'The scheduled task id. (required|integer|exists:cb_scheduled_tasks,id)',
-            'enabled' => 'Optional boolean. If omitted, the flag will be toggled.'
+            'task_id' => 'The scheduled task id. (integer|required|exists:cb_scheduled_tasks,id)',
+            'enabled' => 'Optional boolean. If omitted, the flag will be toggled. (boolean|nullable)'
         ],
         result: [
             'msg' => 'Success message.',
@@ -132,8 +132,8 @@ class ScheduledTasksProcedure extends Procedure
     public function toggle(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'task_id' => 'required|integer|exists:cb_scheduled_tasks,id',
-            'enabled' => 'nullable|boolean',
+            'task_id' => 'integer|required|exists:cb_scheduled_tasks,id',
+            'enabled' => 'boolean|nullable',
         ]);
 
         /** @var ScheduledTask $task */
@@ -149,7 +149,7 @@ class ScheduledTasksProcedure extends Procedure
     #[RpcMethod(
         description: 'Delete a scheduled task.',
         params: [
-            'task_id' => 'The scheduled task id. (required|integer|exists:cb_scheduled_tasks,id)',
+            'task_id' => 'The scheduled task id. (integer|required|exists:cb_scheduled_tasks,id)',
         ],
         result: [
             'msg' => 'Success message.'
@@ -162,7 +162,7 @@ class ScheduledTasksProcedure extends Procedure
     public function delete(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'task_id' => 'required|integer|exists:cb_scheduled_tasks,id',
+            'task_id' => 'integer|required|exists:cb_scheduled_tasks,id',
         ]);
         ScheduledTask::findOrFail($params['task_id'])->delete();
         return [

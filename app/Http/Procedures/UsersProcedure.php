@@ -15,8 +15,8 @@ class UsersProcedure extends Procedure
         description: "Toggle the envoy of the weekly email report to a given user.",
         params: [
             "user_id" => "An optional user id. If both the user_id and the email are null, the email of the current user is used.",
-            "email" => "An optional user email. If both the user_id and the email are null, the email of the current user is used. (nullable|string|email|max:255|exists:users,email)",
-            "gets_audit_report" => "true if the user wants to receive the weekly email report, false otherwise. When null, the current value is toggled."
+            "email" => "An optional user email. If both the user_id and the email are null, the email of the current user is used. (string|nullable|email|max:191|exists:users,email)",
+            "gets_audit_report" => "true if the user wants to receive the weekly email report, false otherwise. When null, the current value is toggled. (boolean|nullable)"
         ],
         result: [
             "msg" => "A success message.",
@@ -32,9 +32,9 @@ class UsersProcedure extends Procedure
     public function toggleGetsAuditReport(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'user_id' => 'nullable|prohibited_if:email,true|integer|exists:users,id',
-            'email' => 'nullable|prohibited_if:user_id,true|string|email|max:191|exists:users,email',
-            'gets_audit_report' => 'nullable|boolean',
+            'user_id' => 'integer|nullable|prohibits:email|exists:users,id',
+            'email' => 'string|nullable|prohibits:user_id|email|max:191|exists:users,email',
+            'gets_audit_report' => 'boolean|nullable',
         ]);
 
         /** @var User $loggedInUser */
@@ -70,7 +70,7 @@ class UsersProcedure extends Procedure
         description: "Immediately send the weekly email report to a given user.",
         params: [
             "user_id" => "An optional user id. If both the user_id and the email are null, the email of the current user is used.",
-            "email" => "An optional user email. If both the user_id and the email are null, the email of the current user is used. (nullable|string|email|max:255|exists:users,email)",
+            "email" => "An optional user email. If both the user_id and the email are null, the email of the current user is used. (string|nullable|email|max:255|exists:users,email)",
         ],
         result: [
             "msg" => "A success message.",
@@ -84,8 +84,8 @@ class UsersProcedure extends Procedure
     public function sendAuditReport(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'user_id' => 'nullable|prohibited_if:email,true|integer|exists:users,id',
-            'email' => 'nullable|prohibited_if:user_id,true|string|email|max:191|exists:users,email',
+            'user_id' => 'integer|nullable|prohibits:email|exists:users,id',
+            'email' => 'string|nullable|prohibits:user_id|email|max:191|exists:users,email',
         ]);
 
         /** @var User $loggedInUser */
