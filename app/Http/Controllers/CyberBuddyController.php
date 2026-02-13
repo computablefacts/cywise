@@ -238,7 +238,7 @@ class CyberBuddyController extends Controller
             'EXAMPLE' => $template,
             'QA' => $input,
         ]);
-        return LlmsProvider::provide($prompt, 'deepseek-ai/DeepSeek-R1-0528-Turbo');
+        return LlmsProvider::provide($prompt);
     }
 
     public function streamFile(string $secret, Request $request)

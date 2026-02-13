@@ -165,10 +165,10 @@ The action's input must use the same language as the user's input: if the user a
             'role' => RoleEnum::USER->value,
             'content' => $prompt,
         ];
-        $answer = LlmsProvider::provide($messages, 'deepseek-ai/DeepSeek-R1-0528-Turbo', 120);
+        $answer = LlmsProvider::provide($messages);
         array_pop($messages);
 
-        return new SuccessfulAnswer($this->enhanceWithSources(strip_tags($answer)), [], !empty($answer));
+        return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))), [], !empty($answer));
     }
 
     private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): string
