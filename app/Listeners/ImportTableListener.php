@@ -35,6 +35,8 @@ class ImportTableListener extends AbstractListener
         $clickhouseHost = config('towerify.clickhouse.host');
         $clickhouseUsername = config('towerify.clickhouse.username');
         $clickhousePassword = config('towerify.clickhouse.password');
+        $clickhouseDatabase = config('towerify.clickhouse.database');
+        $clickhouseDatabase = $clickhouseDatabase . (($user && $user->tenant_id) ? "_{$user->tenant_id}" : '_0');
         $normalizedTableName = SqlQueriesProvider::normalizeTableName($table);
         $tableIn = TableStorage::inClickhouseTableFunction($credentials, $table);
         $uidSuffix = '_' . Str::random(10);
@@ -157,7 +159,8 @@ class ImportTableListener extends AbstractListener
 
                 // Load the data in clickhouse server
                 // https://clickhouse.com/docs/en/integrations/s3#remote-insert-using-clickhouse-local
-                $query = "INSERT INTO TABLE FUNCTION remoteSecure('{$clickhouseHost}', '{$normalizedTableName}{$uidSuffix}', '{$clickhouseUsername}', '{$clickhousePassword}') (*) SELECT * FROM {$tableOut}";
+                $query = "INSERT INTO TABLE FUNCTION remoteSecure('{$clickhouseHost}', '{$clickhouseDatabase}.{$normalizedTableName}{$uidSuffix}', '{$clickhouseUsername}', '{$clickhousePassword}') (*) SELECT * FROM {$tableOut}";
+                Log::debug($query);
                 $output = ClickhouseLocal::executeQuery($query);
 
                 if (!$output) {
