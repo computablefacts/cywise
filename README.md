@@ -306,13 +306,38 @@ buckets S3 chez AWS. Un bucket public, par exemple `mydomain-cywise-public`, et 
 
 3. Redémarrez la stack avec la commande `./stack-start.sh`.
 
+### Liens et CyberBuddy
+
+CyberBuddy est capable de récupérer le contenu des liens que vous mettez dans
+une conversation avec lui.
+
+Pour que cela fonctionne, vous devez fournir votre clé d'API de scrapfly **ou**
+de scraperapi dans le fichier `.env`.
+
+1. Arrêtez la stack avec la commande `./stack-stop.sh`.
+2. Modifier le fichier `.env` pour ajouter la clé :
+
+  Pour scrapfly :
+  ```env
+  SCRAPFLY_API_KEY=<your_scrapfly_api_key>
+  ```
+
+  Pour scraperapi :
+  ```env
+  SCRAPERAPI_API_KEY=<your_scraperapi_api_key>
+  ```
+
+3. Redémarrez la stack avec la commande `./stack-start.sh`.
+
+
 ## Travaux en cours
 
 Plusieurs fonctionnalités ne sont pas utilisables avec la stack pour le moment. Nous travaillons à les rendre
 accessibles. Notamment :
 
-- [ ] l'import de documents depuis **Gestion des données > Documents**
+- [x] l'import de documents depuis **Gestion des données > Documents**
 - [ ] le déploiement de l'agent sur un serveur (la stack étant accessible sur localhost par défaut)
+- [ ] l'envoi de mails à CyberBuddy (intégration IMAP)
 
 Si vous avez des difficultés à faire fonctionner notre
 stack, [ouvrez un ticket](https://github.com/computablefacts/cywise/issues/new).
