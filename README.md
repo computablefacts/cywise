@@ -287,8 +287,9 @@ Vous devez ensuite mettre en place cette clé dans Cywise.
 
 ### Tables
 
-Afin de pouvoir importer des tables, vous devez avoir 2 buckets S3 chez AWS. Un bucket public, par exemple
-`mydomain-cywise-public`, et un bucket privé, par exemple `mydomain-cywise-private`.
+Afin de pouvoir importer des tables et interroger celles-ci en langage naturel dans CyberBuddy, vous devez avoir 2
+buckets S3 chez AWS. Un bucket public, par exemple `mydomain-cywise-public`, et un bucket privé, par exemple
+`mydomain-cywise-private`.
 
 1. Arrêtez la stack avec la commande `./stack-stop.sh`.
 2. Modifier le fichier `.env` pour ajouter les clés :
