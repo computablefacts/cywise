@@ -335,9 +335,9 @@ de scraperapi dans le fichier `.env`.
 Plusieurs fonctionnalités ne sont pas utilisables avec la stack pour le moment. Nous travaillons à les rendre
 accessibles. Notamment :
 
-- [x] l'import de documents depuis **Gestion des données > Documents**
-- [ ] le déploiement de l'agent sur un serveur (la stack étant accessible sur localhost par défaut)
 - [ ] l'envoi de mails à CyberBuddy (intégration IMAP)
+- [ ] le déploiement de l'agent sur un serveur (la stack étant accessible sur localhost par défaut)
+- [x] l'import de documents depuis **Gestion des données > Documents**
 
 Si vous avez des difficultés à faire fonctionner notre
 stack, [ouvrez un ticket](https://github.com/computablefacts/cywise/issues/new).
