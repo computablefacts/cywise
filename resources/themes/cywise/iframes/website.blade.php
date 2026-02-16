@@ -428,6 +428,106 @@ $premiumFeatures = explode(',', $premium->features);
 <!-- ====== Pricing End ====== -->
 
 <!-- ====== FAQ Start ====== -->
+<section id="podcasts" class="ud-blog-grids" style="padding: 80px 0; background: #f4f7fa;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="ud-section-title mx-auto text-center">
+          <span>Média</span>
+          <h2>Webinaires & Shorts</h2>
+          <p>
+            Retrouvez nos webinaires et vidéos courtes.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-md-6">
+        <div class="ud-single-blog wow fadeInUp" data-wow-delay=".1s">
+          <div class="ud-blog-image">
+            <div class="ratio ratio-16x9">
+              <iframe src="https://www.youtube.com/embed/TdxKrUFlO-Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+          </div>
+          <div class="ud-blog-content">
+            <span class="ud-blog-date">Short - 1 Février 2026</span>
+            <h3 class="ud-blog-title">
+              <a href="https://youtu.be/TdxKrUFlO-Y">
+                Comment protéger mon site web ?
+              </a>
+            </h3>
+            <p class="ud-blog-desc">
+              Question du jour : Mon site résiste-t-il aux attaques courantes ?
+            </p>
+            <br>
+            <p class="ud-blog-desc">
+              Beaucoup n'en ont aucune certitude. Cywise cartographie votre surface exposée et identifie immédiatement
+              les failles prioritaires.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="ud-single-blog wow fadeInUp" data-wow-delay=".15s">
+          <div class="ud-blog-image">
+            <div class="ratio ratio-16x9">
+              <iframe src="https://www.youtube.com/embed/N9KSao79nTg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+          </div>
+          <div class="ud-blog-content">
+            <span class="ud-blog-date">Webinaire - 12 Décembre 2025</span>
+            <h3 class="ud-blog-title">
+              <a href="https://youtu.be/N9KSao79nTg">
+                Les fuites de mots de passes dont vous n'avez jamais entendu parler
+              </a>
+            </h3>
+            <p class="ud-blog-desc">
+              Vous pensez que vos mots de passe sont sécurisés ?
+            </p>
+            <br>
+            <p class="ud-blog-desc">
+              Détrompez-vous. Chaque jour, des milliers de combinaisons d’identifiants et de mots de passe fuitent sur
+              le web, souvent sans que vous ne vous en rendiez compte. Ces données, récupérées lors de fuites massives
+              ou de cyberattaques ciblées, deviennent des clefs universelles pour les pirates. Ils les utilisent pour
+              s'infiltrer dans vos comptes professionnels, personnels, et même dans les systèmes de votre entreprise.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="ud-single-blog wow fadeInUp" data-wow-delay=".2s">
+          <div class="ud-blog-image">
+            <div class="ratio ratio-16x9">
+              <iframe src="https://www.youtube.com/embed/l6NYLhtPKhE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+          </div>
+          <div class="ud-blog-content">
+            <span class="ud-blog-date">Webinaire - 14 Novembre 2025</span>
+            <h3 class="ud-blog-title">
+              <a href="https://youtu.be/l6NYLhtPKhE">
+                Pourquoi les cybercriminels vous ciblent ?
+              </a>
+            </h3>
+            <p class="ud-blog-desc">
+              La cybercriminalité n'est plus une menace réservée aux grandes entreprises.
+            </p>
+            <br>
+            <p>
+              Beaucoup de dirigeants se rassurent encore : « Nous sommes trop petits, personne ne nous piratera. »
+              Pourtant, la réalité est tout autre : les PME sont aujourd'hui la cible privilégiée des attaques
+              opportunistes et automatisées. Les pirates ne vous visent pas personnellement, mais ils scannent Internet
+              à la recherche de failles courantes, de mots de passe réutilisés ou de systèmes non mis à jour. Dès qu'une
+              vulnérabilité est détectée, vous entrez dans leur ligne de mire (sans même qu’ils sachent qui vous êtes).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ====== Podcasts End ====== -->
+
+<!-- ====== FAQ Start ====== -->
 <section id="faq" class="ud-faq">
   <div class="shape">
     <img src="{{ asset('cywise/img/website/faq/shape.svg') }}" alt=""/>
