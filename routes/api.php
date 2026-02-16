@@ -221,6 +221,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\InvitationsProcedure::class,
             \App\Http\Procedures\NotesProcedure::class,
             \App\Http\Procedures\PromptsProcedure::class,
+            \App\Http\Procedures\RapidApiProcedure::class,
             \App\Http\Procedures\RemoteActionsProcedure::class,
             \App\Http\Procedures\OsqueryRulesProcedure::class,
             \App\Http\Procedures\OssecRulesProcedure::class,

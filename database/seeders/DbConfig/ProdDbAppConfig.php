@@ -90,6 +90,10 @@ class ProdDbAppConfig implements DbAppConfigInterface
 
             'mail.mailers.mailcoach.domain' => 'cywiseapp.mailcoach.app',
             'encrypted:mail.mailers.mailcoach.token' => 'm9YPqLakWErKGBs#_GTJmLbOadKQEvkdeFwfdYmXfX7BMkF2CsSh8stuIBhsQ88b6z//nzI+BiMf3mS6XW86nYxcZjaKF2e6eEbD74g==',
+
+            'towerify.rapidapi.email' => 'rapidapi@cywise.io',
+            'towerify.rapidapi.username' => 'RapidApi',
+            'encrypted:towerify.rapidapi.password' => 'JeEZ85S44woI62Ny_YmYKEPtTsCDOrJ5qyG/mT5CA9BfAcBU9ovPfpFB9Wiw=',
         ];
     }
 }

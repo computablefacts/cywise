@@ -86,6 +86,10 @@ class DevDbAppConfig implements DbAppConfigInterface
 
             'mail.mailers.mailcoach.domain' => 'cywiseapp.mailcoach.app',
             'encrypted:mail.mailers.mailcoach.token' => 'f4agCN2VzjXR47a2_VR/fo3UA7KfHG2ZkyNEO3j/xwozU6t7IdHAT9uaA6anNmHC/u2/vQBdZZ67l5UNWepmHZuXjZk18pDRhMGdjfg==',
+
+            'towerify.rapidapi.email' => 'rapidapi@cywise.io',
+            'towerify.rapidapi.username' => 'RapidApi',
+            'encrypted:towerify.rapidapi.password' => '&1i&bVmnH&ygN?CO_GfV+Ikp6Q/OeSwHtkZilmS7IiuzOQ4PXQOX8F/rx0ho=',
         ];
     }
 }

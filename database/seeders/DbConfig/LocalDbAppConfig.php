@@ -81,6 +81,10 @@ class LocalDbAppConfig implements DbAppConfigInterface
 
             'mail.mailers.mailcoach.domain' => 'cywiseapp.mailcoach.app',
             // 'encrypted:mail.mailers.mailcoach.token' => '',
+
+            'towerify.rapidapi.email' => 'rapidapi@cywise.io',
+            'towerify.rapidapi.username' => 'RapidApi',
+            // 'encrypted:towerify.rapidapi.password' => '',
         ];
     }
 }

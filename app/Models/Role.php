@@ -9,6 +9,7 @@ class Role extends \Spatie\Permission\Models\Role
 {
     // https://devdojo.com/wave/docs/features/roles-permissions
     const string ADMIN = 'admin';
+    const string RAPIDAPI = 'rapidapi';
     const string REGISTERED = 'registered';
     const string ESSENTIAL_PLAN = 'essential';
     const string STANDARD_PLAN = 'standard';
@@ -43,6 +44,10 @@ class Role extends \Spatie\Permission\Models\Role
         self::CYBERBUDDY_ONLY => [
             'view.iframes.cyberbuddy',
             'call.cyberbuddy.ask',
+        ],
+        self::RAPIDAPI => [
+            'view.iframes.*',
+            'call.rapidapi.*',
         ],
     ];
 

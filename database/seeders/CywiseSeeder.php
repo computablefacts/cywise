@@ -366,6 +366,25 @@ class CywiseSeeder extends Seeder
         // Add the 'admin' role to the user
         $admin = Role::where('name', Role::ADMIN)->firstOrFail();
         $user->roles()->syncWithoutDetaching($admin);
+
+        // Create RapidApi user
+        $email = config('towerify.rapidapi.email');
+        $username = config('towerify.rapidapi.username');
+        $password = config('towerify.rapidapi.password');
+        /** @var User $user */
+        $user = \App\Models\User::updateOrCreate(
+            ['email' => $email],
+            [
+                'name' => $username,
+                'email' => $email,
+                'password' => Hash::make($password),
+                'verified' => true,
+            ]
+        );
+
+        // Add the 'rapidapi' role to the user
+        $rapidapi = Role::where('name', Role::RAPIDAPI)->firstOrFail();
+        $user->roles()->syncWithoutDetaching($rapidapi);
     }
 
     private function setupOssecRules(): void

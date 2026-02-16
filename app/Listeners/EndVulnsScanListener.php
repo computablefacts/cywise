@@ -58,8 +58,9 @@ class EndVulnsScanListener extends AbstractListener
                     Log::warning("Assets are still being scanned for trial {$trial->id}");
                     return;
                 }
-
-                SendAuditReport::dispatch($user, true);
+                if ($user->email !== config('towerify.rapidapi.email')) {
+                    SendAuditReport::dispatch($user, true);
+                }
 
                 $trial->completed = true;
                 $trial->save();
