@@ -427,7 +427,7 @@ $premiumFeatures = explode(',', $premium->features);
 </section>
 <!-- ====== Pricing End ====== -->
 
-<!-- ====== FAQ Start ====== -->
+<!-- ====== Media Start ====== -->
 <section id="podcasts" class="ud-blog-grids" style="padding: 80px 0; background: #f4f7fa;">
   <div class="container">
     <div class="row">
@@ -525,7 +525,7 @@ $premiumFeatures = explode(',', $premium->features);
     </div>
   </div>
 </section>
-<!-- ====== Podcasts End ====== -->
+<!-- ====== Media End ====== -->
 
 <!-- ====== FAQ Start ====== -->
 <section id="faq" class="ud-faq">
