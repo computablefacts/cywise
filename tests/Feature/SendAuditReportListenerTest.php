@@ -1,6 +1,5 @@
 <?php
 
-use App\AgentSquad\Providers\TranslationsProvider;
 use App\Events\SendAuditReport;
 use App\Listeners\SendAuditReportListener;
 use App\Mail\SimpleEmail;
@@ -11,9 +10,10 @@ use App\Models\AssetTagHash;
 use App\Models\Port;
 use App\Models\Scan;
 use App\Models\User;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Mockery\MockInterface;
 
 test('listener ignores invalid event type', function () {
 
@@ -93,9 +93,11 @@ test('email includes onboarding cta when isOnboarding is true', function () {
 test('email subject reflects vulnerabilities severity', function ($alertLevel, $expectedMailTitle) {
     Mail::fake();
 
-    $this->mock(TranslationsProvider::class, function (MockInterface $mock) {
-        $mock->shouldReceive('provide')->andReturn('');
-    });
+    Config::set('towerify.deepinfra.api', 'http://deepinfra.fake/api');
+    Config::set('towerify.deepinfra.api_key', 'dummy_key');
+    Http::fake([
+        config('towerify.deepinfra.api') . '/chat/completions' => Http::response(['choices' => [['message' => ['content' => 'traduction factice']]]]),
+    ]);
 
     Config::set('towerify.freshdesk.from_email', 'jdoe@example.com');
     asTenant1User();
@@ -146,9 +148,11 @@ test('email body contains summary section', function () {
 test('email contains correct vulnerability counts and severity messages', function () {
     Mail::fake();
 
-    $this->mock(TranslationsProvider::class, function (MockInterface $mock) {
-        $mock->shouldReceive('provide')->andReturn('');
-    });
+    Config::set('towerify.deepinfra.api', 'http://deepinfra.fake/api');
+    Config::set('towerify.deepinfra.api_key', 'dummy_key');
+    Http::fake([
+        config('towerify.deepinfra.api') . '/chat/completions' => Http::response(['choices' => [['message' => ['content' => 'traduction factice']]]]),
+    ]);
 
     Config::set('towerify.freshdesk.from_email', 'jdoe@example.com');
     asTenant1User();
@@ -196,9 +200,11 @@ test('email contains correct vulnerability counts and severity messages', functi
 test('email contains vulnerabilities from a shared asset', function () {
     Mail::fake();
 
-    $this->mock(TranslationsProvider::class, function (MockInterface $mock) {
-        $mock->shouldReceive('provide')->andReturn('');
-    });
+    Config::set('towerify.deepinfra.api', 'http://deepinfra.fake/api');
+    Config::set('towerify.deepinfra.api_key', 'dummy_key');
+    Http::fake([
+        config('towerify.deepinfra.api') . '/chat/completions' => Http::response(['choices' => [['message' => ['content' => 'traduction factice']]]]),
+    ]);
 
     Config::set('towerify.freshdesk.from_email', 'jdoe@example.com');
     asTenant1User();
