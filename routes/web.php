@@ -94,7 +94,7 @@ Route::get('/cyber-advisor', [\App\Http\Controllers\ToolsController::class, 'cyb
  */
 Route::get('check-health', [SimpleHealthCheckController::class, '__invoke']);
 Route::get('check-health/ui', [HealthCheckResultsController::class, '__invoke'])->middleware('auth');
-Route::get('check-health/json', [HealthCheckJsonResultsController::class, '__invoke'])->middleware('auth.basic');
+Route::get('check-health/json', [HealthCheckJsonResultsController::class, '__invoke'])->middleware('auth:api');
 
 // Cywise routes
 Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
