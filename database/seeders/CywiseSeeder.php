@@ -371,20 +371,22 @@ class CywiseSeeder extends Seeder
         $email = config('towerify.rapidapi.email');
         $username = config('towerify.rapidapi.username');
         $password = config('towerify.rapidapi.password');
-        /** @var User $user */
-        $user = \App\Models\User::updateOrCreate(
-            ['email' => $email],
-            [
-                'name' => $username,
-                'email' => $email,
-                'password' => Hash::make($password),
-                'verified' => true,
-            ]
-        );
+        if ($email) {
+            /** @var User $user */
+            $user = \App\Models\User::updateOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $username,
+                    'email' => $email,
+                    'password' => Hash::make($password),
+                    'verified' => true,
+                ]
+            );
 
-        // Add the 'rapidapi' role to the user
-        $rapidapi = Role::where('name', Role::RAPIDAPI)->firstOrFail();
-        $user->roles()->syncWithoutDetaching($rapidapi);
+            // Add the 'rapidapi' role to the user
+            $rapidapi = Role::where('name', Role::RAPIDAPI)->firstOrFail();
+            $user->roles()->syncWithoutDetaching($rapidapi);
+        }
     }
 
     private function setupOssecRules(): void
@@ -719,8 +721,10 @@ class CywiseSeeder extends Seeder
         foreach (glob($path . '/*.json') as $file) {
             Log::debug("Importing {$file}...");
             $json = json_decode(Illuminate\Support\Facades\File::get($file), true);
-            if (Str::endsWith($file, 'anssi-guide-hygiene.json') ||
-                Str::endsWith($file, 'anssi-genai-security-recommendations-1.0.json')) {
+            if (
+                Str::endsWith($file, 'anssi-guide-hygiene.json') ||
+                Str::endsWith($file, 'anssi-genai-security-recommendations-1.0.json')
+            ) {
                 \App\Models\YnhFramework::where('name', $json['name'])->delete();
                 Log::debug("{$file} skipped.");
             } else {
