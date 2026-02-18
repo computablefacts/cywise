@@ -14,6 +14,7 @@ use App\Models\PortTag;
 use App\Models\TimelineItem;
 use App\Models\User;
 use App\Models\YnhOsquery;
+use App\Models\YnhOsqueryRule;
 use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -146,6 +147,7 @@ class TimelineController extends Controller
             'asset_id' => ['nullable', 'integer', 'exists:am_assets,id'],
             'tld' => ['nullable', 'string'],
             'tags' => ['nullable', 'string'], // comma-separated list
+            'rule_name' => ['nullable', 'string'],
         ]);
         $objects = last(explode('/', trim($request->path(), '/')));
         $items = match ($objects) {
@@ -163,8 +165,8 @@ class TimelineController extends Controller
                     null
             ),
             'conversations' => $this->conversations(),
-            'events' => $this->events($params['server_id'] ?? null),
-            'ioc' => $this->iocs(10, $params['server_id'] ?? null, $params['level'] ?? null),
+            'events' => $this->events($params['server_id'] ?? null, $params['rule_name'] ?? null),
+            'ioc' => $this->iocs(10, $params['server_id'] ?? null, $params['level'] ?? null, $params['rule_name'] ?? null),
             'leaks' => $this->leaks(),
             'notes-and-memos' => $this->notesAndMemos(),
             'vulnerabilities' => $this->vulnerabilities(
@@ -208,6 +210,7 @@ class TimelineController extends Controller
             'nb_notes' => $items['nb_notes'] ?? 0,
             'nb_events' => $items['nb_events'] ?? 0,
             'nb_leaks' => $items['nb_leaks'] ?? 0,
+            'rules' => YnhOsqueryRule::where('enabled', true)->orderBy('name')->get(),
         ]);
     }
 
@@ -348,12 +351,13 @@ class TimelineController extends Controller
         ];
     }
 
-    private function events(?int $serverId = null): array
+    private function events(?int $serverId = null, ?string $ruleName = null): array
     {
         $request = new JsonRpcRequest([
             'server_id' => $serverId,
             'min_score' => 0,
             'max_score' => 0,
+            'rule_name' => $ruleName,
         ]);
         $request->setUserResolver(fn() => Auth::user());
         $events = (new EventsProcedure())->list($request)['events'];
@@ -380,11 +384,12 @@ class TimelineController extends Controller
         ];
     }
 
-    private function iocs(int $minScore = 1, ?int $serverId = null, ?string $level = null): array
+    private function iocs(int $minScore = 1, ?int $serverId = null, ?string $level = null, ?string $ruleName = null): array
     {
         $request = new JsonRpcRequest([
             'server_id' => $serverId,
             'min_score' => $minScore,
+            'rule_name' => $ruleName,
         ]);
         $request->setUserResolver(fn() => Auth::user());
         $events = (new EventsProcedure())->list($request)['events'];
