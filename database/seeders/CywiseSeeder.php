@@ -36,6 +36,7 @@ class CywiseSeeder extends Seeder
         $this->setupWave();
         $this->setupCywiseAdmin();
         $this->setupOssecRules();
+        $this->setupCustomOssecRules();
         $this->setupOsqueryRules();
         $this->setupCyberFrameworks();
         $this->setupCyberBuddy();
@@ -512,6 +513,86 @@ class CywiseSeeder extends Seeder
         $total = $ok + $ko;
 
         Log::debug("{$total} rules parsed. {$ok} OK. {$ko} KO.");
+    }
+
+    private function setupCustomOssecRules(): void
+    {
+        $path = database_path('seeders/misc/ossec.json');
+        if (!File::exists($path)) {
+            Log::warning("File not found: {$path}");
+            return;
+        }
+
+        $json = File::get($path);
+        $rules = json_decode($json, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::error("Failed to decode JSON from {$path}: " . json_last_error_msg());
+            return;
+        }
+
+        $policyUid = 'custom_ossec';
+        $policyName = 'Custom OSSEC Rules';
+        $policyDescription = 'Custom OSSEC rules imported from ossec.json';
+
+        $pol = \App\Models\YnhOssecPolicy::updateOrCreate([
+            'uid' => $policyUid,
+        ], [
+            'uid' => $policyUid,
+            'name' => $policyName,
+            'description' => $policyDescription,
+            'references' => [],
+            'requirements' => [],
+        ]);
+
+        $ok = 0;
+        $ko = 0;
+
+        foreach ($rules as $index => $rule) {
+            try {
+                $id = 50000 + $index;
+                $title = $rule['title'] ?? '';
+                $description = $rule['description'] ?? '';
+                $condition = $rule['match_type'] ?? 'all';
+                $references = collect($rule['references'] ?? [])->join(',');
+                $expressions = trim($rule['command'] ?? '');
+
+                if (!empty($expressions) && !Str::endsWith($expressions, ';')) {
+                    $expressions .= ';';
+                }
+
+                $str = "[{$title}] [$condition] [{$references}]\n{$expressions}";
+                $parsedRules = \App\Helpers\OssecRulesParser::parse($str);
+
+                if (count($parsedRules) <= 0 || count($parsedRules['rules']) <= 0) {
+                    Log::warning("Could not parse rule: {$str}");
+                    $ko++;
+                } else {
+                    \App\Models\YnhOssecCheck::updateOrCreate([
+                        'uid' => $id,
+                    ], [
+                        'ynh_ossec_policy_id' => $pol->id,
+                        'uid' => $id,
+                        'title' => $title,
+                        'description' => $description,
+                        'rationale' => '',
+                        'impact' => '',
+                        'remediation' => '',
+                        'compliance' => [],
+                        'references' => array_filter(explode(',', $references), fn(string $ref) => !empty($ref)),
+                        'requirements' => $parsedRules,
+                        'rule' => $str,
+                    ]);
+                    $ok++;
+                }
+            } catch (\Exception $e) {
+                Log::warning("Error importing rule index {$index}: " . $e->getMessage());
+                $ko++;
+            }
+        }
+
+        $total = $ok + $ko;
+        Log::debug("{$total} custom OSSEC rules parsed. {$ok} OK. {$ko} KO.");
     }
 
     private function setupOsqueryRules(): void
