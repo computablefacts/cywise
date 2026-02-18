@@ -536,6 +536,7 @@ class CywiseSeeder extends Seeder
         $policyName = 'Cywise OSSEC Rules';
         $policyDescription = 'Cywise OSSEC Rules';
 
+        // TODO : create one policy for each OS (see OssecCheckScript::hasScript and YnhOssecPolicy::isWindows, ...)
         $pol = \App\Models\YnhOssecPolicy::updateOrCreate([
             'uid' => $policyUid,
         ], [
@@ -579,7 +580,7 @@ class CywiseSeeder extends Seeder
                         'rationale' => '',
                         'impact' => '',
                         'remediation' => '',
-                        'compliance' => [], // TODO : add the OS here
+                        'compliance' => [],
                         'references' => array_filter(explode(',', $references), fn(string $ref) => !empty($ref)),
                         'requirements' => $parsedRules,
                         'rule' => $str,
