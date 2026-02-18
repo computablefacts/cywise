@@ -3,11 +3,9 @@
 namespace App\Helpers;
 
 use App\Hashing\TwHasher;
-use App\Models\Role;
 use App\Models\User;
 use App\Models\YnhServer;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class EventsSeeder
@@ -21,59 +19,40 @@ class EventsSeeder
 
     private static function firstOrCreateDismissTestUser(string $name, string $email, string $password): User
     {
-        /** @var User $user */
-        $user = User::query()->firstOrCreate(
-            ['email' => $email],
-            [
-                'name' => $name,
-                'email' => $email,
-                'password' => TwHasher::hash($password),
-                'type' => 'admin',
-            ]
-        );
+        $user = User::query()->where('email', '=', $email)->first();
 
-        self::addAdminRole($user);
+        if ($user) {
+            return $user;
+        }
+
+        /** @var User $user */
+        $user = User::factory([
+            'name' => $name,
+            'email' => $email,
+            'password' => TwHasher::hash($password),
+        ])->admin()->create();
 
         return $user;
-    }
-
-    private static function addAdminRole(User $dismissTestUser): void
-    {
-        $adminRole = Role::query()->where('name', Role::ADMIN)->first();
-
-        if ($adminRole) {
-            if (!DB::table('model_roles')
-                ->where('role_id', $adminRole->id)
-                ->where('model_id', $dismissTestUser->id)
-                ->exists()) {
-                DB::table('model_roles')
-                    ->insert([
-                        'role_id' => $adminRole->id,
-                        'model_type' => User::class,
-                        'model_id' => $dismissTestUser->id,
-                    ]);
-            }
-        }
     }
 
     public static function findOrCreateServers(int $count = self::SERVERS_COUNT): Collection
     {
         $user = self::getDismissTestUser();
         $existingServersCount = YnhServer::query()
-            ->where('user_id', '=', $user->id)
+            ->where('created_by', '=', $user->id)
             ->count();
 
         if ($existingServersCount < $count) {
             YnhServer::factory()
                 ->count($count - $existingServersCount)
                 ->state(fn(array $attributes) => [
-                    'user_id' => $user->id,
+                    'created_by' => $user->id,
                 ])
                 ->create();
         }
 
         $servers = YnhServer::query()
-            ->where('user_id', '=', $user->id)
+            ->where('created_by', '=', $user->id)
             ->limit($count)
             ->get();
 
