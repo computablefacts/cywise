@@ -149,7 +149,16 @@ class TimelineController extends Controller
             'tags' => ['nullable', 'string'], // comma-separated list
             'rule_name' => ['nullable', 'string'],
         ]);
+
+        $rulesList = YnhOsqueryRule::where('enabled', true)->orderBy('name')->get();
         $objects = last(explode('/', trim($request->path(), '/')));
+
+        if ($objects === 'events') {
+            $rulesList = $rulesList->filter(fn(YnhOsqueryRule $rule) => $rule->score <= 0);
+        } else if ($objects === 'ioc') {
+            $rulesList = $rulesList->filter(fn(YnhOsqueryRule $rule) => $rule->score > 0);
+        }
+
         $items = match ($objects) {
             'assets' => $this->assets(
                 $params['status'] ?? null,
@@ -184,6 +193,28 @@ class TimelineController extends Controller
             ),
             default => [],
         };
+
+        $rulesDetails = $rulesList->mapWithKeys(function (YnhOsqueryRule $rule) {
+            return [$rule->name => [
+                'id' => $rule->id,
+                'name' => $rule->name,
+                'display_name' => $rule->displayName(),
+                'description' => $rule->displayDescription(),
+                'platform' => $rule->platform->value,
+                'interval' => \Carbon\CarbonInterval::seconds($rule->interval)->cascade()->forHumans(),
+                'is_ioc' => $rule->is_ioc,
+                'score' => $rule->score,
+                'query' => $rule->query,
+                'tactics' => collect($rule->mitreAttckTactics())->map(fn(string $t) => Str::lower($t))->values(),
+                'mitre' => $rule->attck ? collect(explode(',', $rule->attck))->map(fn(string $uid) => [
+                    'uid' => $uid,
+                    'url' => Str::startsWith($uid, 'TA') ? "https://attack.mitre.org/tactics/$uid/" : "https://attack.mitre.org/techniques/$uid/"
+                ])->values() : [],
+                'can_edit' => isset($rule->created_by) || \Auth::user()?->isCywiseAdmin(),
+                'editor_url' => route('iframes.rules-editor', ['rule_id' => $rule->id]),
+            ]];
+        })->toArray();
+
         return view('theme::iframes.timeline', [
             'today_separator' => $this->separator(Carbon::now()),
             'items' => (
@@ -210,7 +241,9 @@ class TimelineController extends Controller
             'nb_notes' => $items['nb_notes'] ?? 0,
             'nb_events' => $items['nb_events'] ?? 0,
             'nb_leaks' => $items['nb_leaks'] ?? 0,
-            'rules' => YnhOsqueryRule::where('enabled', true)->orderBy('name')->get(),
+            'rules' => $rulesList,
+            'rulesDetails' => $rulesDetails,
+            'selectedRule' => $params['rule_name'] ?? null ? YnhOsqueryRule::where('name', $params['rule_name'])->first() : null,
         ]);
     }
 

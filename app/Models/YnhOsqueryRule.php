@@ -73,6 +73,14 @@ class YnhOsqueryRule extends Model
         return \Auth::user()?->isCywiseAdmin() ? $this->name : Str::after($this->name, 'cywise_');
     }
 
+    public function displayDescription(): string
+    {
+        if (Str::startsWith($this->comments, 'Needs further work on the collected data to be useful')) {
+            return $this->description;
+        }
+        return $this->comments ?? $this->description;
+    }
+
     public function mitreAttckTactics(): array
     {
         return $this->mitreAttck()->flatMap(fn(YnhMitreAttck $attck) => $attck->tactics)->unique()->sort()->toArray();

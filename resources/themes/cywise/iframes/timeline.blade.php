@@ -288,6 +288,12 @@
     transition: all 0.3s ease;
   }
 
+  .pre-light {
+    color: #565656;
+    padding: 0.5rem;
+    background-color: #fff3cd;
+  }
+
   .scroll-to-top:hover {
     background-color: var(--c-grey-500);
     transform: translateY(-1px);
@@ -366,13 +372,13 @@
         <form method="get" action="{{ route('iframes.events') }}" class="row g-2 align-items-end">
           <div class="col-sm-8">
             <label for="rule_name" class="form-label">
-              {{ __('Rule name') }}
+              {{ __('Rule') }}
             </label>
             <select id="rule_name" name="rule_name" class="form-select">
               <option value="">{{ __('All rules') }}</option>
               @foreach($rules as $rule)
               <option value="{{ $rule->name }}" {{ request('rule_name') === $rule->name ? 'selected' : '' }}>
-                {{ $rule->displayName() }}
+              {{ $rule->displayName() }}
               </option>
               @endforeach
             </select>
@@ -407,13 +413,13 @@
         <form method="get" action="{{ route('iframes.ioc') }}" class="row g-2 align-items-end">
           <div class="col-sm-8">
             <label for="rule_name" class="form-label">
-              {{ __('Rule name') }}
+              {{ __('Rule') }}
             </label>
             <select id="rule_name" name="rule_name" class="form-select">
               <option value="">{{ __('All rules') }}</option>
               @foreach($rules as $rule)
               <option value="{{ $rule->name }}" {{ request('rule_name') === $rule->name ? 'selected' : '' }}>
-                {{ $rule->displayName() }}
+              {{ $rule->displayName() }} ({{ $rule->score }} / 100)
               </option>
               @endforeach
             </select>
@@ -496,6 +502,173 @@
           <input type="hidden" name="asset_id" value="{{ request('asset_id') }}">
           @endif
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
+@if(isset($selectedRule))
+<div id="selected-rule-card" class="row mt-3 mb-1">
+  <div class="col">
+    <div class="card">
+      <div class="card-header pb-0">
+        <div class="row mt-2">
+          <div class="col">
+            <h6 id="rule-title">
+              @if(isset($selectedRule->created_by) || \Auth::user()?->isCywiseAdmin())
+              <a href="{{ route('iframes.rules-editor', ['rule_id' => $selectedRule->id]) }}">
+                {{ $selectedRule->displayName() }}
+              </a>
+              @else
+              {{ $selectedRule->displayName() }}
+              @endif
+            </h6>
+          </div>
+          <div class="col col-auto" id="rule-tactics">
+            @if(!empty($selectedRule->mitreAttckTactics()))
+            @foreach($selectedRule->mitreAttckTactics() as $tactic)
+            <span class="lozenge new">{{ \Illuminate\Support\Str::lower($tactic) }}</span>&nbsp;
+            @endforeach
+            @endif
+          </div>
+        </div>
+      </div>
+      <div class="card-body pt-0">
+        <div class="row mt-2">
+          <div class="col col-2 text-end">
+            <b>{{ __('Description') }}</b>
+          </div>
+          <div class="col">
+            <div class="text-muted" id="rule-description">
+              @if(\Illuminate\Support\Str::startsWith($selectedRule->comments, 'Needs further work on the collected data
+              to be useful'))
+              {{ $selectedRule->description }}
+              @else
+              {{ $selectedRule->comments }}
+              @endif
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col col-2 text-end">
+            <b>{{ __('Platform') }}</b>
+          </div>
+          <div class="col" id="rule-platform-info">
+        <span class="lozenge information" id="rule-platform">
+          {{ $selectedRule->platform->value }}
+        </span>&nbsp;
+            <span class="lozenge information" id="rule-interval">
+          {{ \Carbon\CarbonInterval::seconds($selectedRule->interval)->cascade()->forHumans() }}
+        </span>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col col-2 text-end">
+            <b>{{ __('IoC') }}</b>
+          </div>
+          <div class="col" id="rule-ioc-info">
+            @if($selectedRule->is_ioc)
+            <span class="lozenge error">{{ __('yes') }}</span>&nbsp;
+            @else
+            <span class="lozenge success">{{ __('no') }}</span>&nbsp;
+            @endif
+            @if($selectedRule->score >= 75)
+            <span class="lozenge error">{{ $selectedRule->score }}&nbsp;/&nbsp;100</span>
+            @elseif($selectedRule->score >= 50)
+            <span class="lozenge warning">{{ $selectedRule->score }}&nbsp;/&nbsp;100</span>
+            @elseif($selectedRule->score >= 25)
+            <span class="lozenge information">{{ $selectedRule->score }}&nbsp;/&nbsp;100</span>
+            @else
+            <span class="lozenge neutral">{{ $selectedRule->score }}&nbsp;/&nbsp;100</span>
+            @endif
+          </div>
+        </div>
+        <div id="rule-mitre-row" class="row mt-2" @if(empty($selectedRule->attck)) style="display: none;" @endif>
+          <div class="col col-2 text-end">
+            <b>{{ __('Mitre') }}</b>
+          </div>
+          <div class="col" id="rule-mitre-links">
+            @if(!empty($selectedRule->attck))
+            @foreach(explode(',', $selectedRule->attck) as $attck)
+            @if(\Illuminate\Support\Str::startsWith($attck, 'TA'))
+            <a href="https://attack.mitre.org/tactics/{{ $attck }}/" target="_blank">{{ $attck }}</a>&nbsp;
+            @else
+            <a href="https://attack.mitre.org/techniques/{{ $attck }}/" target="_blank">{{ $attck }}</a>&nbsp;
+            @endif
+            @endforeach
+            @endif
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col col-2 text-end">
+            <b>{{ __('Rule') }}</b>
+          </div>
+          <div class="col">
+            <div style="display:grid;">
+              <div class="overflow-auto">
+                <pre id="rule-query" class="mb-0 w-100 pre-light">{{ $selectedRule->query }}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@else
+<div id="selected-rule-card" class="row mt-3 mb-1" style="display: none;">
+  <div class="col">
+    <div class="card">
+      <div class="card-header pb-0">
+        <div class="row mt-2">
+          <div class="col">
+            <h6 id="rule-title"></h6>
+          </div>
+          <div class="col col-auto" id="rule-tactics"></div>
+        </div>
+      </div>
+      <div class="card-body pt-0">
+        <div class="row mt-2">
+          <div class="col col-2 text-end">
+            <b>{{ __('Description') }}</b>
+          </div>
+          <div class="col">
+            <div class="text-muted" id="rule-description"></div>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col col-2 text-end">
+            <b>{{ __('Platform') }}</b>
+          </div>
+          <div class="col" id="rule-platform-info">
+            <span class="lozenge information" id="rule-platform"></span>&nbsp;
+            <span class="lozenge information" id="rule-interval"></span>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col col-2 text-end">
+            <b>{{ __('IoC') }}</b>
+          </div>
+          <div class="col" id="rule-ioc-info"></div>
+        </div>
+        <div id="rule-mitre-row" class="row mt-2" style="display: none;">
+          <div class="col col-2 text-end">
+            <b>{{ __('Mitre') }}</b>
+          </div>
+          <div class="col" id="rule-mitre-links"></div>
+        </div>
+        <div class="row mt-2">
+          <div class="col col-2 text-end">
+            <b>{{ __('Rule') }}</b>
+          </div>
+          <div class="col">
+            <div style="display:grid;">
+              <div class="overflow-auto">
+                <pre id="rule-query" class="mb-0 w-100 pre-light"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -784,6 +957,103 @@
       elAddTag.classList.add('d-none');
     }
   };
+
+  /* RULES DYNAMIC DISPLAY */
+
+  const rulesDetails = @json($rulesDetails);
+
+  const updateRuleDisplay = (ruleName) => {
+
+    const elCard = document.getElementById('selected-rule-card');
+
+    if (!elCard) {
+      return;
+    }
+    if (!ruleName || !rulesDetails[ruleName]) {
+      elCard.style.display = 'none';
+      return;
+    }
+
+    const data = rulesDetails[ruleName];
+    elCard.style.display = 'flex';
+
+    // Title
+    const elTitle = elCard.querySelector('#rule-title');
+    if (data.can_edit) {
+      elTitle.innerHTML = `<a href="${data.editor_url}">${data.display_name}</a>`;
+    } else {
+      elTitle.textContent = data.display_name;
+    }
+
+    // Tactics
+    const elTactics = elCard.querySelector('#rule-tactics');
+    elTactics.innerHTML = '';
+    (data.tactics || []).forEach(tactic => {
+      const span = document.createElement('span');
+      span.className = 'lozenge new';
+      span.textContent = tactic;
+      elTactics.appendChild(span);
+      elTactics.appendChild(document.createTextNode('\u00A0'));
+    });
+
+    // Description
+    elCard.querySelector('#rule-description').textContent = data.description;
+
+    // Platform
+    elCard.querySelector('#rule-platform').textContent = data.platform;
+    elCard.querySelector('#rule-interval').textContent = data.interval;
+
+    // IoC & Score
+    const elIocInfo = elCard.querySelector('#rule-ioc-info');
+    let iocHtml = '';
+
+    if (data.is_ioc) {
+      iocHtml += `<span class="lozenge error">{{ __('yes') }}</span>&nbsp;`;
+    } else {
+      iocHtml += `<span class="lozenge success">{{ __('no') }}</span>&nbsp;`;
+    }
+
+    let scoreClass = 'neutral';
+
+    if (data.score >= 75) {
+      scoreClass = 'error';
+    } else if (data.score >= 50) {
+      scoreClass = 'warning';
+    } else if (data.score >= 25) {
+      scoreClass = 'information';
+    }
+
+    iocHtml += `<span class="lozenge ${scoreClass}">${data.score}&nbsp;/&nbsp;100</span>`;
+    elIocInfo.innerHTML = iocHtml;
+
+    // Mitre
+    const elMitreRow = elCard.querySelector('#rule-mitre-row');
+    const elMitreLinks = elCard.querySelector('#rule-mitre-links');
+
+    if (data.mitre && data.mitre.length > 0) {
+      elMitreRow.style.display = 'flex';
+      elMitreLinks.innerHTML = '';
+      data.mitre.forEach(m => {
+        const a = document.createElement('a');
+        a.href = m.url;
+        a.target = '_blank';
+        a.textContent = m.uid;
+        elMitreLinks.appendChild(a);
+        elMitreLinks.appendChild(document.createTextNode('\u00A0'));
+      });
+    } else {
+      elMitreRow.style.display = 'none';
+    }
+
+    // Query
+    elCard.querySelector('#rule-query').textContent = data.query;
+  };
+
+  document.querySelectorAll('select[name="rule_name"]').forEach(select => {
+    select.addEventListener('change', (e) => {
+      updateRuleDisplay(e.target.value);
+    });
+  });
 
 </script>
 @endpush
