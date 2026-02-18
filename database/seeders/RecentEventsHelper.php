@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers;
+namespace Database\Seeders;
 
 use App\Hashing\TwHasher;
 use App\Models\User;
@@ -8,7 +8,7 @@ use App\Models\YnhServer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
-class EventsSeeder
+class RecentEventsHelper
 {
     const int SERVERS_COUNT = 3;
 
