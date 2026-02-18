@@ -71,6 +71,7 @@ class EventsProcedure extends Procedure
         params: [
             "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise. (integer|required|min:0|max:100)",
             "max_score" => "An optional maximum score to filter events by. (integer|nullable|min:0|max:100)",
+            "rule_name" => "An optional rule name to filter events by. (string|nullable|min:0|max:191)",
             "server_id" => "An optional server id to filter events by.",
             "ip_address" => "An optional server IP address to filter events by. (string|nullable|min:4|max:15|exists:ynh_servers,ip_address)",
             "window" => "An optional window of time [min_date, max_date] to filter events by."
@@ -106,6 +107,7 @@ class EventsProcedure extends Procedure
         $params = $request->validate([
             'min_score' => 'integer|required|min:0|max:100',
             'max_score' => 'integer|nullable|min:0|max:100',
+            'rule_name' => 'string|nullable|min:0|max:191',
             'server_id' => 'integer|nullable|prohibits:ip_address|exists:ynh_servers,id',
             'ip_address' => 'string|nullable|prohibits:server_id|min:4|max:15|exists:ynh_servers,ip_address',
             'window' => 'array|nullable|min:2|max:2',
@@ -115,6 +117,7 @@ class EventsProcedure extends Procedure
         $serverId = $params['server_id'] ?? null;
         $minScore = $params['min_score'] ?? 0;
         $maxScore = $params['max_score'] ?? 100;
+        $ruleName = $params['rule_name'] ?? null;
 
         if (isset($params['window'])) {
             $minDate = Carbon::createFromFormat('Y-m-d', $params['window'][0])->startOfDay();
@@ -157,6 +160,9 @@ class EventsProcedure extends Procedure
             ->where('ynh_osquery_rules.score', '>=', $minScore)
             ->where('ynh_osquery_rules.score', '<=', $maxScore);
 
+        if (isset($ruleName)) {
+            $events = $events->where('ynh_osquery_rules.name', $ruleName);
+        }
         if ($dismissed->isNotEmpty()) {
             $tuples = $dismissed->map(fn(object $item) => "({$item->ynh_server_id}, {$item->ynh_osquery_rule_id})")->implode(',');
             $events = $events->whereRaw("(ynh_server_id, ynh_osquery_rule_id) NOT IN ({$tuples})");
