@@ -11,7 +11,9 @@ if [ $# -eq 0 ]; then
 
     echo -e "\nLe mode 'watch' va démarrer."
     echo -e "\nVous pouvez voir les logs en lançant dans un autre terminal :"
-    echo -e "  docker compose logs --timestamps --follow"
+    echo -e "  ./stack-dev.sh logs --timestamps --follow"
+    echo -e "\nOu vous pouvez executer une commande en lançant dans un autre terminal :"
+    echo -e "  ./stack-dev.sh exec app php artisan"
 
     docker compose $DEV_DOCKER_COMPOSE_FILES watch --no-up
 else
