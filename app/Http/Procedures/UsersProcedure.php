@@ -5,6 +5,7 @@ namespace App\Http\Procedures;
 use App\Events\SendAuditReport;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Sajya\Server\Procedure;
 
 class UsersProcedure extends Procedure
@@ -111,6 +112,39 @@ class UsersProcedure extends Procedure
 
         return [
             "msg" => "The email report has been sent to the user {$user->name}."
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Configure Telegram bot token for the current user and returns the webhook URL to set at Telegram.",
+        params: [
+            "bot_token" => "The Telegram bot token to save for this user.",
+        ],
+        result: [
+            "webhook" => "The absolute URL to configure as Telegram webhook.",
+        ]
+    )]
+    public function setTelegramBot(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'bot_token' => 'required|string|min:10|max:255',
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+        $user->telegram_bot_token = $params['bot_token'];
+
+        if (empty($user->telegram_webhook_secret)) {
+            $user->telegram_webhook_secret = Str::random(48);
+        }
+
+        $user->save();
+
+        $baseUrl = Str::rtrim(config('app.url'), '/');
+        $webhook = "{$baseUrl}/api/telegram/webhook/{$user->telegram_webhook_secret}";
+
+        return [
+            'webhook' => $webhook,
         ];
     }
 }

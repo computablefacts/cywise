@@ -28,6 +28,8 @@ use Wave\User as WaveUser;
  * @property string performa_secret
  * @property boolean terms_accepted
  * @property boolean gets_audit_report
+ * @property ?string telegram_bot_token
+ * @property ?string telegram_webhook_secret
  * @property ?int superset_id
  */
 class User extends WaveUser
@@ -57,6 +59,8 @@ class User extends WaveUser
         'am_api_token',
         'superset_id',
         'gets_audit_report',
+        'telegram_bot_token',
+        'telegram_webhook_secret',
     ];
 
     /**
@@ -68,6 +72,8 @@ class User extends WaveUser
         'password',
         'ynh_password',
         'remember_token',
+        'telegram_bot_token',
+        'telegram_webhook_secret',
     ];
 
     protected static function boot()
