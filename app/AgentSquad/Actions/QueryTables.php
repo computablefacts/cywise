@@ -19,7 +19,9 @@ class QueryTables extends AbstractAction
         $tables = Table::query()
             ->get()
             ->map(function (Table $table) {
-                $schema = implode(',', $table->schema);
+                $schema = collect($table->schema)
+                    ->map(fn(array $column) => $column['new_name'])
+                    ->join(",");
                 return "{$table->name}: {$table->description} (schema={$schema})";
             })
             ->join("\n- ");
