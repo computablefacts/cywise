@@ -518,6 +518,7 @@ class CywiseSeeder extends Seeder
     private function setupCustomOssecRules(): void
     {
         $path = database_path('seeders/misc/ossec.json');
+
         if (!File::exists($path)) {
             Log::warning("File not found: {$path}");
             return;
@@ -531,9 +532,9 @@ class CywiseSeeder extends Seeder
             return;
         }
 
-        $policyUid = 'custom_ossec';
-        $policyName = 'Custom OSSEC Rules';
-        $policyDescription = 'Custom OSSEC rules imported from ossec.json';
+        $policyUid = 'cywise_ossec';
+        $policyName = 'Cywise OSSEC Rules';
+        $policyDescription = 'Cywise OSSEC Rules';
 
         $pol = \App\Models\YnhOssecPolicy::updateOrCreate([
             'uid' => $policyUid,
@@ -578,7 +579,7 @@ class CywiseSeeder extends Seeder
                         'rationale' => '',
                         'impact' => '',
                         'remediation' => '',
-                        'compliance' => [],
+                        'compliance' => [], // TODO : add the OS here
                         'references' => array_filter(explode(',', $references), fn(string $ref) => !empty($ref)),
                         'requirements' => $parsedRules,
                         'rule' => $str,
@@ -592,7 +593,7 @@ class CywiseSeeder extends Seeder
         }
 
         $total = $ok + $ko;
-        Log::debug("{$total} custom OSSEC rules parsed. {$ok} OK. {$ko} KO.");
+        Log::debug("{$total} Cywise OSSEC rules parsed. {$ok} OK. {$ko} KO.");
     }
 
     private function setupOsqueryRules(): void
