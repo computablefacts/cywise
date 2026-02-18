@@ -327,14 +327,17 @@
           </div>
           <div class="col-sm-5">
             <label for="tags" class="form-label">
-              {{ __('Tags (comma-separated)') }}
+              {{ __('Tag') }}
             </label>
-            <input type="text"
-                   id="tags"
-                   name="tags"
-                   value="{{ request('tags') }}"
-                   class="form-control"
-                   placeholder="prod, external">
+            <select id="tags" name="tags" class="form-select">
+              <option value="">{{ __('All tags') }}</option>
+              @foreach($tags as $tag)
+              <option value="{{ $tag }}" {{ request(
+              'tags') === $tag ? 'selected' : '' }}>
+              {{ \Illuminate\Support\Str::ucfirst($tag) }}
+              </option>
+              @endforeach
+            </select>
           </div>
           <div class="col-sm-2">
             <label class="form-label d-block">&nbsp;</label>
@@ -377,7 +380,8 @@
             <select id="rule_name" name="rule_name" class="form-select">
               <option value="">{{ __('All rules') }}</option>
               @foreach($rules as $rule)
-              <option value="{{ $rule->name }}" {{ request('rule_name') === $rule->name ? 'selected' : '' }}>
+              <option value="{{ $rule->name }}" {{ request(
+              'rule_name') === $rule->name ? 'selected' : '' }}>
               {{ $rule->displayName() }}
               </option>
               @endforeach
@@ -418,7 +422,8 @@
             <select id="rule_name" name="rule_name" class="form-select">
               <option value="">{{ __('All rules') }}</option>
               @foreach($rules as $rule)
-              <option value="{{ $rule->name }}" {{ request('rule_name') === $rule->name ? 'selected' : '' }}>
+              <option value="{{ $rule->name }}" {{ request(
+              'rule_name') === $rule->name ? 'selected' : '' }}>
               {{ $rule->displayName() }} ({{ $rule->score }} / 100)
               </option>
               @endforeach
@@ -474,14 +479,17 @@
           </div>
           <div class="col-sm-5">
             <label for="tags" class="form-label">
-              {{ __('Tags (comma-separated)') }}
+              {{ __('Tag') }}
             </label>
-            <input type="text"
-                   id="tags"
-                   name="tags"
-                   value="{{ request('tags') }}"
-                   class="form-control"
-                   placeholder="prod, external">
+            <select id="tags" name="tags" class="form-select">
+              <option value="">{{ __('All tags') }}</option>
+              @foreach($tags as $tag)
+              <option value="{{ $tag }}" {{ request(
+              'tags') === $tag ? 'selected' : '' }}>
+              {{ \Illuminate\Support\Str::ucfirst($tag) }}
+              </option>
+              @endforeach
+            </select>
           </div>
           <div class="col-sm-2">
             <label class="form-label d-block">&nbsp;</label>

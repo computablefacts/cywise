@@ -9,6 +9,7 @@ use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Asset;
+use App\Models\AssetTag;
 use App\Models\Conversation;
 use App\Models\PortTag;
 use App\Models\TimelineItem;
@@ -244,6 +245,14 @@ class TimelineController extends Controller
             'rules' => $rulesList,
             'rulesDetails' => $rulesDetails,
             'selectedRule' => $params['rule_name'] ?? null ? YnhOsqueryRule::where('name', $params['rule_name'])->first() : null,
+            'tags' => AssetTag::query()
+                ->select('tag')
+                ->distinct()
+                ->orderBy('tag')
+                ->get()
+                ->map(fn(AssetTag $tag) => Str::lower($tag->tag))
+                ->unique()
+                ->values(),
         ]);
     }
 
