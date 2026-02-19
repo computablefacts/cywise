@@ -16,7 +16,6 @@ use App\Models\Honeypot;
 use App\Models\Prompt;
 use App\Models\Template;
 use App\Models\Vector;
-use App\Models\YnhBackup;
 use App\Models\YnhServer;
 use App\Observers\AssetObserver;
 use App\Observers\AssetTagHashObserver;
@@ -31,7 +30,6 @@ use App\Observers\HoneypotObserver;
 use App\Observers\PromptObserver;
 use App\Observers\TemplateObserver;
 use App\Observers\VectorObserver;
-use App\Observers\YnhBackupObserver;
 use App\Observers\YnhServerObserver;
 use App\Rules\AtLeastOneDigit;
 use App\Rules\AtLeastOneLetter;
@@ -117,7 +115,6 @@ class AppServiceProvider extends ServiceProvider
             return true;
         });
 
-        YnhBackup::observe(YnhBackupObserver::class);
         YnhServer::observe(YnhServerObserver::class);
 
         // AdversaryMeter

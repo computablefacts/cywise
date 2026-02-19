@@ -131,11 +131,6 @@ class YnhServer extends Model
         return $this->hasMany(YnhSshTraces::class, 'ynh_server_id', 'id');
     }
 
-    public function backups(): HasMany
-    {
-        return $this->hasMany(YnhBackup::class, 'ynh_server_id', 'id');
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
