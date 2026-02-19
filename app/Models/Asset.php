@@ -57,7 +57,7 @@ class Asset extends Model
 
     public function trial(): BelongsTo
     {
-        return $this->belongsTo(YnhTrial::class, 'ynh_trial_id', 'id');
+        return $this->belongsTo(Trial::class, 'ynh_trial_id', 'id');
     }
 
     public function isDns(): bool

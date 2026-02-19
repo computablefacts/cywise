@@ -18,9 +18,9 @@ use App\Models\RemoteAction;
 use App\Models\ScheduledTask;
 use App\Models\Table;
 use App\Models\Template;
+use App\Models\Trial;
 use App\Models\Vector;
 use App\Models\YnhServer;
-use App\Models\YnhTrial;
 use App\Observers\AssetObserver;
 use App\Observers\AssetTagHashObserver;
 use App\Observers\AssetTagObserver;
@@ -36,9 +36,9 @@ use App\Observers\RemoteActionObserver;
 use App\Observers\ScheduledTaskObserver;
 use App\Observers\TableObserver;
 use App\Observers\TemplateObserver;
+use App\Observers\TrialObserver;
 use App\Observers\VectorObserver;
 use App\Observers\YnhServerObserver;
-use App\Observers\YnhTrialObserver;
 use App\Rules\AtLeastOneDigit;
 use App\Rules\AtLeastOneLetter;
 use App\Rules\AtLeastOneLowercaseLetter;
@@ -124,7 +124,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         YnhServer::observe(YnhServerObserver::class);
-        YnhTrial::observe(YnhTrialObserver::class);
 
         // AdversaryMeter
         Asset::observe(AssetObserver::class);
@@ -132,6 +131,7 @@ class AppServiceProvider extends ServiceProvider
         AssetTag::observe(AssetTagObserver::class);
         HiddenAlert::observe(HiddenAlertObserver::class);
         Honeypot::observe(HoneypotObserver::class);
+        Trial::observe(TrialObserver::class);
 
         // CyberBuddy
         Chunk::observe(ChunkObserver::class);

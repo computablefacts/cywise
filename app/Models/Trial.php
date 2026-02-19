@@ -20,9 +20,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property boolean completed
  * @property ?int created_by
  */
-class YnhTrial extends Model
+class Trial extends Model
 {
     use HasFactory, HasTenant;
+
+    protected $table = 'ynh_trials';
 
     protected $fillable = [
         'hash',

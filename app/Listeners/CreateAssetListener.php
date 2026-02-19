@@ -8,7 +8,7 @@ use App\Models\Asset;
 use App\Models\AssetTag;
 use App\Models\Honeypot;
 use App\Models\User;
-use App\Models\YnhTrial;
+use App\Models\Trial;
 use App\Rules\IsValidAsset;
 use App\Rules\IsValidDomain;
 use App\Rules\IsValidIpAddress;
@@ -36,8 +36,8 @@ class CreateAssetListener extends AbstractListener
             return null;
         }
         if ($trialId > 0) {
-            /** @var YnhTrial $trial */
-            $trial = YnhTrial::where('id', $trialId)->firstOrFail();
+            /** @var Trial $trial */
+            $trial = Trial::where('id', $trialId)->firstOrFail();
             /** @var Asset $azzet */
             $azzet = Asset::where('asset', $asset)
                 ->where('created_by', $trial->created_by)
