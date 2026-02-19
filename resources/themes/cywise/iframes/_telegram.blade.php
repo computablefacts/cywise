@@ -100,10 +100,7 @@
         elWebhookCurl.textContent = "Cliquez sur \"Enregistrer\" pour afficher la commande curl du webhook.";
       }
 
-      getTelegramConfigurationApiCall(result => {
-        console.log(result);
-        updateWebhookOutputs(result['webhook'], result['bot_token']);
-      });
+      getTelegramConfigurationApiCall(result => updateWebhookOutputs(result['webhook'], result['bot_token']));
     }
   })();
 </script>
