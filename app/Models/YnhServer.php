@@ -141,11 +141,6 @@ class YnhServer extends Model
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(YnhOrder::class);
-    }
-
     public function isReady(): bool
     {
         return $this->is_ready !== null && $this->is_ready;
