@@ -54,6 +54,10 @@ class Alert extends Model
         'updated_at' => 'datetime',
     ];
 
+    protected $hidden = [
+        'ai_remediation'
+    ];
+
     public function asset(): Asset
     {
         return Asset::select('am_assets.*')
