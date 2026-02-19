@@ -7,6 +7,8 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
 use App\Models\TimelineItem;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -21,6 +23,7 @@ class NotesProcedure extends Procedure
     #[RpcMethod(
         description: 'Create a note.',
         params: [
+            'subject' => 'An optional subject of the note.',
             'note' => 'The note content.',
             'scopes' => "An optional set of scopes associated with the note such as 'CyberBuddy', 'Orchestrator' or 'SOC Operator'",
         ],
@@ -31,18 +34,25 @@ class NotesProcedure extends Procedure
     public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'note' => 'required|string|min:1|max:1000',
-            'scopes' => 'nullable|array|min:0|max:3',
+            'subject' => 'string|nullable|min:1|max:',
+            'note' => 'string|required|min:1|max:1000',
+            'scopes' => 'array|nullable|min:0|max:3',
             'scopes.*' => 'string|in:CyberBuddy,Orchestrator,SOC Operator',
         ]);
 
         /** @var User $user */
         $user = $request->user();
+        $subject = $params['subject'] ?? '';
+        $body = $params['note'];
         $scopes = $params['scopes'] ?? [NotesProcedure::SCOPE_IS_CYBERBUDDY];
-        $item = TimelineItem::createNote($user, $params['note'], '', $scopes);
+        $item = TimelineItem::createItem($user->id, 'note', Carbon::now(), 0, [
+            'body' => Str::limit(trim($body), 10000 - 3, '...'),
+            'subject' => Str::limit(trim($subject), 10000 - 3, '...'),
+            'scopes' => json_encode($scopes),
+        ]);
 
         // Transform URLs provided by the user into notes
-        ProcessIncomingEmails::extractAndSummarizeHyperlinks($params['note']);
+        ProcessIncomingEmails::extractAndSummarizeHyperlinks($body);
 
         return [
             "msg" => "Your note has been saved!",
@@ -68,7 +78,7 @@ class NotesProcedure extends Procedure
         /** @var User $user */
         $user = $request->user();
         /** @var TimelineItem $item */
-        $item = TimelineItem::fetchNotes($user->id, null, null, 0)
+        $item = TimelineItem::fetchItems($user->id, 'note', null, null, 0)
             ->filter(fn(TimelineItem $item) => $item->id == $params['note_id'])
             ->firstOrFail();
         $item->deleteItem();
@@ -99,7 +109,7 @@ class NotesProcedure extends Procedure
         $scope = $params['scope'] ?? null;
 
         return [
-            'notes' => TimelineItem::fetchNotes($user->id, null, null, 0)
+            'notes' => TimelineItem::fetchItems($user->id, 'note', null, null, 0)
                 ->filter(function (TimelineItem $note) use ($scope) {
                     if ($scope === null) {
                         return true;
@@ -113,7 +123,8 @@ class NotesProcedure extends Procedure
                         'creation_date' => $note->timestamp,
                         'subject' => $attributes['subject'] ?? 'Unknown subject',
                         'body' => $attributes['body'] ?? '',
-                        'scopes' => json_decode($attributes['scopes'] ?? '[]')
+                        'scopes' => json_decode($attributes['scopes'] ?? '[]'),
+                        'item' => $note,
                     ];
                 })
                 ->values(),

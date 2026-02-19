@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Iframes;
 use App\Helpers\JosianeClient;
 use App\Http\Controllers\Controller;
 use App\Http\Procedures\EventsProcedure;
+use App\Http\Procedures\NotesProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
@@ -612,11 +613,13 @@ class TimelineController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        $notes = TimelineItem::fetchNotes($user->id, null, null, 0);
+        $request = new JsonRpcRequest();
+        $request->setUserResolver(fn() => $user);
+        $notes = (new NotesProcedure())->list($request)['notes'];
 
         return [
             'nb_notes' => $notes->count(),
-            'items' => $notes->map(fn(TimelineItem $item) => self::noteAndMemo($user, $item)),
+            'items' => $notes->map(fn(array $item) => self::noteAndMemo($user, $item['item'])),
         ];
     }
 

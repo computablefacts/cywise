@@ -6,12 +6,12 @@ use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\AgentSquad\Providers\WebpagesProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
+use App\Http\Procedures\NotesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Mail\SimpleEmail;
 use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\File;
-use App\Models\TimelineItem;
 use App\Models\User;
 use App\Rules\IsValidCollectionName;
 use Illuminate\Bus\Queueable;
@@ -58,15 +58,16 @@ class ProcessIncomingEmails implements ShouldQueue
 
             if (!empty($url)) {
 
-                /** @var TimelineItem $note */
-                $note = TimelineItem::fetchNotes($user->id, null, null, 0, [[
-                    ['subject', '=', $url]
-                ]])->first();
+                $request = new JsonRpcRequest();
+                $request->setUserResolver(fn() => $user);
+                $note = (new NotesProcedure())->list($request)['notes']
+                    ->map(fn(array $item) => $item['subject'] === $url)
+                    ->first();
 
                 if ($note) {
                     $result[] = [
                         'url' => $url,
-                        'summary' => $note->attributes()['body'],
+                        'summary' => $note['body'],
                     ];
                 } else {
                     try {
@@ -85,12 +86,22 @@ class ProcessIncomingEmails implements ShouldQueue
                     }
                     if (count($result) > 0) {
                         $note = $result[count($result) - 1];
-                        TimelineItem::createNote($user, $note['summary'], $note['url']);
+                        self::createNote($user, $note['summary'], $note['url']);
                     }
                 }
             }
         }
         return $result;
+    }
+
+    private static function createNote(User $user, string $body, string $subject = ''): void
+    {
+        $request = new JsonRpcRequest([
+            'subject' => $subject,
+            'note' => $body,
+        ]);
+        $request->setUserResolver(fn() => $user);
+        (new NotesProcedure())->create($request);
     }
 
     public function __construct()
@@ -260,7 +271,7 @@ class ProcessIncomingEmails implements ShouldQueue
         }
         if (!empty($body)) {
 
-            TimelineItem::createNote($user, $body, $message->getSubject()->toString());
+            self::createNote($user, $body, $message->getSubject()->toString());
             self::extractAndSummarizeHyperlinks($body);
 
             if ($message->hasAttachments()) {
@@ -270,14 +281,14 @@ class ProcessIncomingEmails implements ShouldQueue
                 if ($collection) { // TODO : move to privcol{user_id} ?
                     $message->attachments()->each(function (Attachment $attachment) use ($user, $collection) {
                         if (!$attachment->save("/tmp/")) {
-                            TimelineItem::createNote($user, "Attachment {$attachment->filename} could not be added to {$collection->name}.", "An error occurred.");
+                            self::createNote($user, "Attachment {$attachment->filename} could not be added to {$collection->name}.", "An error occurred.");
                             Log::error("Attachment {$attachment->name} could not be saved!");
                         } else {
                             $path = "/tmp/{$attachment->filename}";
                             // TODO : deal with duplicate files using the md5/sha1 file hash
                             $url = \App\Http\Controllers\CyberBuddyController::saveLocalFile($collection, $path);
                             unlink($path);
-                            TimelineItem::createNote($user, "{$attachment->filename} has been added to {$collection->name}.", "Attachment saved!");
+                            self::createNote($user, "{$attachment->filename} has been added to {$collection->name}.", "Attachment saved!");
                         }
                     });
                 }
