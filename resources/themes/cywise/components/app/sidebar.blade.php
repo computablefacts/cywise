@@ -199,7 +199,6 @@ $user = \Auth::user();
                                   id="datamanagement_dropdown"
                                   :active="false"
                                   :open="(
-                          Request::is('prompts') ||
                           Request::is('tables') ||
                           Request::is('collections') ||
                           Request::is('documents') ||
@@ -248,6 +247,7 @@ $user = \Auth::user();
                                   id="admin_dropdown"
                                   :active="false"
                                   :open="(
+                          Request::is('prompts') ||
                           Request::is('users') ||
                           Request::is('shares') ||
                           Request::is('roles-and-permissions') ||
