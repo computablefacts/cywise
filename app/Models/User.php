@@ -166,9 +166,7 @@ class User extends WaveUser
      */
     public function actAs(): void
     {
-        if (Auth::setUser($this)) {
-            Log::debug('The authenticated user is now : ' . Auth::user()->email);
-        } else {
+        if (!Auth::setUser($this)) {
             Log::error('User::actAs() failed for user : ' . $this->email);
         }
     }
