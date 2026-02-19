@@ -414,5 +414,13 @@
     executeJsonRpcApiCall('scheduled-tasks@delete', {task_id: taskId}, onSuccess, onError);
   }
 
+  function setTelegramConfigurationApiCall(botToken, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('users@setTelegramConfiguration', {bot_token: botToken}, onSuccess, onErrorDefault, onFinally);
+  }
+
+  function getTelegramConfigurationApiCall(onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('users@getTelegramConfiguration', {}, onSuccess);
+  }
+
 </script>
 @endonce

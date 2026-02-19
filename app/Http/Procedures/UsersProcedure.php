@@ -124,7 +124,7 @@ class UsersProcedure extends Procedure
             "webhook" => "The absolute URL to configure as Telegram webhook.",
         ]
     )]
-    public function setTelegramBot(JsonRpcRequest $request): array
+    public function setTelegramConfiguration(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'bot_token' => 'required|string|min:10|max:255',
@@ -144,6 +144,34 @@ class UsersProcedure extends Procedure
         $webhook = "{$baseUrl}/api/telegram/webhook/{$user->telegram_webhook_secret}";
 
         return [
+            'webhook' => $webhook,
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Get Telegram's configuration for the current user.",
+        params: [],
+        result: [
+            "bot_token" => "The Telegram bot token of the current user.",
+            "webhook" => "The absolute URL to configure as Telegram webhook or an empty string.",
+        ]
+    )]
+    public function getTelegramConfiguration(JsonRpcRequest $request): array
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        if (empty($user->telegram_bot_token) || empty($user->telegram_webhook_secret)) {
+            return [
+                'webhook' => '',
+            ];
+        }
+
+        $baseUrl = Str::rtrim(config('app.url'), '/');
+        $webhook = "{$baseUrl}/api/telegram/webhook/{$user->telegram_webhook_secret}";
+
+        return [
+            'bot_token' => $user->telegram_bot_token,
             'webhook' => $webhook,
         ];
     }

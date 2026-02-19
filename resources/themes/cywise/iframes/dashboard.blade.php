@@ -596,12 +596,19 @@ $apps = \App\Models\YnhServer::forUser(request()->user())
 </div>
 <!-- ACTIONS : BEGIN -->
 <!-- AGENTS & METRICS : BEGIN -->
-<div class="row pb-3">
+<div class="row">
   <div class="col">
     @include('theme::iframes._agent')
   </div>
 </div>
 <!-- AGENTS & METRICS : END -->
+<!-- TELEGRAM : BEGIN -->
+<div class="row pb-3">
+  <div class="col">
+    @include('theme::iframes._telegram')
+  </div>
+</div>
+<!-- TELEGRAM : END -->
 @endsection
 
 @push('scripts')
