@@ -3,8 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\SendAuditReport;
-use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Procedures\EventsProcedure;
+use App\Http\Procedures\LeaksProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Mail\SimpleEmail;
 use App\Models\Alert;
@@ -125,7 +125,7 @@ class SendAuditReportListener extends AbstractListener
     {
         $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->subDay())->count();
 
-        $nbLeaks = TimelineController::fetchLeaks($user)
+        $nbLeaks = $this->fetchLeaks($user)
             ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
             ->unique()
             ->count();
@@ -168,7 +168,7 @@ class SendAuditReportListener extends AbstractListener
         $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->startOfDay()->subWeek())
             ->count();
 
-        $nbLeaks = TimelineController::fetchLeaks($user)
+        $nbLeaks = $this->fetchLeaks($user)
             ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
             ->unique()
             ->count();
@@ -253,7 +253,7 @@ class SendAuditReportListener extends AbstractListener
 
     private function buildSectionLeaks(User $user): string
     {
-        $leaks = TimelineController::fetchLeaks($user, Carbon::now()->utc()->subDays(7))
+        $leaks = $this->fetchLeaks($user, Carbon::now()->utc()->subDays(7))
             ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
             ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE)
             ->reverse()
@@ -366,5 +366,16 @@ class SendAuditReportListener extends AbstractListener
             <h3>Analyse de l'activité des serveurs</h3>
             <ul>{$activity->implode('')}</ul>
         ";
+    }
+
+    private function fetchLeaks(User $user, ?Carbon $createdAtOrAfter = null): Collection
+    {
+        if ($createdAtOrAfter) {
+            $request = new JsonRpcRequest(['created_at_or_after' => $createdAtOrAfter->toIso8601String()]);
+        } else {
+            $request = new JsonRpcRequest();
+        }
+        $request->setUserResolver(fn() => $user);
+        return (new LeaksProcedure())->list($request)['leaks'];
     }
 }

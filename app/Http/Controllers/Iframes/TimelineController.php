@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Iframes;
 
-use App\Helpers\JosianeClient;
 use App\Http\Controllers\Controller;
 use App\Http\Procedures\EventsProcedure;
+use App\Http\Procedures\LeaksProcedure;
 use App\Http\Procedures\NotesProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
@@ -27,89 +27,6 @@ use Illuminate\View\View;
 
 class TimelineController extends Controller
 {
-    public static function fetchLeaks(User $user, ?Carbon $createdAtOrAfter = null): Collection
-    {
-        $now = Carbon::now()->utc()->subDays(15);
-        $leaks = TimelineItem::fetchLeaks($user->id, $now, null, 0);
-
-        if ($leaks->isEmpty()) {
-
-            $tlds = "'" . Asset::select('am_assets.*')
-                    ->join('users', 'users.id', '=', 'am_assets.created_by')
-                    ->when($user->tenant_id, fn($query, $tenantId) => $query->where('users.tenant_id', $tenantId))
-                    ->when($user->customer_id, fn($query, $customerId) => $query->where('users.customer_id', $customerId))
-                    ->get()
-                    ->map(fn(Asset $asset) => $asset->tld())
-                    ->filter(fn(?string $tld) => !empty($tld))
-                    ->unique()
-                    ->join("','") . "'";
-
-            if ($tlds === "''") {
-                $leaks = collect();
-            } else {
-                $query = "
-                  SELECT DISTINCT 
-                    min(db_date) AS leak_date, 
-                    lower(concat(login, '@', login_email_domain)) AS email, 
-                    concat(url_scheme, '://', url_subdomain, '.', url_domain) AS website, 
-                    password
-                  FROM dumps_login_email_domain 
-                  WHERE login_email_domain IN ({$tlds})
-                  GROUP BY email, website, password
-                  ORDER BY email, website ASC
-                ";
-
-                // Log::debug($query);
-
-                $output = JosianeClient::executeQuery($query);
-                $leaks = collect(explode("\n", $output))
-                    ->filter(fn(string $line) => !empty($line) && $line !== 'ok')
-                    ->map(function (string $line) {
-                        $obj = explode("\t", $line);
-                        return [
-                            'leak_date' => Str::before(Str::trim($obj[0]), ' '),
-                            'email' => Str::trim($obj[1] ?? ''),
-                            'website' => Str::trim($obj[2] ?? ''),
-                            'password' => self::maskPassword(Str::trim($obj[3] ?? '')),
-                        ];
-                    })
-                    ->map(function (array $credentials) {
-                        // if (preg_match("/(?i)\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|(([^\s()<>]+|(([^\s()<>]+)))*))+(?:(([^\s()<>]+|(([^\s()<>]+)))*)|[^\s`!()[]{};:'\".,<>?«»“”‘’]))/", $credentials['website'])) {
-                        if (filter_var($credentials['website'], FILTER_VALIDATE_URL)) {
-                            return $credentials;
-                        }
-                        return [
-                            'leak_date' => $credentials['leak_date'],
-                            'email' => $credentials['email'],
-                            'website' => '',
-                            'password' => $credentials['password'],
-                        ];
-                    })
-                    ->unique(fn(array $credentials) => $credentials['email'] . $credentials['website'] . $credentials['password']);
-            }
-            if (count($leaks) > 0) {
-
-                // Get previous leaks
-                $leaksPrev = TimelineItem::fetchLeaks($user->id, null, $now, 0)
-                    ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']));
-
-                $leaks = $leaks->filter(function (array $leak) use ($leaksPrev) {
-                    return !$leaksPrev->contains(function (object $leakPrev) use ($leak) {
-                        return $leakPrev->email === $leak['email'] &&
-                            $leakPrev->website === $leak['website'] &&
-                            $leakPrev->password === $leak['password'];
-                    });
-                });
-
-                // Only add the new leaks
-                if (count($leaks) > 0) {
-                    $leaks->chunk(10)->each(fn(Collection $leaksChunk) => TimelineItem::createLeak($user, $leaksChunk->values()->toArray()));
-                }
-            }
-        }
-        return TimelineItem::fetchLeaks($user->id, $createdAtOrAfter, null, 0);
-    }
-
     public static function noteAndMemo(User $user, TimelineItem $item): array
     {
         $timestamp = $item->timestamp->utc()->format('Y-m-d H:i:s');
@@ -584,7 +501,9 @@ class TimelineController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        $leaks = self::fetchLeaks($user);
+        $request = new JsonRpcRequest();
+        $request->setUserResolver(fn() => $user);
+        $leaks = (new LeaksProcedure())->list($request)['leaks'];
 
         return [
             'nb_leaks' => $leaks->count(),
