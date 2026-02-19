@@ -3,7 +3,7 @@
 <div class="card mt-3">
   <div class="card-body">
     <h6 class="card-title text-truncate">
-      Interagir avec Cywise au travers d'un bot Telegram
+      Interagir avec Cywise au moyen d'un bot Telegram
     </h6>
     <p class="mb-2">
       Pour utiliser Cywise depuis Telegram, vous devez créer un bot Telegram et configurer son webhook.
@@ -40,8 +40,8 @@
       <b>3. Configurer le webhook côté Telegram</b>
     </p>
     <p>
-      Après avoir enregistré le token auprès de Cywise, vous obtiendrez l'URL du webhook à déclarer auprès de Telegram.
-      Utilisez ensuite la commande curl ci-dessous pour définir le webhook :
+      Après avoir enregistré le token auprès de Cywise, vous obtiendrez l'URL d'un webhook. Utilisez la commande curl
+      ci-dessous pour déclarer ce webhook auprès de Telegram :
     </p>
     <pre class="mb-2" style="white-space: pre-wrap"><code id="tg-webhook-curl">(en attente — enregistrez d'abord le token)</code></pre>
     <p>
@@ -49,11 +49,11 @@
     </p>
     <pre class="mb-2" style="white-space: pre-wrap"><code id="tg-webhook-info">curl -s https://api.telegram.org/bot&lt;BOT_TOKEN&gt;/getWebhookInfo | jq</code></pre>
     <p>
-      <b>4. C'est fini ! Vous pouvez maintenant interagir avec Cywise via Telegram</b>
+      <b>4. C'est fini ! Vous pouvez maintenant interagir avec Cywise au moyen de Telegram</b>
     </p>
     <p>
-      Une fois le webhook actif, envoyez un message à votre bot dans Telegram : il répondra via CyberBuddy, dans le
-      contexte de votre compte Cywise.
+      Une fois le webhook actif, envoyez un message à votre bot Telegram : il répondra via <a
+          href="{{ route('iframes.cyberbuddy') }}">CyberBuddy</a>, dans le contexte de votre compte Cywise.
     </p>
   </div>
 </div>
