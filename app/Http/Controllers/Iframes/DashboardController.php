@@ -11,7 +11,6 @@ use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Honeypot;
-use App\Models\TimelineItem;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -61,8 +60,6 @@ class DashboardController extends Controller
         }
 
         $leaks = (new LeaksProcedure())->list(JsonRpcRequest::createFrom($request))['leaks']
-            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
-            ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE)
             ->reverse()
             ->take(10);
 

@@ -127,7 +127,10 @@ class LeaksProcedure extends Procedure
             }
         }
         return [
-            'leaks' => TimelineItem::fetchItems($user->id, 'leak', $createdAtOrAfter, null, 0),
+            'leaks' => TimelineItem::fetchItems($user->id, 'leak', $createdAtOrAfter, null, 0)
+                ->flatMap(fn(TimelineItem $item) => collect(json_decode($item->attributes()['credentials'], true))
+                    ->map(fn(array $credentials) => (object)array_merge(['timestamp' => $item->timestamp], $credentials)))
+                ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE),
         ];
     }
 

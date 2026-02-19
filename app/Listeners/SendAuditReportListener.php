@@ -9,7 +9,6 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Mail\SimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
-use App\Models\TimelineItem;
 use App\Models\User;
 use App\Models\YnhServer;
 use Carbon\Carbon;
@@ -125,10 +124,7 @@ class SendAuditReportListener extends AbstractListener
     {
         $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->subDay())->count();
 
-        $nbLeaks = $this->fetchLeaks($user)
-            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
-            ->unique()
-            ->count();
+        $nbLeaks = $this->fetchLeaks($user)->unique()->count();
 
         $nbHigh = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
@@ -168,10 +164,7 @@ class SendAuditReportListener extends AbstractListener
         $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->startOfDay()->subWeek())
             ->count();
 
-        $nbLeaks = $this->fetchLeaks($user)
-            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
-            ->unique()
-            ->count();
+        $nbLeaks = $this->fetchLeaks($user)->unique()->count();
 
         $nbDns = $assets->filter(fn(Asset $asset) => $asset->is_monitored && $asset->isDns())
             ->pluck('asset')
@@ -254,8 +247,6 @@ class SendAuditReportListener extends AbstractListener
     private function buildSectionLeaks(User $user): string
     {
         $leaks = $this->fetchLeaks($user, Carbon::now()->utc()->subDays(7))
-            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
-            ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE)
             ->reverse()
             ->map(function (object $leak) {
 

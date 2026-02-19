@@ -46,17 +46,6 @@ class TimelineController extends Controller
         ];
     }
 
-    private static function maskPassword(string $password, int $size = 3): string
-    {
-        if (Str::length($password) <= 2) {
-            return Str::repeat('*', Str::length($password));
-        }
-        if (Str::length($password) <= 2 * $size) {
-            return self::maskPassword($password, 1);
-        }
-        return Str::substr($password, 0, $size) . Str::repeat('*', Str::length($password) - 2 * $size) . Str::substr($password, -$size, $size);
-    }
-
     public function __invoke(Request $request): View
     {
         $params = $request->validate([
@@ -507,9 +496,9 @@ class TimelineController extends Controller
 
         return [
             'nb_leaks' => $leaks->count(),
-            'items' => $leaks->map(function (TimelineItem $item) use ($user) {
+            'items' => $leaks->chunk(25)->map(function (Collection $leaks) use ($user) {
 
-                $timestamp = $item->timestamp->utc()->format('Y-m-d H:i:s');
+                $timestamp = $leaks->first()->timestamp->utc()->format('Y-m-d H:i:s');
                 $date = Str::before($timestamp, ' ');
                 $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
 
@@ -521,7 +510,7 @@ class TimelineController extends Controller
                         'date' => $date,
                         'time' => $time,
                         'user' => $user,
-                        'leak' => $item,
+                        'leaks' => $leaks,
                     ])->render(),
                 ];
             }),
