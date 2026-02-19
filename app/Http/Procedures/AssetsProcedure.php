@@ -109,7 +109,20 @@ class AssetsProcedure extends Procedure
             "if the request is 'Can you provide information about my website example.com?', the input should be {\"asset\":\"example.com\"}",
             "if the request is 'retrieve detailed information about 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\"}",
         ],
-        ai_result: "@json(\$result)",
+        ai_result: "
+            The user's tags associated to {{ \$result['asset'] }} are {{ implode(', ', \$result['tags']) }}.
+            @if(!empty(\$result['timeline']['sentinel']['end']))
+            A full scan of {{ \$result['asset'] }} returned {{ count(\$result['vulnerabilities']) }} vulnerabilities and {{ count(\$result['ports']) }} open ports.
+            @elseif(!empty(\$result['timeline']['sentinel']['start']))
+            A vulnerability scan is running for {{ \$result['asset'] }}.
+            @elseif(!empty(\$result['timeline']['nmap']['end']))
+            A vulnerability scan will start soon for {{ \$result['asset'] }}.
+            @elseif(!empty(\$result['timeline']['nmap']['start']))
+            A port scan is running for {{ \$result['asset'] }}.
+            @else
+            A port scan will start soon for {{ \$result['asset'] }}.
+            @endif
+        ",
     )]
     public function get(JsonRpcRequest $request): array
     {
@@ -276,7 +289,7 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Create a single asset.",
+        description: "Create and optionally monitor an asset.",
         params: [
             "asset" => "The asset as an IP address or a DNS. (string|required|min:1|max:191)",
             "watch" => "True if the asset should be monitored directly after the creation. False otherwise. (boolean)",
