@@ -83,6 +83,7 @@ class TelegramWebhookController extends Controller
         $answer = str_replace(['<p>', '</p>'], ["\n", "\n"], $answer);
         $answer = str_replace(['<br>', '<br/>', '<br />'], "\n", $answer);
         $answer = strip_tags($answer, '<b><i><a><code><pre>');
+        $answer = preg_replace("/\n{3,}/", "\n\n", $answer);
         $answer = Str::trim($answer);
 
         if ($answer === '') {
