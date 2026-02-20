@@ -30,10 +30,7 @@ class QueryTables extends AbstractAction
             "type" => "function",
             "function" => [
                 "name" => "query_tables",
-                "description" => "
-Answer analytical questions by querying structured tables. The following tables and schemas are available:
-- {$tables}
-                ",
+                "description" => "Answer analytical questions by querying structured tables. The following tables and schemas are available:\n- {$tables}",
                 "parameters" => [
                     "type" => "object",
                     "properties" => [
