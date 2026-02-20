@@ -123,10 +123,10 @@ class VulnerabilitiesProcedure extends Procedure
                     $query = $asset->alerts();
                 }
                 if ($portTags) {
-                    $query->join('am_ports_tags', 'am_ports_tags.port_id', '=', 'am_alerts.port_id')
+                    $query->join('am_ports_tags', 'am_ports_tags.port_id', '=', 'alerts_dedup.port_id')
                         ->whereIn('am_ports_tags.tag', $portTags);
                 }
-                return $query->get();
+                return $query->distinct()->get();
             })
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 

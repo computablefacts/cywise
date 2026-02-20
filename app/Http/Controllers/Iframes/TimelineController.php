@@ -169,8 +169,11 @@ class TimelineController extends Controller
                 ->map(fn(AssetTag $tag) => Str::lower($tag->tag))
                 ->unique()
                 ->values(),
-            'portTags' => PortTag::query()
+            'port_tags' => PortTag::query()
                 ->select('tag')
+                ->join('am_ports', 'am_ports.id', '=', 'am_ports_tags.port_id')
+                ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
+                ->whereIn('am_scans.asset_id', Asset::query()->pluck('id'))
                 ->distinct()
                 ->orderBy('tag')
                 ->get()
