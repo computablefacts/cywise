@@ -43,11 +43,21 @@
       Après avoir enregistré le token auprès de Cywise, vous obtiendrez l'URL d'un webhook. Utilisez la commande curl
       ci-dessous pour déclarer ce webhook auprès de Telegram :
     </p>
-    <pre class="mb-2" style="white-space: pre-wrap"><code id="tg-webhook-curl">(en attente — enregistrez d'abord le token)</code></pre>
+    <div class="mb-2">
+      <div class="input-group">
+        <input type="text" id="tg-webhook-curl" class="form-control" readonly placeholder="(en attente — enregistrez d'abord le token)">
+        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('tg-webhook-curl')">Copier</button>
+      </div>
+    </div>
     <p>
       <b>Astuce :</b> vous pouvez ensuite vérifier la configuration de Telegram avec <code>getWebhookInfo</code> :
     </p>
-    <pre class="mb-2" style="white-space: pre-wrap"><code id="tg-webhook-info">curl -s https://api.telegram.org/bot&lt;BOT_TOKEN&gt;/getWebhookInfo | jq</code></pre>
+    <div class="mb-2">
+      <div class="input-group">
+        <input type="text" id="tg-webhook-info" class="form-control" readonly placeholder="curl -s https://api.telegram.org/bot<BOT_TOKEN>/getWebhookInfo | jq">
+        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('tg-webhook-info')">Copier</button>
+      </div>
+    </div>
     <p>
       <b>4. C'est fini ! Vous pouvez maintenant interagir avec Cywise au moyen de Telegram</b>
     </p>
@@ -60,6 +70,15 @@
 
 @push('scripts')
 <script>
+  function copyToClipboard(id) {
+    const el = document.getElementById(id);
+    el.select();
+    document.execCommand('copy');
+    if (toaster) {
+      toaster.toastSuccess("Copié dans le presse-papier");
+    }
+  }
+
   (function () {
 
     const elBtn = document.getElementById('tg-save-token');
@@ -69,10 +88,10 @@
 
     function updateWebhookOutputs(webhook, token) {
       if (token && webhook && elWebhookCurl) {
-        elWebhookCurl.textContent = `curl -s "https://api.telegram.org/bot${token}/setWebhook" -d url=${webhook}`;
+        elWebhookCurl.value = `curl -s "https://api.telegram.org/bot${token}/setWebhook" -d url=${webhook}`;
       }
       if (token && elWebhookInfo) {
-        elWebhookInfo.textContent = `curl -s https://api.telegram.org/bot${token}/getWebhookInfo | jq`;
+        elWebhookInfo.value = `curl -s https://api.telegram.org/bot${token}/getWebhookInfo | jq`;
       }
     }
 
@@ -97,7 +116,7 @@
       const existingToken = (elInput.value || '').trim();
 
       if (existingToken) {
-        elWebhookCurl.textContent = "Cliquez sur \"Enregistrer\" pour afficher la commande curl du webhook.";
+        elWebhookCurl.placeholder = "Cliquez sur \"Enregistrer\" pour afficher la commande curl du webhook.";
       }
 
       getTelegramConfigurationApiCall(result => updateWebhookOutputs(result['webhook'], result['bot_token']));
