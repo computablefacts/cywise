@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Requests\JsonRpcRequest;
+use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\User;
+use App\Rules\IsValidCollectionName;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -38,13 +40,48 @@ class TelegramWebhookController extends Controller
         $chat = $message['chat'] ?? [];
         $chatId = $chat['id'] ?? null;
         $text = isset($message['text']) ? Str::trim((string)$message['text']) : '';
+        $attachment = $message['document'] ?? $message['photo'] ?? $message['video'] ?? $message['audio'] ?? $message['voice'] ?? null;
 
-        if ($chatId === null || $text === '') {
+        if ($chatId === null || ($text === '' && !$attachment)) {
             return response()->json(['ok' => true]);
         }
 
         // $user is resolved by secret above
         $user->actAs();
+
+        // Handle attachment if present
+        if ($attachment) {
+
+            $fileId = is_array($attachment) ? ($attachment['file_id'] ?? (isset($attachment[0]) ? $attachment[count($attachment) - 1]['file_id'] : null)) : null;
+
+            if ($fileId) {
+                try {
+
+                    $client = new Client(['base_uri' => 'https://api.telegram.org']);
+                    $response = $client->get("/bot{$user->telegram_bot_token}/getFile", [
+                        'query' => ['file_id' => $fileId],
+                    ]);
+                    $file = json_decode($response->getBody()->getContents(), true);
+
+                    if ($file['ok'] ?? false) {
+
+                        $path = $file['result']['file_path'];
+                        $url = "https://api.telegram.org/file/bot{$user->telegram_bot_token}/{$path}";
+                        $collection = $this->getOrCreateCollection("privcol{$user->id}", 0);
+                        $isSaved = \App\Http\Controllers\CyberBuddyController::saveDistantFile($collection, $url);
+
+                        if ($isSaved) {
+                            $text = ($text === '') ? "J'ai reçu votre fichier. Celui-ci est en cours de traitement." : "{$text} (fichier joint reçu et en cours de traitement)";
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Telegram attachment processing failed: ' . $e->getMessage());
+                }
+            }
+        }
+        if ($text === '') {
+            return response()->json(['ok' => true]);
+        }
 
         // Map chat id to a valid 10-char thread id used by our Conversations
         $threadId = $this->threadIdFromChatId($chatId);
@@ -125,5 +162,24 @@ class TelegramWebhookController extends Controller
         $padded = substr($hash . $base36, -10);
         // Guarantee it is exactly 10 alphanum
         return str_pad($padded, 10, '0', STR_PAD_LEFT);
+    }
+
+    private function getOrCreateCollection(string $collectionName, int $priority): ?Collection
+    {
+        /** @var \App\Models\Collection $collection */
+        $collection = Collection::where('name', $collectionName)
+            ->where('is_deleted', false)
+            ->first();
+        if (!$collection) {
+            if (!IsValidCollectionName::test($collectionName)) {
+                Log::error("Invalid collection name : {$collectionName}");
+                return null;
+            }
+            $collection = Collection::create([
+                'name' => $collectionName,
+                'priority' => max($priority, 0),
+            ]);
+        }
+        return $collection;
     }
 }
