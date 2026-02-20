@@ -110,6 +110,46 @@
 </section>
 <!-- ====== Hero End ====== -->
 
+<!-- ====== Team In Pocket Start ====== -->
+<section id="team-pocket" class="ud-about" style="padding: 100px 0; background: #fff;">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 col-md-12">
+        <div class="ud-about-content wow fadeInUp" data-wow-delay=".2s">
+          <span class="tag">Accompagnement IA</span>
+          <h2>Cywise c'est une équipe Cyber dans votre poche !</h2>
+          <p>
+            Emportez toute votre expertise en cybersécurité partout avec vous. Que vous soyez en déplacement ou au
+            bureau, accédez instantanément à vos indicateurs clés, recevez des alertes en temps réel et pilotez votre
+            stratégie de défense directement depuis votre smartphone.
+          </p>
+          <p>
+            Notre intégration avec <a href="https://telegram.org" target="_blank">Telegram</a> vous permet de rester
+            réactif face aux menaces, de consulter vos alertes et de collaborer avec votre équipe en un clin d'oeil. La
+            sécurité de votre entreprise ne s'arrête jamais, et votre accès non plus.
+          </p>
+          <a href="{{ route('register') }}" class="ud-main-btn">Découvrir l'application</a>
+        </div>
+      </div>
+      <div class="col-lg-6 col-md-12">
+        <div class="ud-about-image wow fadeInUp" data-wow-delay=".25s" style="display: flex; justify-content: center;">
+          <div class="phone-mockup" style="position: relative; width: 280px; height: 560px; background: #222; border: 12px solid #333; border-radius: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden;">
+            <!-- Haut du téléphone (encoche/caméra) -->
+            <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 25px; background: #333; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; z-index: 10;"></div>
+            <!-- Écran (zone pour le futur screenshot) -->
+            <div class="phone-screen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f8f9fa; display: flex; align-items: center; justify-content: center; text-align: center;">
+              <img src="{{ asset('cywise/img/screenshot-telegram.png') }}">
+            </div>
+            <!-- Bouton bas -->
+            <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 40px; height: 4px; background: #333; border-radius: 2px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ====== Team In Pocket End ====== -->
+
 <!-- ====== Features Start ====== -->
 <section id="features" class="ud-features">
   <div class="container">
@@ -446,7 +486,9 @@ $premiumFeatures = explode(',', $premium->features);
         <div class="ud-single-blog wow fadeInUp" data-wow-delay=".1s">
           <div class="ud-blog-image">
             <div class="ratio ratio-16x9">
-              <iframe src="https://www.youtube.com/embed/TdxKrUFlO-Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/TdxKrUFlO-Y" title="YouTube video player" frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowfullscreen></iframe>
             </div>
           </div>
           <div class="ud-blog-content">
@@ -471,7 +513,9 @@ $premiumFeatures = explode(',', $premium->features);
         <div class="ud-single-blog wow fadeInUp" data-wow-delay=".15s">
           <div class="ud-blog-image">
             <div class="ratio ratio-16x9">
-              <iframe src="https://www.youtube.com/embed/N9KSao79nTg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/N9KSao79nTg" title="YouTube video player" frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowfullscreen></iframe>
             </div>
           </div>
           <div class="ud-blog-content">
@@ -498,7 +542,9 @@ $premiumFeatures = explode(',', $premium->features);
         <div class="ud-single-blog wow fadeInUp" data-wow-delay=".2s">
           <div class="ud-blog-image">
             <div class="ratio ratio-16x9">
-              <iframe src="https://www.youtube.com/embed/l6NYLhtPKhE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/l6NYLhtPKhE" title="YouTube video player" frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowfullscreen></iframe>
             </div>
           </div>
           <div class="ud-blog-content">
