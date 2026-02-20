@@ -608,7 +608,7 @@ $apps = \App\Models\YnhServer::forUser(request()->user())
     <div class="card mt-3">
       <div class="card-body">
         <h6 class="card-title text-truncate">
-          Vous souhaitez nteragir avec Cywise au moyen d'un bot ?
+          Vous souhaitez interagir avec Cywise au moyen d'un bot ?
         </h6>
         <ul class="nav nav-tabs" role="tablist">
           <li class="nav-item" role="presentation">
