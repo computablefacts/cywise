@@ -140,7 +140,7 @@ class AppServiceProvider extends ServiceProvider
         Conversation::observe(ConversationObserver::class);
         File::observe(FilesObserver::class);
         Prompt::observe(PromptObserver::class);
-        RemoteAction::observe(RemoteActionObserver::class);
+        // RemoteAction::observe(RemoteActionObserver::class);
         ScheduledTask::observe(ScheduledTaskObserver::class);
         Table::observe(TableObserver::class);
         Template::observe(TemplateObserver::class);
