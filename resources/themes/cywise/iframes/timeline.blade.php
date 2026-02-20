@@ -424,7 +424,7 @@
               @foreach($rules as $rule)
               <option value="{{ $rule->name }}" {{ request(
               'rule_name') === $rule->name ? 'selected' : '' }}>
-              {{ $rule->displayName() }} ({{ $rule->score }} / 100)
+              {{ $rule->displayName() }}
               </option>
               @endforeach
             </select>
