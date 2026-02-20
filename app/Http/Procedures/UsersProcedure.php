@@ -175,6 +175,7 @@ class UsersProcedure extends Procedure
             'webhook' => $webhook,
         ];
     }
+
     #[RpcMethod(
         description: "Configure WhatsApp configuration for the current user and returns the webhook URL.",
         params: [
@@ -189,7 +190,7 @@ class UsersProcedure extends Procedure
     public function setWhatsAppConfiguration(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'access_token' => 'required|string|min:10|max:255',
+            'access_token' => 'required|string|min:10|max:512',
             'phone_number_id' => 'required|string|min:1|max:191',
         ]);
 

@@ -24,6 +24,7 @@ class WhatsAppWebhookController extends Controller
 
         // WhatsApp Webhook Verification (Hub challenge)
         if ($request->isMethod('GET')) {
+
             $mode = $request->query('hub_mode');
             $token = $request->query('hub_verify_token');
             $challenge = $request->query('hub_challenge');
@@ -108,7 +109,7 @@ class WhatsAppWebhookController extends Controller
 
         // Reply to WhatsApp
         try {
-            $client = new Client(['base_uri' => 'https://graph.facebook.com/v17.0/']);
+            $client = new Client(['base_uri' => 'https://graph.facebook.com/v25.0/']);
             $client->post("{$user->whatsapp_phone_number_id}/messages", [
                 'headers' => [
                     'Authorization' => "Bearer {$user->whatsapp_access_token}",
@@ -127,7 +128,6 @@ class WhatsAppWebhookController extends Controller
         } catch (\Exception $e) {
             Log::error('WhatsApp sendMessage failed: ' . $e->getMessage());
         }
-
         return response()->json(['ok' => true]);
     }
 
