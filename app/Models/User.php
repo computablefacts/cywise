@@ -30,6 +30,9 @@ use Wave\User as WaveUser;
  * @property boolean gets_audit_report
  * @property ?string telegram_bot_token
  * @property ?string telegram_webhook_secret
+ * @property ?string whatsapp_access_token
+ * @property ?string whatsapp_phone_number_id
+ * @property ?string whatsapp_webhook_secret
  * @property ?int superset_id
  */
 class User extends WaveUser
@@ -61,6 +64,9 @@ class User extends WaveUser
         'gets_audit_report',
         'telegram_bot_token',
         'telegram_webhook_secret',
+        'whatsapp_access_token',
+        'whatsapp_phone_number_id',
+        'whatsapp_webhook_secret',
     ];
 
     /**
@@ -74,6 +80,9 @@ class User extends WaveUser
         'remember_token',
         'telegram_bot_token',
         'telegram_webhook_secret',
+        'whatsapp_access_token',
+        'whatsapp_phone_number_id',
+        'whatsapp_webhook_secret',
     ];
 
     protected static function boot()

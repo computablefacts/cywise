@@ -422,5 +422,16 @@
     executeJsonRpcApiCall('users@getTelegramConfiguration', {}, onSuccess);
   }
 
+  function setWhatsAppConfigurationApiCall(accessToken, phoneNumberId, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('users@setWhatsAppConfiguration', {
+      access_token: accessToken,
+      phone_number_id: phoneNumberId
+    }, onSuccess, onErrorDefault, onFinally);
+  }
+
+  function getWhatsAppConfigurationApiCall(onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('users@getWhatsAppConfiguration', {}, onSuccess);
+  }
+
 </script>
 @endonce

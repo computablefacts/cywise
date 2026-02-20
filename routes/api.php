@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Sajya\Server\Middleware\GzipCompress;
 use Wave\Facades\Wave;
 use App\Http\Controllers\TelegramWebhookController;
+use App\Http\Controllers\WhatsAppWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 // Public Telegram webhook (secret in URL)
 Route::post('/telegram/webhook/{secret}', [TelegramWebhookController::class, 'handle'])
+    ->middleware(['throttle:120,1']);
+
+// Public WhatsApp webhook (secret in URL)
+Route::match(['get', 'post'], '/whatsapp/webhook/{secret}', [WhatsAppWebhookController::class, 'handle'])
     ->middleware(['throttle:120,1']);
 
 Wave::api();
