@@ -334,7 +334,7 @@
               @foreach($tags as $tag)
               <option value="{{ $tag }}" {{ request(
               'tags') === $tag ? 'selected' : '' }}>
-              {{ \Illuminate\Support\Str::ucfirst($tag) }}
+              {{ $tag }}
               </option>
               @endforeach
             </select>
@@ -484,7 +484,8 @@
             <select id="tags" name="tags" class="form-select">
               <option value="">{{ __('All tags') }}</option>
               @foreach($tags as $tag)
-              <option value="{{ $tag }}" {{ request('tags') === $tag ? 'selected' : '' }}>
+              <option value="{{ $tag }}" {{ request(
+              'tags') === $tag ? 'selected' : '' }}>
               {{ $tag }}
               </option>
               @endforeach
@@ -497,7 +498,8 @@
             <select id="port_tags" name="port_tags" class="form-select">
               <option value="">{{ __('All tags') }}</option>
               @foreach($port_tags as $tag)
-              <option value="{{ $tag }}" {{ request('port_tags') === $tag ? 'selected' : '' }}>
+              <option value="{{ $tag }}" {{ request(
+              'port_tags') === $tag ? 'selected' : '' }}>
               {{ $tag }}
               </option>
               @endforeach
