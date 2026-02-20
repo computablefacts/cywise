@@ -326,5 +326,7 @@
   "save": "sauvegarder",
   "similar events": "événements similaires",
   "unknown": "criticité inconnue",
-  "yes": "oui"
+  "yes": "oui",
+  "User tag": "Étiquette utilisateur",
+  "System tag": "Étiquette système"
 }

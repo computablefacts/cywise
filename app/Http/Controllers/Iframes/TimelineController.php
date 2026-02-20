@@ -55,6 +55,7 @@ class TimelineController extends Controller
             'asset_id' => ['nullable', 'integer', 'exists:am_assets,id'],
             'tld' => ['nullable', 'string'],
             'tags' => ['nullable', 'string'], // comma-separated list
+            'port_tags' => ['nullable', 'string'], // comma-separated list
             'rule_name' => ['nullable', 'string'],
         ]);
 
@@ -92,6 +93,14 @@ class TimelineController extends Controller
                 $params['tld'] ?? null,
                 !empty($params['tags']) ?
                     collect(explode(',', $params['tags']))
+                        ->map(fn(string $tag) => Str::trim($tag))
+                        ->filter(fn(string $tag) => !empty($tag))
+                        ->unique()
+                        ->values()
+                        ->all() :
+                    null,
+                !empty($params['port_tags']) ?
+                    collect(explode(',', $params['port_tags']))
                         ->map(fn(string $tag) => Str::trim($tag))
                         ->filter(fn(string $tag) => !empty($tag))
                         ->unique()
@@ -158,6 +167,14 @@ class TimelineController extends Controller
                 ->orderBy('tag')
                 ->get()
                 ->map(fn(AssetTag $tag) => Str::lower($tag->tag))
+                ->unique()
+                ->values(),
+            'portTags' => PortTag::query()
+                ->select('tag')
+                ->distinct()
+                ->orderBy('tag')
+                ->get()
+                ->map(fn(PortTag $tag) => Str::lower($tag->tag))
                 ->unique()
                 ->values(),
         ]);
@@ -531,9 +548,9 @@ class TimelineController extends Controller
         ];
     }
 
-    private function vulnerabilities(?string $level = null, ?int $assetId = null, ?string $tld = null, ?array $tags = null): array
+    private function vulnerabilities(?string $level = null, ?int $assetId = null, ?string $tld = null, ?array $tags = null, ?array $portTags = null): array
     {
-        $alerts = $this->alerts($assetId, $tld, $tags);
+        $alerts = $this->alerts($assetId, $tld, $tags, $portTags);
         $nbHigh = 0;
         $nbMedium = 0;
         $nbLow = 0;
@@ -623,12 +640,13 @@ class TimelineController extends Controller
         ];
     }
 
-    private function alerts(?int $assetId = null, ?string $tld = null, ?array $tags = null): Collection
+    private function alerts(?int $assetId = null, ?string $tld = null, ?array $tags = null, ?array $portTags = null): Collection
     {
         $request = new JsonRpcRequest([
             'asset_id' => $assetId,
             'tld' => $tld,
             'tags' => $tags,
+            'port_tags' => $portTags,
         ]);
         $request->setUserResolver(fn() => Auth::user());
         $alerts = (new VulnerabilitiesProcedure())->list($request);

@@ -477,21 +477,33 @@
                    class="form-control"
                    placeholder="example.com">
           </div>
-          <div class="col-sm-5">
+          <div class="col-sm-3">
             <label for="tags" class="form-label">
-              {{ __('Tag') }}
+              {{ __('User tag') }}
             </label>
             <select id="tags" name="tags" class="form-select">
               <option value="">{{ __('All tags') }}</option>
               @foreach($tags as $tag)
-              <option value="{{ $tag }}" {{ request(
-              'tags') === $tag ? 'selected' : '' }}>
+              <option value="{{ $tag }}" {{ request('tags') === $tag ? 'selected' : '' }}>
               {{ \Illuminate\Support\Str::ucfirst($tag) }}
               </option>
               @endforeach
             </select>
           </div>
-          <div class="col-sm-2">
+          <div class="col-sm-3">
+            <label for="port_tags" class="form-label">
+              {{ __('System tag') }}
+            </label>
+            <select id="port_tags" name="port_tags" class="form-select">
+              <option value="">{{ __('All tags') }}</option>
+              @foreach($portTags as $tag)
+              <option value="{{ $tag }}" {{ request('port_tags') === $tag ? 'selected' : '' }}>
+              {{ \Illuminate\Support\Str::ucfirst($tag) }}
+              </option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-sm-1">
             <label class="form-label d-block">&nbsp;</label>
             <button type="submit" class="btn btn-primary w-100">
               {{ __('Filter!') }}

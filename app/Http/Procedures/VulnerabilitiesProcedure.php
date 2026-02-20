@@ -39,6 +39,7 @@ class VulnerabilitiesProcedure extends Procedure
             "level" => "An optional criticality level such as high, medium or low. (string|nullable|min:3|max:6|in:high,medium,low)",
             "tld" => "An optional asset TLD to match. (string|nullable)",
             "tags" => "An optional list of assets tags to match.",
+            "port_tags" => "An optional list of ports tags to match.",
         ],
         result: [
             "high" => "A list of vulnerabilities with critical severity.",
@@ -71,10 +72,15 @@ class VulnerabilitiesProcedure extends Procedure
             \$remediation = \$alert->translated('remediation');
             @endphp
             ## {{ \$alert->title }}
+            
             **Actif concerné.** L'actif concerné est {{ \$alert->asset()?->asset }} pointant vers le serveur {{ \$alert->port?->ip }}. Le port {{ \$alert->port?->port }} de ce serveur est ouvert et expose un service {{ \$alert->port?->service }} ({{ \$alert->port?->product }}).
+            
             **Description détaillée.** {{ \$vulnerability }}
+            
             **Remédiation.** {{ \$remediation }}
+            
             {{ \$cve }}
+            
             @endforeach
             @endif
             @endforeach
@@ -89,11 +95,14 @@ class VulnerabilitiesProcedure extends Procedure
             'tld' => 'string|nullable',
             'tags' => 'array|nullable|min:1|max:10',
             'tags.*' => 'string',
+            'port_tags' => 'array|nullable|min:1|max:10',
+            'port_tags.*' => 'string',
         ]);
 
         $assetId = $params['asset_id'] ?? null;
         $tld = $params['tld'] ?? null;
         $tags = $params['tags'] ?? null;
+        $portTags = $params['port_tags'] ?? null;
         $alerts = Asset::query()
             ->where('is_monitored', true)
             ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
@@ -103,7 +112,7 @@ class VulnerabilitiesProcedure extends Procedure
                 ->whereIn('am_assets_tags.tag', $tags)
             )
             ->get()
-            ->flatMap(function (Asset $asset) use ($params) {
+            ->flatMap(function (Asset $asset) use ($params, $portTags) {
                 if (($params['level'] ?? '') === 'high') {
                     $query = $asset->alertsWithCriticalityHigh();
                 } else if (($params['level'] ?? '') === 'medium') {
@@ -112,6 +121,10 @@ class VulnerabilitiesProcedure extends Procedure
                     $query = $asset->alertsWithCriticalityLow();
                 } else {
                     $query = $asset->alerts();
+                }
+                if ($portTags) {
+                    $query->join('am_ports_tags', 'am_ports_tags.port_id', '=', 'am_alerts.port_id')
+                        ->whereIn('am_ports_tags.tag', $portTags);
                 }
                 return $query->get();
             })
