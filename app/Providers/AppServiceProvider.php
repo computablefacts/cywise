@@ -14,9 +14,12 @@ use App\Models\File;
 use App\Models\HiddenAlert;
 use App\Models\Honeypot;
 use App\Models\Prompt;
+use App\Models\RemoteAction;
+use App\Models\ScheduledTask;
+use App\Models\Table;
 use App\Models\Template;
+use App\Models\Trial;
 use App\Models\Vector;
-use App\Models\YnhBackup;
 use App\Models\YnhServer;
 use App\Observers\AssetObserver;
 use App\Observers\AssetTagHashObserver;
@@ -29,9 +32,12 @@ use App\Observers\FilesObserver;
 use App\Observers\HiddenAlertObserver;
 use App\Observers\HoneypotObserver;
 use App\Observers\PromptObserver;
+use App\Observers\RemoteActionObserver;
+use App\Observers\ScheduledTaskObserver;
+use App\Observers\TableObserver;
 use App\Observers\TemplateObserver;
+use App\Observers\TrialObserver;
 use App\Observers\VectorObserver;
-use App\Observers\YnhBackupObserver;
 use App\Observers\YnhServerObserver;
 use App\Rules\AtLeastOneDigit;
 use App\Rules\AtLeastOneLetter;
@@ -117,7 +123,6 @@ class AppServiceProvider extends ServiceProvider
             return true;
         });
 
-        YnhBackup::observe(YnhBackupObserver::class);
         YnhServer::observe(YnhServerObserver::class);
 
         // AdversaryMeter
@@ -126,6 +131,7 @@ class AppServiceProvider extends ServiceProvider
         AssetTag::observe(AssetTagObserver::class);
         HiddenAlert::observe(HiddenAlertObserver::class);
         Honeypot::observe(HoneypotObserver::class);
+        Trial::observe(TrialObserver::class);
 
         // CyberBuddy
         Chunk::observe(ChunkObserver::class);
@@ -134,6 +140,9 @@ class AppServiceProvider extends ServiceProvider
         Conversation::observe(ConversationObserver::class);
         File::observe(FilesObserver::class);
         Prompt::observe(PromptObserver::class);
+        // RemoteAction::observe(RemoteActionObserver::class);
+        ScheduledTask::observe(ScheduledTaskObserver::class);
+        Table::observe(TableObserver::class);
         Template::observe(TemplateObserver::class);
         Vector::observe(VectorObserver::class);
 

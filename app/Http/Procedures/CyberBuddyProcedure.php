@@ -13,6 +13,7 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
 use App\Models\Conversation;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -83,6 +84,7 @@ class CyberBuddyProcedure extends Procedure
             $answer = $orchestrator->run($user, $threadId, $messages, $question);
 
         } catch (\Exception $e) {
+            Log::error($e);
             $answer = new FailedAnswer(__("Sorry, an error occurred: :msg", ['msg' => $e->getMessage()]));
         }
 

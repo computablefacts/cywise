@@ -10,7 +10,7 @@ use App\Models\YnhFramework;
 use App\Models\YnhOsquery;
 use App\Models\YnhOsqueryLatestEvent;
 use App\Models\YnhOsqueryRule;
-use App\Models\YnhTrial;
+use App\Models\Trial;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -37,7 +37,7 @@ class Cleanup implements ShouldQueue
     {
         Log::debug("Cleaning up trials...");
 
-        YnhTrial::whereNull('created_by')
+        Trial::whereNull('created_by')
             ->where('updated_at', '<', now()->subDays(10))
             ->delete();
 

@@ -9,7 +9,7 @@
   <div class="timeline-item-wrapper">
     <div class="timeline-item-description">
       <span>
-        {!! __('We have found <b>:count leaked or compromised</b> identifiers. If no action has been taken yet, ask the affected users to change their passwords.', [ 'count' => count(json_decode($leak->attributes()['credentials'])) ]) !!}
+        {!! __('We have found <b>:count leaked or compromised</b> identifiers. If no action has been taken yet, ask the affected users to change their passwords.', [ 'count' => count($leaks) ]) !!}
       </span>
     </div>
     <div class="comment p-0 mb-0">
@@ -24,7 +24,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach(json_decode($leak->attributes()['credentials']) as $l)
+        @foreach($leaks as $l)
         <tr>
           <td>{{ empty($l->leak_date) ? '-' : $l->leak_date }}</td>
           <td>{{ $l->email }}</td>

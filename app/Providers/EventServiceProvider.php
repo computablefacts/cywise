@@ -15,7 +15,6 @@ use App\Events\IngestFile;
 use App\Events\IngestHoneypotsEvents;
 use App\Events\ProcessLogalertPayload;
 use App\Events\ProcessLogalertPayloadEx;
-use App\Events\ProcessLogparserPayload;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Events\SendAuditReport;
@@ -36,7 +35,6 @@ use App\Listeners\LoginSucceededListener;
 use App\Listeners\LogoutSucceededListener;
 use App\Listeners\ProcessLogalertPayloadListener;
 use App\Listeners\ProcessLogalertPayloadListenerEx;
-use App\Listeners\ProcessLogparserPayloadListener;
 use App\Listeners\RebuildLatestEventsCacheListener;
 use App\Listeners\RebuildPackagesListListener;
 use App\Listeners\SendAuditReportListener;
@@ -60,9 +58,6 @@ class EventServiceProvider extends ServiceProvider
         ],
         ProcessLogalertPayloadEx::class => [
             ProcessLogalertPayloadListenerEx::class,
-        ],
-        ProcessLogparserPayload::class => [
-            ProcessLogparserPayloadListener::class,
         ],
         RebuildPackagesList::class => [
             RebuildPackagesListListener::class,

@@ -414,5 +414,24 @@
     executeJsonRpcApiCall('scheduled-tasks@delete', {task_id: taskId}, onSuccess, onError);
   }
 
+  function setTelegramConfigurationApiCall(botToken, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('users@setTelegramConfiguration', {bot_token: botToken}, onSuccess, onErrorDefault, onFinally);
+  }
+
+  function getTelegramConfigurationApiCall(onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('users@getTelegramConfiguration', {}, onSuccess);
+  }
+
+  function setWhatsAppConfigurationApiCall(accessToken, phoneNumberId, onSuccess = onSuccessDefault, onFinally = onFinallyDefault) {
+    executeJsonRpcApiCall('users@setWhatsAppConfiguration', {
+      access_token: accessToken,
+      phone_number_id: phoneNumberId
+    }, onSuccess, onErrorDefault, onFinally);
+  }
+
+  function getWhatsAppConfigurationApiCall(onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('users@getWhatsAppConfiguration', {}, onSuccess);
+  }
+
 </script>
 @endonce

@@ -31,6 +31,9 @@ class EmbedChunks implements ShouldQueue
         Collection::where('is_deleted', false)
             ->get()
             ->each(function (Collection $collection) {
+
+                $collection->createdBy->actAs();
+
                 $collection->chunks()
                     ->where('is_embedded', false)
                     ->where('is_deleted', false)

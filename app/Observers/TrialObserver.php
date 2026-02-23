@@ -4,7 +4,7 @@ namespace App\Observers;
 
 use App\Traits\IsTenantAware;
 
-class YnhSummaryObserver
+class TrialObserver
 {
     use IsTenantAware;
 }

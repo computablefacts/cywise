@@ -10,7 +10,7 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Mail\HoneypotRequested;
 use App\Models\Honeypot;
 use App\Models\User;
-use App\Models\YnhTrial;
+use App\Models\Trial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -51,8 +51,8 @@ class ToolsController extends Controller
         }
 
         // Load trial (if any)
-        /** @var YnhTrial $trial */
-        $trial = YnhTrial::updateOrCreate(['hash' => $hash], ['hash' => $hash]);
+        /** @var Trial $trial */
+        $trial = Trial::updateOrCreate(['hash' => $hash], ['hash' => $hash]);
 
         // Deal with parameters validation and state management
         if ($step === 2 && $request->get('action') == 'next') {
@@ -165,8 +165,8 @@ class ToolsController extends Controller
         $hash = $params['hash'];
 
         // Load trial (if any)
-        /** @var YnhTrial $trial */
-        $trial = YnhTrial::where('hash', $hash)->firstOrFail();
+        /** @var Trial $trial */
+        $trial = Trial::where('hash', $hash)->firstOrFail();
         $request->replace(['domain' => $trial->domain]);
 
         return (new AssetsProcedure())->discover(JsonRpcRequest::createFrom($request))['subdomains'];
