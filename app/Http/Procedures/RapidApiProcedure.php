@@ -4,7 +4,7 @@ namespace App\Http\Procedures;
 
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
-use App\Models\YnhTrial;
+use App\Models\Trial;
 use Illuminate\Support\Str;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
@@ -51,8 +51,8 @@ class RapidApiProcedure extends Procedure
         $asset = Str::betweenFirst($params['asset'], '://', '/');
         $hash = md5($asset . now()->utc()->format('Y-m-d'));
 
-        /** @var YnhTrial $trial */
-        $trial = YnhTrial::updateOrCreate([
+        /** @var Trial $trial */
+        $trial = Trial::updateOrCreate([
             'hash' => $hash
         ], [
             'domain' => $asset,
@@ -118,8 +118,8 @@ class RapidApiProcedure extends Procedure
         $user = $request->user();
         $asset = Str::betweenFirst($params['asset'], '://', '/');
 
-        /** @var YnhTrial $trial */
-        $trial = YnhTrial::query()
+        /** @var Trial $trial */
+        $trial = Trial::query()
             ->where('domain', $asset)
             ->where('email', $user->email)
             ->where('updated_at', '>=', now()->subDays(2))

@@ -47,7 +47,6 @@ use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Mail\PerformaRequested;
 use App\Models\YnhServer;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -322,21 +321,6 @@ Route::get('/localmetrics/{secret}', function (string $secret, \Illuminate\Http\
         ->header('Content-Type', 'text/plain');
 })->middleware('throttle:6,1');
 
-Route::get('/logparser/{secret}', function (string $secret, \Illuminate\Http\Request $request) {
-
-    $server = \App\Models\YnhServer::where('secret', $secret)->first();
-
-    if (!$server) {
-        return response('Unknown server', 500)
-            ->header('Content-Type', 'text/plain');
-    }
-
-    $config = ($server->platform === OsqueryPlatformEnum::WINDOWS) ? \App\Models\YnhOsquery::configLogParserWindows($server) : \App\Models\YnhOsquery::configLogParserLinux($server);
-
-    return response($config, 200)
-        ->header('Content-Type', 'text/plain');
-})->middleware('throttle:6,1');
-
 Route::post('/logparser/{secret}', function (string $secret, \Illuminate\Http\Request $request) {
 
     if (!$request->hasFile('data')) {
@@ -360,26 +344,7 @@ Route::post('/logparser/{secret}', function (string $secret, \Illuminate\Http\Re
 
     $filename = $file->getClientOriginalName();
 
-    if ($filename === "apache.txt.gz" || $filename === "nginx.txt.gz") {
-
-        $logs = collect(gzfile($file->getRealPath()))
-            ->map(fn(string $line) => Str::of(trim($line))->split('/\s+/'))
-            ->filter(fn(Collection $lines) => $lines->count() === 3 && filter_var($lines->last(), FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6))
-            ->map(fn(Collection $lines) => [
-                'count' => $lines->first(),
-                'service' => $lines->get(1),
-                'ip' => YnhServer::expandIp($lines->last()),
-            ]);
-
-        if ($logs->isEmpty()) {
-            return response('ok (empty file)', 200)
-                ->header('Content-Type', 'text/plain');
-        }
-
-        // Do not chunk because logs are managed as a whole!
-        \App\Events\ProcessLogparserPayload::dispatch($server, $logs);
-
-    } else if ($filename === "osquery.jsonl.gz") {
+    if ($filename === "osquery.jsonl.gz") {
 
         $logs = collect(gzfile($file->getRealPath()))
             ->map(fn(string $line) => json_decode(trim($line), true));

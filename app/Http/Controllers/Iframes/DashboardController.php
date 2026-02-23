@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Procedures\AssetsProcedure;
 use App\Http\Procedures\EventsProcedure;
 use App\Http\Procedures\HoneypotsProcedure;
+use App\Http\Procedures\LeaksProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Honeypot;
-use App\Models\TimelineItem;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -59,9 +59,7 @@ class DashboardController extends Controller
             $alerts = $alerts->concat($procedure->list($req)['low']);
         }
 
-        $leaks = TimelineController::fetchLeaks($request->user())
-            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
-            ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE)
+        $leaks = (new LeaksProcedure())->list(JsonRpcRequest::createFrom($request))['leaks']
             ->reverse()
             ->take(10);
 

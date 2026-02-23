@@ -596,12 +596,47 @@ $apps = \App\Models\YnhServer::forUser(request()->user())
 </div>
 <!-- ACTIONS : BEGIN -->
 <!-- AGENTS & METRICS : BEGIN -->
-<div class="row pb-3">
+<div class="row">
   <div class="col">
     @include('theme::iframes._agent')
   </div>
 </div>
 <!-- AGENTS & METRICS : END -->
+<!-- MESSAGING TABS : BEGIN -->
+<div class="row pb-3">
+  <div class="col">
+    <div class="card mt-3">
+      <div class="card-body">
+        <h6 class="card-title text-truncate">
+          Vous souhaitez interagir avec Cywise au moyen d'un bot ?
+        </h6>
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-bs-toggle="tab" href="#tab-telegram" role="tab"
+               aria-controls="tab-telegram" aria-selected="true">
+              Telegram
+            </a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab-whatsapp" role="tab"
+               aria-controls="tab-whatsapp" aria-selected="false">
+              WhatsApp
+            </a>
+          </li>
+        </ul>
+        <div class="tab-content pt-5" id="messaging-tab-content">
+          <div class="tab-pane active" id="tab-telegram" role="tabpanel" aria-labelledby="tab-telegram">
+            @include('theme::iframes._telegram')
+          </div>
+          <div class="tab-pane" id="tab-whatsapp" role="tabpanel" aria-labelledby="tab-whatsapp">
+            @include('theme::iframes._whatsapp')
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MESSAGING TABS : END -->
 @endsection
 
 @push('scripts')

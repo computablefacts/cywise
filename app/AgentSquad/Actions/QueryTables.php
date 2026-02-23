@@ -19,7 +19,9 @@ class QueryTables extends AbstractAction
         $tables = Table::query()
             ->get()
             ->map(function (Table $table) {
-                $schema = implode(',', $table->schema);
+                $schema = collect($table->schema)
+                    ->map(fn(array $column) => $column['new_name'])
+                    ->join(",");
                 return "{$table->name}: {$table->description} (schema={$schema})";
             })
             ->join("\n- ");
@@ -28,10 +30,7 @@ class QueryTables extends AbstractAction
             "type" => "function",
             "function" => [
                 "name" => "query_tables",
-                "description" => "
-Answer analytical questions by querying structured tables. The following tables and schemas are available:
-- {$tables}
-                ",
+                "description" => "Answer analytical questions by querying structured tables. The following tables and schemas are available:\n- {$tables}",
                 "parameters" => [
                     "type" => "object",
                     "properties" => [

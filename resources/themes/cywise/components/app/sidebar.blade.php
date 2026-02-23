@@ -190,8 +190,7 @@ $user = \Auth::user();
             @endif
           </x-app.sidebar-dropdown>
           @endif
-          @if($user->canView('iframes.prompts')
-          || $user->canView('iframes.tables')
+          @if($user->canView('iframes.tables')
           || $user->canView('iframes.collections')
           || $user->canView('iframes.documents')
           || $user->canView('iframes.chunks'))
@@ -200,19 +199,11 @@ $user = \Auth::user();
                                   id="datamanagement_dropdown"
                                   :active="false"
                                   :open="(
-                          Request::is('prompts') ||
                           Request::is('tables') ||
                           Request::is('collections') ||
                           Request::is('documents') ||
                           Request::is('chunks')
                         ) ? '1' : '0'">
-            @if($user->canView('iframes.prompts'))
-            <x-app.sidebar-link href="{{ route('prompts') }}"
-                                icon="phosphor-notepad"
-                                :active="Request::is('prompts')">
-              {{ __('Prompts') }}
-            </x-app.sidebar-link>
-            @endif
             @if($user->canView('iframes.tables'))
             <x-app.sidebar-link href="{{ route('tables') }}"
                                 icon="phosphor-table"
@@ -243,7 +234,8 @@ $user = \Auth::user();
             @endif
           </x-app.sidebar-dropdown>
           @endif
-          @if($user->canView('iframes.users')
+          @if($user->canView('iframes.prompts')
+          || $user->canView('iframes.users')
           || $user->canView('iframes.shares')
           || $user->canView('iframes.roles-and-permissions')
           || $user->canView('iframes.traces')
@@ -255,6 +247,7 @@ $user = \Auth::user();
                                   id="admin_dropdown"
                                   :active="false"
                                   :open="(
+                          Request::is('prompts') ||
                           Request::is('users') ||
                           Request::is('shares') ||
                           Request::is('roles-and-permissions') ||
@@ -262,6 +255,13 @@ $user = \Auth::user();
                           Request::is('traces') ||
                           Request::is('actions')
                         ) ? '1' : '0'">
+            @if($user->canView('iframes.prompts'))
+            <x-app.sidebar-link href="{{ route('prompts') }}"
+                                icon="phosphor-notepad"
+                                :active="Request::is('prompts')">
+              {{ __('Prompts') }}
+            </x-app.sidebar-link>
+            @endif
             @if($user->canView('iframes.actions'))
             <x-app.sidebar-link href="{{ route('actions') }}"
                                 icon="phosphor-wrench"

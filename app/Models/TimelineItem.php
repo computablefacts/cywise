@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * @property integer id
@@ -115,32 +114,6 @@ class TimelineItem extends Model
                 $item->delete();
             });
         });
-    }
-
-    public static function createLeak(User $user, array $identifiers): TimelineItem
-    {
-        return self::createItem($user->id, 'leak', Carbon::now(), 0, [
-            'credentials' => json_encode($identifiers),
-        ]);
-    }
-
-    public static function fetchLeaks(?int $ownedBy = null, ?Carbon $createdAtOrAfter = null, ?Carbon $createdAtOrBefore = null, ?int $flags = null, array $ands = []): \Illuminate\Support\Collection
-    {
-        return self::fetchItems($ownedBy, 'leak', $createdAtOrAfter, $createdAtOrBefore, $flags, $ands);
-    }
-
-    public static function createNote(User $user, string $body, string $subject = '', array $scopes = []): TimelineItem
-    {
-        return self::createItem($user->id, 'note', Carbon::now(), 0, [
-            'body' => Str::limit(trim($body), 10000 - 3, '...'),
-            'subject' => Str::limit(trim($subject), 10000 - 3, '...'),
-            'scopes' => json_encode($scopes),
-        ]);
-    }
-
-    public static function fetchNotes(?int $ownedBy = null, ?Carbon $createdAtOrAfter = null, ?Carbon $createdAtOrBefore = null, ?int $flags = null, array $ands = []): \Illuminate\Support\Collection
-    {
-        return self::fetchItems($ownedBy, 'note', $createdAtOrAfter, $createdAtOrBefore, $flags, $ands);
     }
 
     public static function createItem(int $ownedBy, string $type, Carbon $timestamp, int $flags = 0, array $attributes = []): TimelineItem

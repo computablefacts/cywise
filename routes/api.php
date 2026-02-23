@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Sajya\Server\Middleware\GzipCompress;
 use Wave\Facades\Wave;
+use App\Http\Controllers\TelegramWebhookController;
+use App\Http\Controllers\WhatsAppWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +33,14 @@ use Wave\Facades\Wave;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return auth()->user();
 });
+
+// Public Telegram webhook (secret in URL)
+Route::post('/telegram/webhook/{secret}', [TelegramWebhookController::class, 'handle'])
+    ->middleware(['throttle:120,1']);
+
+// Public WhatsApp webhook (secret in URL)
+Route::match(['get', 'post'], '/whatsapp/webhook/{secret}', [WhatsAppWebhookController::class, 'handle'])
+    ->middleware(['throttle:120,1']);
 
 Wave::api();
 
@@ -219,6 +229,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\FrameworksProcedure::class,
             \App\Http\Procedures\HoneypotsProcedure::class,
             \App\Http\Procedures\InvitationsProcedure::class,
+            \App\Http\Procedures\LeaksProcedure::class,
             \App\Http\Procedures\NotesProcedure::class,
             \App\Http\Procedures\PromptsProcedure::class,
             \App\Http\Procedures\RapidApiProcedure::class,

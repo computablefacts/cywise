@@ -12,7 +12,7 @@ use App\Models\Asset;
 use App\Models\Port;
 use App\Models\Scan;
 use App\Models\User;
-use App\Models\YnhTrial;
+use App\Models\Trial;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -41,7 +41,7 @@ class EndVulnsScanListener extends AbstractListener
 
             /** @var Asset $asset */
             $asset = $scan->asset()->firstOrFail();
-            /** @var YnhTrial $trial */
+            /** @var Trial $trial */
             $trial = $asset->trial()->first();
 
             if ($trial) {

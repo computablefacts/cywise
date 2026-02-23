@@ -652,6 +652,7 @@ class CywiseSeeder extends Seeder
             'assets@unmonitor',
             'events@list',
             'events@socOperator',
+            'leaks@list',
             'scheduled-tasks@create',
             'scheduled-tasks@list',
             'scheduled-tasks@toggle',

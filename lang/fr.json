@@ -68,9 +68,9 @@
   "Connection String": "Chaîne de connexion",
   "Conversations": "Conversations",
   "Company": "Société",
+  "Copied to clipboard": "Copié dans le presse-papier",
   "Copy": "Copier",
   "Created At": "Créé le",
-  "Created By": "Créé par",
   "Dashboard": "Tableau de bord",
   "Data Management": "Gestion des données",
   "Deduplicate rows": "Dé-dupliquer les lignes",
@@ -326,5 +326,7 @@
   "save": "sauvegarder",
   "similar events": "événements similaires",
   "unknown": "criticité inconnue",
-  "yes": "oui"
+  "yes": "oui",
+  "User tag": "Étiquette utilisateur",
+  "System tag": "Étiquette système"
 }

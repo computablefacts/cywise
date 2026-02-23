@@ -3,13 +3,12 @@
 namespace App\Listeners;
 
 use App\Events\SendAuditReport;
-use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Procedures\EventsProcedure;
+use App\Http\Procedures\LeaksProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Mail\SimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
-use App\Models\TimelineItem;
 use App\Models\User;
 use App\Models\YnhServer;
 use Carbon\Carbon;
@@ -125,10 +124,7 @@ class SendAuditReportListener extends AbstractListener
     {
         $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->subDay())->count();
 
-        $nbLeaks = TimelineController::fetchLeaks($user)
-            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
-            ->unique()
-            ->count();
+        $nbLeaks = $this->fetchLeaks($user)->unique()->count();
 
         $nbHigh = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
@@ -168,10 +164,7 @@ class SendAuditReportListener extends AbstractListener
         $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->startOfDay()->subWeek())
             ->count();
 
-        $nbLeaks = TimelineController::fetchLeaks($user)
-            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
-            ->unique()
-            ->count();
+        $nbLeaks = $this->fetchLeaks($user)->unique()->count();
 
         $nbDns = $assets->filter(fn(Asset $asset) => $asset->is_monitored && $asset->isDns())
             ->pluck('asset')
@@ -253,9 +246,7 @@ class SendAuditReportListener extends AbstractListener
 
     private function buildSectionLeaks(User $user): string
     {
-        $leaks = TimelineController::fetchLeaks($user, Carbon::now()->utc()->subDays(7))
-            ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']))
-            ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE)
+        $leaks = $this->fetchLeaks($user, Carbon::now()->utc()->subDays(7))
             ->reverse()
             ->map(function (object $leak) {
 
@@ -366,5 +357,16 @@ class SendAuditReportListener extends AbstractListener
             <h3>Analyse de l'activité des serveurs</h3>
             <ul>{$activity->implode('')}</ul>
         ";
+    }
+
+    private function fetchLeaks(User $user, ?Carbon $createdAtOrAfter = null): Collection
+    {
+        if ($createdAtOrAfter) {
+            $request = new JsonRpcRequest(['created_at_or_after' => $createdAtOrAfter->toIso8601String()]);
+        } else {
+            $request = new JsonRpcRequest();
+        }
+        $request->setUserResolver(fn() => $user);
+        return (new LeaksProcedure())->list($request)['leaks'];
     }
 }

@@ -63,142 +63,6 @@ class YnhOsquery extends Model
         'dismissed' => 'boolean',
     ];
 
-    /** @deprecated */
-    public static function configLogParserLinux(YnhServer $server): string
-    {
-        $url = app_url();
-        return <<< EOT
-#!/bin/bash
-
-if [ -f /etc/os-release ]; then
-
-    id_like=$(grep '^ID_LIKE=' /etc/os-release | cut -d'=' -f2 | tr -d '"')
-    
-    if [ -z "\$id_like" ]; then
-      id_like=$(grep '^ID=' /etc/os-release | cut -d'=' -f2 | tr -d '"')
-    fi
-
-    # Ensure that the OS is debian-based
-    if [[ "\$id_like" == *"debian"* ]]; then
-    
-        # Parse Nginx logs
-        if [ -d /etc/nginx ]; then
-          for conf_file in "/etc/nginx/"{sites-available,conf.d}"/"*; do
-            if [ -f "\$conf_file" ]; then
-            
-              server_name=$(grep -E "^\s*server_name\s+" "\$conf_file" | awk '{print $2}' | tr -d ';' | head -1)
-              access_log_info=$(grep -E "^\s*access_log\s+" "\$conf_file")
-            
-              if [ -z "\$server_name" ]; then
-                server_name="vhost.unk"
-              fi
-              if [ -n "\$access_log_info" ]; then
-            
-                access_log_path=$(echo "\$access_log_info" | awk '{print $2}' | tr -d ';' | head -1)
-                log_format=$(echo "\$access_log_info" | awk '{print $3}' | tr -d ';' | head -1)
-            
-                if [ "\$log_format" == "combined" ] || [ "\$log_format" == "" ]; then
-                  while read file; do
-                    if [[ "\$file" == *.gz ]]; then
-                      zcat "\$file" | awk -v fname="\$server_name" '{print fname" "$1}'
-                    else
-                      cat "\$file" | awk -v fname="\$server_name" '{print fname" "$1}'
-                    fi
-                  done< <(find "$(dirname \$access_log_path)" -type f -name "$(basename \$access_log_path)*")
-                fi
-              fi
-            fi
-          done | sort | uniq -c | awk '$1 >= 3' | sort -nr | gzip -c >/opt/logparser/nginx.txt.gz
-          
-          if [ -f /opt/logparser/nginx.txt.gz ]; then
-            curl --silent -X POST \
-              -H "Content-Type: multipart/form-data" \
-              -F "data=@/opt/logparser/nginx.txt.gz" \
-              {$url}/logparser/{$server->secret} \
-              > /dev/null
-          fi
-        fi
-        
-        # Parse Apache logs
-        if [ -d /etc/apache2 ] && [ -d /opt/logparser ]; then
-          if [ -f /etc/apache2/envvars ]; then
-            apache_log_dir=$(grep -R "APACHE_LOG_DIR" /etc/apache2/envvars | awk -F'=' '{print $2}' | awk -F'$' '{print $1}')
-          else
-            apache_log_dir="/var/log/apache2"
-          fi
-          for conf_file in "/etc/apache2/sites-available/"*; do
-            if [ -f "\$conf_file" ]; then
-        
-              server_name=$(grep -E "^\s*ServerName\s+" "\$conf_file" | awk '{print $2}')
-              server_alias=$(grep -E "^\s*ServerAlias\s+" "\$conf_file" | awk '{print $2}')
-              custom_log_info=$(grep -E "^\s*CustomLog\s+" "\$conf_file")
-        
-              if [ -z "\$server_name" ]; then
-                server_name="\$server_alias"
-              fi
-              if [ -z "\$server_name" ]; then
-                server_name="vhost.unk"
-              fi
-              if [ -n "\$custom_log_info" ]; then
-        
-                custom_log_path=$(echo "\$custom_log_info" | awk '{print $2}' | tr -d '"' | sed "s|\\\${APACHE_LOG_DIR}|\$apache_log_dir|g")
-                log_format=$(echo "\$custom_log_info" | awk '{print $3}')
-        
-                if [ "\$log_format" == "combined" ] || [ "\$log_format" == "common" ] || [ -z "\$log_format" ]; then
-                  while read file; do
-                    if [[ "\$file" == *.gz ]]; then
-                      zcat "\$file" | awk -v fname="\$server_name" '{print fname" "$1}'
-                    else
-                      cat "\$file" | awk -v fname="\$server_name" '{print fname" "$1}'
-                    fi
-                  done< <(find "$(dirname \$custom_log_path)" -type f -name "$(basename \$custom_log_path)*")
-                fi
-              fi
-            fi
-          done | sort | uniq -c | awk '$1 >= 3' | sort -nr | gzip -c >/opt/logparser/apache.txt.gz
-          
-          if [ -f /opt/logparser/apache.txt.gz ]; then
-            curl --silent -X POST \
-              -H "Content-Type: multipart/form-data" \
-              -F "data=@/opt/logparser/apache.txt.gz" \
-              {$url}/logparser/{$server->secret} \
-              > /dev/null
-          fi
-        fi
-    fi
-fi
-
-# Parse local history to get back dropped metrics and events
-# if [ -f /var/log/osquery/osqueryd.snapshots.log ] && [ -f /var/log/osquery/osqueryd.results.log ]; then
-# 
-#   cat /var/log/osquery/osqueryd.snapshots.log /var/log/osquery/osqueryd.results.log \
-#     | grep -Eai "$(date +"%a %b %d")" \
-#     | gzip -c >/opt/logparser/osquery.jsonl.gz
-# 
-#   if [ -f /opt/logparser/osquery.jsonl.gz ]; then
-#     curl -X POST \
-#       -H "Content-Type: multipart/form-data" \
-#       -F "data=@/opt/logparser/osquery.jsonl.gz" \
-#       {$url}/logparser/{$server->secret}
-#     rm -f /opt/logparser/osquery.jsonl.gz
-#   fi
-# fi
-
-EOT;
-    }
-
-    /** @deprecated */
-    public static function configLogParserWindows(YnhServer $server): string
-    {
-        $url = app_url();
-        return <<< EOT
-# TODO
-
-Write-Host "TODO!"
-
-EOT;
-    }
-
     public static function configLogAlert(YnhServer $server): array
     {
         $url = app_url();
@@ -422,16 +286,12 @@ else
   rm /opt/logalert/config2.json
 fi
 
-# Update LogParser configuration
-wget -O /opt/logparser/parser2 {$url}/logparser/{$server->secret}
-
-if [ -s /opt/logparser/parser2 ]; then
-  if { bash -n /opt/logparser/parser2; } then
-    mv -f /opt/logparser/parser2 /opt/logparser/parser
-    chmod +x /opt/logparser/parser
-  fi
-else
-    rm /opt/logparser/parser2
+# TODO : remove deprecated LogParser script
+if [ -f /opt/logparser/parser ]; then 
+  rm -rf /opt/logparser/parser
+fi
+if [ -f /opt/logparser/parser2 ]; then 
+  rm -rf /opt/logparser/parser2
 fi
 {$updatePerformaConfig}
 # Set LogAlert as a daemon
@@ -475,9 +335,6 @@ echo '--watchdog_memory_limit=350' >> /etc/osquery/osquery.flags
 echo '--watchdog_utilization_limit=130' >> /etc/osquery/osquery.flags
 echo '--worker_threads=2' >> /etc/osquery/osquery.flags
 
-# Parse web logs every hour
-cat <(fgrep -i -v '/opt/logparser/parser' <(crontab -l)) <(echo '0 * * * * /opt/logparser/parser') | crontab -
-
 # Drop Osquery daemon's output every sunday at 01:11 am
 cat <(fgrep -i -v 'rm /var/log/osquery/osqueryd.results.log /var/log/osquery/osqueryd.snapshots.log' <(crontab -l)) <(echo '11 1 * * 0 rm /var/log/osquery/osqueryd.results.log /var/log/osquery/osqueryd.snapshots.log') | crontab -
 
@@ -486,6 +343,9 @@ cat <(fgrep -i -v 'rm /opt/logalert/log.txt' <(crontab -l)) <(echo '22 2 * * * r
 
 # Auto-update the server every day at 03:33 am
 cat <(crontab -l | sed '/curl -s https:\/\/.*\/update\/.*| bash/d') <(echo '33 3 * * * curl -s {$url}/update/{$server->secret} | bash') | crontab -
+
+# Delete entry that parse web logs every hour
+crontab -l | grep -v "logparser" | crontab -
 
 # Delete entry that call old domain app.towerify.io
 crontab -l | grep -v "app\.towerify\.io" | crontab -
@@ -748,19 +608,19 @@ if (Test-Path "\$osqueryPath\osquery2.conf") {
     }
 }
 
-# Update LogParser
-Invoke-WebRequest -Uri "{$url}/logparser/{$server->secret}" -OutFile "\$cywisePath\logparser2.ps1" -ErrorAction SilentlyContinue
-
+# TODO : remove deprecated LogParser script
+if (Test-Path "\$cywisePath\logparser.ps1") {
+    Remove-Item "\$cywisePath\logparser.ps1" -Force
+}
 if (Test-Path "\$cywisePath\logparser2.ps1") {
-    # Remplacer logparser.ps1 par logparser2.ps1
-    Copy-Item "\$cywisePath\logparser2.ps1" "\$cywisePath\logparser.ps1" -Force
+    Remove-Item "\$cywisePath\logparser2.ps1" -Force
 }
 
 # Update localMetrics
 Invoke-WebRequest -Uri "{$url}/localmetrics/{$server->secret}" -OutFile "\$cywisePath\localMetrics2.ps1" -ErrorAction SilentlyContinue
 
 if (Test-Path "\$cywisePath\localMetrics2.ps1") {
-    # Remplacer logparser.ps1 par localMetrics2.ps1
+    # Remplacer localMetrics2.ps1 par localMetrics.ps1
     Copy-Item "\$cywisePath\localMetrics2.ps1" "\$cywisePath\localMetrics.ps1" -Force
 }
 
@@ -785,9 +645,6 @@ if (Test-Path "\$cywisePath\localMetrics2.ps1") {
 Start-Service logalert
 Start-Service osqueryd
 
-# Parse web logs every hour
-CreateOrUpdate-ScheduledTask -Executable "powershell.exe" -Arguments "-File ""\$cywisePath\logparser.ps1"""  -TaskName "LogParser" -ExecutionType Custom -RepeatInterval 3600
-
 # Drop Osquery daemon's output every sunday at 01:11 am
 CreateOrUpdate-ScheduledTask -Executable "powershell.exe" -Arguments "-Command ""& { if (Test-Path '\$osqueryPath\log\osqueryd.results.log') { Remove-Item -Path '\$osqueryPath\log\osqueryd.results.log' -Force }; if (Test-Path '\$osqueryPath\log\osqueryd.snapshots.log') { Remove-Item -Path '\$osqueryPath\log\osqueryd.snapshots.log' -Force } }""" -TaskName "DeleteOsqueryLogFiles" -ExecutionType "Weekly" -DayOfWeek 0 -TimeOfWeek "1:11"
 
@@ -799,6 +656,10 @@ CreateOrUpdate-ScheduledTask -Executable "powershell.exe" -Arguments "-Command "
 
 # Collect CPU, memory and disks metrics every 5 minutes
 CreateOrUpdate-ScheduledTask -Executable "powershell.exe" -Arguments "-File ""\$cywisePath\localMetrics.ps1"""  -TaskName "LocalMetrics" -ExecutionType Custom -RepeatInterval 300
+
+# Delete entry that parse web logs every hour
+Unregister-ScheduledTask -TaskName LogParser -Confirm:\$false
+
 $updatePerformaScheduledTask
 EOT;
     }

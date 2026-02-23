@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Iframes;
 
-use App\Helpers\JosianeClient;
 use App\Http\Controllers\Controller;
 use App\Http\Procedures\EventsProcedure;
+use App\Http\Procedures\LeaksProcedure;
+use App\Http\Procedures\NotesProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
@@ -26,89 +27,6 @@ use Illuminate\View\View;
 
 class TimelineController extends Controller
 {
-    public static function fetchLeaks(User $user, ?Carbon $createdAtOrAfter = null): Collection
-    {
-        $now = Carbon::now()->utc()->subDays(15);
-        $leaks = TimelineItem::fetchLeaks($user->id, $now, null, 0);
-
-        if ($leaks->isEmpty()) {
-
-            $tlds = "'" . Asset::select('am_assets.*')
-                    ->join('users', 'users.id', '=', 'am_assets.created_by')
-                    ->when($user->tenant_id, fn($query, $tenantId) => $query->where('users.tenant_id', $tenantId))
-                    ->when($user->customer_id, fn($query, $customerId) => $query->where('users.customer_id', $customerId))
-                    ->get()
-                    ->map(fn(Asset $asset) => $asset->tld())
-                    ->filter(fn(?string $tld) => !empty($tld))
-                    ->unique()
-                    ->join("','") . "'";
-
-            if ($tlds === "''") {
-                $leaks = collect();
-            } else {
-                $query = "
-                  SELECT DISTINCT 
-                    min(db_date) AS leak_date, 
-                    lower(concat(login, '@', login_email_domain)) AS email, 
-                    concat(url_scheme, '://', url_subdomain, '.', url_domain) AS website, 
-                    password
-                  FROM dumps_login_email_domain 
-                  WHERE login_email_domain IN ({$tlds})
-                  GROUP BY email, website, password
-                  ORDER BY email, website ASC
-                ";
-
-                // Log::debug($query);
-
-                $output = JosianeClient::executeQuery($query);
-                $leaks = collect(explode("\n", $output))
-                    ->filter(fn(string $line) => !empty($line) && $line !== 'ok')
-                    ->map(function (string $line) {
-                        $obj = explode("\t", $line);
-                        return [
-                            'leak_date' => Str::before(Str::trim($obj[0]), ' '),
-                            'email' => Str::trim($obj[1] ?? ''),
-                            'website' => Str::trim($obj[2] ?? ''),
-                            'password' => self::maskPassword(Str::trim($obj[3] ?? '')),
-                        ];
-                    })
-                    ->map(function (array $credentials) {
-                        // if (preg_match("/(?i)\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|(([^\s()<>]+|(([^\s()<>]+)))*))+(?:(([^\s()<>]+|(([^\s()<>]+)))*)|[^\s`!()[]{};:'\".,<>?«»“”‘’]))/", $credentials['website'])) {
-                        if (filter_var($credentials['website'], FILTER_VALIDATE_URL)) {
-                            return $credentials;
-                        }
-                        return [
-                            'leak_date' => $credentials['leak_date'],
-                            'email' => $credentials['email'],
-                            'website' => '',
-                            'password' => $credentials['password'],
-                        ];
-                    })
-                    ->unique(fn(array $credentials) => $credentials['email'] . $credentials['website'] . $credentials['password']);
-            }
-            if (count($leaks) > 0) {
-
-                // Get previous leaks
-                $leaksPrev = TimelineItem::fetchLeaks($user->id, null, $now, 0)
-                    ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']));
-
-                $leaks = $leaks->filter(function (array $leak) use ($leaksPrev) {
-                    return !$leaksPrev->contains(function (object $leakPrev) use ($leak) {
-                        return $leakPrev->email === $leak['email'] &&
-                            $leakPrev->website === $leak['website'] &&
-                            $leakPrev->password === $leak['password'];
-                    });
-                });
-
-                // Only add the new leaks
-                if (count($leaks) > 0) {
-                    $leaks->chunk(10)->each(fn(Collection $leaksChunk) => TimelineItem::createLeak($user, $leaksChunk->values()->toArray()));
-                }
-            }
-        }
-        return TimelineItem::fetchLeaks($user->id, $createdAtOrAfter, null, 0);
-    }
-
     public static function noteAndMemo(User $user, TimelineItem $item): array
     {
         $timestamp = $item->timestamp->utc()->format('Y-m-d H:i:s');
@@ -128,17 +46,6 @@ class TimelineController extends Controller
         ];
     }
 
-    private static function maskPassword(string $password, int $size = 3): string
-    {
-        if (Str::length($password) <= 2) {
-            return Str::repeat('*', Str::length($password));
-        }
-        if (Str::length($password) <= 2 * $size) {
-            return self::maskPassword($password, 1);
-        }
-        return Str::substr($password, 0, $size) . Str::repeat('*', Str::length($password) - 2 * $size) . Str::substr($password, -$size, $size);
-    }
-
     public function __invoke(Request $request): View
     {
         $params = $request->validate([
@@ -148,6 +55,7 @@ class TimelineController extends Controller
             'asset_id' => ['nullable', 'integer', 'exists:am_assets,id'],
             'tld' => ['nullable', 'string'],
             'tags' => ['nullable', 'string'], // comma-separated list
+            'port_tags' => ['nullable', 'string'], // comma-separated list
             'rule_name' => ['nullable', 'string'],
         ]);
 
@@ -185,6 +93,14 @@ class TimelineController extends Controller
                 $params['tld'] ?? null,
                 !empty($params['tags']) ?
                     collect(explode(',', $params['tags']))
+                        ->map(fn(string $tag) => Str::trim($tag))
+                        ->filter(fn(string $tag) => !empty($tag))
+                        ->unique()
+                        ->values()
+                        ->all() :
+                    null,
+                !empty($params['port_tags']) ?
+                    collect(explode(',', $params['port_tags']))
                         ->map(fn(string $tag) => Str::trim($tag))
                         ->filter(fn(string $tag) => !empty($tag))
                         ->unique()
@@ -251,6 +167,17 @@ class TimelineController extends Controller
                 ->orderBy('tag')
                 ->get()
                 ->map(fn(AssetTag $tag) => Str::lower($tag->tag))
+                ->unique()
+                ->values(),
+            'port_tags' => PortTag::query()
+                ->select('tag')
+                ->join('am_ports', 'am_ports.id', '=', 'am_ports_tags.port_id')
+                ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
+                ->whereIn('am_scans.asset_id', Asset::query()->pluck('id'))
+                ->distinct()
+                ->orderBy('tag')
+                ->get()
+                ->map(fn(PortTag $tag) => Str::lower($tag->tag))
                 ->unique()
                 ->values(),
         ]);
@@ -583,13 +510,15 @@ class TimelineController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        $leaks = self::fetchLeaks($user);
+        $request = new JsonRpcRequest();
+        $request->setUserResolver(fn() => $user);
+        $leaks = (new LeaksProcedure())->list($request)['leaks'];
 
         return [
             'nb_leaks' => $leaks->count(),
-            'items' => $leaks->map(function (TimelineItem $item) use ($user) {
+            'items' => $leaks->chunk(25)->map(function (Collection $leaks) use ($user) {
 
-                $timestamp = $item->timestamp->utc()->format('Y-m-d H:i:s');
+                $timestamp = $leaks->first()->timestamp->utc()->format('Y-m-d H:i:s');
                 $date = Str::before($timestamp, ' ');
                 $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
 
@@ -601,7 +530,7 @@ class TimelineController extends Controller
                         'date' => $date,
                         'time' => $time,
                         'user' => $user,
-                        'leak' => $item,
+                        'leaks' => $leaks,
                     ])->render(),
                 ];
             }),
@@ -612,17 +541,19 @@ class TimelineController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        $notes = TimelineItem::fetchNotes($user->id, null, null, 0);
+        $request = new JsonRpcRequest();
+        $request->setUserResolver(fn() => $user);
+        $notes = (new NotesProcedure())->list($request)['notes'];
 
         return [
             'nb_notes' => $notes->count(),
-            'items' => $notes->map(fn(TimelineItem $item) => self::noteAndMemo($user, $item)),
+            'items' => $notes->map(fn(array $item) => self::noteAndMemo($user, $item['item'])),
         ];
     }
 
-    private function vulnerabilities(?string $level = null, ?int $assetId = null, ?string $tld = null, ?array $tags = null): array
+    private function vulnerabilities(?string $level = null, ?int $assetId = null, ?string $tld = null, ?array $tags = null, ?array $portTags = null): array
     {
-        $alerts = $this->alerts($assetId, $tld, $tags);
+        $alerts = $this->alerts($assetId, $tld, $tags, $portTags);
         $nbHigh = 0;
         $nbMedium = 0;
         $nbLow = 0;
@@ -712,12 +643,13 @@ class TimelineController extends Controller
         ];
     }
 
-    private function alerts(?int $assetId = null, ?string $tld = null, ?array $tags = null): Collection
+    private function alerts(?int $assetId = null, ?string $tld = null, ?array $tags = null, ?array $portTags = null): Collection
     {
         $request = new JsonRpcRequest([
             'asset_id' => $assetId,
             'tld' => $tld,
             'tags' => $tags,
+            'port_tags' => $portTags,
         ]);
         $request->setUserResolver(fn() => Auth::user());
         $alerts = (new VulnerabilitiesProcedure())->list($request);

@@ -4,7 +4,7 @@ namespace App\Observers;
 
 use App\Traits\IsTenantAware;
 
-class YnhBackupObserver
+class ScheduledTaskObserver
 {
     use IsTenantAware;
 }
