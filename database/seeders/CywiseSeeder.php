@@ -532,27 +532,42 @@ class CywiseSeeder extends Seeder
             return;
         }
 
-        $policyUid = 'cywise_ossec';
-        $policyName = 'Cywise OSSEC Rules';
-        $policyDescription = 'Cywise OSSEC Rules';
+        // Cleanup (?)
+        \App\Models\YnhOssecPolicy::query()->where('uid', 'cywise_ossec')->delete();
 
-        // TODO : create one policy for each OS (see OssecCheckScript::hasScript and YnhOssecPolicy::isWindows, ...)
-        $pol = \App\Models\YnhOssecPolicy::updateOrCreate([
-            'uid' => $policyUid,
-        ], [
-            'uid' => $policyUid,
-            'name' => $policyName,
-            'description' => $policyDescription,
-            'references' => [],
-            'requirements' => [],
-        ]);
+        $policiesConfig = [
+            'unix' => [
+                'uid' => 'cywise_ossec_unix',
+                'name' => 'Cywise OSSEC Rules for Unix',
+                'description' => 'Cywise OSSEC Rules for Unix',
+                'id_offset' => 50000,
+            ],
+            'centos' => [
+                'uid' => 'cywise_ossec_centos',
+                'name' => 'Cywise OSSEC Rules for CentOS',
+                'description' => 'Cywise OSSEC Rules for CentOS',
+                'id_offset' => 60000,
+            ],
+        ];
+
+        $policies = [];
+        foreach ($policiesConfig as $key => $config) {
+            $policies[$key] = \App\Models\YnhOssecPolicy::updateOrCreate([
+                'uid' => $config['uid'],
+            ], [
+                'uid' => $config['uid'],
+                'name' => $config['name'],
+                'description' => $config['description'],
+                'references' => [],
+                'requirements' => [],
+            ]);
+        }
 
         $ok = 0;
         $ko = 0;
 
         foreach ($rules as $index => $rule) {
             try {
-                $id = 50000 + $index;
                 $title = $rule['title'] ?? '';
                 $description = $rule['description'] ?? '';
                 $condition = $rule['match_type'] ?? 'all';
@@ -570,21 +585,32 @@ class CywiseSeeder extends Seeder
                     Log::warning("Could not parse rule: {$str}");
                     $ko++;
                 } else {
-                    \App\Models\YnhOssecCheck::updateOrCreate([
-                        'uid' => $id,
-                    ], [
-                        'ynh_ossec_policy_id' => $pol->id,
-                        'uid' => $id,
-                        'title' => $title,
-                        'description' => $description,
-                        'rationale' => '',
-                        'impact' => '',
-                        'remediation' => '',
-                        'compliance' => [],
-                        'references' => array_filter(explode(',', $references), fn(string $ref) => !empty($ref)),
-                        'requirements' => $parsedRules,
-                        'rule' => $str,
-                    ]);
+                    $isRedHat = Str::contains($title, 'RedHat');
+
+                    foreach ($policiesConfig as $key => $config) {
+                        if ($key === 'unix' && $isRedHat) {
+                            continue;
+                        }
+
+                        $id = $config['id_offset'] + $index;
+                        $pol = $policies[$key];
+
+                        \App\Models\YnhOssecCheck::updateOrCreate([
+                            'uid' => $id,
+                        ], [
+                            'ynh_ossec_policy_id' => $pol->id,
+                            'uid' => $id,
+                            'title' => $title,
+                            'description' => $description,
+                            'rationale' => '',
+                            'impact' => '',
+                            'remediation' => '',
+                            'compliance' => [],
+                            'references' => array_filter(explode(',', $references), fn(string $ref) => !empty($ref)),
+                            'requirements' => $parsedRules,
+                            'rule' => $str,
+                        ]);
+                    }
                     $ok++;
                 }
             } catch (\Exception $e) {
@@ -594,7 +620,7 @@ class CywiseSeeder extends Seeder
         }
 
         $total = $ok + $ko;
-        Log::debug("{$total} Cywise OSSEC rules parsed. {$ok} OK. {$ko} KO.");
+        Log::debug("{$total} custom OSSEC rules processed. {$ok} OK. {$ko} KO.");
     }
 
     private function setupOsqueryRules(): void

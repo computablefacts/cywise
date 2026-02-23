@@ -12,7 +12,7 @@ use App\Models\Asset;
 use App\Models\Port;
 use App\Models\Scan;
 use App\Models\User;
-use App\Models\Trial;
+use App\Models\YnhTrial;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -41,7 +41,7 @@ class EndVulnsScanListener extends AbstractListener
 
             /** @var Asset $asset */
             $asset = $scan->asset()->firstOrFail();
-            /** @var Trial $trial */
+            /** @var YnhTrial $trial */
             $trial = $asset->trial()->first();
 
             if ($trial) {
@@ -317,7 +317,7 @@ class EndVulnsScanListener extends AbstractListener
             $results['explanation'] = $this->processLlmPart($port, $alert, $category, $context, 'explanation');
         }
         if ($mode === 'script' || $mode === 'both') {
-            $results['script'] = $this->processLlmPart($port, $alert, $category, $context, 'script');
+            $results['script'] = $this->processLlmPart($port, $alert, $category, $context, 'script', $results['explanation'] ?? null);
         }
 
         $aiRemediation = $results['explanation'] ?? '';
@@ -434,7 +434,7 @@ class EndVulnsScanListener extends AbstractListener
         return 'unknown';
     }
 
-    private function processLlmPart(Port $port, array $alert, string $category, array $context, string $type): string
+    private function processLlmPart(Port $port, array $alert, string $category, array $context, string $type, ?string $explanation = null): string
     {
         $title = $alert['title'] ?? '';
         $alertType = $alert['type'] ?? '';
@@ -467,7 +467,7 @@ class EndVulnsScanListener extends AbstractListener
             'cve_id' => $context['cve_id'] ?? 'N/A',
             'domain' => $context['ip'],
             'filename' => basename(parse_url($context['exposed_url'] ?? '', PHP_URL_PATH) ?: 'file'),
-            'analysis_context' => '',
+            'analysis_context' => $explanation ?? '',
             'risky_parts' => 'Analyse en cours...',
             'cve_info' => $context['cve_info'] ?? '',
         ];
