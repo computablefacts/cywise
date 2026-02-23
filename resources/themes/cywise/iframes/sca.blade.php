@@ -154,6 +154,7 @@
         {{ $check->description }}
       </div>
     </div>
+    @if($check->rationale)
     <div class="row mt-2">
       <div class="col col-2 text-end">
         <b>{{ __('Rationale') }}</b>
@@ -162,6 +163,8 @@
         {{ $check->rationale }}
       </div>
     </div>
+    @endif
+    @if($check->remediation)
     <div class="row mt-2">
       <div class="col col-2 text-end">
         <b>{{ __('Remediation') }}</b>
@@ -170,6 +173,7 @@
         {{ $check->remediation }}
       </div>
     </div>
+    @endif
     @if($check->references)
     <div class="row mt-2">
       <div class="col col-2 text-end">
