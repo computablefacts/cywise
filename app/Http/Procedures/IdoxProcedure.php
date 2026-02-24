@@ -16,15 +16,16 @@ class IdoxProcedure extends Procedure
         description: "List the user's workspaces.",
         params: [],
         result: [
-            'msg' => 'Success message.',
+            'workspaces' => 'A list of workspaces.',
         ],
         ai_examples: [
+            "if the request is 'list IDOX workspaces', the input should be {}",
             "if the request is 'list FusionLive workspaces', the input should be {}",
         ],
         ai_result: "
             J'ai trouvé {{ count(\$result['workspaces']) }} espaces de travail :
             @foreach(\$result['workspaces'] as \$w)
-            - L'espace de travail '{{ \$w['name'] }}' a pour statut '{{ \$w['status'] }}' et pour URI '{{ \$w['uri'] }}'
+            - L'espace de travail '{{ \$w['name'] }}' a été créé le {{ \$w['creation_date'] }} par {{ \$w['created_by'] }} et a pour identifiant {{ \$w['id'] }}. Il est associé à la société {{ \$w['company'] }} et a pour statut '{{ \$w['status'] }}'.
             @endforeach
         ",
     )]
@@ -50,10 +51,17 @@ class IdoxProcedure extends Procedure
             'workspaces' => array_map(function (\SimpleXMLElement $w) {
                 return [
                     'id' => (int)(IdoxXmlElement::attr($w, 'id') ?? 0),
+                    'company_id' => (int)(IdoxXmlElement::attr($w, 'company_id') ?? 0),
+                    'company' => (string)(IdoxXmlElement::attr($w, 'company') ?? ''),
                     'name' => (string)(IdoxXmlElement::attr($w, 'name') ?? ''),
                     'status' => (string)(IdoxXmlElement::attr($w, 'status') ?? ''),
                     'uri' => (string)(IdoxXmlElement::attr($w, 'uri') ?? ''),
+                    'creation_date' => (string)(IdoxXmlElement::attr($w, 'creationdate') ?? ''),
+                    'created_by' => (string)(IdoxXmlElement::attr($w, 'initiator') ?? ''),
                     'is_default' => (IdoxXmlElement::attr($w, 'is_default') === 'true'),
+                    'is_inbox_enabled' => (IdoxXmlElement::attr($w, 'isInboxEnabled') === 'true'),
+                    'is_dcl_enabled' => (IdoxXmlElement::attr($w, 'isDLCEnabled') === 'true'),
+                    'is_br_enabled' => (IdoxXmlElement::attr($w, 'isBREnabled') === 'true'),
                 ];
             }, $el->workspaces),
         ];
