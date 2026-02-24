@@ -4,6 +4,8 @@ use App\Events\BeginVulnsScan;
 use App\Events\EndPortsScan;
 use App\Events\EndVulnsScan;
 use App\Http\Controllers\TablesUploadController;
+use App\Http\Controllers\TelegramWebhookController;
+use App\Http\Controllers\WhatsAppWebhookController;
 use App\Mail\SimpleEmail;
 use App\Models\Asset;
 use App\Models\Honeypot;
@@ -16,8 +18,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Sajya\Server\Middleware\GzipCompress;
 use Wave\Facades\Wave;
-use App\Http\Controllers\TelegramWebhookController;
-use App\Http\Controllers\WhatsAppWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -228,6 +228,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\FilesProcedure::class,
             \App\Http\Procedures\FrameworksProcedure::class,
             \App\Http\Procedures\HoneypotsProcedure::class,
+            \App\Http\Procedures\IdoxProcedure::class,
             \App\Http\Procedures\InvitationsProcedure::class,
             \App\Http\Procedures\LeaksProcedure::class,
             \App\Http\Procedures\NotesProcedure::class,
