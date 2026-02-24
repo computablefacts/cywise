@@ -56,7 +56,8 @@
         "techamica/smtpserver-api": "^1.0",
         "tymon/jwt-auth": "@dev",
         "wamania/php-stemmer": "^4.0",
-        "webklex/laravel-imap": "^6.2"
+        "webklex/laravel-imap": "^6.2",
+        "ext-simplexml": "*"
     },
     "require-dev": {
         "alebatistella/duskapiconf": "^1.2",
