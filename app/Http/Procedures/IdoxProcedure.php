@@ -67,6 +67,133 @@ class IdoxProcedure extends Procedure
         ];
     }
 
+    #[RpcMethod(
+        description: "List all folders and documents for a workspace.",
+        params: [
+            'workspace_id' => 'The workspace ID. (integer|required|min:0)',
+            'status' => 'An optional document status to filter by. (string|nullable|min:1|max:50)'
+        ],
+        result: [
+            'documents' => 'A list of documents.',
+        ],
+        ai_examples: [
+            "if the request is 'list files in 1458', the input should be {\"workspace_id\":1458}",
+            "if the request is 'list files whose status is 'MAJ - Pour mise à jour' in 1458', the input should be {\"workspace_id\":1458,\"status\":\"MAJ - Pour mise à jour\"}",
+        ],
+        ai_result: "{{ json_encode(\$result) }}",
+    )]
+    public function listDocuments(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'workspace_id' => 'integer|required|min:0',
+            'status' => 'string|nullable|min:1|max:50',
+        ]);
+        $workspaceId = $params['workspace_id'];
+        $status = $params['status'] ?? null;
+        $token = $this->token($username, $password);
+        $documents = collect($this->crawlFolders($token, $workspaceId, 0))
+            ->filter(fn(array $location) => ($location['count'] ?? 0) > 0)
+            ->map(function (array $location) use ($status) {
+                if ($status != null) {
+                    $location['documents'] = array_filter($location['documents'], fn(array $doc) => $doc['status'] === $status);
+                }
+                return $location;
+            })
+            ->values()
+            ->toArray();
+
+        return [
+            'documents' => $documents,
+        ];
+    }
+
+    private function crawlFolders(string $token, int $workspaceId, int $folderId): array
+    {
+        $documents = [$this->loadDocuments($token, $workspaceId, $folderId)];
+        $folders = $this->loadFolders($token, $workspaceId, $folderId);
+
+        foreach ($folders as $folder) {
+            $subDocuments = $this->crawlFolders($token, $workspaceId, (int)$folder['id']);
+            $documents = array_merge($documents, $subDocuments);
+        }
+        return $documents;
+    }
+
+    private function loadFolders(string $token, int $workspaceId, int $folderId): array
+    {
+        $payload = $folderId > 0 ?
+            "<listfolders mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/><parent id=\"{$folderId}\"/></listfolders>" :
+            "<listfolders mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/></listfolders>";
+        $result = $this->post('/pws/folders', $payload);
+
+        if ($result['code'] != 0) {
+            return [];
+        }
+
+        $el = new IdoxXmlElement($result['data'], [
+            'folders' => [
+                'xpath' => '/status/folders/folder',
+                'many' => true
+            ],
+        ]);
+
+        return array_map(function (\SimpleXMLElement $f) {
+            return [
+                'id' => (int)IdoxXmlElement::attr($f, 'id'),
+                'name' => (string)IdoxXmlElement::attr($f, 'name'),
+            ];
+        }, $el->folders);
+    }
+
+    private function loadDocuments(string $token, int $workspaceId, int $folderId): array
+    {
+        $payload = "<listdocuments mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/><parent id=\"{$folderId}\"/></listdocuments>";
+        $result = $this->post('/pws/folders', $payload);
+
+        if ($result['code'] != 0) {
+            return [];
+        }
+
+        $el = new IdoxXmlElement($result['data'], [
+            'location' => '/status/documents/@location',
+            'count' => '/status/documents/@count',
+            'documents' => [
+                'xpath' => '/status/documents/document',
+                'many' => true
+            ],
+        ]);
+
+        $location = (string)$el->location;
+        $count = (int)$el->count;
+
+        return [
+            'id' => $folderId,
+            'location' => $location,
+            'count' => $count,
+            'documents' => array_map(function (\SimpleXMLElement $d) {
+                return [
+                    'id' => (int)IdoxXmlElement::attr($d, 'id'),
+                    'upload_date' => (string)IdoxXmlElement::attr($d, 'uploaded'),
+                    'first_version_id' => (int)IdoxXmlElement::attr($d, 'firstVersionId'),
+                    'reference' => (string)IdoxXmlElement::attr($d, 'reference'),
+                    'title' => (string)IdoxXmlElement::attr($d, 'title'),
+                    'revision' => (string)IdoxXmlElement::attr($d, 'revision'),
+                    'status' => (string)IdoxXmlElement::attr($d, 'status'),
+                    'version' => (string)IdoxXmlElement::attr($d, 'version'),
+                    'is_latest' => (IdoxXmlElement::attr($d, 'islatest') === 'true'),
+                    'has_content' => (IdoxXmlElement::attr($d, 'hascontent') === 'true'),
+                    'has_link' => (IdoxXmlElement::attr($d, 'haslink') === 'true'),
+                    'is_link' => (IdoxXmlElement::attr($d, 'islink') === 'true'),
+                    'is_locked' => (IdoxXmlElement::attr($d, 'islocked') === 'true'),
+                    'has_attachment' => (IdoxXmlElement::attr($d, 'hasattachment') === 'true'),
+                    'has_markup' => (IdoxXmlElement::attr($d, 'hasmarkup') === 'true'),
+                    'size' => (int)IdoxXmlElement::attr($d, 'size'),
+                    'company_name' => (string)IdoxXmlElement::attr($d, 'companyname'),
+                ];
+            }, $el->documents),
+        ];
+    }
+
     private function token(string $username, string $password): string
     {
         $result = $this->authenticate($username, $password);
