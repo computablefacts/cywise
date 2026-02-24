@@ -451,7 +451,7 @@ class EndVulnsScanListener extends AbstractListener
                 Log::warning("Fetch failed ($url): " . $response->status());
             }
         } catch (\Exception $e) {
-            Log::warning("Impossible de fetch le fichier exposé ($url): " . $e->getMessage());
+            Log::warning("Fetch failed ($url): " . $e->getMessage());
         }
     }
 
