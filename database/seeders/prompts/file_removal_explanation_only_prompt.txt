@@ -12,6 +12,9 @@ Un fichier exposé a été détecté sur un serveur. Tu dois fournir une documen
 <tags>{tags}</tags>
 <title>{title}</title>
 <description>{vulnerability}</description>
+<file_data>
+{content}
+</file_data>
 </vulnerability>
 
 {analysis_context}
@@ -42,7 +45,7 @@ Tu DOIS répondre en suivant EXACTEMENT ce format MARKDOWN avec balises de comme
 ### Risques si Non Corrigé
 
 **Éléments sensibles identifiés:**
-{risky_parts}
+[Analyse précisément {content} pour identifier ce qui est sensible : versions (Node.js, Next.js, etc.), chemins, ou secrets]
 
 **Impact potentiel:**
 [En te basant sur les éléments sensibles ci-dessus, explique les conséquences concrètes de cette exposition]

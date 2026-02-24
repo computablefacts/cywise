@@ -381,36 +381,78 @@ class EndVulnsScanListener extends AbstractListener
         ];
 
         if ($category === 'file_exposed') {
-            if (preg_match('/url\s*:(?:http?:\/\/)?([^\s<>"\']+)/i', $context['vulnerability'], $matches)) {
-
-                $url = Str::contains($matches[0], 'url :') ? Str::after($matches[0], ':') : $matches[1];
-                $url = Str::trim($url);
+            $url = $this->extractExposedUrl($alert, $port);
+            if ($url) {
                 $context['exposed_url'] = $url;
-
-                try {
-                    $response = Http::withOptions(['verify' => false])->timeout(10)->get($url);
-                    if ($response->successful()) {
-                        $context['file_content'] = Str::limit($response->body(), 4000);
-                        $serverHeader = Str::lower($response->header('Server', ''));
-                        $poweredBy = Str::lower($response->header('X-Powered-By', ''));
-                        if (Str::contains($serverHeader, 'nginx')) {
-                            $context['technology'] = 'nginx';
-                        } elseif (Str::contains($serverHeader, 'apache') || Str::contains($poweredBy, 'apache')) {
-                            $context['technology'] = 'apache';
-                        }
-                    }
-                } catch (\Exception $e) {
-                    Log::warning("Impossible de fetch le fichier exposé: " . $e->getMessage());
-                }
+                $this->fetchExposedContent($url, $context);
             }
         }
+
         if ($context['technology'] === 'unknown' && in_array($category, ['file_exposed', 'weak_cipher', 'general'])) {
             $context['technology'] = $this->probeTechnology($context['ip'], (int)$context['port']);
         }
+
         if ($category === 'cve' && $context['cve_id']) {
             $context['cve_info'] = "NIST NVD: https://nvd.nist.gov/vuln/detail/" . strtoupper($context['cve_id']);
         }
+
         return $context;
+    }
+
+    private function extractExposedUrl(array $alert, Port $port): ?string
+    {
+        $url = $alert['url'] ?? $alert['matched_at'] ?? $alert['matched-at'] ?? null;
+        $searchIn = ($alert['vulnerability'] ?? '') . ' ' . ($alert['title'] ?? '');
+
+        if (!$url && preg_match('/(?:url|cible|target|host|matched|exposé)\s*:\s*(?:https?:\/\/)?([^\s<>"\']+)/i', $searchIn, $matches)) {
+            $url = $matches[1];
+        }
+
+        $hasPath = false;
+        if ($url) {
+            $parsed = parse_url(Str::contains($url, '://') ? $url : 'http://' . $url);
+            $hasPath = !empty($parsed['path']) && $parsed['path'] !== '/';
+        }
+
+        if (!$hasPath) {
+            if (preg_match('/(?:fichier|file|path|chemin|filename)\s*:\s*([^\s<>"\']+)/i', $searchIn, $matches)) {
+                $path = ltrim($matches[1], '/');
+                $base = $url ?: ($port->ip . ($port->port != 80 && $port->port != 443 ? ':' . $port->port : ''));
+                $url = rtrim($base, '/') . '/' . $path;
+            }
+        }
+
+        if ($url) {
+            $url = Str::trim($url);
+            if (!Str::contains($url, '://')) {
+                $scheme = ($port->ssl || $port->port === 443) ? 'https://' : 'http://';
+                $url = $scheme . ltrim($url, '/');
+            }
+            return $url;
+        }
+
+        return null;
+    }
+
+    private function fetchExposedContent(string $url, array &$context): void
+    {
+        try {
+            $response = Http::withOptions(['verify' => false])->timeout(10)->get($url);
+            if ($response->successful()) {
+                $context['file_content'] = Str::limit($response->body(), 4000);
+                $serverHeader = Str::lower($response->header('Server', ''));
+                $poweredBy = Str::lower($response->header('X-Powered-By', ''));
+                if (Str::contains($serverHeader, 'nginx')) {
+                    $context['technology'] = 'nginx';
+                } elseif (Str::contains($serverHeader, 'apache') || Str::contains($poweredBy, 'apache')) {
+                    $context['technology'] = 'apache';
+                }
+            } else {
+                Log::warning("Fetch failed ($url): " . $response->status());
+            }
+        } catch (\Exception $e) {
+            Log::warning("Impossible de fetch le fichier exposé ($url): " . $e->getMessage());
+        }
     }
 
     private function probeTechnology(string $ip, int $port): string
@@ -438,42 +480,36 @@ class EndVulnsScanListener extends AbstractListener
     {
         $title = $alert['title'] ?? '';
         $alertType = $alert['type'] ?? '';
+        $fileContent = $context['file_content'] ?? '';
 
-        if ($category === 'file_exposed' && !empty($context['file_content']) && $type === 'explanation') {
-            $fpPrompt = PromptsProvider::provide('false_positive_prompt', [
-                'CONTENT' => $context['file_content'],
-                'TITLE' => $title,
-                'TYPE' => $alertType
-            ]);
+        if ($category === 'file_exposed' && !empty($fileContent) && $type === 'explanation') {
+            $fpPrompt = PromptsProvider::provide('false_positive_prompt', array_merge($context, [
+                'content' => $fileContent,
+                'title' => $title,
+                'type' => $alertType,
+            ]));
+
             $fpResult = LlmsProvider::provide($fpPrompt);
             if (Str::contains(Str::lower($fpResult), '<is_false_positive>true</is_false_positive>')) {
-                return "Faux positif" . $fpResult;
+                return $fpResult;
             }
         }
 
         $template = $this->resolveTemplate($category, $type);
 
-        $vars = [
-            'ip' => $context['ip'],
-            'port' => $context['port'],
-            'protocol' => $context['protocol'],
+        $vars = array_merge($context, [
+            'content' => $fileContent,
             'title' => $title,
             'type' => $alertType,
-            'vulnerability' => $context['vulnerability'],
             'remediation' => $alert['remediation'] ?? '',
-            'technology' => $context['technology'],
             'technology_upper' => strtoupper($context['technology']),
-            'tags' => $context['tags'],
-            'cve_id' => $context['cve_id'] ?? 'N/A',
             'domain' => $context['ip'],
             'filename' => basename(parse_url($context['exposed_url'] ?? '', PHP_URL_PATH) ?: 'file'),
             'analysis_context' => $explanation ?? '',
-            'risky_parts' => 'Analyse en cours...',
-            'cve_info' => $context['cve_info'] ?? '',
-        ];
+            'risky_parts' => !empty($fileContent) ? $fileContent : 'Analyse en cours...',
+        ]);
 
         if ($type === 'script') {
-
             $scriptDir = base_path("database/seeders/remediations");
             $scriptFile = match ($category) {
                 'file_exposed' => "script_{$context['technology']}.bash",

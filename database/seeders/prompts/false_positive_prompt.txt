@@ -1,4 +1,4 @@
-Un fichier a été détecté comme exposé mais l'analyse automatique indique que c'est un FAUX POSITIF. Explique de façon concise pourquoi c'est un faux positif en suivant le format markdown attendu.
+Tu es un expert en cybersécurité. Un fichier a été détecté comme exposé. Ton rôle est de déterminer s'il s'agit d'un FAUX POSITIF (le contenu n'est pas sensible) ou d'un vrai risque. Si c'est un faux positif, explique de façon concise pourquoi en suivant le format markdown attendu.
 
 <alert_info>
 Type: {type}
@@ -6,24 +6,31 @@ Titre: {title}
 IP: {ip}:{port}
 </alert_info>
 
-<analysis>
-Cette alerte a été analysée automatiquement et identifiée comme un FAUX POSITIF avec une confiance élevée.
+<content>
+{content}
+</content>
 
-Raison:
-{risky_parts}
+<analysis>
+Analyse le contenu du fichier {filename} fourni ci-dessus (dans <content>) et détermine si c'est un faux positif. 
+Un faux positif est un fichier qui ne contient AUCUNE information sensible (identifiants, clés, PII, configurations internes, secrets). 
+Un README standard de projet open-source ou une documentation publique est généralement un faux positif s'il n'expose pas de secrets ou de configurations confidentielles.
 </analysis>
 
 <output_format>
-Réponds en suivant EXACTEMENT ce format markdown (sans balises HTML) :
+Si et seulement si c'est un faux positif, tu DOIS inclure la balise <is_false_positive>true</is_false_positive> dans ta réponse.
+Puis explique pourquoi c'est un faux positif de façon concise.
 
+Format attendu :
+<is_false_positive>true</is_false_positive>
 **Faux positif** : [Explication concise en 2-3 phrases expliquant pourquoi le fichier ne présente aucun risque de sécurité. Mentionne le type de contenu et l'absence de données sensibles.]
+</output_format>
+
+<example>
+<is_false_positive>true</is_false_positive>
+**Faux positif** : Le fichier `README.md` contient uniquement des informations **publiques** standard pour un projet open-source (documentation technique, badges CI/CD, liens officiels). Aucune donnée sensible (identifiants, clés, PII, configurations internes) n'est exposée. L'alerte est sans risque.
+</example>
 
 IMPORTANT :
 - Reste concis et direct
 - Utilise le format markdown simple (pas de balises HTML)
 - Ne fournis PAS de solution puisque c'est un faux positif
-</output_format>
-
-<example>
-**Faux positif** : Le fichier `README.md` contient uniquement des informations **publiques** standard pour un projet open-source (documentation technique, badges CI/CD, liens officiels). Aucune donnée sensible (identifiants, clés, PII, configurations internes) n'est exposée. L'alerte est sans risque.
-</example>
