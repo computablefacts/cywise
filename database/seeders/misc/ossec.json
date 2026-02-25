@@ -1,45 +1,10 @@
 [
     {
-        "title": "Disable acceptance of all IPv4 redirected packets",
-        "description": "Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.",
+        "title": "CIS: Additional process hardening",
+        "description": "1.5.4 Ensure prelink is disabled",
         "match_type": "all",
         "references": [],
-        "command": "c:sysctl -n net.ipv4.conf.default.accept_redirects -> =:0;\nc:sysctl -n net.ipv4.conf.all.accept_redirects -> =:0;"
-    },
-    {
-        "title": "Install auditd",
-        "description": "auditd provides extended logging capabilities on recent distributions",
-        "match_type": "all",
-        "references": [],
-        "command": "c:dpkg -s auditd -> r:install ok installed || c:rpm -q audit -> r:^audit-;\nf:/etc/audit/auditd.conf -> r:^log_file\\s+/var/log/audit/audit.log;\nf:/etc/audit/auditd.conf -> r:^log_format\\s+raw;\nf:/etc/audit/auditd.conf -> r:^flush\\s+(INCREMENTAL|INCREMENTAL_ASYNC);\nf:/etc/audit/auditd.conf -> r:^max_log_file_action\\s+keep_logs;\nf:/etc/audit/auditd.conf -> r:^space_left\\s+75;\nf:/etc/audit/auditd.conf -> r:^action_mail_acct\\s+root;\nf:/etc/audit/auditd.conf -> r:^space_left_action\\s+SYSLOG;\nf:/etc/audit/auditd.conf -> r:^admin_space_left\\s+50;\nf:/etc/audit/auditd.conf -> r:^admin_space_left_action\\s+SUSPEND;\nf:/etc/audit/auditd.conf -> r:^disk_full_action\\s+SUSPEND;\nf:/etc/audit/auditd.conf -> r:^disk_error_action\\s+SUSPEND;"
-    },
-    {
-        "title": "ICMP ratemask",
-        "description": "Ratemask is a logical OR of all ICMP codes to rate limit",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.icmp_ratemask -> =:88089;"
-    },
-    {
-        "title": "Disable acceptance of all secure redirected packets",
-        "description": "Disable acceptance of all secure redirected packets these prevents Man-in-the-Middle attacks.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.conf.all.secure_redirects -> =:0;\nc:sysctl -n net.ipv4.conf.default.secure_redirects -> =:0;"
-    },
-    {
-        "title": "Do not install tftp server",
-        "description": "tftp-server provides little security http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.5",
-        "match_type": "all",
-        "references": [],
-        "command": "not c:dpkg -s tftp-server -> r:install ok installed;"
-    },
-    {
-        "title": "Unique uid and gid",
-        "description": "Check for unique uids gids",
-        "match_type": "all",
-        "references": [],
-        "command": "c:cut -d: -f3 /etc/passwd | sort | uniq -d -> r:^$;\nc:cut -d: -f3 /etc/group | sort | uniq -d -> r:^$;"
+        "command": "not c:dpkg -s prelink -> r:install ok installed;"
     },
     {
         "title": "Check for SUID/ SGID blacklist",
@@ -49,11 +14,11 @@
         "command": "c:find / -perm /6000 -type f -> r:.;"
     },
     {
-        "title": "Disable loading kernel modules",
-        "description": "The sysctl key kernel.modules_disabled is very straightforward. If it contains a '1' it will disable loading new modules, where a '0' will still allow loading them. Using this option will be a great protection against loading malicious kernel modules.",
+        "title": "Check login.defs",
+        "description": "Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs",
         "match_type": "all",
         "references": [],
-        "command": "c:sysctl -n kernel.modules_disabled -> =:1;"
+        "command": "f:/etc/login.defs;\nc:stat -c %U /etc/login.defs -> =:root;\nc:stat -c %G /etc/login.defs -> =:root;\nf:/etc/login.defs -> r:^LOGIN_RETRIES\\s+5;\nf:/etc/login.defs -> r:^LOGIN_TIMEOUT\\s+60;\nf:/etc/login.defs -> r:^UID_MIN\\s+1000;\nf:/etc/login.defs -> r:^GID_MIN\\s+1000;"
     },
     {
         "title": "Check login.defs - RedHat specific",
@@ -63,97 +28,6 @@
         "command": "not c:test -w /etc/login.defs;\nf:/etc/login.defs -> r:^SYS_UID_MIN\\s+201;\nf:/etc/login.defs -> r:^SYS_UID_MAX\\s+999;\nf:/etc/login.defs -> r:^SYS_GID_MIN\\s+201;\nf:/etc/login.defs -> r:^SYS_GID_MAX\\s+999;"
     },
     {
-        "title": "Disable acceptance of all IPv6 redirected packets",
-        "description": "Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.default.accept_redirects -> =:0;\nc:sysctl -n net.ipv6.conf.all.accept_redirects -> =:0;"
-    },
-    {
-        "title": "kernel.randomize_va_space",
-        "description": "kernel.randomize_va_space",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n kernel.randomize_va_space -> =:2;"
-    },
-    {
-        "title": "Disable log martians",
-        "description": "log_martians can cause a denial of service attack to the host",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.conf.all.log_martians -> =:1;\nc:sysctl -n net.ipv4.conf.default.log_martians -> =:1;"
-    },
-    {
-        "title": "Disable learning Hop limit from router advertisement",
-        "description": "The accept_ra_defrtr setting controls whether the system will accept Hop Limit settings from a router advertisement. Setting it to 0 prevents a router from changing your default IPv6 Hop Limit for outgoing packets.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.default.accept_ra_defrtr -> =:0;"
-    },
-    {
-        "title": "ICMP ratelimit",
-        "description": "icmp_ratelimit defines how many packets that match the icmp_ratemask per second",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.icmp_ratelimit -> =:100;"
-    },
-    {
-        "title": "ICMP echo ignore broadcasts",
-        "description": "Blocking ICMP ECHO requests to broadcast addresses",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.icmp_echo_ignore_broadcasts -> =:1;"
-    },
-    {
-        "title": "Shared Media IP Architecture",
-        "description": "Send(router) or accept(host) RFC1620 shared media redirects. If it is not set the kernel does not assume that different subnets on this device can communicate directly.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.conf.all.shared_media -> =:1;\nc:sysctl -n net.ipv4.conf.default.shared_media -> =:1;"
-    },
-    {
-        "title": "Protection against SYN flood attacks",
-        "description": "A SYN-Attack is a denial of service (DoS) attack that consumes resources on your system forcing you to reboot.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.tcp_syncookies -> =:1;"
-    },
-    {
-        "title": "Disable IPv6 if it is not needed",
-        "description": "Disable IPv6 if it is not needed",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.all.disable_ipv6 -> =:1;"
-    },
-    {
-        "title": "CIS: Additional process hardening",
-        "description": "1.5.4 Ensure prelink is disabled",
-        "match_type": "all",
-        "references": [],
-        "command": "not c:dpkg -s prelink -> r:install ok installed;"
-    },
-    {
-        "title": "IPv6 Forwarding",
-        "description": "If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.all.forwarding -> =:0;"
-    },
-    {
-        "title": "Disable the system`s acceptance of router advertisement",
-        "description": "Setting controls whether the system will accept router advertisement",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.all.accept_ra -> =:0;\nc:sysctl -n net.ipv6.conf.default.accept_ra -> =:0;"
-    },
-    {
-        "title": "Protect log-directory",
-        "description": "The log-directory /var/log should belong to root",
-        "match_type": "all",
-        "references": [],
-        "command": "f:/var/log;\nc:test -d /var/log;\nc:stat -c %U /var/log -> =:root;"
-    },
-    {
         "title": "Check owner and permissions for /etc/passwd",
         "description": "Check periodically the owner and permissions for /etc/passwd",
         "match_type": "all",
@@ -161,39 +35,18 @@
         "command": "f:/etc/passwd;\nc:stat -c '%U %G %a' /etc/passwd -> r:^root root;\nc:stat -c %a /etc/passwd -> n:(\\d+) compare <= 644;\nnot c:test -x /etc/passwd;"
     },
     {
-        "title": "Assign one global unicast IPv6 addresses to each interface",
-        "description": "The max_addresses setting determines how many global unicast IPv6 addresses can be assigned to each interface. The default is 16, but it should be set to exactly the number of statically configured global addresses required.",
-        "match_type": "all",
+        "title": "Check for .rhosts and .netrc file",
+        "description": "Find .rhosts and .netrc files - CIS Benchmark 9.2.9-10",
+        "match_type": "none",
         "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.default.max_addresses -> =:1;"
+        "command": "c:find / -maxdepth 3 -iname .rhosts -print -> r:.;\nc:find / -maxdepth 3 -iname .netrc -print -> r:.;"
     },
     {
-        "title": "Disable learning Prefix Information from router advertisement",
-        "description": "The accept_ra_pinfo setting controls whether the system will accept prefix info from the router.",
+        "title": "Check owner and permissions for /etc/shadow",
+        "description": "Check periodically the owner and permissions for /etc/shadow",
         "match_type": "all",
         "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.default.accept_ra_pinfo -> =:0;"
-    },
-    {
-        "title": "Entropy",
-        "description": "Check system has enough entropy - greater than 1000",
-        "match_type": "all",
-        "references": [],
-        "command": "c:cat /proc/sys/kernel/random/entropy_avail -> n:(\\d+) compare >= 1000;"
-    },
-    {
-        "title": "Install syslog server package",
-        "description": "Syslog server is required to receive system and applications logs",
-        "match_type": "all",
-        "references": [],
-        "command": "c:dpkg -s rsyslog -> r:install ok installed || c:dpkg -s syslog-ng -> r:install ok installed || c:rpm -q rsyslog -> r:^rsyslog-;"
-    },
-    {
-        "title": "Do not run deprecated inetd or xinetd",
-        "description": "http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.1",
-        "match_type": "all",
-        "references": [],
-        "command": "not c:dpkg -s inetd -> r:install ok installed;\nnot c:dpkg -s xinetd -> r:install ok installed;"
+        "command": "f:/etc/shadow;\nc:stat -c %U /etc/shadow -> =:root;\nnot c:test -x /etc/shadow;\nc:stat -c %a /etc/shadow -> n:(\\d+) compare <= 640;"
     },
     {
         "title": "CIS: Disable unused filesystems",
@@ -210,123 +63,32 @@
         "command": "c:echo $PATH -> !r:\\.:;\nc:echo $PATH -> !r:(^|:):|:(:|$);"
     },
     {
-        "title": "ARP announce",
-        "description": "Always use the best local address for this target. In this mode we ignore the source address in the IP packet and try to select local address that we prefer for talks with\tthe target host.",
+        "title": "Entropy",
+        "description": "Check system has enough entropy - greater than 1000",
         "match_type": "all",
         "references": [],
-        "command": "c:sysctl -n net.ipv4.conf.all.arp_announce -> =:2;"
+        "command": "c:cat /proc/sys/kernel/random/entropy_avail -> n:(\\d+) compare >= 1000;"
     },
     {
-        "title": "Secure Core Dumps - dump settings",
-        "description": "Ensure that core dumps can never be made by setuid programs",
+        "title": "Install auditd",
+        "description": "auditd provides extended logging capabilities on recent distributions",
         "match_type": "all",
         "references": [],
-        "command": "c:sysctl -n fs.suid_dumpable -> r:^(0|2)$;"
+        "command": "f:/usr/sbin/auditd;\nf:/etc/audit/auditd.conf -> r:^log_file\\s+/var/log/audit/audit.log;\nf:/etc/audit/auditd.conf -> r:^log_format\\s+raw;\nf:/etc/audit/auditd.conf -> r:^flush\\s+(INCREMENTAL|INCREMENTAL_ASYNC);\nf:/etc/audit/auditd.conf -> r:^max_log_file_action\\s+keep_logs;\nf:/etc/audit/auditd.conf -> r:^space_left\\s+75;\nf:/etc/audit/auditd.conf -> r:^action_mail_acct\\s+root;\nf:/etc/audit/auditd.conf -> r:^space_left_action\\s+SYSLOG;\nf:/etc/audit/auditd.conf -> r:^admin_space_left\\s+50;\nf:/etc/audit/auditd.conf -> r:^admin_space_left_action\\s+SUSPEND;\nf:/etc/audit/auditd.conf -> r:^disk_full_action\\s+SUSPEND;\nf:/etc/audit/auditd.conf -> r:^disk_error_action\\s+SUSPEND;"
     },
     {
-        "title": "Disable IPv6 autoconfiguration",
-        "description": "The autoconf setting controls whether router advertisements can cause the system to assign a global unicast address to an interface.",
+        "title": "Install syslog server package",
+        "description": "Syslog server is required to receive system and applications logs",
         "match_type": "all",
         "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.default.autoconf -> =:0;"
+        "command": "f:/usr/sbin/rsyslogd;"
     },
     {
-        "title": "Secure Core Dumps - dump path",
-        "description": "Ensure that core dumps are done with fully qualified path",
+        "title": "Do not run deprecated inetd or xinetd",
+        "description": "http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.1",
         "match_type": "all",
         "references": [],
-        "command": "c:sysctl -n kernel.core_pattern -> r:^/.*;"
-    },
-    {
-        "title": "Disable neighbor solicitations to send out per address",
-        "description": "The dad_transmits setting determines how many neighbor solicitations to send out per address (global and link-local) when bringing up an interface to ensure the desired address is unique on the network.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.default.dad_transmits -> =:0;"
-    },
-    {
-        "title": "ICMP ignore bogus error responses",
-        "description": "Sometimes routers send out invalid responses to broadcast frames. This is a violation of RFC 1122 and the kernel will logged this. To avoid filling up your logfile with unnecessary stuff, you can tell the kernel not to issue these warnings",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.icmp_ignore_bogus_error_responses -> =:1;"
-    },
-    {
-        "title": "Disable Accept Router Preference from router advertisement",
-        "description": "Disable Accept Router Preference from router advertisement",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv6.conf.default.accept_ra_rtr_pref -> =:0;"
-    },
-    {
-        "title": "Check owner and permissions for /etc/shadow",
-        "description": "Check periodically the owner and permissions for /etc/shadow",
-        "match_type": "all",
-        "references": [],
-        "command": "f:/etc/shadow;\nc:stat -c %U /etc/shadow -> =:root;\nnot c:test -x /etc/shadow;\nc:stat -c %a /etc/shadow -> n:(\\d+) compare <= 640;"
-    },
-    {
-        "title": "Trusted hosts login",
-        "description": "hosts.equiv file is a weak implemenation of authentication. Disabling the hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.",
-        "match_type": "none",
-        "references": [],
-        "command": "f:/etc/hosts.equiv;"
-    },
-    {
-        "title": "Do not install Telnet server",
-        "description": "Telnet protocol uses unencrypted communication, that means the password and other sensitive data are unencrypted. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.2",
-        "match_type": "all",
-        "references": [],
-        "command": "not c:dpkg -s telnetd -> r:install ok installed;"
-    },
-    {
-        "title": "TCP timestamps",
-        "description": "It is possible to estimate the current uptime of a Linux system. It's preferable to disable TCP timestamps on your systems.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.tcp_timestamps -> =:0;"
-    },
-    {
-        "title": "Disable sending of redirects packets",
-        "description": "Disable sending of redirects packets",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.conf.default.send_redirects -> =:0;\nc:sysctl -n net.ipv4.conf.all.send_redirects -> =:0;"
-    },
-    {
-        "title": "ARP ignore",
-        "description": "Reply only if the target IP address is local address configured on the incoming interface.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.conf.all.arp_ignore -> =:1;"
-    },
-    {
-        "title": "Magic SysRq",
-        "description": "Kernel.sysreg is a 'magical' key combo you can hit which the kernel will respond to regardless of whatever else it is doing, unless it is completely locked up.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n kernel.sysrq -> =:0;"
-    },
-    {
-        "title": "Reverse path filtering",
-        "description": "The rp_filter can reject incoming packets if their source address doesn't match the network interface that they're arriving on, which helps to prevent IP spoofing.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.conf.all.rp_filter -> =:1;\nc:sysctl -n net.ipv4.conf.default.rp_filter -> =:1;"
-    },
-    {
-        "title": "TCP RFC1337 Protect Against TCP Time-Wait",
-        "description": "This enables a fix for time-wait assassination hazards in tcp, described in RFC 1337. If enabled, this causes the kernel to drop RST packets for sockets in the time-wait state.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n net.ipv4.tcp_rfc1337 -> =:1;"
-    },
-    {
-        "title": "CPU No execution Flag or Kernel ExecShield",
-        "description": "Kernel features and CPU flags provide a protection against buffer overflows. The CPU NX Flag and the kernel parameter exec-shield prevents code execution on a per memory page basis. If the CPU supports the NX-Flag then this should be used instead of the kernel parameter exec-shield.",
-        "match_type": "all",
-        "references": [],
-        "command": "c:sysctl -n kernel.exec-shield -> =:1;"
+        "command": "not c:dpkg -s inetd -> r:install ok installed;\nnot c:dpkg -s xinetd -> r:install ok installed;"
     },
     {
         "title": "Do not install rsh server",
@@ -336,18 +98,18 @@
         "command": "not c:dpkg -s rsh-server -> r:install ok installed;"
     },
     {
-        "title": "IPv4 Forwarding",
-        "description": "If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.",
+        "title": "Do not install Telnet server",
+        "description": "Telnet protocol uses unencrypted communication, that means the password and other sensitive data are unencrypted. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.2",
         "match_type": "all",
         "references": [],
-        "command": "c:sysctl -n net.ipv4.ip_forward -> =:0;\nc:sysctl -n net.ipv4.conf.all.forwarding -> =:0;"
+        "command": "not c:dpkg -s telnetd -> r:install ok installed;"
     },
     {
-        "title": "Disable Source Routing",
-        "description": "The accept_source_route option causes network interfaces to accept packets with the Strict Source Route (SSR) or Loose Source Routing (LSR) option set. An attacker is able to send a source routed packet into the network, then he could intercept the replies and your server might not know that it is not communicating with a trusted server",
+        "title": "Do not install tftp server",
+        "description": "tftp-server provides little security http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.5",
         "match_type": "all",
         "references": [],
-        "command": "c:sysctl -n net.ipv4.conf.all.accept_source_route -> =:0;\nc:sysctl -n net.ipv4.conf.default.accept_source_route -> =:0;"
+        "command": "not c:dpkg -s tftp-server -> r:install ok installed;"
     },
     {
         "title": "Do not install ypserv server (NIS)",
@@ -357,6 +119,69 @@
         "command": "not c:dpkg -s ypserv -> r:install ok installed;"
     },
     {
+        "title": "Protect log-directory",
+        "description": "The log-directory /var/log should belong to root",
+        "match_type": "all",
+        "references": [],
+        "command": "f:/var/log;\nc:test -d /var/log;\nc:stat -c %U /var/log -> =:root;"
+    },
+    {
+        "title": "ARP announce",
+        "description": "Always use the best local address for this target. In this mode we ignore the source address in the IP packet and try to select local address that we prefer for talks with\tthe target host.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.conf.all.arp_announce -> =:2;"
+    },
+    {
+        "title": "ARP ignore",
+        "description": "Reply only if the target IP address is local address configured on the incoming interface.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.conf.all.arp_ignore -> =:1;"
+    },
+    {
+        "title": "Assign one global unicast IPv6 addresses to each interface",
+        "description": "The max_addresses setting determines how many global unicast IPv6 addresses can be assigned to each interface. The default is 16, but it should be set to exactly the number of statically configured global addresses required.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv6.conf.default.max_addresses -> =:1;"
+    },
+    {
+        "title": "CPU No execution Flag or Kernel ExecShield",
+        "description": "Kernel features and CPU flags provide a protection against buffer overflows. The CPU NX Flag and the kernel parameter exec-shield prevents code execution on a per memory page basis. If the CPU supports the NX-Flag then this should be used instead of the kernel parameter exec-shield.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n kernel.exec-shield -> =:1;"
+    },
+    {
+        "title": "Disable Accept Router Preference from router advertisement",
+        "description": "Disable Accept Router Preference from router advertisement",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv6.conf.default.accept_ra_rtr_pref -> =:0;"
+    },
+    {
+        "title": "Disable acceptance of all IPv4 redirected packets",
+        "description": "Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.conf.default.accept_redirects -> =:0;\nc:sysctl -n net.ipv4.conf.all.accept_redirects -> =:0;"
+    },
+    {
+        "title": "Disable acceptance of all IPv6 redirected packets",
+        "description": "Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv6.conf.default.accept_redirects -> =:0;\nc:sysctl -n net.ipv6.conf.all.accept_redirects -> =:0;"
+    },
+    {
+        "title": "Disable acceptance of all secure redirected packets",
+        "description": "Disable acceptance of all secure redirected packets these prevents Man-in-the-Middle attacks.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.conf.all.secure_redirects -> =:0;\nc:sysctl -n net.ipv4.conf.default.secure_redirects -> =:0;"
+    },
+    {
         "title": "Disable acceptance of IPv6 router solicitations messages",
         "description": "The router solicitations setting determines how many router solicitations are sent when bringing up the interface. If addresses are statically assigned, there is no need to send any solicitations.",
         "match_type": "all",
@@ -364,17 +189,192 @@
         "command": "c:sysctl -n net.ipv6.conf.default.router_solicitations -> =:0;"
     },
     {
-        "title": "Check login.defs",
-        "description": "Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs",
+        "title": "Disable IPv6 autoconfiguration",
+        "description": "The autoconf setting controls whether router advertisements can cause the system to assign a global unicast address to an interface.",
         "match_type": "all",
         "references": [],
-        "command": "f:/etc/login.defs;\nc:stat -c %U /etc/login.defs -> =:root;\nc:stat -c %G /etc/login.defs -> =:root;\nf:/etc/login.defs -> r:^LOGIN_RETRIES\\s+5;\nf:/etc/login.defs -> r:^LOGIN_TIMEOUT\\s+60;\nf:/etc/login.defs -> r:^UID_MIN\\s+1000;\nf:/etc/login.defs -> r:^GID_MIN\\s+1000;"
+        "command": "c:sysctl -n net.ipv6.conf.default.autoconf -> =:0;"
     },
     {
-        "title": "Check for .rhosts and .netrc file",
-        "description": "Find .rhosts and .netrc files - CIS Benchmark 9.2.9-10",
+        "title": "Disable IPv6 if it is not needed",
+        "description": "Disable IPv6 if it is not needed",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv6.conf.all.disable_ipv6 -> =:1;"
+    },
+    {
+        "title": "Disable learning Hop limit from router advertisement",
+        "description": "The accept_ra_defrtr setting controls whether the system will accept Hop Limit settings from a router advertisement. Setting it to 0 prevents a router from changing your default IPv6 Hop Limit for outgoing packets.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv6.conf.default.accept_ra_defrtr -> =:0;"
+    },
+    {
+        "title": "Disable learning Prefix Information from router advertisement",
+        "description": "The accept_ra_pinfo setting controls whether the system will accept prefix info from the router.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv6.conf.default.accept_ra_pinfo -> =:0;"
+    },
+    {
+        "title": "Disable loading kernel modules",
+        "description": "The sysctl key kernel.modules_disabled is very straightforward. If it contains a '1' it will disable loading new modules, where a '0' will still allow loading them. Using this option will be a great protection against loading malicious kernel modules.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n kernel.modules_disabled -> =:1;"
+    },
+    {
+        "title": "Disable log martians",
+        "description": "log_martians can cause a denial of service attack to the host",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.conf.all.log_martians -> =:1;\nc:sysctl -n net.ipv4.conf.default.log_martians -> =:1;"
+    },
+    {
+        "title": "Disable neighbor solicitations to send out per address",
+        "description": "The dad_transmits setting determines how many neighbor solicitations to send out per address (global and link-local) when bringing up an interface to ensure the desired address is unique on the network.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv6.conf.default.dad_transmits -> =:0;"
+    },
+    {
+        "title": "Disable sending of redirects packets",
+        "description": "Disable sending of redirects packets",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.conf.default.send_redirects -> =:0;\nc:sysctl -n net.ipv4.conf.all.send_redirects -> =:0;"
+    },
+    {
+        "title": "Disable Source Routing",
+        "description": "The accept_source_route option causes network interfaces to accept packets with the Strict Source Route (SSR) or Loose Source Routing (LSR) option set. An attacker is able to send a source routed packet into the network, then he could intercept the replies and your server might not know that it is not communicating with a trusted server",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.conf.all.accept_source_route -> =:0;\nc:sysctl -n net.ipv4.conf.default.accept_source_route -> =:0;"
+    },
+    {
+        "title": "Disable the system`s acceptance of router advertisement",
+        "description": "Setting controls whether the system will accept router advertisement",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv6.conf.all.accept_ra -> =:0;\nc:sysctl -n net.ipv6.conf.default.accept_ra -> =:0;"
+    },
+    {
+        "title": "ICMP echo ignore broadcasts",
+        "description": "Blocking ICMP ECHO requests to broadcast addresses",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.icmp_echo_ignore_broadcasts -> =:1;"
+    },
+    {
+        "title": "ICMP ignore bogus error responses",
+        "description": "Sometimes routers send out invalid responses to broadcast frames. This is a violation of RFC 1122 and the kernel will logged this. To avoid filling up your logfile with unnecessary stuff, you can tell the kernel not to issue these warnings",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.icmp_ignore_bogus_error_responses -> =:1;"
+    },
+    {
+        "title": "ICMP ratelimit",
+        "description": "icmp_ratelimit defines how many packets that match the icmp_ratemask per second",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.icmp_ratelimit -> =:100;"
+    },
+    {
+        "title": "ICMP ratemask",
+        "description": "Ratemask is a logical OR of all ICMP codes to rate limit",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.icmp_ratemask -> =:88089;"
+    },
+    {
+        "title": "IPv4 Forwarding",
+        "description": "If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.ip_forward -> =:0;\nc:sysctl -n net.ipv4.conf.all.forwarding -> =:0;"
+    },
+    {
+        "title": "IPv6 Forwarding",
+        "description": "If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv6.conf.all.forwarding -> =:0;"
+    },
+    {
+        "title": "kernel.randomize_va_space",
+        "description": "kernel.randomize_va_space",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n kernel.randomize_va_space -> =:2;"
+    },
+    {
+        "title": "Magic SysRq",
+        "description": "Kernel.sysreg is a 'magical' key combo you can hit which the kernel will respond to regardless of whatever else it is doing, unless it is completely locked up.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n kernel.sysrq -> =:0;"
+    },
+    {
+        "title": "Protection against SYN flood attacks",
+        "description": "A SYN-Attack is a denial of service (DoS) attack that consumes resources on your system forcing you to reboot.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.tcp_syncookies -> =:1;"
+    },
+    {
+        "title": "Reverse path filtering",
+        "description": "The rp_filter can reject incoming packets if their source address doesn't match the network interface that they're arriving on, which helps to prevent IP spoofing.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.conf.all.rp_filter -> =:1;\nc:sysctl -n net.ipv4.conf.default.rp_filter -> =:1;"
+    },
+    {
+        "title": "Secure Core Dumps - dump path",
+        "description": "Ensure that core dumps are done with fully qualified path",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n kernel.core_pattern -> r:^/.*;"
+    },
+    {
+        "title": "Secure Core Dumps - dump settings",
+        "description": "Ensure that core dumps can never be made by setuid programs",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n fs.suid_dumpable -> r:^(0|2)$;"
+    },
+    {
+        "title": "Shared Media IP Architecture",
+        "description": "Send(router) or accept(host) RFC1620 shared media redirects. If it is not set the kernel does not assume that different subnets on this device can communicate directly.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.conf.all.shared_media -> =:1;\nc:sysctl -n net.ipv4.conf.default.shared_media -> =:1;"
+    },
+    {
+        "title": "TCP RFC1337 Protect Against TCP Time-Wait",
+        "description": "This enables a fix for time-wait assassination hazards in tcp, described in RFC 1337. If enabled, this causes the kernel to drop RST packets for sockets in the time-wait state.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.tcp_rfc1337 -> =:1;"
+    },
+    {
+        "title": "TCP timestamps",
+        "description": "It is possible to estimate the current uptime of a Linux system. It's preferable to disable TCP timestamps on your systems.",
+        "match_type": "all",
+        "references": [],
+        "command": "c:sysctl -n net.ipv4.tcp_timestamps -> =:0;"
+    },
+    {
+        "title": "Trusted hosts login",
+        "description": "hosts.equiv file is a weak implemenation of authentication. Disabling the hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.",
         "match_type": "none",
         "references": [],
-        "command": "c:find / -maxdepth 3 \\( -iname .rhosts -o -iname .netrc \\) -print -> r:.;"
+        "command": "f:/etc/hosts.equiv;"
+    },
+    {
+        "title": "Unique uid and gid",
+        "description": "Check for unique uids gids",
+        "match_type": "all",
+        "references": [],
+        "command": "c:cut -d: -f3 /etc/passwd | sort | uniq -d -> r:^$;\nc:cut -d: -f3 /etc/group | sort | uniq -d -> r:^$;"
     }
 ]
