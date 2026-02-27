@@ -11,13 +11,13 @@ class Subscribed
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && (auth()->user()->subscriber() || auth()->user()->hasRole('admin'))) {
+        $user = auth()->user();
+
+        if (Auth::check() && ($user->subscriber() || $user->isAdmin())) {
             return $next($request);
         }
 

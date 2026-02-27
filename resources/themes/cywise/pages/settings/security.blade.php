@@ -5,8 +5,10 @@
     use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
     use Filament\Forms\Form;
+    use Filament\Schemas\Schema;
     use Filament\Notifications\Notification;
-    
+    use App\Models\ActivityLog;
+
     middleware('auth');
     name('settings.security');
 
@@ -21,10 +23,10 @@
             $this->form->fill();
         }
 
-        public function form(Form $form): Form
+        public function form(Schema $schema): Schema
         {
-            return $form
-                ->schema([
+            return $schema
+                ->components([
                     TextInput::make('current_password')
                         ->label('Current Password')
                         ->required()
@@ -34,7 +36,7 @@
                     TextInput::make('password')
                         ->label('New Password')
                         ->required()
-                        ->minLength(4)
+                        ->minLength(config('wave.auth.min_password_length'))
                         ->password()
                         ->revealable(),
                     TextInput::make('password_confirmation')
@@ -47,7 +49,7 @@
                 ])
                 ->statePath('data');
         }
-        
+
         public function save(): void
         {
             $state = $this->form->getState();
@@ -56,6 +58,12 @@
             auth()->user()->forceFill([
                 'password' => bcrypt($state['password'])
             ])->save();
+
+            // Log the activity
+            ActivityLog::log(
+                'password_changed',
+                'Password was successfully changed'
+            );
 
             $this->form->fill();
 
@@ -70,7 +78,7 @@
 ?>
 
 <x-layouts.app>
-    @volt('settings.security') 
+    @volt('settings.security')
         <div class="relative">
             <x-app.settings-layout
                 title="Security"

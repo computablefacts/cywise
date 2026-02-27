@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Listeners\LogSuccessfulLogin;
+use App\Listeners\LogSuccessfulLogout;
 use App\Listeners\SamlEventSubscriber;
 use App\Models\Asset;
 use App\Models\AssetTag;
@@ -44,7 +46,14 @@ use App\Rules\AtLeastOneLetter;
 use App\Rules\AtLeastOneLowercaseLetter;
 use App\Rules\AtLeastOneUppercaseLetter;
 use App\Rules\OnlyLettersAndDigits;
+use Exception;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
@@ -53,11 +62,18 @@ use Illuminate\Validation\Rules\Password;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * The path to the "home" route for your application.
      *
-     * @return void
+     * Typically, users are redirected here after authentication.
+     *
+     * @var string
      */
-    public function register()
+    public const HOME = '/dashboard';
+
+    /**
+     * Register any application services.
+     */
+    public function register(): void
     {
         // AdversaryMeter
         $this->app->bind('am_api_utils', function () {
@@ -72,10 +88,8 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         if ($this->app->environment() == 'production') {
             $this->app['request']->server->set('HTTPS', true);
@@ -95,6 +109,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->setSchemaDefaultLength();
 
+        // Register activity log event listeners
+        Event::listen(Login::class, LogSuccessfulLogin::class);
+        Event::listen(Logout::class, LogSuccessfulLogout::class);
+
         Validator::extend('base64image', function ($attribute, $value, $parameters, $validator) {
             $explode = explode(',', $value);
             $allow = ['png', 'jpg', 'svg', 'jpeg'];
@@ -111,17 +129,19 @@ class AppServiceProvider extends ServiceProvider
             );
 
             // check file format
-            if (!in_array($format, $allow)) {
+            if (! in_array($format, $allow)) {
                 return false;
             }
 
             // check base64 format
-            if (!preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $explode[1])) {
+            if (! preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $explode[1])) {
                 return false;
             }
 
             return true;
         });
+
+        $this->bootRoute();
 
         YnhServer::observe(YnhServerObserver::class);
 
@@ -154,7 +174,15 @@ class AppServiceProvider extends ServiceProvider
     {
         try {
             Schema::defaultStringLength(191);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
         }
+    }
+
+    public function bootRoute()
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: (request()->header('CF-Connecting-IP') ?? request()->ip()));
+        });
+
     }
 }

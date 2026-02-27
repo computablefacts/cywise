@@ -4,10 +4,12 @@
     use Filament\Forms\Concerns\InteractsWithForms;
     use Filament\Forms\Contracts\HasForms;
     use Filament\Forms\Form;
+    use Filament\Schemas\Schema;
     use Filament\Notifications\Notification;
 	use Livewire\Volt\Component;
 	use Wave\Traits\HasDynamicFields;
     use Wave\ApiKey;
+    use App\Models\ActivityLog;
 
 	middleware('auth');
     name('settings.profile');
@@ -24,15 +26,21 @@
             $this->form->fill();
         }
 
-       public function form(Form $form): Form
+       public function form(Schema $schema): Schema
         {
-            return $form
-                ->schema([
+            return $schema
+                ->components([
                     \Filament\Forms\Components\TextInput::make('name')
                         ->label('Name')
                         ->required()
 						->rules('required|string')
 						->default(auth()->user()->name),
+					\Filament\Forms\Components\TextInput::make('username')
+                        ->label('Username')
+                        ->required()
+						->rules('sometimes|required|string|alpha_dash|max:255|unique:users,username,' . auth()->user()->id)
+						->helperText('Your unique username used in your profile URL')
+						->default(auth()->user()->username),
 					\Filament\Forms\Components\TextInput::make('email')
                         ->label('Email Address')
                         ->required()
@@ -64,22 +72,46 @@
                 ->send();
 		}
 
-		private function saveNewUserAvatar(){
-			$path = 'avatars/' . auth()->user()->username . '.png';
-			$image = \Intervention\Image\ImageManagerStatic::make($this->avatar)->resize(800, 800);
-			Storage::disk('public')->put($path, $image->encode());
-			auth()->user()->avatar = $path;
-			auth()->user()->save();
-			// This will update/refresh the avatar in the sidebar
-			$this->js('window.dispatchEvent(new CustomEvent("refresh-avatar"));');
+	private function saveNewUserAvatar(){
+		$path = 'avatars/' . auth()->user()->username . '.png';
+		$image = app('image')->read($this->avatar)->resize(800, 800);
+		Storage::disk('public')->put($path, $image->encode());
+		auth()->user()->avatar = $path;
+		auth()->user()->save();
+		
+		// Log avatar update
+		ActivityLog::log('avatar_updated', 'Profile avatar was updated');
+		
+		// This will update/refresh the avatar in the sidebar
+		$this->js('window.dispatchEvent(new CustomEvent("refresh-avatar"));');
+	}	private function saveFormFields($state){
+		// Track changes for activity log
+		$user = auth()->user();
+		$changes = [];
+		
+		if($user->name !== $state['name']) {
+			$changes[] = 'name';
 		}
-
-		private function saveFormFields($state){
-			auth()->user()->name = $state['name'];
-			auth()->user()->email = $state['email'];
-			auth()->user()->save();
-			$fieldsToSave = config('profile.fields');
-			$this->saveDynamicFields($fieldsToSave);
+		if($user->username !== $state['username']) {
+			$changes[] = 'username';
+		}
+		if($user->email !== $state['email']) {
+			$changes[] = 'email';
+		}
+		
+		$user->name = $state['name'];
+		$user->username = $state['username'];
+		$user->email = $state['email'];
+		$user->save();
+		$fieldsToSave = config('profile.fields');
+		$this->saveDynamicFields($fieldsToSave);
+		
+		// Log the profile update
+		if(!empty($changes)) {
+			ActivityLog::log('profile_updated', 'Profile updated: ' . implode(', ', $changes), [
+				'changed_fields' => $changes
+			]);
+		}
 		}
 
 	}
@@ -166,12 +198,12 @@
 		class="relative w-full">
 			<form wire:submit="save" class="w-full">
 				<div class="relative flex flex-col mt-5 lg:px-10">
-					<div class="relative flex-shrink-0 w-32 h-32 cursor-pointer group">
+					<div class="relative shrink-0 w-32 h-32 cursor-pointer group">
 						<img id="preview" src="{{ auth()->user()->avatar() . '?' . time() }}" class="w-32 h-32 rounded-full">
 
 						<div class="absolute inset-0 w-full h-full">
 							<input type="file" id="upload" class="absolute inset-0 z-20 w-full h-full opacity-0 cursor-pointer group">
-							<button class="absolute bottom-0 z-10 flex items-center justify-center w-10 h-10 mb-2 -ml-5 bg-black bg-opacity-75 rounded-full opacity-75 left-1/2 group-hover:opacity-100">
+							<button class="absolute bottom-0 z-10 flex items-center justify-center w-10 h-10 mb-2 -ml-5 bg-black bg-black/75 rounded-full opacity-75 left-1/2 group-hover:opacity-100">
 								<svg class="w-6 h-6 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
 							</button>
 						</div>
@@ -210,9 +242,9 @@
 						</div>
 					</div>
 					<div class="mt-5 sm:mt-6">
-						<span class="flex w-full rounded-md shadow-sm">
-							<button @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'profile-avatar-crop' }}));" class="inline-flex justify-center w-full px-4 py-2 mr-2 text-base font-medium leading-6 transition duration-150 ease-in-out bg-white border border-transparent rounded-md shadow-sm text-zinc-700 border-zinc-300 hover:text-zinc-500 active:text-zinc-800 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue sm:text-sm sm:leading-5" type="button">Cancel</button>
-							<button @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'profile-avatar-crop' }})); applyImageCrop()" class="inline-flex justify-center w-full px-4 py-2 ml-2 text-base font-medium leading-6 text-white transition duration-150 ease-in-out bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-500 focus:outline-none focus:border-blue-700 focus:shadow-outline-wave sm:text-sm sm:leading-5" id="apply-crop" type="button">Apply</button>
+						<span class="flex w-full rounded-md shadow-xs">
+							<button @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'profile-avatar-crop' }}));" class="inline-flex justify-center w-full px-4 py-2 mr-2 text-base font-medium leading-6 transition duration-150 ease-in-out bg-white border border-transparent rounded-md shadow-xs text-zinc-700 border-zinc-300 hover:text-zinc-500 active:text-zinc-800 focus:outline-hidden focus:border-blue-300 focus:shadow-outline-blue sm:text-sm sm:leading-5" type="button">Cancel</button>
+							<button @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'profile-avatar-crop' }})); applyImageCrop()" class="inline-flex justify-center w-full px-4 py-2 ml-2 text-base font-medium leading-6 text-white transition duration-150 ease-in-out bg-blue-600 border border-transparent rounded-md shadow-xs hover:bg-blue-500 focus:outline-hidden focus:border-blue-700 focus:shadow-outline-wave sm:text-sm sm:leading-5" id="apply-crop" type="button">Apply</button>
 						</span>
 					</div>
 				</x-filament::modal>

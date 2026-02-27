@@ -2,26 +2,28 @@
 
 namespace Wave;
 
-use Wave\Plan;
 use Carbon\Carbon;
-use Wave\Changelog;
-use Wave\Subscription;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Http;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Filament\Models\Contracts\HasAvatar;
-use Illuminate\Notifications\Notifiable;
 use Devdojo\Auth\Models\User as AuthUser;
+use Exception;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Lab404\Impersonate\Models\Impersonate;
+use Spatie\Permission\Traits\HasRoles;
+use Stripe\StripeClient;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends AuthUser implements JWTSubject, HasAvatar, FilamentUser
+class User extends AuthUser implements FilamentUser, HasAvatar, JWTSubject
 {
-    use Notifiable, Impersonate, HasRoles;
+    use HasRoles, Impersonate, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -51,13 +53,16 @@ class User extends AuthUser implements JWTSubject, HasAvatar, FilamentUser
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'trial_ends_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'trial_ends_at' => 'datetime',
+        ];
+    }
 
     public function onTrial()
     {
@@ -67,89 +72,122 @@ class User extends AuthUser implements JWTSubject, HasAvatar, FilamentUser
         if ($this->subscriber()) {
             return false;
         }
+
         return true;
     }
 
-    
-
-    public function subscriptions()
+    public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class, 'billable_id')->where('billable_type', 'user');
     }
 
     public function subscriber()
     {
+        // Use cache if available, otherwise direct query
+        if (app()->bound('cache')) {
+            try {
+                return Cache::remember("user_subscriber_{$this->id}", 300, function () {
+                    return $this->subscriptions()->where('status', 'active')->exists();
+                });
+            } catch (Exception $e) {
+                // Fallback to direct query if cache fails
+            }
+        }
+
         return $this->subscriptions()->where('status', 'active')->exists();
     }
 
     public function subscribedToPlan($planSlug)
     {
+        // Use cache if available, otherwise direct query
+        if (app()->bound('cache')) {
+            try {
+                return Cache::remember("user_plan_{$this->id}_{$planSlug}", 300, function () use ($planSlug) {
+                    $plan = Plan::getByName($planSlug);
+                    if (! $plan) {
+                        return false;
+                    }
+
+                    return $this->subscriptions()->where('plan_id', $plan->id)->where('status', 'active')->exists();
+                });
+            } catch (Exception $e) {
+                // Fallback to direct query if cache fails
+            }
+        }
+
         $plan = Plan::where('name', $planSlug)->first();
-        if (!$plan) {
+        if (! $plan) {
             return false;
         }
+
         return $this->subscriptions()->where('plan_id', $plan->id)->where('status', 'active')->exists();
     }
 
-    public function plan(){
+    public function plan()
+    {
         $latest_subscription = $this->latestSubscription();
+
         return Plan::find($latest_subscription->plan_id);
     }
 
-    public function planInterval(){
+    public function planInterval()
+    {
         $latest_subscription = $this->latestSubscription();
-        return ($latest_subscription->cycle == 'month') ? 'Monthly' : 'Yearly'; 
+
+        return ($latest_subscription->cycle == 'month') ? 'Monthly' : 'Yearly';
     }
 
     public function latestSubscription()
     {
-        return $this->subscriptions()->where('status', 'active')->orderBy('created_at', 'desc')->first();
+        return $this->subscriptions()->where('status', 'active')->orderByDesc('created_at')->first();
     }
 
-    public function subscription()
+    public function subscription(): HasOne
     {
-        return $this->hasOne(Subscription::class, 'billable_id')->where('status', 'active')->orderBy('created_at', 'desc');
+        return $this->hasOne(Subscription::class, 'billable_id')->where('status', 'active')->orderByDesc('created_at');
     }
 
-    public function switchPlans(Plan $plan){
+    public function switchPlans(Plan $plan)
+    {
         $this->syncRoles([]);
-        $this->assignRole( $plan->role->name );
+        $this->assignRole($plan->role->name);
     }
 
-    public function invoices(){
+    public function invoices()
+    {
         $user_invoices = [];
 
-        if(is_null($this->subscription)){
-            return null;
+        if ($this->subscriptions()->doesntExist()) {
+            return;
         }
 
-        if(config('wave.billing_provider') == 'stripe'){
-            $stripe = new \Stripe\StripeClient(config('wave.stripe.secret_key'));
-            $subscriptions = $this->subscriptions()->get();        
-            foreach($subscriptions as $subscription){
-                $invoices = $stripe->invoices->all([ 'customer' => $subscription->vendor_customer_id, 'limit' => 100 ]);
+        if (config('wave.billing_provider') == 'stripe') {
+            $stripe = new StripeClient(config('wave.stripe.secret_key'));
+            $subscriptions = $this->subscriptions()->get();
+            foreach ($subscriptions as $subscription) {
+                $invoices = $stripe->invoices->all(['customer' => $subscription->vendor_customer_id, 'limit' => 100]);
 
-                foreach($invoices as $invoice){
-                    array_push($user_invoices, (object)[
+                foreach ($invoices as $invoice) {
+                    array_push($user_invoices, (object) [
                         'id' => $invoice->id,
-                        'created' => \Carbon\Carbon::parse($invoice->created)->isoFormat('MMMM Do YYYY, h:mm:ss a'),
-                        'total' => number_format(($invoice->total /100), 2, '.', ' '),
-                        'download' => $invoice->invoice_pdf
+                        'created' => Carbon::parse($invoice->created)->isoFormat('MMMM Do YYYY, h:mm:ss a'),
+                        'total' => number_format(($invoice->total / 100), 2, '.', ' '),
+                        'download' => $invoice->invoice_pdf,
                     ]);
                 }
             }
-        } else { 
+        } else {
             $paddle_url = (config('wave.paddle.env') == 'sandbox') ? 'https://sandbox-api.paddle.com' : 'https://api.paddle.com';
-            $response = Http::withToken(config('wave.paddle.api_key'))->get($paddle_url . '/transactions', [
-                'subscription_id' => $this->subscription->vendor_subscription_id
+            $response = Http::withToken(config('wave.paddle.api_key'))->get($paddle_url.'/transactions', [
+                'subscription_id' => $this->subscription->vendor_subscription_id,
             ]);
             $responseJson = json_decode($response->body());
-            foreach($responseJson->data as $invoice){
-                array_push($user_invoices, (object)[
+            foreach ($responseJson->data as $invoice) {
+                array_push($user_invoices, (object) [
                     'id' => $invoice->id,
-                    'created' => \Carbon\Carbon::parse($invoice->created_at)->isoFormat('MMMM Do YYYY, h:mm:ss a'),
-                    'total' => number_format(($invoice->details->totals->subtotal /100), 2, '.', ' '),
-                    'download' => '/settings/invoices/' . $invoice->id
+                    'created' => Carbon::parse($invoice->created_at)->isoFormat('MMMM Do YYYY, h:mm:ss a'),
+                    'total' => number_format(($invoice->details->totals->subtotal / 100), 2, '.', ' '),
+                    'download' => '/settings/invoices/'.$invoice->id,
                 ]);
             }
         }
@@ -157,47 +195,52 @@ class User extends AuthUser implements JWTSubject, HasAvatar, FilamentUser
         return $user_invoices;
     }
 
-    /**
-     * @return bool
-     */
-    public function canImpersonate()
+    public function canImpersonate(): bool
     {
         // If user is admin they can impersonate
         return $this->hasRole('admin');
     }
 
-    /**
-     * @return bool
-     */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        // return if the user has a role of admin
+        // Use cache if available, otherwise direct query
+        if (app()->bound('cache')) {
+            try {
+                return Cache::remember("user_admin_{$this->id}", 600, function () {
+                    return $this->hasRole('admin');
+                });
+            } catch (Exception $e) {
+                // Fallback to direct query if cache fails
+            }
+        }
+
         return $this->hasRole('admin');
     }
 
-    /**
-     * @return bool
-     */
-    public function canBeImpersonated()
+    public function canBeImpersonated(): bool
     {
         // Any user that is not an admin can be impersonated
-        return !$this->hasRole('admin');
+        return ! $this->hasRole('admin');
     }
 
     public function hasChangelogNotifications()
     {
         // Get the latest Changelog
-        $latest_changelog = Changelog::orderBy('created_at', 'DESC')->first();
+        $latest_changelog = Changelog::orderByDesc('created_at')->first();
 
-        if (!$latest_changelog) return false;
-        return !$this->changelogs->contains($latest_changelog->id);
+        if (! $latest_changelog) {
+            return false;
+        }
+
+        return ! $this->changelogs->contains($latest_changelog->id);
     }
 
-    public function link(){
-        return url('/profile/' . $this->username);
+    public function link()
+    {
+        return url('/profile/'.$this->username);
     }
 
-    public function changelogs()
+    public function changelogs(): BelongsToMany
     {
         return $this->belongsToMany('Wave\Changelog');
     }
@@ -207,9 +250,31 @@ class User extends AuthUser implements JWTSubject, HasAvatar, FilamentUser
         return ApiKey::create(['user_id' => $this->id, 'name' => $name, 'key' => Str::random(60)]);
     }
 
-    public function apiKeys()
+    public function apiKeys(): HasMany
     {
-        return $this->hasMany('Wave\ApiKey')->orderBy('created_at', 'DESC');
+        return $this->hasMany('Wave\ApiKey')->orderByDesc('created_at');
+    }
+
+    /**
+     * Clear user-related caches when data changes
+     */
+    public function clearUserCache()
+    {
+        // Only clear cache if it's available
+        if (app()->bound('cache')) {
+            try {
+                Cache::forget("user_subscriber_{$this->id}");
+                Cache::forget("user_admin_{$this->id}");
+
+                // Clear plan-specific caches
+                $plans = Plan::pluck('name');
+                foreach ($plans as $planName) {
+                    Cache::forget("user_plan_{$this->id}_{$planName}");
+                }
+            } catch (Exception $e) {
+                // Silently handle cache clearing failures
+            }
+        }
     }
 
     public function avatar()
@@ -229,10 +294,8 @@ class User extends AuthUser implements JWTSubject, HasAvatar, FilamentUser
 
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
      */
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
         return [];
     }
@@ -245,6 +308,7 @@ class User extends AuthUser implements JWTSubject, HasAvatar, FilamentUser
     public function profile($key)
     {
         $keyValue = $this->profileKeyValue($key);
+
         return isset($keyValue->value) ? $keyValue->value : '';
     }
 

@@ -2,35 +2,24 @@
 
 namespace App\Providers\Filament;
 
-use Wave\Widgets;
-use Filament\Pages;
-use Filament\Panel;
-use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
-use Illuminate\Support\Facades\Blade;
-//use Filament\Widgets;
-// use BezhanSalleh\FilamentGoogleAnalytics\Widgets;
+use App\Filament\Widgets\DashboardWidget;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Filament\Panel;
+use Filament\PanelProvider;
+// use Filament\Widgets;
+// use BezhanSalleh\FilamentGoogleAnalytics\Widgets;
+use Filament\Support\Colors\Color;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-
-use Filament\Facades\Filament;
-use Filament\Navigation\NavigationBuilder;
-use Filament\Navigation\NavigationGroup;
-use Filament\Navigation\NavigationItem;
-
-use App\Filament\Resources\UserResource;
-use App\Filament\Resources\RoleResource;
-use App\Filament\Resources\PlanResource;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -41,10 +30,8 @@ class AdminPanelProvider extends PanelProvider
         return 'heroicon-o-presentation-chart-line';
     }
 
-    private $dynamicWidgets = [];
     public function panel(Panel $panel): Panel
     {
-        $this->renderAnalyticsIfCredentialsExist();
 
         Blade::component('wave::admin.components.label', 'label');
 
@@ -63,24 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             // ->discoverWidgets(in: app_path('BezhanSalleh\FilamentGoogleAnalytics\Widgets'), for: 'BezhanSalleh\\FilamentGoogleAnalytics\\Widgets')
             ->widgets([
-                Widgets\WaveInfoWidget::class,
-                Widgets\WelcomeWidget::class,
-                Widgets\UsersWidget::class,
-                Widgets\PostsPagesWidget::class,
-                ...$this->dynamicWidgets,
-
-                // Google Analytics Widgets that are available here: https://filamentphp.com/plugins/bezhansalleh-google-analytics
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\PageViewsWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\VisitorsWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\ActiveUsersOneDayWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\ActiveUsersSevenDayWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\ActiveUsersTwentyEightDayWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\SessionsWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\SessionsDurationWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\SessionsByCountryWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\SessionsByDeviceWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\MostVisitedPagesWidget::class,
-                \BezhanSalleh\FilamentGoogleAnalytics\Widgets\TopReferrersListWidget::class,
+                DashboardWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -95,26 +65,9 @@ class AdminPanelProvider extends PanelProvider
                 // \App\Http\Middleware\WaveEditTab::class
             ])
             ->authMiddleware([
-                Authenticate::class
+                Authenticate::class,
             ])
             ->brandLogo(fn () => view('wave::admin.logo'))
             ->darkModeBrandLogo(fn () => view('wave::admin.logo-dark'));
-    }
-
-    // This function will render if user has account crenditals file 
-    // located at storage/app/analytics/service-account-credentials.json
-    // Find More details here: https://github.com/spatie/laravel-analytics
-    private function renderAnalyticsIfCredentialsExist(){
-        if(is_array(config('analytics.service_account_credentials_json')) ||
-           file_exists(config('analytics.service_account_credentials_json'))){
-            \Config::set('filament-google-analytics.page_views.filament_dashboard', true);
-            \Config::set('filament-google-analytics.active_users_one_day.filament_dashboard', true);
-            \Config::set('filament-google-analytics.active_users_seven_day.filament_dashboard', true);
-            \Config::set('filament-google-analytics.active_users_twenty_eight_day.filament_dashboard', true);
-            \Config::set('filament-google-analytics.most_visited_pages.filament_dashboard', true);
-            \Config::set('filament-google-analytics.top_referrers_list.filament_dashboard', true);
-        } else {
-            $this->dynamicWidgets = [Widgets\AnalyticsPlaceholderWidget::class];
-        }
     }
 }

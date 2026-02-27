@@ -26,9 +26,11 @@ class UserFactory extends Factory
         Role::createRoles();
 
         return [
-            'name' => $this->faker->name,
-            'email' => $this->faker->unique()->safeEmail,
+            'name' => $this->faker->name(),
+            'username' => $this->faker->unique()->userName(),
+            'email' => $this->faker->unique()->safeEmail(),
             'password' => $password ?: $password = bcrypt('secret'),
+            'avatar' => 'demo/default.png',
             'remember_token' => Str::random(60),
         ];
     }

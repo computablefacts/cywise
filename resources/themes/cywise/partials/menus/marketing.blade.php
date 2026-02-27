@@ -50,7 +50,7 @@
                 <span class="">Resources</span>
                 <svg class="w-5 h-5 transition-all duration-300 ease-out group-hover:-rotate-180" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" class=""></path></svg>
             </a>
-            <div class="hidden top-0 left-0 invisible space-y-3 w-full w-screen bg-white border-t border-b border-zinc-100 shadow-sm opacity-0 transition-all duration-300 ease-out -translate-y-2 md:block group-hover:block group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 md:fixed md:mt-24">
+            <div class="hidden top-0 left-0 invisible space-y-3 w-full w-screen bg-white border-t border-b border-zinc-100 shadow-xs opacity-0 transition-all duration-300 ease-out -translate-y-2 md:block group-hover:block group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 md:fixed md:mt-24">
                 <ul class="flex flex-col justify-between mx-auto max-w-7xl md:flex-row md:px-4">
                     <li class="w-full border-l border-zinc-100 md:w-1/5">
                         <a href="#_" class="block p-6 text-lg font-semibold rounded-lg transition duration-300 hover:bg-zinc-50 lg:p-7 lg:py-10">

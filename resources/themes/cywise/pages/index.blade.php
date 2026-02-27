@@ -1,8 +1,6 @@
 <?php
-
-use function Laravel\Folio\{name};
-
-name('home');
+    use function Laravel\Folio\{name};
+    name('home');
 ?>
 
 <x-layouts.website
