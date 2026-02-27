@@ -1,16 +1,16 @@
 <?php
     use function Laravel\Folio\{name};
     name('changelog');
-
+    
     // use a dynamic layout based on whether or not the user is authenticated
     $layout = ((auth()->guest()) ? 'layouts.marketing' : 'layouts.app');
 ?>
 
-<x-dynamic-component
+<x-dynamic-component 
 	:component="$layout"
 	bodyClass="bg-zinc-50"
 >
-
+    
     <x-app.container>
         <x-card class="lg:p-10">
 

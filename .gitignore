@@ -25,6 +25,7 @@
 .env.backup
 .env.production
 .phpunit.result.cache
+.phpunit.cache
 Homestead.json
 Homestead.yaml
 auth.json
@@ -32,4 +33,34 @@ npm-debug.log
 yarn-error.log
 /.fleet
 /.idea
+/.nova
 /.vscode
+
+# Wave ignores.
+/public/.well-known
+/public/demo
+/.vagrant
+/wave-pro
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+.DS_Store
+/wave/vendor/
+/public/wave/docs
+/storage/app/analytics
+/packages
+storage/app/livewire-tmp
+resources/themes/.gitignore
+/resources/plugins/*
+!/resources/plugins/installed.json
+/storage/app/public/livewire-tmp
+/storage/app/public/*
+!/storage/app/public/demo
+
+# Ignore everything inside the resources/plugins folder
+resources/plugins/*
+
+# But do not ignore the resources/plugins folder itself
+!resources/plugins/
+!resources/plugins/installed.json

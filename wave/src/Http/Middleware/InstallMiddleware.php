@@ -3,6 +3,8 @@
 namespace Wave\Http\Middleware;
 
 use Closure;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Wave\User;
 
 class InstallMiddleware
@@ -10,24 +12,22 @@ class InstallMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
-    public function handle(\Illuminate\Http\Request $request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         // if we are not on the install route
-        if($request->path() != 'install'){
+        if ($request->path() != 'install') {
 
             try {
                 $user = User::first();
-            } catch (\Illuminate\Database\QueryException $e) {
-                
+            } catch (QueryException $e) {
+
                 return redirect()->route('wave.install');
-                
+
             }
 
-            if(User::first() === null){
+            if (User::first() === null) {
                 return redirect()->route('wave.install');
             }
         }

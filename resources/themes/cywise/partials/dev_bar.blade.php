@@ -23,7 +23,7 @@
     :class="{ 'translate-y-full': !open, 'translate-y-0': open }"
     x-on:keydown.escape="open = false"
     x-cloak>
-    <div class="fixed inset-0 z-20 bg-black bg-opacity-25" x-show="open" @click="open=false"></div>
+    <div class="fixed inset-0 z-20 bg-black bg-black/25" x-show="open" @click="open=false"></div>
 
     
 
@@ -48,7 +48,7 @@
                             </div>
                         @endif
                     </div>
-                    <div x-show="open" @click="open=false" class="flex justify-center items-center px-2 w-auto h-full text-white border-l opacity-75 cursor-pointer border-white/10 hover:bg-blue-600 hover:bg-opacity-10 hover:opacity-100">
+                    <div x-show="open" @click="open=false" class="flex justify-center items-center px-2 w-auto h-full text-white border-l opacity-75 cursor-pointer border-white/10 hover:bg-blue-600 hover:bg-black/10 hover:opacity-100">
                         <span class="flex items-center px-2 py-1 pt-0.5 text-xs leading-none rounded-full opacity-50 bg-zinc-600">esc</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         

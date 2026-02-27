@@ -1,12 +1,12 @@
 @props([
     'position' => 'bottom'
 ])
-<div x-data="{ dropdownOpen: false }" :class="{ 'block z-50 w-auto lg:w-full dark:bg-zinc-900 dark:border-zinc-800' : open, 'hidden': ! open }" class="relative flex-shrink-0 sm:p-0 dark:text-zinc-200 sm:flex sm:w-auto sm:bg-transparent sm:items-center" x-cloak>
+<div x-data="{ dropdownOpen: false }" :class="{ 'block z-50 w-auto lg:w-full dark:bg-zinc-900 dark:border-zinc-800' : open, 'hidden': ! open }" class="relative shrink-0 sm:p-0 dark:text-zinc-200 sm:flex sm:w-auto sm:bg-transparent sm:items-center" x-cloak>
     <button @click="dropdownOpen=!dropdownOpen" class="flex p-2.5 lg:p-2 w-full space-x-1 text-[13px] hover:bg-zinc-200/70 rounded-lg justify-between items-center w-full hover:text-black dark:hover:text-zinc-100 dark:hover:bg-zinc-700/60 space-x-1.5 overflow-hidden group-hover:autoflow-auto items">
         <span class="relative flex items-center space-x-2">
             <x-avatar src="{{ auth()->user()->avatar() }}" alt="{{ auth()->user()->name }} photo" size="2xs" />
             <span @class([
-                'flex-shrink-0 ease-out duration-50',
+                'shrink-0 ease-out duration-50',
                 'hidden' => ($position != 'bottom')
             ])>{{ Auth::user()->name }}</span>
         </span>
@@ -43,8 +43,8 @@
                 @endif
                 <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
-                    <button onclick="event.preventDefault(); this.closest('form').submit();" class="relative w-full flex cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-100 select-none hover:bg-zinc-200 dark:hover:bg-zinc-700/60 items-center rounded-lg p-2 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
-                        <x-phosphor-sign-out-duotone class="flex-shrink-0 w-auto h-5 ml-1 mr-2" />
+                    <button onclick="event.preventDefault(); this.closest('form').submit();" class="relative w-full flex cursor-pointer hover:text-zinc-700 dark:hover:text-zinc-100 select-none hover:bg-zinc-200 dark:hover:bg-zinc-700/60 items-center rounded-lg p-2 text-sm outline-hidden transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                        <x-phosphor-sign-out-duotone class="shrink-0 w-auto h-5 ml-1 mr-2" />
                         <span>Log out</span>
                     </button>
                 </form>

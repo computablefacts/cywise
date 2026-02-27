@@ -46,6 +46,8 @@ x-common: &common
     host.docker.internal: host-gateway
   env_file:
     - .env
+  environment:
+    - APP_DEBUG=true
 
 services:
   app:
