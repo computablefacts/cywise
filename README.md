@@ -145,6 +145,14 @@ quelles sont les règles de télétravail dans notre PSSI ? », pour obtenir une
 vos ressources internes. Une manière simple et efficace de diffuser vos bonnes pratiques et de faciliter l'accès à
 l'information au quotidien.
 
+### Notifications
+
+:white_check_mark: auto-hébergé :white_check_mark: SaaS
+
+**Restez informés, où que vous soyez.** Pour les versions auto-hébergée et SaaS, l'utilisateur a la possibilité
+d'interagir avec la plateforme au travers des messageries [Telegram](https://telegram.org) et
+[WhatsApp](https://www.whatsapp.com/).
+
 ### Single Sign-On (SSO)
 
 :white_check_mark: auto-hébergé :white_check_mark: SaaS
