@@ -6,14 +6,14 @@ use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Conversation;
 use App\Models\User;
-use GuzzleHttp\Client;
+use App\Services\MessagingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class WhatsAppWebhookController extends Controller
 {
-    public function handle(Request $request, string $secret)
+    public function handle(Request $request, string $secret, MessagingService $messagingService)
     {
         /** @var \App\Models\User|null $user */
         $user = User::where('whatsapp_webhook_secret', $secret)->first();
@@ -34,7 +34,6 @@ class WhatsAppWebhookController extends Controller
             }
             return response('Forbidden', 403);
         }
-
         if (!$user->whatsapp_access_token || !$user->whatsapp_phone_number_id) {
             Log::error("WhatsApp webhook: configuration missing for user {$user->id}");
             return response()->json(['ok' => true]);
@@ -54,6 +53,11 @@ class WhatsAppWebhookController extends Controller
         }
 
         $from = $message['from'] ?? null; // Sender's phone number
+
+        if ($from && $user->whatsapp_phone_number !== (string)$from) {
+            $user->update(['whatsapp_phone_number' => (string)$from]);
+        }
+
         $text = $message['text']['body'] ?? '';
         $text = Str::trim((string)$text);
 
@@ -92,43 +96,16 @@ class WhatsAppWebhookController extends Controller
         $answer = $response['html'] ?? '';
         $answer = Str::before($answer, '<br><br><b>Sources :</b>'); // remove sources
         $answer = preg_replace("/\[((\d+,?)+)]/", "", $answer); // remove references
-
-        // WhatsApp formatting (Markdown-like)
-        $answer = str_replace(['<p>', '</p>'], ["", "\n\n"], $answer);
-        $answer = str_replace(['<br>', '<br/>', '<br />'], "\n", $answer);
-        $answer = str_replace(['<b>', '</b>'], '*', $answer);
-        $answer = str_replace(['<i>', '</i>'], '_', $answer);
-        $answer = str_replace(['<code>', '</code>'], '`', $answer);
-        $answer = str_replace(['<pre>', '</pre>'], '```', $answer);
-        $answer = strip_tags($answer);
-        $answer = Str::trim($answer);
+        $answer = $messagingService->formatForWhatsApp($answer);
 
         if ($answer === '') {
-            $answer = 'Je n\'ai pas pu formater la réponse. Pouvez-vous reformuler votre demande ?';
+            return response()->json(['ok' => false, 'error' => 'Je n\'ai pas pu formater la réponse. Pouvez-vous reformuler votre demande ?'], 500);
         }
 
         // Reply to WhatsApp
-        try {
-            $client = new Client(['base_uri' => 'https://graph.facebook.com/v25.0/']);
-            $client->post("{$user->whatsapp_phone_number_id}/messages", [
-                'headers' => [
-                    'Authorization' => "Bearer {$user->whatsapp_access_token}",
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'messaging_product' => 'whatsapp',
-                    'to' => $from,
-                    'type' => 'text',
-                    'text' => [
-                        'body' => $answer,
-                    ],
-                ],
-                'timeout' => 10,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('WhatsApp sendMessage failed: ' . $e->getMessage());
-        }
-        return response()->json(['ok' => true]);
+        return response()->json([
+            'ok' => $messagingService->sendWhatsApp($user, $answer, (string)$from),
+        ]);
     }
 
     private function threadIdFromPhoneNumber(string $phoneNumber): string
