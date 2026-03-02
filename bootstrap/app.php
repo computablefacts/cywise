@@ -131,6 +131,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('subscriptions:cancel-expired')->hourly();
         $schedule->command('accounts:process-deletions')->daily();
         $schedule->command('activity:clean')->daily();
+
+        // Health Check history cleaning
+        $schedule->command('model:prune', ['--model' => [\Spatie\Health\Models\HealthCheckResultHistoryItem::class]])->daily();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
