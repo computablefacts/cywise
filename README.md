@@ -149,9 +149,8 @@ l'information au quotidien.
 
 :white_check_mark: auto-hébergé :white_check_mark: SaaS
 
-**Restez informés, où que vous soyez.** Pour les versions auto-hébergée et SaaS, l'utilisateur a la possibilité
-d'interagir avec la plateforme au travers des messageries [Telegram](https://telegram.org) et
-[WhatsApp](https://www.whatsapp.com/).
+**Restez informés, où que vous soyez.** Cywise vous permet d'interagir avec la plateforme en langage naturel au moyen
+des messageries [Telegram](https://telegram.org) et [WhatsApp](https://www.whatsapp.com/).
 
 ### Single Sign-On (SSO)
 
@@ -325,18 +324,19 @@ de scraperapi dans le fichier `.env`.
 1. Arrêtez la stack avec la commande `./stack-stop.sh`.
 2. Modifier le fichier `.env` pour ajouter la clé :
 
-  Pour scrapfly :
+Pour scrapfly :
+
   ```env
   SCRAPFLY_API_KEY=<your_scrapfly_api_key>
   ```
 
-  Pour scraperapi :
+Pour scraperapi :
+
   ```env
   SCRAPERAPI_API_KEY=<your_scraperapi_api_key>
   ```
 
 3. Redémarrez la stack avec la commande `./stack-start.sh`.
-
 
 ## Travaux en cours
 
