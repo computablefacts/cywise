@@ -16,7 +16,7 @@ class Notification extends BaseNotification implements ShouldQueue
 
     public static function viaEmail(string $content, string $subject = 'Cywise', ?string $from = null): Notification
     {
-        return new Notification($subject, $content, $from, [MailCoachChannel::class]);
+        return new Notification($content, $subject, $from, [MailCoachChannel::class]);
     }
 
     /**
