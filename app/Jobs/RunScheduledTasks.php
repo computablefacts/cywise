@@ -8,6 +8,9 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Models\Conversation;
 use App\Models\ScheduledTask;
 use App\Models\User;
+use App\Notifications\Channels\MailCoachChannel;
+use App\Notifications\Channels\TelegramChannel;
+use App\Notifications\Channels\WhatsAppChannel;
 use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -78,6 +81,7 @@ class RunScheduledTasks implements ShouldQueue
 
                     // Step 2: Execute the task and email the result (only once per day)
                     $tsk = Str::trim($task->task);
+                    $ran = false;
 
                     if (!$runTask || empty($tsk)) {
                         Log::debug("[RunScheduledTasks] Skipping task {$task->id} because condition evaluated to false");
@@ -87,15 +91,21 @@ class RunScheduledTasks implements ShouldQueue
                         $response = $this->ask($user, $threadId, $tsk);
                         $answer = $response['html'] ?? '';
                         $summary = LlmsProvider::provide("Summarize this text in about 10 words :\n\n{$answer}");
-                        $user->notify(Notification::viaEmail($answer, "Cywise : {$summary}"));
+                        $user->notify(new Notification($answer, "Cywise : {$summary}", null, [TelegramChannel::class, WhatsAppChannel::class, MailCoachChannel::class]));
                         Log::debug("[RunScheduledTasks] Emailed result for task {$task->id} to {$user->email}");
                         $task->last_email_sent_at = Carbon::now();
+                        $ran = true;
                     }
 
                     $task->prev_run_date = Carbon::now();
                     $task->next_run_date = Carbon::instance($task->cron()->getNextRunDate());
                     $task->save();
 
+                    // If the task should only run once, delete it after successful execution
+                    if ($task->run_once && $ran) {
+                        Log::debug("[RunScheduledTasks] Deleting 'run_once' task {$task->id} after execution");
+                        $task->delete();
+                    }
                 } catch (\Exception $exception) {
                     Log::error($exception->getMessage());
                 }

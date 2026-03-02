@@ -60,6 +60,7 @@ class ScheduledTasksProcedure extends Procedure
             'cron' => 'Cron expression MIN HOUR DOM MON DOW. (string|required)',
             'trigger' => 'Optional condition that must evaluate to true to run the task. (string|nullable)',
             'task' => 'The task/instruction to execute when the schedule/trigger matches. (string|required)',
+            'run_once' => 'Optional boolean. If true, the task will be deleted after being successfully executed once. (boolean|nullable)',
         ],
         result: [
             'msg' => 'Success message.',
@@ -79,6 +80,7 @@ class ScheduledTasksProcedure extends Procedure
             'cron' => 'string|required',
             'trigger' => 'string|nullable',
             'task' => 'string|required',
+            'run_once' => 'boolean|nullable',
         ]);
 
         if (!CronExpression::isValidExpression($params['cron'])) {
@@ -101,6 +103,7 @@ class ScheduledTasksProcedure extends Procedure
             'cron' => $params['cron'],
             'trigger' => $params['trigger'] ?? '',
             'task' => $params['task'],
+            'run_once' => $params['run_once'] ?? false,
             'prev_run_date' => null,
             'next_run_date' => Carbon::instance((new CronExpression($params['cron']))->getNextRunDate()),
             'created_by' => $user->id,
