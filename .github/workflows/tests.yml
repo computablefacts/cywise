@@ -33,7 +33,7 @@ jobs:
           user: 'tw_testuser'
           password: 'z0rglub'
         env:
-          DOCKER_API_VERSION: 1.52
+          DOCKER_API_VERSION: 1.48
       - name: Lock Laravel Version
         run: composer require "laravel/framework:${{ matrix.laravel }}.*" --no-update -v
       - name: Composer Install
