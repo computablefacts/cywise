@@ -37,6 +37,7 @@ class RunScheduledTasks implements ShouldQueue
     public function handle()
     {
         ScheduledTask::query()
+            ->withoutGlobalScope('tenant_scope')
             ->where('enabled', true)
             ->where('next_run_date', '<=', Carbon::now())
             ->get()
