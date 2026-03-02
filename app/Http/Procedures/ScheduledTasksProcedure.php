@@ -57,8 +57,8 @@ class ScheduledTasksProcedure extends Procedure
     #[RpcMethod(
         description: 'Create a new scheduled task.',
         params: [
-            'cron' => 'Cron expression MIN HOUR DOM MON DOW to schedule a repetitive task, e.g. "every Monday at 9am". (string|required_without:schedule|prohibits:schedule|nullable)',
-            'schedule' => 'Schedule a one-off task, e.g. "in 10 minutes" or "tomorrow", using PHP relative formats: https://www.php.net/manual/en/datetime.formats.php#datetime.formats.relative. (string|required_without:cron|prohibits:cron|nullable)',
+            'cron' => 'Schedule a repetitive task, e.g. "every Monday at 9am", using a cron expression MIN HOUR DOM MON DOW. (string|required_without:schedule|prohibits:schedule|nullable)',
+            'schedule' => 'Schedule a one-off task, e.g. "in 10 minutes" or "tomorrow", using PHP relative format: https://www.php.net/manual/en/datetime.formats.php#datetime.formats.relative. (string|required_without:cron|prohibits:cron|nullable)',
             'trigger' => 'Optional condition that must evaluate to true to run the task. (string|nullable)',
             'task' => 'The task/instruction to execute when the schedule/trigger matches. (string|required)',
             'run_once' => 'Optional boolean. If true, the task will be deleted after being successfully executed once. (boolean|nullable)',
