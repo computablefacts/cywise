@@ -9,7 +9,6 @@ use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
 use App\Http\Requests\JsonRpcRequest;
 use App\Listeners\CreateAssetListener;
 use App\Listeners\DeleteAssetListener;
-use App\Mail\SimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\AssetTag;
@@ -19,6 +18,8 @@ use App\Models\Port;
 use App\Models\PortTag;
 use App\Models\Scan;
 use App\Models\User;
+use App\Notifications\Notifiables\FreshdeskNotifiable;
+use App\Notifications\Notification;
 use App\Rules\IsValidAsset;
 use App\Rules\IsValidDomain;
 use App\Rules\IsValidIpAddress;
@@ -70,7 +71,7 @@ class AssetsProcedure extends Procedure
         $response = ApiUtils::discover_public($domain);
         try {
             if (($response['fallback'] ?? false) === true) {
-                SimpleEmail::sendEmail("Cywise : No subdomain for {$domain}", "No subdomain for {$domain}", "Please, investigate.");
+                (new FreshdeskNotifiable)->notify(new Notification("Please, investigate.", "Cywise : No subdomain for {$domain}"));
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());

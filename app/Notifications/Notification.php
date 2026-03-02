@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Channels\MailCoachChannel;
 use App\Notifications\Channels\TelegramChannel;
 use App\Notifications\Channels\WhatsAppChannel;
 use App\Services\MessagingService;
@@ -16,7 +17,7 @@ class Notification extends BaseNotification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(protected string $content)
+    public function __construct(protected string $content, protected string $subject = 'Cywise', protected ?string $from = null)
     {
     }
 
@@ -27,7 +28,17 @@ class Notification extends BaseNotification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return [TelegramChannel::class, WhatsAppChannel::class];
+        return [TelegramChannel::class, WhatsAppChannel::class, MailCoachChannel::class];
+    }
+
+    public function toMailCoach(object $notifiable): array
+    {
+        return [
+            'subject' => $this->subject,
+            'title' => $this->subject,
+            'content' => $this->content,
+            'from' => $this->from,
+        ];
     }
 
     public function toTelegram(object $notifiable): string

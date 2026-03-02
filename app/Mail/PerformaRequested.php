@@ -5,9 +5,6 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Spatie\MailcoachMailer\Concerns\UsesMailcoachMail;
 
@@ -15,21 +12,10 @@ class PerformaRequested extends Mailable
 {
     use Queueable, SerializesModels, UsesMailcoachMail;
 
-    private int $id;
-    private string $user;
-    private string $dns;
-    private string $secret;
-
-    public static function sendEmail(): void
-    {
-        try {
-            Mail::mailer()
-                ->to(config('towerify.freshdesk.to_email'))
-                ->send(new PerformaRequested(Auth::user()->id, Auth::user()->email));
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-        }
-    }
+    public int $id;
+    public string $user;
+    public string $dns;
+    public string $secret;
 
     /**
      * Create a new message instance.
@@ -40,7 +26,7 @@ class PerformaRequested extends Mailable
     {
         $this->id = $id;
         $this->user = $user;
-        $this->dns = 'a' . Str::lower(Str::random(3) . '-' . Str::random(4) . '-' . Str::random(4));;
+        $this->dns = 'a' . Str::lower(Str::random(3) . '-' . Str::random(4) . '-' . Str::random(4));
         $this->secret = Str::lower(Str::random(24));
     }
 
@@ -53,7 +39,7 @@ class PerformaRequested extends Mailable
     {
         return match (config('mail.default')) {
             'mailcoach' => $this->buildMailcoach(),
-            default     => $this->buildStandard(), // Tous les autres
+            default => $this->buildStandard(), // Tous les autres
         };
     }
 
@@ -71,7 +57,7 @@ class PerformaRequested extends Mailable
                 'secret' => $this->secret,
                 'id' => $this->id,
             ])
-            ->faking(! app()->environment('prod', 'production'));
+            ->faking(!app()->environment('prod', 'production'));
     }
 
     /**

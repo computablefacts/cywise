@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use App\Mail\SimpleEmail;
+use App\Notifications\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Str;
 
 /**
@@ -100,7 +101,7 @@ Cliquez sur ce lien pour créer votre compte : <br/>
 <a href="{$invitationLink}">{$invitationLink}</a>
 EOT;
 
-        SimpleEmail::sendEmail($subject, $htmlTitle, $htmlBody, $this->email);
+        NotificationFacade::route('mail', $this->email)->notify(new Notification($htmlBody, $subject));
     }
 
     public function getLink()

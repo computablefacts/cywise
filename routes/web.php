@@ -44,8 +44,9 @@ use App\Http\Controllers\Iframes\WebsiteController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
-use App\Mail\PerformaRequested;
 use App\Models\YnhServer;
+use App\Notifications\Notifiables\FreshdeskNotifiable;
+use App\Notifications\PerformaRequestedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -199,7 +200,9 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
 
     // Send a Performa setup request if the tenant does not have a Performa domain yet
     if (!$user->performa_domain || !$user->performa_secret) {
-        PerformaRequested::sendEmail();
+        $dns = 'a' . Str::lower(Str::random(3) . '-' . Str::random(4) . '-' . Str::random(4));
+        $secret = Str::lower(Str::random(24));
+        (new FreshdeskNotifiable)->notify(new PerformaRequestedNotification($user->id, $user->email, $dns, $secret));
     }
 
     // 1. In the browser, go to "https://app.towerify.io" and login using your user account

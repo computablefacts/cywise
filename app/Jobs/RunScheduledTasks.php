@@ -5,10 +5,10 @@ namespace App\Jobs;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\SimpleEmail;
 use App\Models\Conversation;
 use App\Models\ScheduledTask;
 use App\Models\User;
+use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -87,7 +87,7 @@ class RunScheduledTasks implements ShouldQueue
                         $response = $this->ask($user, $threadId, $tsk);
                         $answer = $response['html'] ?? '';
                         $summary = LlmsProvider::provide("Summarize this text in about 10 words :\n\n{$answer}");
-                        SimpleEmail::sendEmail("Cywise : {$summary}", "CyberBuddy vous répond !", $answer, $user->email);
+                        $user->notify(new Notification($answer, "Cywise : {$summary}"));
                         Log::debug("[RunScheduledTasks] Emailed result for task {$task->id} to {$user->email}");
                         $task->last_email_sent_at = Carbon::now();
                     }

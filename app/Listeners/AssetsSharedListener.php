@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\AssetsShared;
-use App\Mail\SimpleEmail;
+use App\Notifications\Notification;
 use Illuminate\Auth\Passwords\PasswordBroker;
 
 class AssetsSharedListener extends AbstractListener
@@ -58,8 +58,7 @@ class AssetsSharedListener extends AbstractListener
         $body[] = '</td></tr>';
         $body[] = '</tbody></table>';
 
-        SimpleEmail::sendEmail($subject, $title, implode("\n", $body), $to, $from);
-
+        $recipient->notify(new Notification(implode("\n", $body), $subject, $from));
     }
 
     private function buildEmailCta(string $link): string

@@ -6,11 +6,12 @@ use App\Events\EndVulnsScan;
 use App\Http\Controllers\TablesUploadController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\WhatsAppWebhookController;
-use App\Mail\SimpleEmail;
 use App\Models\Asset;
 use App\Models\Honeypot;
 use App\Models\Port;
 use App\Models\Scan;
+use App\Notifications\Notifiables\FreshdeskNotifiable;
+use App\Notifications\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -54,13 +55,11 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
         'message' => ['required', 'string', 'min:5', 'max:1000'],
     ]);
 
-    SimpleEmail::sendEmail(
-        "{$params['email']} vous a contacté !",
-        '',
+    (new FreshdeskNotifiable)->notify(new Notification(
         "<b>Fullname:</b> {$params['fullName']}<br><b>Email:</b> {$params['email']}<br><b>Phone:</b> {$params['phone']}<br><b>Message:</b> {$params['message']}",
-        null,
+        "{$params['email']} vous a contacté !",
         $params['email']
-    );
+    ));
 
     return response()->json([
         'ok' => true,

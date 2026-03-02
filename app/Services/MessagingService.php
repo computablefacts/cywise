@@ -2,13 +2,43 @@
 
 namespace App\Services;
 
+use App\Mail\SimpleEmail;
 use App\Models\User;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class MessagingService
 {
+    public function sendMailCoach(User $user, string $subject, string $title, string $content, ?string $template = null, array $data = [], ?string $from = null): bool
+    {
+        try {
+            if ($template === 'honeypot-requested') {
+                $mailable = new \App\Mail\HoneypotRequested(
+                    $data['id'],
+                    \App\Enums\HoneypotCloudSensorsEnum::from($data['cloud_sensor']),
+                    \App\Enums\HoneypotCloudProvidersEnum::from($data['cloud_provider']),
+                    $data['dns'],
+                    $user->email
+                );
+            } elseif ($template === 'performa-requested') {
+                $mailable = new \App\Mail\PerformaRequested($data['id'], $user->email);
+            } else {
+                $mailable = new SimpleEmail($subject, $title, $content, $from);
+            }
+
+            Mail::mailer()
+                ->to($user->email)
+                ->send($mailable);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('MailCoach sendMessage failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function sendTelegram(User $user, string $message, ?string $chatId = null): bool
     {
         $chatId = $chatId ?: $user->telegram_chat_id;

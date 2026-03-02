@@ -6,11 +6,11 @@ use App\Events\SendAuditReport;
 use App\Http\Procedures\EventsProcedure;
 use App\Http\Procedures\LeaksProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\SimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\User;
 use App\Models\YnhServer;
+use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Collection;
@@ -97,7 +97,7 @@ class SendAuditReportListener extends AbstractListener
 
         Log::debug("Sending audit report to {$user->email}...");
 
-        SimpleEmail::sendEmail($subject, '', implode("\n", $body), $to, $from);
+        $user->notify(new Notification(implode("\n", $body), $subject, $from));
     }
 
     private function buildEmailCta(User $user): string

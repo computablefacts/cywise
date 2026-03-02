@@ -2,15 +2,65 @@
 
 namespace Tests\Feature;
 
+use App\Enums\HoneypotCloudProvidersEnum;
+use App\Enums\HoneypotCloudSensorsEnum;
 use App\Models\User;
+use App\Notifications\HoneypotRequestedNotification;
 use App\Notifications\Notification;
+use App\Notifications\PerformaRequestedNotification;
 use App\Services\MessagingService;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
-use Mockery;
 use Tests\TestCaseWithDb;
 
 class NotificationTest extends TestCaseWithDb
 {
+    public function test_honeypot_requested_notification_to_mailcoach_data(): void
+    {
+        $user = User::factory()->make();
+        $notification = new HoneypotRequestedNotification(
+            123,
+            HoneypotCloudSensorsEnum::HTTP,
+            HoneypotCloudProvidersEnum::AWS,
+            'test.cywise.io',
+            'user@example.com'
+        );
+        $data = $notification->toMailCoach($user);
+
+        $this->assertEquals("Cywise : Honeypot requested by user@example.com", $data['subject']);
+        $this->assertEquals(123, $data['id']);
+        $this->assertEquals('HTTP', $data['cloud_sensor']);
+        $this->assertEquals('AWS', $data['cloud_provider']);
+        $this->assertEquals('test.cywise.io', $data['dns']);
+        $this->assertEquals('honeypot-requested', $data['mailcoach_template']);
+    }
+
+    public function test_performa_requested_notification_to_mailcoach_data(): void
+    {
+        $user = User::factory()->make();
+        $notification = new PerformaRequestedNotification(
+            456,
+            'user@example.com',
+            'a-b-c',
+            'secret123'
+        );
+        $data = $notification->toMailCoach($user);
+
+        $this->assertEquals("Cywise : Performa requested by user@example.com", $data['subject']);
+        $this->assertEquals(456, $data['id']);
+        $this->assertEquals('a-b-c.cywise.io', $data['dns']);
+        $this->assertEquals('secret123', $data['secret']);
+        $this->assertEquals('performa-requested', $data['mailcoach_template']);
+    }
+
+    public function test_notification_with_custom_from(): void
+    {
+        $user = User::factory()->make();
+        $notification = new Notification("content", "subject", "custom@example.com");
+        $data = $notification->toMailCoach($user);
+
+        $this->assertEquals("custom@example.com", $data['from']);
+    }
+
     public function test_notification_sends_to_telegram_and_whatsapp(): void
     {
         NotificationFacade::fake();
@@ -31,20 +81,33 @@ class NotificationTest extends TestCaseWithDb
             Notification::class,
             function ($notification, $channels) {
                 return in_array(\App\Notifications\Channels\TelegramChannel::class, $channels) &&
-                       in_array(\App\Notifications\Channels\WhatsAppChannel::class, $channels);
+                    in_array(\App\Notifications\Channels\WhatsAppChannel::class, $channels) &&
+                    in_array(\App\Notifications\Channels\MailCoachChannel::class, $channels);
             }
         );
+    }
+
+    public function test_notification_to_mailcoach_data(): void
+    {
+        $user = User::factory()->make();
+        $notification = new Notification("Some content", "Some subject");
+        $data = $notification->toMailCoach($user);
+
+        $this->assertEquals("Some subject", $data['subject']);
+        $this->assertEquals("Some subject", $data['title']);
+        $this->assertEquals("Some content", $data['content']);
     }
 
     public function test_messaging_service_formatting(): void
     {
         $service = new MessagingService();
         $html = "<p>Hello</p><br><b>World</b>";
-
         $telegram = $service->formatForTelegram($html);
+
         $this->assertEquals("Hello\n\n<b>World</b>", $telegram);
 
         $whatsapp = $service->formatForWhatsApp($html);
+
         $this->assertEquals("Hello\n\n*World*", $whatsapp);
     }
 
