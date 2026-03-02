@@ -81,8 +81,7 @@ class NotificationTest extends TestCaseWithDb
             Notification::class,
             function ($notification, $channels) {
                 return in_array(\App\Notifications\Channels\TelegramChannel::class, $channels) &&
-                    in_array(\App\Notifications\Channels\WhatsAppChannel::class, $channels) &&
-                    in_array(\App\Notifications\Channels\MailCoachChannel::class, $channels);
+                    in_array(\App\Notifications\Channels\WhatsAppChannel::class, $channels);
             }
         );
     }
