@@ -119,4 +119,21 @@ class NotificationTest extends TestCaseWithDb
         $this->assertEquals("Hello\n\n<b>World</b>", $notification->toTelegram($user));
         $this->assertEquals("Hello\n\n*World*", $notification->toWhatsApp($user));
     }
+
+    public function test_notification_sends_to_single_channel(): void
+    {
+        NotificationFacade::fake();
+
+        $user = User::factory()->create();
+
+        $user->notify(new Notification("Hello", "Subject", null, [\App\Notifications\Channels\TelegramChannel::class]));
+
+        NotificationFacade::assertSentTo(
+            $user,
+            Notification::class,
+            function ($notification, $channels) {
+                return count($channels) === 1 && $channels[0] === \App\Notifications\Channels\TelegramChannel::class;
+            }
+        );
+    }
 }

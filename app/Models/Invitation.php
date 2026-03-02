@@ -101,7 +101,8 @@ Cliquez sur ce lien pour créer votre compte : <br/>
 <a href="{$invitationLink}">{$invitationLink}</a>
 EOT;
 
-        NotificationFacade::route('mail', $this->email)->notify(new Notification($htmlBody, $subject));
+        NotificationFacade::route('mail', $this->email)
+            ->notify(Notification::viaEmail($htmlBody, $subject));
     }
 
     public function getLink()

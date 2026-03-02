@@ -246,7 +246,7 @@ class ProcessIncomingEmails implements ShouldQueue
         $body = Str::before($body, '<br><br><b>Sources :</b>'); // remove sources
         $body = preg_replace("/\[((\d+,?)+)]/", "", $body); // remove references
 
-        $user->notify(new Notification(
+        $user->notify(Notification::viaEmail(
             $body,
             "Re: {$subject}",
             self::SENDER_CYBERBUDDY

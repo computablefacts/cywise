@@ -87,7 +87,7 @@ class RunScheduledTasks implements ShouldQueue
                         $response = $this->ask($user, $threadId, $tsk);
                         $answer = $response['html'] ?? '';
                         $summary = LlmsProvider::provide("Summarize this text in about 10 words :\n\n{$answer}");
-                        $user->notify(new Notification($answer, "Cywise : {$summary}"));
+                        $user->notify(Notification::viaEmail($answer, "Cywise : {$summary}"));
                         Log::debug("[RunScheduledTasks] Emailed result for task {$task->id} to {$user->email}");
                         $task->last_email_sent_at = Carbon::now();
                     }

@@ -55,7 +55,7 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
         'message' => ['required', 'string', 'min:5', 'max:1000'],
     ]);
 
-    (new FreshdeskNotifiable)->notify(new Notification(
+    (new FreshdeskNotifiable)->notify(Notification::viaEmail(
         "<b>Fullname:</b> {$params['fullName']}<br><b>Email:</b> {$params['email']}<br><b>Phone:</b> {$params['phone']}<br><b>Message:</b> {$params['message']}",
         "{$params['email']} vous a contacté !",
         $params['email']

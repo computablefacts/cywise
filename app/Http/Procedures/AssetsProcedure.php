@@ -71,7 +71,7 @@ class AssetsProcedure extends Procedure
         $response = ApiUtils::discover_public($domain);
         try {
             if (($response['fallback'] ?? false) === true) {
-                (new FreshdeskNotifiable)->notify(new Notification("Please, investigate.", "Cywise : No subdomain for {$domain}"));
+                (new FreshdeskNotifiable)->notify(Notification::viaEmail("Please, investigate.", "Cywise : No subdomain for {$domain}"));
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());

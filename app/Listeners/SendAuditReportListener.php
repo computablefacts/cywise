@@ -97,7 +97,7 @@ class SendAuditReportListener extends AbstractListener
 
         Log::debug("Sending audit report to {$user->email}...");
 
-        $user->notify(new Notification(implode("\n", $body), $subject, $from));
+        $user->notify(Notification::viaEmail(implode("\n", $body), $subject, $from));
     }
 
     private function buildEmailCta(User $user): string

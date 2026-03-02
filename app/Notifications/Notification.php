@@ -14,10 +14,20 @@ class Notification extends BaseNotification implements ShouldQueue
 {
     use Queueable;
 
+    public static function viaEmail(string $content, string $subject = 'Cywise', ?string $from = null): Notification
+    {
+        return new Notification($subject, $content, $from, [MailCoachChannel::class]);
+    }
+
     /**
      * Create a new notification instance.
+     *
+     * @param string $content
+     * @param string $subject
+     * @param string|null $from
+     * @param array|null $channels
      */
-    public function __construct(protected string $content, protected string $subject = 'Cywise', protected ?string $from = null)
+    public function __construct(protected string $content, protected string $subject = 'Cywise', protected ?string $from = null, protected ?array $channels = null)
     {
     }
 
@@ -28,7 +38,7 @@ class Notification extends BaseNotification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return [TelegramChannel::class, WhatsAppChannel::class, MailCoachChannel::class];
+        return $this->channels ?? [WhatsAppChannel::class, TelegramChannel::class];
     }
 
     public function toMailCoach(object $notifiable): array
