@@ -120,7 +120,7 @@ résultats de vos scans. CyberBuddy, notre assistant virtuel, vous guide en temp
 connaissances vérifiées et des bonnes pratiques reconnues. Une expertise accessible, où que vous soyez.
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
 
 ### CyberScribe
 
@@ -131,7 +131,17 @@ Systèmes d'Information (PSSI) ? CyberScribe, notre éditeur intelligent, vous a
 documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence artificielle.
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
+
+### Telegram & WhatsApp
+
+:white_check_mark: auto-hébergé :white_check_mark: SaaS
+
+**Restez informés, où que vous soyez.** Cywise vous permet d'interagir avec la plateforme en langage naturel au moyen
+des messageries [Telegram](https://telegram.org) et [WhatsApp](https://www.whatsapp.com/).
+
+> [!WARNING]
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
 
 ## Divers
 
@@ -144,13 +154,6 @@ instantané et intuitif à l'information. Il leur suffit de poser une question e
 quelles sont les règles de télétravail dans notre PSSI ? », pour obtenir une réponse précise, extraite directement de
 vos ressources internes. Une manière simple et efficace de diffuser vos bonnes pratiques et de faciliter l'accès à
 l'information au quotidien.
-
-### Notifications
-
-:white_check_mark: auto-hébergé :white_check_mark: SaaS
-
-**Restez informés, où que vous soyez.** Cywise vous permet d'interagir avec la plateforme en langage naturel au moyen
-des messageries [Telegram](https://telegram.org) et [WhatsApp](https://www.whatsapp.com/).
 
 ### Single Sign-On (SSO)
 
