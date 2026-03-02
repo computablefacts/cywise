@@ -148,6 +148,16 @@ return [
      */
     'secret_token' => env('HEALTH_SECRET_TOKEN'),
 
+    /*
+     * Intervals (in minutes) at which each level's health checks are refreshed
+     * by the `health:check-level {level}` scheduled command.
+     */
+    'level_refresh_intervals' => [
+        'critical' => env('HEALTH_CRITICAL_INTERVAL', 1),
+        'medium' => env('HEALTH_MEDIUM_INTERVAL', 15),
+        'info' => env('HEALTH_INFO_INTERVAL', 60),
+    ],
+
 /**
  * By default, conditionally skipped health checks are treated as failures.
  * You can override this behavior by uncommenting the configuration below.

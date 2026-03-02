@@ -16,6 +16,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use App\Console\Commands\RunLevelHealthChecksCommand;
 use Spatie\Health\Commands\DispatchQueueCheckJobsCommand;
 use Spatie\Health\Commands\ScheduleCheckHeartbeatCommand;
 
@@ -125,6 +126,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Health check - please let this at the end
         $schedule->command(DispatchQueueCheckJobsCommand::class)->everyMinute();
         $schedule->command(ScheduleCheckHeartbeatCommand::class)->everyMinute();
+        $schedule->command(RunLevelHealthChecksCommand::class, ['critical'])->everyNMinutes(config('health.level_refresh_intervals.critical'));
+        $schedule->command(RunLevelHealthChecksCommand::class, ['medium'])->everyNMinutes(config('health.level_refresh_intervals.medium'));
+        $schedule->command(RunLevelHealthChecksCommand::class, ['info'])->everyNMinutes(config('health.level_refresh_intervals.info'));
 
         // Misc. Wave
         // $schedule->command('inspire')->hourly();

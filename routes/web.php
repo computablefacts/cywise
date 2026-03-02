@@ -41,6 +41,7 @@ use App\Http\Controllers\Iframes\TracesController;
 use App\Http\Controllers\Iframes\UsersController;
 use App\Http\Controllers\Iframes\UsersInvitationController;
 use App\Http\Controllers\Iframes\WebsiteController;
+use App\Http\Controllers\MultiLevelHealthCheckController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
@@ -53,9 +54,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Spatie\Health\Http\Controllers\HealthCheckJsonResultsController;
-use Spatie\Health\Http\Controllers\HealthCheckResultsController;
-use Spatie\Health\Http\Controllers\SimpleHealthCheckController;
 use Wave\Facades\Wave;
 
 // Wave routes
@@ -92,16 +90,30 @@ Route::get('/cyber-advisor', [\App\Http\Controllers\ToolsController::class, 'cyb
 /**
  * Health check
  */
-Route::get('check-health', [SimpleHealthCheckController::class, '__invoke']);
-Route::get('check-health/ui', [HealthCheckResultsController::class, '__invoke'])->middleware('auth');
-Route::get('check-health/json', [HealthCheckJsonResultsController::class, '__invoke'])->middleware('auth:api');
+// Multi-level health checks (simple global result, compatible Kubernetes probes)
+Route::get('check-health', [MultiLevelHealthCheckController::class, 'critical']);
+Route::get('check-health/critical', [MultiLevelHealthCheckController::class, 'critical']);
+Route::get('check-health/medium', [MultiLevelHealthCheckController::class, 'medium']);
+Route::get('check-health/info', [MultiLevelHealthCheckController::class, 'info']);
+
+// Multi-level health checks (detailed JSON results)
+Route::get('check-health/json', [MultiLevelHealthCheckController::class, 'criticalJson'])->middleware('auth:sanctum');
+Route::get('check-health/critical/json', [MultiLevelHealthCheckController::class, 'criticalJson'])->middleware('auth:sanctum');
+Route::get('check-health/medium/json', [MultiLevelHealthCheckController::class, 'mediumJson'])->middleware('auth:sanctum');
+Route::get('check-health/info/json', [MultiLevelHealthCheckController::class, 'infoJson'])->middleware('auth:sanctum');
+
+// Multi-level health checks (HTML UI)
+Route::get('check-health/ui', [MultiLevelHealthCheckController::class, 'criticalUi'])->middleware('auth');
+Route::get('check-health/critical/ui', [MultiLevelHealthCheckController::class, 'criticalUi'])->middleware('auth');
+Route::get('check-health/medium/ui', [MultiLevelHealthCheckController::class, 'mediumUi'])->middleware('auth');
+Route::get('check-health/info/ui', [MultiLevelHealthCheckController::class, 'infoUi'])->middleware('auth');
 
 // Cywise routes
 Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
 
     $token = $request->input('api_token');
 
-    if (!$token) {
+    if (! $token) {
         return response('Missing token', 403)
             ->header('Content-Type', 'text/plain');
     }
@@ -109,7 +121,7 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
     /** @var \Laravel\Sanctum\PersonalAccessToken $token */
     $token = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
 
-    if (!$token) {
+    if (! $token) {
         return response('Invalid token', 403)
             ->header('Content-Type', 'text/plain');
     }
@@ -120,14 +132,14 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
 
     $ip = $request->input('server_ip');
 
-    if (!$ip) {
+    if (! $ip) {
         return response('Invalid IP address', 500)
             ->header('Content-Type', 'text/plain');
     }
 
     $name = $request->input('server_name');
 
-    if (!$name) {
+    if (! $name) {
         return response('Invalid server name', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -140,7 +152,7 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
         $platform = OsqueryPlatformEnum::LINUX;
     }
 
-    if (!$platform) {
+    if (! $platform) {
         return response('Invalid platform name', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -149,13 +161,13 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
         ->where('name', $name)
         ->first();
 
-    if (!$server) {
+    if (! $server) {
 
         $server = \App\Models\YnhServer::where('ip_address_v6', $ip)
             ->where('name', $name)
             ->first();
 
-        if (!$server) {
+        if (! $server) {
 
             $server = YnhServer::create([
                 'name' => $name,
@@ -175,16 +187,16 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
         return response('The server is already configured', 500)
             ->header('Content-Type', 'text/plain');
     }
-    if (!$server->secret) {
+    if (! $server->secret) {
         $server->secret = Str::random(30);
     }
-    if (!$server->ssh_port) {
+    if (! $server->ssh_port) {
         $server->ssh_port = 22;
     }
-    if (!$server->ssh_username) {
+    if (! $server->ssh_username) {
         $server->ssh_username = 'twr_admin';
     }
-    if (!$server->ssh_public_key || !$server->ssh_private_key) {
+    if (! $server->ssh_public_key || ! $server->ssh_private_key) {
 
         $keys = new SshKeyPair();
         $keys->init();
@@ -217,7 +229,7 @@ Route::get('/update/{secret}', function (string $secret, \Illuminate\Http\Reques
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (!$server) {
+    if (! $server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -253,7 +265,7 @@ Route::post('/logalert/{secret}', function (string $secret, \Illuminate\Http\Req
 
         $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-        if (!$server) {
+        if (! $server) {
             return new JsonResponse([
                 'status' => 'failure',
                 'message' => 'server not found',
@@ -262,20 +274,22 @@ Route::post('/logalert/{secret}', function (string $secret, \Illuminate\Http\Req
         }
 
         $events = collect($request->input('lines'))
-            ->map(fn($line) => $line ? json_decode($line, true) : [])
-            ->filter(fn($event) => $event && count($event) > 0)
+            ->map(fn ($line) => $line ? json_decode($line, true) : [])
+            ->filter(fn ($event) => $event && count($event) > 0)
             ->all();
 
         \App\Events\ProcessLogalertPayload::dispatch($server, $events);
 
     } catch (\Exception $e) {
         \Illuminate\Support\Facades\Log::error($e);
+
         return new JsonResponse([
             'status' => 'failure',
             'message' => $e->getMessage(),
             'payload' => $payload,
         ], 200, ['Access-Control-Allow-Origin' => '*']);
     }
+
     return new JsonResponse(['status' => 'success'], 200, ['Access-Control-Allow-Origin' => '*']);
 });
 
@@ -283,7 +297,7 @@ Route::get('/logalert/{secret}', function (string $secret, \Illuminate\Http\Requ
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (!$server) {
+    if (! $server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -298,7 +312,7 @@ Route::get('/osquery/{secret}', function (string $secret, \Illuminate\Http\Reque
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (!$server) {
+    if (! $server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -313,7 +327,7 @@ Route::get('/localmetrics/{secret}', function (string $secret, \Illuminate\Http\
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (!$server) {
+    if (! $server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -326,31 +340,31 @@ Route::get('/localmetrics/{secret}', function (string $secret, \Illuminate\Http\
 
 Route::post('/logparser/{secret}', function (string $secret, \Illuminate\Http\Request $request) {
 
-    if (!$request->hasFile('data')) {
+    if (! $request->hasFile('data')) {
         return response('Missing attachment', 500)
             ->header('Content-Type', 'text/plain');
     }
 
     $file = $request->file('data');
 
-    if (!$file->isValid()) {
+    if (! $file->isValid()) {
         return response('Invalid attachment', 500)
             ->header('Content-Type', 'text/plain');
     }
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (!$server) {
+    if (! $server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
 
     $filename = $file->getClientOriginalName();
 
-    if ($filename === "osquery.jsonl.gz") {
+    if ($filename === 'osquery.jsonl.gz') {
 
         $logs = collect(gzfile($file->getRealPath()))
-            ->map(fn(string $line) => json_decode(trim($line), true));
+            ->map(fn (string $line) => json_decode(trim($line), true));
 
         if ($logs->isEmpty()) {
             return response('ok (empty file)', 200)
@@ -365,6 +379,7 @@ Route::post('/logparser/{secret}', function (string $secret, \Illuminate\Http\Re
         return response('Invalid attachment', 500)
             ->header('Content-Type', 'text/plain');
     }
+
     return response("ok ({$logs->count()} rows in file)", 200)
         ->header('Content-Type', 'text/plain');
 });
@@ -373,7 +388,7 @@ Route::get('/performa/{secret}', function (string $secret, \Illuminate\Http\Requ
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (!$server) {
+    if (! $server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -387,18 +402,20 @@ Route::get('/performa/{secret}', function (string $secret, \Illuminate\Http\Requ
 Route::get('/performa/user/login/{performa_domain}', function (string $performa_domain, \Illuminate\Http\Request $request) {
 
     $shouldLogout = $request->input('logout', 0);
-    if (1 == $shouldLogout) {
+    if ($shouldLogout == 1) {
         Auth::logout();
+
         return redirect()->route('home');
     }
 
     /** @var User $user */
     $user = Auth::user();
-    $usernames = collect(config('towerify.performa.whitelist.usernames'))->map(fn(string $username) => $username . '@')->toArray();
-    $domains = collect(config('towerify.performa.whitelist.domains'))->map(fn(string $domain) => '@' . $domain)->toArray();
+    $usernames = collect(config('towerify.performa.whitelist.usernames'))->map(fn (string $username) => $username.'@')->toArray();
+    $domains = collect(config('towerify.performa.whitelist.domains'))->map(fn (string $domain) => '@'.$domain)->toArray();
 
     if ($user
-        && ($user->performa_domain === $performa_domain
+        && (
+            $user->performa_domain === $performa_domain
             || (Str::startsWith($user->email, $usernames) && Str::endsWith($user->email, $domains))
         )
     ) {
@@ -417,7 +434,7 @@ Route::get('/performa/user/login/{performa_domain}', function (string $performa_
 
     return response()->json([
         'code' => 0,
-        'location' => route('login') . '?redirect_to=',
+        'location' => route('login').'?redirect_to=',
     ]);
 
 })->middleware('throttle:6,1');
@@ -427,8 +444,8 @@ Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialI
 
     /** @var User $user */
     $user = Auth::user();
-    $usernames = collect(config('towerify.telescope.whitelist.usernames'))->map(fn(string $username) => $username . '@')->toArray();
-    $domains = collect(config('towerify.telescope.whitelist.domains'))->map(fn(string $domain) => '@' . $domain)->toArray();
+    $usernames = collect(config('towerify.telescope.whitelist.usernames'))->map(fn (string $username) => $username.'@')->toArray();
+    $domains = collect(config('towerify.telescope.whitelist.domains'))->map(fn (string $domain) => '@'.$domain)->toArray();
 
     if (Str::startsWith($user->email, $usernames) && Str::endsWith($user->email, $domains)) {
         try {
@@ -446,8 +463,10 @@ Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialI
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
         }
+
         return response('ok', 200)->header('Content-Type', 'text/plain');
     }
+
     return response('Unauthorized', 403)->header('Content-Type', 'text/plain');
 })->middleware('auth');
 
