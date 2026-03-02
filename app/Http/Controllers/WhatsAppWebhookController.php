@@ -99,7 +99,7 @@ class WhatsAppWebhookController extends Controller
                         $content = $response->getBody()->getContents();
                         $contentType = $response->getHeaderLine('Content-Type');
                         $filename = $attachment['filename'] ?? ($mediaId . $this->contentTypeToExtension($contentType));
-                        $fileTmp = tempnam(sys_get_temp_dir(), "{$filename}_");
+                        $fileTmp = tempnam(sys_get_temp_dir(), "{$filename}_") . $this->contentTypeToExtension($contentType);
                         file_put_contents($fileTmp, $content); // Temporary store because saveDistantFile doesn't support headers
                         $collection = $this->getOrCreateCollection("privcol{$user->id}", 0);
                         $isSaved = \App\Http\Controllers\CyberBuddyController::saveLocalFile($collection, $fileTmp);
