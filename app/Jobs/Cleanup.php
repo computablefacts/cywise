@@ -214,10 +214,10 @@ class Cleanup implements ShouldQueue
                             $delay = self::DELETION_DELAY_DAYS;
                             $user->notify(Notification::viaEmail("
                               <p>Bonjour,</p>
-                              <p>Votre p&eacute;riode d'essai sur Cywise arrive &agrave; son terme. Conform&eacute;ment &agrave; nos <a href=\"{$terms}\">conditions d'utilisation</a>, <b>votre compte sera d&eacute;sactiv&eacute; et les donn&eacute;es associ&eacute;es seront supprim&eacute;es dans {$delay} jours, soit le {$tenant->deletion_scheduled_at->format('Y-m-d')}.</b></p>
-                              <p>Si vous souhaitez prolonger votre exp&eacute;rience ou discuter d'une solution adapt&eacute;e &agrave; vos besoins, n'h&eacute;sitez pas &agrave; r&eacute;pondre &agrave; cet email.</p>
-                              <p>Nous restons &agrave; votre disposition pour toute question.</p>
-                              <p>Bonne journ&eacute;e !</p>
+                              <p>Votre période d'essai sur Cywise arrive à son terme. Conformément à nos <a href=\"{$terms}\">conditions d'utilisation</a>, <b>votre compte sera désactivé et les données associées seront supprimées dans {$delay} jours</b>, soit le {$tenant->deletion_scheduled_at->format('Y-m-d')}.</p>
+                              <p>Si vous souhaitez prolonger votre expérience ou discuter d'une solution adaptée à vos besoins, n'hésitez pas à répondre à cet email.</p>
+                              <p>Nous restons à votre disposition pour toute question.</p>
+                              <p>Bonne journée !</p>
                             ", "📢 Fin de votre période d'essai sur Cywise"));
                         });
                     }
@@ -233,9 +233,9 @@ class Cleanup implements ShouldQueue
                     $users->each(function (User $user) {
                         $user->notify(Notification::viaEmail("
                             <p>Bonjour,</p>
-                            <p>Conform&eacute;ment &agrave; ce qui vous a &eacute;t&eacute; annonc&eacute;, vos donn&eacute;es ont maintenant &eacute;t&eacute; supprim&eacute;es. Cependant, votre compte utilisateur reste actif.</p>
-                            <p>Nous restons &agrave; votre disposition pour toute question.</p>
-                            <p>Bonne journ&eacute;e !</p>
+                            <p>Conformément à ce qui vous a été annoncé, vos données ont maintenant été supprimées. Cependant, votre compte utilisateur reste actif.</p>
+                            <p>Nous restons à votre disposition pour toute question.</p>
+                            <p>Bonne journée !</p>
                         ", "📢 Confirmation de la suppression de vos données sur Cywise"));
                     });
                 }
