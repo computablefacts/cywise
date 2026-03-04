@@ -176,7 +176,7 @@ class Cleanup implements ShouldQueue
         });
     }
 
-    private function cleanupTenants()
+    private function cleanupTenants(): void
     {
         Tenant::where('cleanup', true)
             /* ->where(function ($query) {
@@ -261,7 +261,7 @@ class Cleanup implements ShouldQueue
             || TimelineFact::whereIn('owned_by', $userIds)->exists();
     }
 
-    private function cleanupTenantData(\Illuminate\Support\Collection $users)
+    private function cleanupTenantData(\Illuminate\Support\Collection $users): void
     {
         $userIds = $users->pluck('id')->toArray();
 
