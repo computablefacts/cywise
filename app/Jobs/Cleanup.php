@@ -179,6 +179,7 @@ class Cleanup implements ShouldQueue
     private function cleanupTenants(): void
     {
         Tenant::where('cleanup', true)
+            ->where('created_at', '<=', now()->subDays(15))
             /* ->where(function ($query) {
                 $query->whereNull('deletion_scheduled_at')
                     ->orWhere('deletion_scheduled_at', '<=', now());

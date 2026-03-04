@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Jobs\Cleanup;
 use App\Models\Asset;
+use App\Models\Chunk;
 use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\File;
@@ -57,7 +58,10 @@ class CleanupTenantDataTest extends TestCaseWithDb
     {
         NotificationFacade::fake();
 
-        $tenant = Tenant::create(['name' => 'Paying Tenant']);
+        $tenant = Tenant::create([
+            'name' => 'Paying Tenant',
+            'created_at' => now()->subDays(16),
+        ]);
         $user = User::factory()->create([
             'tenant_id' => $tenant->id,
         ]);
@@ -80,7 +84,11 @@ class CleanupTenantDataTest extends TestCaseWithDb
     {
         NotificationFacade::fake();
 
-        $tenant = Tenant::create(['name' => 'Non-Paying Tenant']);
+        $tenant = Tenant::create([
+            'name' => 'Non-Paying Tenant',
+        ]);
+        $tenant->created_at = now()->subDays(16);
+        $tenant->save();
         $user = User::factory()->create([
             'tenant_id' => $tenant->id,
         ]);
@@ -108,7 +116,10 @@ class CleanupTenantDataTest extends TestCaseWithDb
     {
         NotificationFacade::fake();
 
-        $tenant = Tenant::create(['name' => 'Empty Tenant']);
+        $tenant = Tenant::create([
+            'name' => 'Empty Tenant',
+            'created_at' => now()->subDays(16),
+        ]);
         User::factory()->create([
             'tenant_id' => $tenant->id,
         ]);
@@ -124,8 +135,10 @@ class CleanupTenantDataTest extends TestCaseWithDb
     {
         $tenant = Tenant::create([
             'name' => 'Returning Tenant',
-            'deletion_scheduled_at' => now()->addDays(2)
+            'deletion_scheduled_at' => now()->addDays(2),
         ]);
+        $tenant->created_at = now()->subDays(16);
+        $tenant->save();
         $user = User::factory()->create([
             'tenant_id' => $tenant->id,
         ]);
@@ -142,8 +155,10 @@ class CleanupTenantDataTest extends TestCaseWithDb
 
         $tenant = Tenant::create([
             'name' => 'Expired Tenant',
-            'deletion_scheduled_at' => now()->subMinutes(1)
+            'deletion_scheduled_at' => now()->subMinutes(1),
         ]);
+        $tenant->created_at = now()->subDays(16);
+        $tenant->save();
         $user = User::factory()->create([
             'tenant_id' => $tenant->id,
         ]);
@@ -184,10 +199,16 @@ class CleanupTenantDataTest extends TestCaseWithDb
             'hash' => 'hash',
             'created_by' => $user->id,
         ]);
+        $chunk = Chunk::create([
+            'collection_id' => $collection->id,
+            'file_id' => $file->id,
+            'text' => 'test chunk',
+            'created_by' => $user->id,
+        ]);
         $vector = Vector::create([
             'collection_id' => $collection->id,
             'file_id' => $file->id,
-            'chunk_id' => 1,
+            'chunk_id' => $chunk->id,
             'locale' => 'fr',
             'hypothetical_question' => 'test?',
             'embedding' => [0.1, 0.2],
@@ -234,8 +255,10 @@ class CleanupTenantDataTest extends TestCaseWithDb
         $tenant = Tenant::create([
             'name' => 'Excluded Tenant',
             'cleanup' => false,
-            'deletion_scheduled_at' => now()->subMinutes(1)
+            'deletion_scheduled_at' => now()->subMinutes(1),
         ]);
+        $tenant->created_at = now()->subDays(16);
+        $tenant->save();
         $user = User::factory()->create([
             'tenant_id' => $tenant->id,
         ]);
@@ -249,6 +272,30 @@ class CleanupTenantDataTest extends TestCaseWithDb
 
         $this->assertNotNull($tenant->fresh()->deletion_scheduled_at);
         $this->assertDatabaseHas('am_assets', ['id' => $asset->id]);
+
+        NotificationFacade::assertNothingSent();
+    }
+
+    public function test_recent_tenant_is_ignored_by_cleanup()
+    {
+        NotificationFacade::fake();
+
+        $tenant = Tenant::create([
+            'name' => 'Recent Tenant',
+        ]);
+        $user = User::factory()->create([
+            'tenant_id' => $tenant->id,
+        ]);
+        Asset::create([
+            'asset' => 'recent.com',
+            'type' => \App\Enums\AssetTypesEnum::DNS,
+            'created_by' => $user->id,
+        ]);
+
+        (new Cleanup())->handle();
+
+        $this->assertNull($tenant->fresh()->deletion_scheduled_at);
+        $this->assertDatabaseHas('am_assets', ['asset' => 'recent.com']);
 
         NotificationFacade::assertNothingSent();
     }
