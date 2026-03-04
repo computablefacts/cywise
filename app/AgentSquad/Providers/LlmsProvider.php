@@ -56,7 +56,7 @@ class LlmsProvider extends AbstractProvider
     private static function callDeepInfra(array $messages, string $model, int $timeoutInSeconds = 60): array
     {
         return self::post(
-            config('towerify.deepinfra.api') . '/chat/completions', config('towerify.deepinfra.api_key'), $messages, $model, $timeoutInSeconds);
+            config('towerify.deepinfra.api') . '/chat/completions', config('towerify.deepinfra.api_key', 'fake_bearer'), $messages, $model, $timeoutInSeconds);
     }
 
     private static function post(string $url, string $bearer, array $messages, string $model, int $timeoutInSeconds = 60): array
