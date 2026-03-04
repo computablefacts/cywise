@@ -160,10 +160,10 @@ class Cleanup implements ShouldQueue
                             $hasChunk = false;
                             Log::debug("Vector {$vector->id} has no chunk.");
                         }
-                        if (!$hasCollection && !$hasFile && !$hasChunk) {
+                        if (!$hasCollection || !$hasFile || !$hasChunk) {
                             $vector->delete();
                             Log::debug("Vector {$vector->id} removed.");
-                        } else if (!$hasCollection || !$hasFile || !$hasChunk) {
+                        } else {
                             $vector->save();
                             Log::debug("Vector {$vector->id} updated.");
                         }
