@@ -72,6 +72,7 @@ class HealthServiceProvider extends ServiceProvider
 
             // Disk space
             UsedDiskSpaceCheck::new()->name('critical.UsedDiskSpaceCheck')
+                ->warnWhenUsedSpaceIsAbovePercentage(95)
                 ->failWhenUsedSpaceIsAbovePercentage(95),
 
             // Assets discover
@@ -112,6 +113,7 @@ class HealthServiceProvider extends ServiceProvider
 
             // Disk space
             UsedDiskSpaceCheck::new()->name('medium.UsedDiskSpaceCheck')
+                ->warnWhenUsedSpaceIsAbovePercentage(90)
                 ->failWhenUsedSpaceIsAbovePercentage(90),
 
             // Assets discover
@@ -141,6 +143,7 @@ class HealthServiceProvider extends ServiceProvider
         return [
             // Disk space
             UsedDiskSpaceCheck::new()->name('info.UsedDiskSpaceCheck')
+                ->warnWhenUsedSpaceIsAbovePercentage(80)
                 ->failWhenUsedSpaceIsAbovePercentage(80),
 
             // Database table size for telescope
