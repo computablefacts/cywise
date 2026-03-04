@@ -99,7 +99,7 @@ class CleanupTenantDataTest extends TestCaseWithDb
             $user,
             Notification::class,
             function ($notification, $channels) {
-                return Str::contains($notification->toMailCoach(new \stdClass())['content'], 'Votre p&eacute;riode d\'essai sur Cywise arrive &agrave; son terme.');
+                return Str::contains($notification->toMailCoach(new \stdClass())['content'], 'Votre période d\'essai sur Cywise arrive à son terme.');
             }
         );
     }
@@ -222,7 +222,7 @@ class CleanupTenantDataTest extends TestCaseWithDb
             $user,
             Notification::class,
             function ($notification, $channels) {
-                return Str::contains($notification->toMailCoach(new \stdClass())['content'], 'Conform&eacute;ment &agrave; ce qui vous a &eacute;t&eacute; annonc&eacute;, vos donn&eacute;es ont maintenant &eacute;t&eacute; supprim&eacute;es.');
+                return Str::contains($notification->toMailCoach(new \stdClass())['content'], 'Conformément à ce qui vous a été annoncé, vos données ont maintenant été supprimées.');
             }
         );
     }
