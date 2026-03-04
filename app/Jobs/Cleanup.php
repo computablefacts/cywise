@@ -212,7 +212,7 @@ class Cleanup implements ShouldQueue
                         $users->each(function (User $user) use ($tenant) {
                             $terms = "https://www.cywise.io/terms";
                             $delay = self::DELETION_DELAY_DAYS;
-                            $user->notify(new Notification("
+                            $user->notify(Notification::viaEmail("
                               <p>Bonjour,</p>
                               <p>Votre p&eacute;riode d'essai sur Cywise arrive &agrave; son terme. Conform&eacute;ment &agrave; nos <a href=\"{$terms}\">conditions d'utilisation</a>, <b>votre compte sera d&eacute;sactiv&eacute; et les donn&eacute;es associ&eacute;es seront supprim&eacute;es dans {$delay} jours, soit le {$tenant->deletion_scheduled_at->format('Y-m-d')}.</b></p>
                               <p>Si vous souhaitez prolonger votre exp&eacute;rience ou discuter d'une solution adapt&eacute;e &agrave; vos besoins, n'h&eacute;sitez pas &agrave; r&eacute;pondre &agrave; cet email.</p>
@@ -231,7 +231,7 @@ class Cleanup implements ShouldQueue
                     $tenant->save();
 
                     $users->each(function (User $user) {
-                        $user->notify(new Notification("
+                        $user->notify(Notification::viaEmail("
                             <p>Bonjour,</p>
                             <p>Conform&eacute;ment &agrave; ce qui vous a &eacute;t&eacute; annonc&eacute;, vos donn&eacute;es ont maintenant &eacute;t&eacute; supprim&eacute;es. Cependant, votre compte utilisateur reste actif.</p>
                             <p>Nous restons &agrave; votre disposition pour toute question.</p>
