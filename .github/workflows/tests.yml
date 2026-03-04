@@ -79,3 +79,4 @@ jobs:
         env:
           DROP_SCAN_EVENTS_AFTER_X_MINUTES: 0.5
           DROP_DISCOVERY_EVENTS_AFTER_X_MINUTES: 0.5
+          DEEPINFRA_API_KEY: ${{ secrets.DEEPINFRA_API_KEY }}
