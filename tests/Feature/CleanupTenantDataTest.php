@@ -299,4 +299,39 @@ class CleanupTenantDataTest extends TestCaseWithDb
 
         NotificationFacade::assertNothingSent();
     }
+
+    public function test_empty_tenant_older_than_15_days_is_deleted()
+    {
+        $tenant = Tenant::create(['name' => 'Empty Old Tenant']);
+        $tenant->created_at = now()->subDays(16);
+        $tenant->save();
+
+        (new Cleanup())->handle();
+
+        $this->assertDatabaseMissing('tenants', ['id' => $tenant->id]);
+    }
+
+    public function test_empty_tenant_younger_than_15_days_is_not_deleted()
+    {
+        $tenant = Tenant::create(['name' => 'Empty Young Tenant']);
+        $tenant->created_at = now()->subDays(14);
+        $tenant->save();
+
+        (new Cleanup())->handle();
+
+        $this->assertDatabaseHas('tenants', ['id' => $tenant->id]);
+    }
+
+    public function test_non_empty_tenant_older_than_15_days_is_not_deleted()
+    {
+        $tenant = Tenant::create(['name' => 'Non-Empty Old Tenant']);
+        $tenant->created_at = now()->subDays(16);
+        $tenant->save();
+
+        User::factory()->create(['tenant_id' => $tenant->id]);
+
+        (new Cleanup())->handle();
+
+        $this->assertDatabaseHas('tenants', ['id' => $tenant->id]);
+    }
 }

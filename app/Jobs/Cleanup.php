@@ -50,6 +50,11 @@ class Cleanup implements ShouldQueue
         $this->cleanupTenants();
 
         Log::debug("Non-paying customers cleaned.");
+        Log::debug("Cleaning up empty tenants...");
+
+        $this->deleteEmptyTenants();
+
+        Log::debug("Empty tenants cleaned.");
         Log::debug("Cleaning up trials...");
 
         Trial::whereNull('created_by')
@@ -174,6 +179,22 @@ class Cleanup implements ShouldQueue
 
             Log::debug("Conversations of user {$user->email} purged.");
         });
+    }
+
+    private function deleteEmptyTenants(): void
+    {
+        Tenant::where('created_at', '<=', now()->subDays(15))
+            ->get()
+            ->each(function (Tenant $tenant) {
+
+                $hasUsers = User::withoutGlobalScope('tenant_scope')
+                    ->where('tenant_id', $tenant->id)
+                    ->exists();
+
+                if (!$hasUsers) {
+                    $tenant->delete();
+                }
+            });
     }
 
     private function cleanupTenants(): void
