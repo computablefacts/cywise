@@ -112,7 +112,7 @@ class SendAuditReportListener extends AbstractListener
         return "
             <tr>
               <td style=\"padding-top: 20px;\">
-                <p><b>Dernière étape pour créer votre compte utilisateur :</b> cliquez ci-dessous pour choisir votre mot de passe et activer votre compte. Ce lien expirera dans 12h.</p>
+                <p><b>Dernière étape pour créer votre compte utilisateur :</b> cliquez ci-dessous pour choisir votre mot de passe et activer votre compte. Ce lien expirera dans 60 minutes.</p>
               </td>
             </tr>
             <tr>
