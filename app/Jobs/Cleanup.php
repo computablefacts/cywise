@@ -277,7 +277,7 @@ class Cleanup implements ShouldQueue
             || Conversation::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || File::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || Collection::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            // || Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || Vector::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || TimelineItem::whereIn('owned_by', $userIds)->exists()
             || TimelineFact::whereIn('owned_by', $userIds)->exists();
@@ -331,7 +331,7 @@ class Cleanup implements ShouldQueue
         Vector::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
         File::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
         Collection::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
-        Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
+        // Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
 
         // 4. Leaks & co
         TimelineItem::whereIn('owned_by', $userIds)->delete();
