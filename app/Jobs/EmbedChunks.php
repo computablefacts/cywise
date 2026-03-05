@@ -6,12 +6,14 @@ use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
 use App\Models\Chunk;
 use App\Models\Collection;
 use App\Models\File;
+use App\Models\User;
 use App\Models\Vector;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class EmbedChunks implements ShouldQueue
 {
@@ -32,7 +34,15 @@ class EmbedChunks implements ShouldQueue
             ->get()
             ->each(function (Collection $collection) {
 
-                $collection->createdBy->actAs();
+                /** @var User $user */
+                $user = $collection->createdBy;
+
+                if (!$user) {
+                    Log::error("Collection has no createdBy user : {$collection->name} ({$collection->id})");
+                    return;
+                }
+
+                $user->actAs();
 
                 $collection->chunks()
                     ->where('is_embedded', false)
