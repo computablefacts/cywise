@@ -260,7 +260,7 @@ class EventsProcedure extends Procedure
             ];
         }
 
-        $logs = implode("\n", cywise_compress_log_buffer($events->toArray()));
+        $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
         $memos = MemosProvider::provide($user, NotesProcedure::SCOPE_IS_SOC_OPERATOR);
         $prompt = PromptsProvider::provide('default_soc_operator', [
             'SERVER_NAME' => $server->name,
