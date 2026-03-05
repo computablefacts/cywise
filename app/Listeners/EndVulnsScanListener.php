@@ -50,6 +50,7 @@ class EndVulnsScanListener extends AbstractListener
                     return;
                 }
 
+                /** @var User $user */
                 $user = $trial->createdBy;
                 $assets = $trial->assets()->get();
                 $scansInProgress = $assets->contains(fn(Asset $asset) => $asset->scanInProgress()->isNotEmpty());
