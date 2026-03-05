@@ -230,7 +230,7 @@ class EventsProcedure extends Procedure
         }
 
         $user = $request->user();
-        $minDate = Carbon::now()->utc()->startOfDay()->subWeek();
+        $minDate = Carbon::now()->utc()->startOfDay()->subDays(5);
         $maxDate = Carbon::now()->utc()->endOfDay();
 
         Log::debug("Building SOC operator report for server {$server->name} ({$server->ip()})...");
