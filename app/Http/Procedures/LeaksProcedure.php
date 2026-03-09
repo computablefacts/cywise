@@ -9,6 +9,7 @@ use App\Models\TimelineItem;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Sajya\Server\Procedure;
 
@@ -60,10 +61,14 @@ class LeaksProcedure extends Procedure
         $createdAtOrAfter = isset($params['created_at_or_after']) ? Carbon::parse($params['created_at_or_after']) : null;
         $asset = isset($params['asset']) ?? null;
 
+        Log::debug("Fetching leaks of the last 15 days...");
+
         /** @var User $user */
         $user = $request->user();
         $now = Carbon::now()->utc()->subDays(15);
         $leaks = TimelineItem::fetchItems($user->id, 'leak', $now, null, 0);
+
+        Log::debug("{$leaks->count()} leaks found.");
 
         if ($leaks->isEmpty()) {
 
@@ -91,10 +96,11 @@ class LeaksProcedure extends Procedure
                   FROM dumps_login_email_domain 
                   WHERE login_email_domain IN ({$tlds})
                   GROUP BY email, website, password
-                  ORDER BY email, website ASC
+                  ORDER BY leak_date DESC, email ASC, website ASC
+                  LIMIT 1000
                 ";
 
-                // Log::debug($query);
+                Log::debug("Searching leaked credentials...");
 
                 $output = JosianeClient::executeQuery($query);
                 $leaks = collect(explode("\n", $output))
@@ -122,11 +128,19 @@ class LeaksProcedure extends Procedure
                     })
                     ->unique(fn(array $credentials) => $credentials['email'] . $credentials['website'] . $credentials['password']);
             }
+
+            Log::debug("{$leaks->count()} leaked credentials found.");
+
             if (count($leaks) > 0) {
+
+                Log::debug("Fetching all leaks...");
 
                 // Get previous leaks
                 $leaksPrev = TimelineItem::fetchItems($user->id, 'leak', null, $now, 0)
                     ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']));
+
+                Log::debug("{$leaksPrev->count()} leaks found.");
+                Log::debug("Computing diff...]");
 
                 $leaks = $leaks->filter(function (array $leak) use ($leaksPrev) {
                     return !$leaksPrev->contains(function (object $leakPrev) use ($leak) {
@@ -135,6 +149,8 @@ class LeaksProcedure extends Procedure
                             $leakPrev->password === $leak['password'];
                     });
                 });
+
+                Log::debug("{$leaks->count()} new leaks found.");
 
                 // Only add the new leaks
                 if (count($leaks) > 0) {

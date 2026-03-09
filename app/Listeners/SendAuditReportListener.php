@@ -131,23 +131,37 @@ class SendAuditReportListener extends AbstractListener
 
     private function buildEmailSubject(User $user, Collection $assets): string
     {
+        Log::debug("Building subject for user {$user->email}...");
+
         $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->subDay())->count();
 
+        Log::debug("{$nbNewAssets} new assets found for user {$user->email}");
+
         $nbLeaks = $this->fetchLeaks($user)->unique()->count();
+
+        Log::debug("{$nbLeaks} leaks found for user {$user->email}");
 
         $nbHigh = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
+        Log::debug("{$nbHigh} vulnerabilities high found for user {$user->email}");
+
         $nbMedium = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
+
+        Log::debug("{$nbMedium} vulnerabilities medium found for user {$user->email}");
 
         $nbLow = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityLow()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
+        Log::debug("{$nbLow} vulnerabilities low found for user {$user->email}");
+
         $nbIssues = $nbNewAssets + $nbLeaks + $nbHigh + $nbMedium + $nbLow;
+
+        Log::debug("{$nbIssues} alerts found for user {$user->email}");
 
         if ($nbIssues === 0) {
             return 'Cywise - Tout va bien !';
@@ -169,15 +183,23 @@ class SendAuditReportListener extends AbstractListener
 
     private function buildSummary(User $user, Collection $assets): string
     {
+        Log::debug("Building summary for user {$user->email}...");
+
         $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->startOfDay()->subWeek())
             ->count();
 
+        Log::debug("{$nbNewAssets} new assets found for user {$user->email}");
+
         $nbLeaks = $this->fetchLeaks($user)->unique()->count();
+
+        Log::debug("{$nbLeaks} leaks found for user {$user->email}");
 
         $nbDns = $assets->filter(fn(Asset $asset) => $asset->is_monitored && $asset->isDns())
             ->pluck('asset')
             ->unique()
             ->count();
+
+        Log::debug("{$nbDns} DNS found for user {$user->email}");
 
         $nbIpAddresses = $assets->filter(fn(Asset $asset) => $asset->is_monitored)
             ->flatMap(fn(Asset $asset) => $asset->ports()->get())
@@ -185,19 +207,29 @@ class SendAuditReportListener extends AbstractListener
             ->unique()
             ->count();
 
+        Log::debug("{$nbIpAddresses} IP addresses found for user {$user->email}");
+
         $nbHigh = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
+
+        Log::debug("{$nbHigh} vulnerabilities high found for user {$user->email}");
 
         $nbMedium = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityMedium()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
+        Log::debug("{$nbMedium} vulnerabilities medium found for user {$user->email}");
+
         $nbLow = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityLow()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
             ->count();
 
+        Log::debug("{$nbLow} vulnerabilities low found for user {$user->email}");
+
         $nbAlerts = $nbHigh + $nbMedium + $nbLow;
+
+        Log::debug("{$nbAlerts} alerts found for user {$user->email}");
 
         $newAssets = match ($nbNewAssets) {
             0 => '',
