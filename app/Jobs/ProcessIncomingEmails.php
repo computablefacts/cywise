@@ -8,11 +8,11 @@ use App\AgentSquad\Providers\WebpagesProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Procedures\NotesProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\SimpleEmail;
 use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\File;
 use App\Models\User;
+use App\Notifications\Notification;
 use App\Rules\IsValidCollectionName;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -246,13 +246,11 @@ class ProcessIncomingEmails implements ShouldQueue
         $body = Str::before($body, '<br><br><b>Sources :</b>'); // remove sources
         $body = preg_replace("/\[((\d+,?)+)]/", "", $body); // remove references
 
-        SimpleEmail::sendEmail(
-            "Re: {$subject}",
-            "CyberBuddy vous répond !",
+        $user->notify(Notification::viaEmail(
             $body,
-            $user->email,
+            "Re: {$subject}",
             self::SENDER_CYBERBUDDY
-        );
+        ));
 
         if (!$message->move('CyberBuddy')) {
             Log::error('Message could not be moved to the CyberBuddy folder!');

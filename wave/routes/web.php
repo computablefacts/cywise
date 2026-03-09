@@ -1,11 +1,12 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Route;
+use Wave\Actions\Reset;
+use Wave\Page;
 
 Route::impersonate();
-
-// Documentation routes
-Route::view('docs/{page?}', 'docs::index')->where('page', '(.*)');
 
 // Additional Auth Routes
 Route::get('logout', '\Wave\Http\Controllers\LogoutController@logout')->name('wave.logout');
@@ -17,7 +18,7 @@ Route::view('install', 'wave::install')->name('wave.install');
 Route::group(['middleware' => 'auth'], function () {
     Route::redirect('settings', 'settings/profile')->name('settings');
 
-    if(config("wave.billing_provider") == 'paddle'){
+    if (config('wave.billing_provider') == 'paddle') {
         Route::get('settings/invoices/{invoice}', '\Wave\Http\Controllers\SubscriptionController@invoice')->name('wave.paddle.invoice');
     }
 
@@ -36,7 +37,10 @@ Route::get('wave/theme/image/{theme_name}', '\Wave\Http\Controllers\ThemeImageCo
 Route::get('wave/plugin/image/{plugin_name}', '\Wave\Http\Controllers\PluginImageController@show');
 Route::redirect('admin/login', '/auth/login');
 
-Route::get('reset', \Wave\Actions\Reset::class);
+// Reset sqlite database - only in local environment
+if (app()->environment('local')) {
+    Route::get('reset', Reset::class)->middleware('auth');
+}
 
 /***** Billing Routes *****/
 Route::post('webhook/paddle', '\Wave\Http\Controllers\Billing\Webhooks\PaddleWebhook@handler')->middleware('paddle-webhook-signature');
@@ -45,17 +49,17 @@ Route::get('stripe/portal', '\Wave\Http\Controllers\Billing\Stripe@redirect_to_c
 Route::redirect('billing', 'settings/subscription')->name('billing');
 
 try {
-    if (App\Models\User::first()) {
+    if (User::first()) {
         /***** Dynamic Page Routes *****/
-        foreach (Wave\Page::all() as $page) {
+        foreach (Page::all() as $page) {
             Route::view($page->slug, 'theme::page', ['page' => $page->toArray()])->name($page->slug);
         }
     }
 
     // If no users are found, redirect to the installer or dummy page
-    if (!App\Models\User::first()) {
+    if (! User::first()) {
         Route::view('/', 'wave::welcome');
     }
-} catch (\Illuminate\Database\QueryException $e) {
+} catch (QueryException $e) {
     // Handle the exception or log it if needed
 }

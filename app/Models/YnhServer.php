@@ -93,7 +93,7 @@ class YnhServer extends Model
     public static function forUser(User $user, bool $readyOnly = false): Collection
     {
         $currentUser = Auth::user();
-        Auth::login($user);
+        $user->actAs();
 
         $query = YnhServer::with('applications', 'domains', 'users')
             ->select('ynh_servers.*')
@@ -104,7 +104,7 @@ class YnhServer extends Model
 
         $servers = $query->get();
 
-        Auth::login($currentUser);
+        $currentUser->actAs();
 
         return $servers;
     }

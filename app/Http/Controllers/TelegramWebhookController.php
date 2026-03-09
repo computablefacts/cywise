@@ -8,6 +8,7 @@ use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\User;
 use App\Rules\IsValidCollectionName;
+use App\Services\MessagingService;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +16,7 @@ use Illuminate\Support\Str;
 
 class TelegramWebhookController extends Controller
 {
-    public function handle(Request $request, string $secret)
+    public function handle(Request $request, string $secret, MessagingService $messagingService)
     {
         // Identify the owner user by their per-user webhook secret
         /** @var \App\Models\User|null $user */
@@ -23,9 +24,6 @@ class TelegramWebhookController extends Controller
 
         if (!$user) {
             return response()->json(['ok' => false, 'error' => 'Forbidden.'], 403);
-        }
-        if (!$user->telegram_bot_token) {
-            return response()->json(['ok' => false, 'error' => "Telegram webhook: bot token not configured."], 500);
         }
 
         $update = $request->all();
@@ -39,6 +37,14 @@ class TelegramWebhookController extends Controller
 
         $chat = $message['chat'] ?? [];
         $chatId = $chat['id'] ?? null;
+
+        if ($chatId && $user->telegram_chat_id !== (string)$chatId) {
+            $user->update(['telegram_chat_id' => (string)$chatId]);
+        }
+        if (!$user->telegram_bot_token) {
+            return response()->json(['ok' => false, 'error' => "Telegram webhook: bot token not configured."], 500);
+        }
+
         $text = isset($message['text']) ? Str::trim((string)$message['text']) : '';
         $attachment = $message['document'] ?? $message['photo'] ?? $message['video'] ?? $message['audio'] ?? $message['voice'] ?? null;
 
@@ -112,37 +118,16 @@ class TelegramWebhookController extends Controller
         $answer = $response['html'] ?? '';
         $answer = Str::before($answer, '<br><br><b>Sources :</b>'); // remove sources
         $answer = preg_replace("/\[((\d+,?)+)]/", "", $answer); // remove references
-
-        // Telegram's HTML parse_mode only supports a limited set of tags.
-        // Unsupported tags like <p>, <div>, etc. cause a 400 Bad Request.
-        // We replace <p> and <br> with newlines, and strip everything else except <b>, <i>, <a>, <code>, <pre>.
-        // See https://core.telegram.org/bots/api#formatting-options for details.
-        $answer = str_replace(['<p>', '</p>'], ["\n", "\n"], $answer);
-        $answer = str_replace(['<br>', '<br/>', '<br />'], "\n", $answer);
-        $answer = strip_tags($answer, '<b><i><a><code><pre>');
-        $answer = preg_replace("/\n{3,}/", "\n\n", $answer);
-        $answer = Str::trim($answer);
+        $answer = $messagingService->formatForTelegram($answer);
 
         if ($answer === '') {
-            $answer = 'Je n\'ai pas pu formater la réponse. Pouvez-vous reformuler votre demande ?';
+            return response()->json(['ok' => false, 'error' => 'Je n\'ai pas pu formater la réponse. Pouvez-vous reformuler votre demande ?'], 500);
         }
 
         // Reply to Telegram using HTML formatting
-        try {
-            $client = new Client(['base_uri' => 'https://api.telegram.org']);
-            $client->post("/bot{$user->telegram_bot_token}/sendMessage", [
-                'json' => [
-                    'chat_id' => $chatId,
-                    'text' => $answer,
-                    'parse_mode' => 'HTML',
-                    'disable_web_page_preview' => false,
-                ],
-                'timeout' => 10,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Telegram sendMessage failed: ' . $e->getMessage());
-        }
-        return response()->json(['ok' => true]);
+        return response()->json([
+            'ok' => $messagingService->sendTelegram($user, $answer, (string)$chatId),
+        ]);
     }
 
     /**

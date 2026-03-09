@@ -163,7 +163,7 @@ class EventsProcedure extends Procedure
         if (isset($ruleName)) {
             $events = $events->where('ynh_osquery_rules.name', $ruleName);
         }
-        if ($dismissed->isNotEmpty()) {
+        if ($dismissed->filter(fn(object $item) => !is_null($item->ynh_server_id) && !is_null($item->ynh_osquery_rule_id))->isNotEmpty()) {
             $tuples = $dismissed->map(fn(object $item) => "({$item->ynh_server_id}, {$item->ynh_osquery_rule_id})")->implode(',');
             $events = $events->whereRaw("(ynh_server_id, ynh_osquery_rule_id) NOT IN ({$tuples})");
         }

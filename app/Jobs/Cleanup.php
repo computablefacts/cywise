@@ -2,15 +2,23 @@
 
 namespace App\Jobs;
 
+use App\Models\Asset;
 use App\Models\Collection;
 use App\Models\Conversation;
+use App\Models\File;
+use App\Models\ScheduledTask;
+use App\Models\Tenant;
+use App\Models\TimelineFact;
+use App\Models\TimelineItem;
+use App\Models\Trial;
 use App\Models\User;
 use App\Models\Vector;
 use App\Models\YnhFramework;
 use App\Models\YnhOsquery;
 use App\Models\YnhOsqueryLatestEvent;
 use App\Models\YnhOsqueryRule;
-use App\Models\Trial;
+use App\Models\YnhServer;
+use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,6 +32,8 @@ class Cleanup implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    const int DELETION_DELAY_DAYS = 3;
+
     public $tries = 1;
     public $maxExceptions = 1;
     public $timeout = 3 * 180; // 9mn
@@ -35,6 +45,16 @@ class Cleanup implements ShouldQueue
 
     public function handle()
     {
+        Log::debug("Cleaning up non-paying customers...");
+
+        $this->cleanupTenants();
+
+        Log::debug("Non-paying customers cleaned.");
+        Log::debug("Cleaning up empty tenants...");
+
+        $this->deleteEmptyTenants();
+
+        Log::debug("Empty tenants cleaned.");
         Log::debug("Cleaning up trials...");
 
         Trial::whereNull('created_by')
@@ -140,10 +160,10 @@ class Cleanup implements ShouldQueue
                             $hasChunk = false;
                             Log::debug("Vector {$vector->id} has no chunk.");
                         }
-                        if (!$hasCollection && !$hasFile && !$hasChunk) {
+                        if (!$hasCollection || !$hasFile || !$hasChunk) {
                             $vector->delete();
                             Log::debug("Vector {$vector->id} removed.");
-                        } else if (!$hasCollection || !$hasFile || !$hasChunk) {
+                        } else {
                             $vector->save();
                             Log::debug("Vector {$vector->id} updated.");
                         }
@@ -159,5 +179,162 @@ class Cleanup implements ShouldQueue
 
             Log::debug("Conversations of user {$user->email} purged.");
         });
+    }
+
+    private function deleteEmptyTenants(): void
+    {
+        Tenant::where('created_at', '<=', now()->subDays(15))
+            ->get()
+            ->each(function (Tenant $tenant) {
+
+                $hasUsers = User::withoutGlobalScope('tenant_scope')
+                    ->where('tenant_id', $tenant->id)
+                    ->exists();
+
+                if (!$hasUsers) {
+                    $tenant->delete();
+                }
+            });
+    }
+
+    private function cleanupTenants(): void
+    {
+        Tenant::where('cleanup', true)
+            ->where('created_at', '<=', now()->subDays(15))
+            /* ->where(function ($query) {
+                $query->whereNull('deletion_scheduled_at')
+                    ->orWhere('deletion_scheduled_at', '<=', now());
+            }) */
+            ->get()
+            ->each(function (Tenant $tenant) {
+
+                $users = User::withoutGlobalScope('tenant_scope')->where('tenant_id', $tenant->id)->get();
+                $hasPayingUser = $users->contains(fn(User $user) => $user->subscriber());
+
+                if ($hasPayingUser) {
+                    if ($tenant->deletion_scheduled_at !== null) {
+
+                        Log::debug("Tenant {$tenant->id} has a paying user now. Cancelling deletion.");
+
+                        $tenant->deletion_scheduled_at = null;
+                        $tenant->save();
+                    }
+                    return;
+                }
+
+                // No paying user
+                if ($tenant->deletion_scheduled_at === null) {
+                    if ($this->hasDataToCleanup($users)) {
+
+                        Log::debug("Tenant {$tenant->id} has no paying user but has data. Scheduling deletion in " . self::DELETION_DELAY_DAYS . " days.");
+
+                        $tenant->deletion_scheduled_at = now()->addDays(self::DELETION_DELAY_DAYS)->endOfDay();
+                        $tenant->save();
+
+                        $users->each(function (User $user) use ($tenant) {
+                            $terms = "https://www.cywise.io/terms";
+                            $delay = self::DELETION_DELAY_DAYS;
+                            $user->notify(Notification::viaEmail("
+                              <p>Bonjour,</p>
+                              <p>Votre période d'essai sur Cywise arrive à son terme. Conformément à nos <a href=\"{$terms}\">conditions d'utilisation</a>, <b>votre compte sera désactivé et les données associées seront supprimées dans {$delay} jours</b>, soit le {$tenant->deletion_scheduled_at->format('Y-m-d')}.</p>
+                              <p>Si vous souhaitez prolonger votre expérience ou discuter d'une solution adaptée à vos besoins, n'hésitez pas à répondre à cet email.</p>
+                              <p>Nous restons à votre disposition pour toute question.</p>
+                              <p>Bonne journée !</p>
+                            ", "📢 Fin de votre période d'essai sur Cywise"));
+                        });
+                    }
+                } else if ($tenant->deletion_scheduled_at <= now()) {
+
+                    Log::info("Tenant {$tenant->id} deletion delay expired. Cleaning up data.");
+
+                    $this->cleanupTenantData($users);
+
+                    $tenant->deletion_scheduled_at = null;
+                    $tenant->save();
+
+                    $users->each(function (User $user) {
+                        $user->notify(Notification::viaEmail("
+                            <p>Bonjour,</p>
+                            <p>Conformément à ce qui vous a été annoncé, vos données ont maintenant été supprimées. Cependant, votre compte utilisateur reste actif.</p>
+                            <p>Nous restons à votre disposition pour toute question.</p>
+                            <p>Bonne journée !</p>
+                        ", "📢 Confirmation de la suppression de vos données sur Cywise"));
+                    });
+                }
+            });
+    }
+
+    private function hasDataToCleanup(\Illuminate\Support\Collection $users): bool
+    {
+        $userIds = $users->pluck('id')->toArray();
+
+        if (empty($userIds)) {
+            return false;
+        }
+        return Asset::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            || YnhServer::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            || ScheduledTask::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            || Conversation::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            || File::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            || Collection::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            || Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            || Vector::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            || TimelineItem::whereIn('owned_by', $userIds)->exists()
+            || TimelineFact::whereIn('owned_by', $userIds)->exists();
+    }
+
+    private function cleanupTenantData(\Illuminate\Support\Collection $users): void
+    {
+        $userIds = $users->pluck('id')->toArray();
+
+        if (empty($userIds)) {
+            return;
+        }
+
+        // 1. Assets and related (Scans, Ports, Alerts, Screenshots, AssetTags)
+        $assetIds = Asset::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->pluck('id')->toArray();
+
+        if (!empty($assetIds)) {
+
+            $scanIds = DB::table('am_scans')->whereIn('asset_id', $assetIds)->pluck('id')->toArray();
+
+            if (!empty($scanIds)) {
+
+                $portIds = DB::table('am_ports')->whereIn('scan_id', $scanIds)->pluck('id')->toArray();
+
+                if (!empty($portIds)) {
+                    DB::table('am_screenshots')->whereIn('port_id', $portIds)->delete();
+                    DB::table('am_alerts')->whereIn('port_id', $portIds)->delete();
+                    DB::table('am_ports_tags')->whereIn('port_id', $portIds)->delete();
+                    DB::table('am_ports')->whereIn('id', $portIds)->delete();
+                }
+
+                DB::table('am_scans')->whereIn('id', $scanIds)->delete();
+            }
+
+            DB::table('am_assets_tags')->whereIn('asset_id', $assetIds)->delete();
+            Asset::withoutGlobalScope('tenant_scope')->whereIn('id', $assetIds)->delete();
+        }
+
+        // 2. Servers and related (Osquery)
+        $serverIds = YnhServer::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->pluck('id')->toArray();
+
+        if (!empty($serverIds)) {
+            YnhOsqueryLatestEvent::whereIn('ynh_server_id', $serverIds)->delete();
+            YnhOsquery::whereIn('ynh_server_id', $serverIds)->delete();
+            YnhServer::withoutGlobalScope('tenant_scope')->whereIn('id', $serverIds)->delete();
+        }
+
+        // 3. ScheduledTasks, Conversations, Vectors, Files, Collections, Trials, etc.
+        ScheduledTask::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
+        Conversation::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
+        Vector::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
+        File::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
+        Collection::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
+        Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
+
+        // 4. Leaks & co
+        TimelineItem::whereIn('owned_by', $userIds)->delete();
+        TimelineFact::whereIn('owned_by', $userIds)->delete();
     }
 }

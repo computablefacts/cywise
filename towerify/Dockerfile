@@ -1,6 +1,6 @@
-#
+# ==============================================
 # PHP Dependencies
-#
+# ==============================================
 FROM composer:2 AS vendor
 
 # Needed dependencies from composer.json
@@ -18,26 +18,51 @@ RUN composer install \
     --no-scripts \
     --prefer-dist
 
-#
+# ==============================================
 # Frontend
-#
-FROM node:18 AS frontend
+# ==============================================
+FROM node:24 AS frontend
 
-COPY --chown=www-data:www-data . /app
-# Add composer dependencies
-COPY --chown=www-data:www-data --from=vendor /app/vendor/ /app/vendor/
+# Display current versions
+RUN node --version
+RUN npm --version
 
 WORKDIR /app
 
-RUN node --version
-RUN npm --version
-# RUN npm install -g npm && npm --version
+# Install node packages
+COPY --chown=www-data:www-data package.json /app/package.json
+COPY --chown=www-data:www-data package-lock.json /app/package-lock.json
+
 RUN npm install --verbose
+
+# Add node dependencies
+COPY --chown=www-data:www-data vite.config.js tailwind.config.js theme.json /app/
+
+# Copy content based on tailwind.config.js
+COPY --chown=www-data:www-data --parents resources/views/filament/**/*.blade.php /app/
+COPY --chown=www-data:www-data --parents --from=vendor /app/vendor/filament/**/*.blade.php /
+COPY --chown=www-data:www-data --parents --from=vendor /app/vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php /
+COPY --chown=www-data:www-data --parents resources/views/**/*.blade.php /app/
+COPY --chown=www-data:www-data --parents resources/views/components/**/*.blade.php /app/
+COPY --chown=www-data:www-data --parents wave/resources/views/**/*.blade.php /app/
+COPY --chown=www-data:www-data --parents resources/themes/**/*.blade.php /app/
+COPY --chown=www-data:www-data --parents resources/plugins/**/*.php /app/
+
+# Copy content based on vite.config.js
+COPY --chown=www-data:www-data --parents resources/themes/**/*.css /app/
+COPY --chown=www-data:www-data --parents resources/themes/**/*.js /app/
+COPY --chown=www-data:www-data --parents resources/css/filament/admin/theme.css /app/
+COPY --chown=www-data:www-data --parents resources/js/app.js /app/
+
+# Others dependencies
+COPY --chown=www-data:www-data --parents resources/js/*.jsx /app/
+COPY --chown=www-data:www-data --parents --from=vendor /app/vendor/filament/**/*.css /
+
 RUN npm run build
 
-#
+# ==============================================
 # PHP configuration
-#
+# ==============================================
 FROM alpine:latest AS php_configuration
 
 RUN mkdir -p /php-config
@@ -71,9 +96,9 @@ RUN echo "date.timezone=UTC" > /php-config/date_timezone.ini
 RUN echo "expose_php=0" > /php-config/expose-php.ini
 
 
-#
+# ==============================================
 # Application
-#
+# ==============================================
 FROM php:8.4-apache AS final
 
 LABEL maintainer="Patrick Brisacier <pbrisacier@mncc.fr>"

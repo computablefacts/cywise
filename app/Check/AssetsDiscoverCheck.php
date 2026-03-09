@@ -16,7 +16,9 @@ class AssetsDiscoverCheck extends Check
     protected string $rootCacheKey = 'health:checks:assetsDiscover';
 
     protected string $domain = 'cywise.io';
+
     protected int $failedDurationThresholdSeconds = 90;
+
     protected int $warningDurationThresholdSeconds = 45;
 
     public function cacheKey(string $cacheKey): self
@@ -50,6 +52,20 @@ class AssetsDiscoverCheck extends Check
         return $this->failedDurationThresholdSeconds;
     }
 
+    public function failAfterSeconds(int $seconds): self
+    {
+        $this->failedDurationThresholdSeconds = $seconds;
+
+        return $this;
+    }
+
+    public function warnAfterSeconds(int $seconds): self
+    {
+        $this->warningDurationThresholdSeconds = $seconds;
+
+        return $this;
+    }
+
     public function getLastStart()
     {
         return cache()->get($this->getCacheKey('lastStart'));
@@ -66,12 +82,12 @@ class AssetsDiscoverCheck extends Check
 
     public function getLastDuration(): int
     {
-        return (int)cache()->get($this->getCacheKey('lastDuration'));
+        return (int) cache()->get($this->getCacheKey('lastDuration'));
     }
 
     public function setLastDuration(float $durationInSeconds): void
     {
-        $roundedDuration = (int)ceil($durationInSeconds);
+        $roundedDuration = (int) ceil($durationInSeconds);
 
         cache()->set($this->getCacheKey('lastDuration'), $roundedDuration);
     }
@@ -116,18 +132,19 @@ class AssetsDiscoverCheck extends Check
         if ($this->lastStatusIs(Status::failed()) && $this->lastStartLessThanMinutes(3)) {
             return false;
         }
+
         return true;
     }
 
     private function lastAssetsDiscoverResult(): Result
     {
-        if (!$this->getLastStart()) {
+        if (! $this->getLastStart()) {
             return $this->getResult(Status::warning(), 'No check yet');
         }
-        if (!$this->lastStartLessThanMinutes(120)) {
+        if (! $this->lastStartLessThanMinutes(120)) {
             return $this->getResult(Status::failed(), 'No check during the last 2 hours');
         }
-        if (!$this->lastResponseIsCorrect()) {
+        if (! $this->lastResponseIsCorrect()) {
             return $this->getResult(Status::failed(), 'Wrong response');
         }
 
@@ -151,12 +168,15 @@ class AssetsDiscoverCheck extends Check
         switch ($status) {
             case Status::failed():
                 $this->setLastStatus($status);
+
                 return Result::make()->failed($message);
             case Status::warning():
                 $this->setLastStatus($status);
+
                 return Result::make()->warning($message);
             case Status::ok():
                 $this->setLastStatus($status);
+
                 return Result::make()->ok($message);
             default:
                 return Result::make()->failed('Unknown status');
@@ -182,7 +202,7 @@ class AssetsDiscoverCheck extends Check
     {
         $lastStartTimestamp = $this->getLastStart();
 
-        if (!$lastStartTimestamp) {
+        if (! $lastStartTimestamp) {
             return false;
         }
 
@@ -190,8 +210,11 @@ class AssetsDiscoverCheck extends Check
         $minutesAgo = $lastStartAt->diffInMinutes();
 
         $carbonVersion = InstalledVersions::getVersion('nesbot/carbon');
-        if (version_compare($carbonVersion,
-            '3.0.0', '<')) {
+        if (version_compare(
+            $carbonVersion,
+            '3.0.0',
+            '<'
+        )) {
             $minutesAgo += 1;
         }
 

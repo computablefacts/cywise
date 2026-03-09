@@ -16,9 +16,9 @@ class NotesProcedure extends Procedure
 {
     public static string $name = 'notes';
 
-    public const SCOPE_IS_ORCHESTRATOR = 'Orchestrator';
-    public const SCOPE_IS_CYBERBUDDY = 'CyberBuddy';
-    public const SCOPE_IS_SOC_OPERATOR = 'SOC Operator';
+    public const string SCOPE_IS_ORCHESTRATOR = 'Orchestrator';
+    public const string SCOPE_IS_CYBERBUDDY = 'CyberBuddy';
+    public const string SCOPE_IS_SOC_OPERATOR = 'SOC Operator';
 
     #[RpcMethod(
         description: 'Create a note.',

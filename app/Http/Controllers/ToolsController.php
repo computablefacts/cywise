@@ -7,10 +7,11 @@ use App\Enums\HoneypotCloudSensorsEnum;
 use App\Enums\HoneypotStatusesEnum;
 use App\Http\Procedures\AssetsProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\HoneypotRequested;
 use App\Models\Honeypot;
-use App\Models\User;
 use App\Models\Trial;
+use App\Models\User;
+use App\Notifications\HoneypotRequestedNotification;
+use App\Notifications\Notifiables\FreshdeskNotifiable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -101,7 +102,7 @@ class ToolsController extends Controller
                     'cloud_provider' => HoneypotCloudProvidersEnum::AWS,
                     'cloud_sensor' => HoneypotCloudSensorsEnum::HTTP,
                 ]);
-                HoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
+                (new FreshdeskNotifiable)->notify(new HoneypotRequestedNotification($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns, $user->email));
 
                 // HTTPS
                 /** @var Honeypot $honeypot */
@@ -111,7 +112,7 @@ class ToolsController extends Controller
                     'cloud_provider' => HoneypotCloudProvidersEnum::AWS,
                     'cloud_sensor' => HoneypotCloudSensorsEnum::HTTPS,
                 ]);
-                HoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
+                (new FreshdeskNotifiable)->notify(new HoneypotRequestedNotification($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns, $user->email));
 
                 // SSH
                 /** @var Honeypot $honeypot */
@@ -121,7 +122,7 @@ class ToolsController extends Controller
                     'cloud_provider' => HoneypotCloudProvidersEnum::AWS,
                     'cloud_sensor' => HoneypotCloudSensorsEnum::SSH,
                 ]);
-                HoneypotRequested::sendEmail($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns);
+                (new FreshdeskNotifiable)->notify(new HoneypotRequestedNotification($honeypot->id, $honeypot->cloud_sensor, $honeypot->cloud_provider, $honeypot->dns, $user->email));
 
                 $trial->honeypots = true;
                 $trial->save();

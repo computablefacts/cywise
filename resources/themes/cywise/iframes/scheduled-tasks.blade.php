@@ -33,11 +33,15 @@
         <td>
           {{ $task->name }}
         </td>
-        <td class="text-center">
+        <td>
+          @if($task->run_once)
+          {{ __('once on') }} {{ $task->next_run_date->format('Y-m-d H:i:s') }}
+          @else
           {{ $task->readableCron() }}
+          @endif
         </td>
         <td>
-          {{ $task->trigger }}
+          {{ empty($task->trigger) ? 'n/a' : $task->trigger }}
         </td>
         <td>
           {{ $task->task }}

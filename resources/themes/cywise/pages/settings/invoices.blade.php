@@ -33,7 +33,7 @@
                                         <td class="px-6 py-4 text-sm font-medium leading-5 text-left whitespace-no-wrap text-zinc-900">€{{ $invoice->total }}</td>
                                         <td class="px-6 py-4 text-sm font-medium leading-5 whitespace-no-wrap text-zinc-900">{{ $invoice->created }}</td>
                                         <td class="px-6 py-4 text-sm font-medium leading-5 text-right whitespace-no-wrap">
-                                            <a href="{{ $invoice->download }}" @if(config("wave.billing_provider") == 'stripe') target="_blank" @endif class="mr-2 text-indigo-600 hover:underline focus:outline-none">Download</a>
+                                            <a href="{{ $invoice->download }}" @if(config("wave.billing_provider") == 'stripe') target="_blank" @endif class="mr-2 text-indigo-600 hover:underline focus:outline-hidden">Download</a>
                                         </td>
 
                                     </tr>

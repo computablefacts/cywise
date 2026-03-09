@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Requests\JsonRpcRequest;
+use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\User;
+use App\Rules\IsValidCollectionName;
+use App\Services\MessagingService;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +16,7 @@ use Illuminate\Support\Str;
 
 class WhatsAppWebhookController extends Controller
 {
-    public function handle(Request $request, string $secret)
+    public function handle(Request $request, string $secret, MessagingService $messagingService)
     {
         /** @var \App\Models\User|null $user */
         $user = User::where('whatsapp_webhook_secret', $secret)->first();
@@ -34,7 +37,6 @@ class WhatsAppWebhookController extends Controller
             }
             return response('Forbidden', 403);
         }
-
         if (!$user->whatsapp_access_token || !$user->whatsapp_phone_number_id) {
             Log::error("WhatsApp webhook: configuration missing for user {$user->id}");
             return response()->json(['ok' => true]);
@@ -49,19 +51,73 @@ class WhatsAppWebhookController extends Controller
         $value = $change['value'] ?? null;
         $message = $value['messages'][0] ?? null;
 
-        if (!$message || ($message['type'] ?? '') !== 'text') {
+        if (!$message) {
             return response()->json(['ok' => true]);
         }
 
         $from = $message['from'] ?? null; // Sender's phone number
-        $text = $message['text']['body'] ?? '';
-        $text = Str::trim((string)$text);
 
-        if (!$from || $text === '') {
+        if ($from && $user->whatsapp_phone_number !== (string)$from) {
+            $user->update(['whatsapp_phone_number' => (string)$from]);
+        }
+
+        $text = $message['text']['body'] ?? '';
+        $attachment = $message['image'] ?? $message['document'] ?? $message['audio'] ?? $message['video'] ?? $message['voice'] ?? null;
+
+        if (!$from || ($text === '' && !$attachment)) {
             return response()->json(['ok' => true]);
         }
 
+        $text = Str::trim((string)$text);
+
+        // $user is resolved by secret above
         $user->actAs();
+
+        // Handle attachment if present
+        if ($attachment) {
+
+            $mediaId = $attachment['id'] ?? null;
+
+            if ($mediaId) {
+                try {
+
+                    $client = new Client(['base_uri' => 'https://graph.facebook.com']);
+                    $response = $client->get("/v25.0/{$mediaId}", [
+                        'headers' => [
+                            'Authorization' => "Bearer {$user->whatsapp_access_token}",
+                        ],
+                    ]);
+                    $file = json_decode($response->getBody()->getContents(), true);
+
+                    if ($file['url'] ?? false) {
+
+                        $response = $client->get($file['url'], [
+                            'headers' => [
+                                'Authorization' => "Bearer {$user->whatsapp_access_token}",
+                            ],
+                        ]);
+                        $content = $response->getBody()->getContents();
+                        $contentType = $response->getHeaderLine('Content-Type');
+                        $filename = $attachment['filename'] ?? ($mediaId . $this->contentTypeToExtension($contentType));
+                        $fileTmp = tempnam(sys_get_temp_dir(), "{$filename}_") . $this->contentTypeToExtension($contentType);
+                        file_put_contents($fileTmp, $content); // Temporary store because saveDistantFile doesn't support headers
+                        $collection = $this->getOrCreateCollection("privcol{$user->id}", 0);
+                        $isSaved = \App\Http\Controllers\CyberBuddyController::saveLocalFile($collection, $fileTmp);
+
+                        if ($isSaved) {
+                            $text = ($text === '') ? "J'ai reçu votre fichier. Celui-ci est en cours de traitement." : "{$text} (fichier joint reçu et en cours de traitement)";
+                        }
+
+                        unlink($fileTmp);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('WhatsApp attachment processing failed: ' . $e->getMessage());
+                }
+            }
+        }
+        if ($text === '') {
+            return response()->json(['ok' => true]);
+        }
 
         // Map phone number to a valid 10-char thread id
         $threadId = $this->threadIdFromPhoneNumber($from);
@@ -92,43 +148,16 @@ class WhatsAppWebhookController extends Controller
         $answer = $response['html'] ?? '';
         $answer = Str::before($answer, '<br><br><b>Sources :</b>'); // remove sources
         $answer = preg_replace("/\[((\d+,?)+)]/", "", $answer); // remove references
-
-        // WhatsApp formatting (Markdown-like)
-        $answer = str_replace(['<p>', '</p>'], ["", "\n\n"], $answer);
-        $answer = str_replace(['<br>', '<br/>', '<br />'], "\n", $answer);
-        $answer = str_replace(['<b>', '</b>'], '*', $answer);
-        $answer = str_replace(['<i>', '</i>'], '_', $answer);
-        $answer = str_replace(['<code>', '</code>'], '`', $answer);
-        $answer = str_replace(['<pre>', '</pre>'], '```', $answer);
-        $answer = strip_tags($answer);
-        $answer = Str::trim($answer);
+        $answer = $messagingService->formatForWhatsApp($answer);
 
         if ($answer === '') {
-            $answer = 'Je n\'ai pas pu formater la réponse. Pouvez-vous reformuler votre demande ?';
+            return response()->json(['ok' => false, 'error' => 'Je n\'ai pas pu formater la réponse. Pouvez-vous reformuler votre demande ?'], 500);
         }
 
         // Reply to WhatsApp
-        try {
-            $client = new Client(['base_uri' => 'https://graph.facebook.com/v25.0/']);
-            $client->post("{$user->whatsapp_phone_number_id}/messages", [
-                'headers' => [
-                    'Authorization' => "Bearer {$user->whatsapp_access_token}",
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'messaging_product' => 'whatsapp',
-                    'to' => $from,
-                    'type' => 'text',
-                    'text' => [
-                        'body' => $answer,
-                    ],
-                ],
-                'timeout' => 10,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('WhatsApp sendMessage failed: ' . $e->getMessage());
-        }
-        return response()->json(['ok' => true]);
+        return response()->json([
+            'ok' => $messagingService->sendWhatsApp($user, $answer, (string)$from),
+        ]);
     }
 
     private function threadIdFromPhoneNumber(string $phoneNumber): string
@@ -140,5 +169,39 @@ class WhatsAppWebhookController extends Controller
         $hash = substr(strtoupper(hash('crc32b', $phoneNumber)), 0, 10);
         $padded = substr($hash . $base36, -10);
         return str_pad($padded, 10, '0', STR_PAD_LEFT);
+    }
+
+    private function getOrCreateCollection(string $collectionName, int $priority): ?Collection
+    {
+        /** @var \App\Models\Collection $collection */
+        $collection = Collection::where('name', $collectionName)
+            ->where('is_deleted', false)
+            ->first();
+        if (!$collection) {
+            if (!IsValidCollectionName::test($collectionName)) {
+                Log::error("Invalid collection name : {$collectionName}");
+                return null;
+            }
+            $collection = Collection::create([
+                'name' => $collectionName,
+                'priority' => max($priority, 0),
+            ]);
+        }
+        return $collection;
+    }
+
+    private function contentTypeToExtension(string $contentType): string
+    {
+        $map = [
+            'image/jpeg' => '.jpg',
+            'image/png' => '.png',
+            'application/pdf' => '.pdf',
+            'application/msword' => '.doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
+            'audio/mpeg' => '.mp3',
+            'audio/ogg' => '.ogg',
+            'video/mp4' => '.mp4',
+        ];
+        return $map[$contentType] ?? '';
     }
 }

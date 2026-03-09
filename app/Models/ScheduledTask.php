@@ -18,6 +18,7 @@ use Lorisleiva\CronTranslator\CronTranslator;
  * @property string trigger
  * @property string task
  * @property bool enabled
+ * @property bool run_once
  * @property ?Carbon prev_run_date
  * @property ?Carbon next_run_date
  * @property ?Carbon last_email_sent_at
@@ -35,6 +36,7 @@ class ScheduledTask extends Model
         'trigger',
         'task',
         'enabled',
+        'run_once',
         'prev_run_date',
         'next_run_date',
         'last_email_sent_at',
@@ -43,6 +45,7 @@ class ScheduledTask extends Model
 
     protected $casts = [
         'enabled' => 'boolean',
+        'run_once' => 'boolean',
         'prev_run_date' => 'datetime',
         'next_run_date' => 'datetime',
         'last_email_sent_at' => 'datetime',

@@ -7,31 +7,17 @@ use App\Enums\HoneypotCloudSensorsEnum;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Spatie\MailcoachMailer\Concerns\UsesMailcoachMail;
 
 class HoneypotRequested extends Mailable
 {
     use Queueable, SerializesModels, UsesMailcoachMail;
 
-    private int $id;
-    private HoneypotCloudSensorsEnum $sensor;
-    private HoneypotCloudProvidersEnum $provider;
-    private string $dns;
-    private string $user;
-
-    public static function sendEmail(int $id, HoneypotCloudSensorsEnum $sensor, HoneypotCloudProvidersEnum $provider, string $dns): void
-    {
-        try {
-            Mail::mailer()
-                ->to(config('towerify.freshdesk.to_email'))
-                ->send(new HoneypotRequested($id, $sensor, $provider, $dns, Auth::user()->email));
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-        }
-    }
+    public int $id;
+    public HoneypotCloudSensorsEnum $sensor;
+    public HoneypotCloudProvidersEnum $provider;
+    public string $dns;
+    public string $user;
 
     /**
      * Create a new message instance.
@@ -56,7 +42,7 @@ class HoneypotRequested extends Mailable
     {
         return match (config('mail.default')) {
             'mailcoach' => $this->buildMailcoach(),
-            default     => $this->buildStandard(), // Tous les autres
+            default => $this->buildStandard(), // Tous les autres
         };
     }
 
@@ -75,7 +61,7 @@ class HoneypotRequested extends Mailable
                 'cloud_sensor' => $this->sensor->value,
                 'dns' => $this->dns,
             ])
-            ->faking(! app()->environment('prod', 'production'));
+            ->faking(!app()->environment('prod', 'production'));
     }
 
     /**

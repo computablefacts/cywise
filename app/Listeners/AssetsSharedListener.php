@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\AssetsShared;
-use App\Mail\SimpleEmail;
+use App\Notifications\Notification;
 use Illuminate\Auth\Passwords\PasswordBroker;
 
 class AssetsSharedListener extends AbstractListener
@@ -15,7 +15,7 @@ class AssetsSharedListener extends AbstractListener
 
     protected function handle2($event)
     {
-        if (! ($event instanceof AssetsShared)) {
+        if (!($event instanceof AssetsShared)) {
             throw new \Exception('Invalid event type!');
         }
 
@@ -45,7 +45,7 @@ class AssetsSharedListener extends AbstractListener
         $body = ['<table cellspacing="0" cellpadding="0" style="margin: auto;"><tbody>'];
         $body[] = '<tr><td style="font-size: 28px; text-align: center;">Bonjour !</td></tr>';
         $body[] = '<tr><td style="font-size: 16px; line-height: 1.6;">';
-        $body[] = '<p>'.htmlspecialchars($sender->name).' ('.htmlspecialchars($sender->email).') a partagé avec vous ses actifs avec les étiquettes ['.htmlspecialchars($tags).'].</p>';
+        $body[] = '<p>' . htmlspecialchars($sender->name) . ' (' . htmlspecialchars($sender->email) . ') a partagé avec vous ses actifs avec les étiquettes [' . htmlspecialchars($tags) . '].</p>';
 
         $body[] = '<p>Pour consulter les actifs partagés, connectez-vous à Cywise :</p>';
         $body[] = '</td></tr>';
@@ -58,8 +58,7 @@ class AssetsSharedListener extends AbstractListener
         $body[] = '</td></tr>';
         $body[] = '</tbody></table>';
 
-        SimpleEmail::sendEmail($subject, $title, implode("\n", $body), $to, $from);
-
+        $recipient->notify(Notification::viaEmail(implode("\n", $body), $subject, $from));
     }
 
     private function buildEmailCta(string $link): string

@@ -40,11 +40,11 @@
         :aria-checked="theme == 'dark'"
         :aria-labelledby="$id('toggle-label')"
         :class="(theme == 'dark') ? 'bg-zinc-700' : 'bg-slate-300'"
-        class="relative inline-flex flex-shrink-0 py-1 ml-1 transition rounded-full w-7 focus:ring-0"
+        class="relative inline-flex shrink-0 py-1 ml-1 transition rounded-full w-7 focus:ring-0"
     >
         <span
             :class="(theme == 'dark') ? 'translate-x-[13px]' : 'translate-x-1'"
-            class="w-3 h-3 transition bg-white rounded-full shadow-md focus:outline-none"
+            class="w-3 h-3 transition bg-white rounded-full shadow-md focus:outline-hidden"
             aria-hidden="true"
         ></span>
     </button>
@@ -52,7 +52,7 @@
     <label
         :id="$id('toggle-label')"
         :class="{ 'text-zinc-600' : theme == 'light' || theme == null, 'text-zinc-300' : theme == 'dark'  }"
-        class="flex-shrink-0 ml-1.5 font-medium cursor-pointer"
+        class="shrink-0 ml-1.5 font-medium cursor-pointer"
     >
         <span x-show="(theme == 'light' || theme == null)">Dark Mode</span>
         <span x-show="(theme == 'dark')">Light Mode</span>

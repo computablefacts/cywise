@@ -57,32 +57,48 @@ class ScheduledTasksProcedure extends Procedure
     #[RpcMethod(
         description: 'Create a new scheduled task.',
         params: [
-            'cron' => 'Cron expression MIN HOUR DOM MON DOW. (string|required)',
+            'cron' => 'Schedule a repetitive task, e.g. "every Monday at 9am", using a cron expression MIN HOUR DOM MON DOW. (string|required_without:schedule|prohibits:schedule|nullable)',
+            'schedule' => 'Schedule a one-off task, e.g. "in 10 minutes" or "tomorrow", using PHP relative format: https://www.php.net/manual/en/datetime.formats.php#datetime.formats.relative. (string|required_without:cron|prohibits:cron|nullable)',
             'trigger' => 'Optional condition that must evaluate to true to run the task. (string|nullable)',
             'task' => 'The task/instruction to execute when the schedule/trigger matches. (string|required)',
+            'run_once' => 'Optional boolean. If true, the task will be deleted after being successfully executed once. (boolean|nullable)',
         ],
         result: [
             'msg' => 'Success message.',
             'task_id' => 'The id of the created scheduled task.'
         ],
         ai_examples: [
+            "if the request is 'remind me in 10 minutes to check the server', the input should be '{\"schedule\":\"+10 minutes\",\"task\":\"remind me to check the server\",\"run_once\":true}'",
+            "if the request is 'send me in 3 days the list of assets with vulnerabilities', the input should be '{\"schedule\":\"+3 days\",\"task\":\"list assets with vulnerabilities\",\"run_once\":true}'",
             "if the request is 'préviens-moi si www.example.com devient vulnérable', the input should be '{\"cron\":\"* * * * *\",\"trigger\":\"le site www.example.com est-il vulnérable ?\",\"task\":\"liste les vulnérabilités de www.example.com\"}'",
             "if the request is 'envoie-moi un email tous les matins à 9h si www.example.com est vulnérable', the input should be '{\"cron\":\"0 9 * * *\",\"trigger\":\"le site www.example.com est-il vulnérable ?\",\"task\":\"liste les vulnérabilités de www.example.com\"}'",
-            "if the request is 'récapitule-moi tous les matins à 9h les vulnérabilités de www.example.com', the input should be '{\"cron\":\"0 9 * * *\",\"trigger\":null,\"task\":\"liste les vulnérabilités de www.example.com\"}'",
-            "if the request is 'préviens-moi si John Doe se connecte au serveur 145.242.34.179', the input should be '{\"cron\":\"* * * * *\",\"trigger\":\"John Doe s'est-il connecté au serveur 145.242.34.179 ?\",\"task\":\"John Doe s'est connecté au serveur 145.242.34.179\"}'"
         ],
         ai_result: "@json(\$result['msg'])",
     )]
     public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'cron' => 'string|required',
+            'cron' => 'string|required_without:schedule|prohibits:schedule|nullable',
+            'schedule' => 'string|required_without:cron|prohibits:cron|nullable',
             'trigger' => 'string|nullable',
             'task' => 'string|required',
+            'run_once' => 'boolean|nullable',
         ]);
 
-        if (!CronExpression::isValidExpression($params['cron'])) {
-            throw new \InvalidArgumentException(__('Invalid cron expression ":cron". Please provide a valid cron expression in the format: MIN HOUR DOM MON DOW.', ['cron' => $params['cron']]));
+        $cron = $params['cron'] ?? null;
+        $runOnce = $params['run_once'] ?? false;
+        $nextRunDate = null;
+
+        if (!empty($params['schedule'])) { // one-off task
+            $cron = '* * * * *';
+            $runOnce = true;
+            $nextRunDate = Carbon::now()->modify($params['schedule']);
+        }
+        if (empty($cron)) {
+            $cron = '* * * * *';
+        }
+        if (!CronExpression::isValidExpression($cron)) {
+            throw new \InvalidArgumentException(__('Invalid cron expression ":cron". Please provide a valid cron expression in the format: MIN HOUR DOM MON DOW.', ['cron' => $cron]));
         }
 
         $answer = LlmsProvider::provide("
@@ -98,11 +114,12 @@ class ScheduledTasksProcedure extends Procedure
         $user = $request->user();
         $task = ScheduledTask::create([
             'name' => LlmsProvider::provide("Summarize the task in about 10 words :\n\n{$params['task']}"),
-            'cron' => $params['cron'],
+            'cron' => $cron,
             'trigger' => $params['trigger'] ?? '',
             'task' => $params['task'],
+            'run_once' => $runOnce,
             'prev_run_date' => null,
-            'next_run_date' => Carbon::instance((new CronExpression($params['cron']))->getNextRunDate()),
+            'next_run_date' => $nextRunDate ?? Carbon::instance((new CronExpression($cron))->getNextRunDate()),
             'created_by' => $user->id,
         ]);
 

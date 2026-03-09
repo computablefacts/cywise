@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         php: [ '8.4' ]
-        laravel: [ '11.47' ]
+        laravel: [ '12.52' ]
     name: PHP ${{ matrix.php }} Laravel ${{ matrix.laravel }}
     steps:
       - name: Checkout
@@ -33,7 +33,7 @@ jobs:
           user: 'tw_testuser'
           password: 'z0rglub'
         env:
-          DOCKER_API_VERSION: 1.52
+          DOCKER_API_VERSION: 1.48
       - name: Lock Laravel Version
         run: composer require "laravel/framework:${{ matrix.laravel }}.*" --no-update -v
       - name: Composer Install
@@ -79,3 +79,4 @@ jobs:
         env:
           DROP_SCAN_EVENTS_AFTER_X_MINUTES: 0.5
           DROP_DISCOVERY_EVENTS_AFTER_X_MINUTES: 0.5
+          DEEPINFRA_API_KEY: ${{ secrets.DEEPINFRA_API_KEY }}

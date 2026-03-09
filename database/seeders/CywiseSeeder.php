@@ -678,6 +678,8 @@ class CywiseSeeder extends Seeder
             'assets@unmonitor',
             'events@list',
             'events@socOperator',
+            'idox@listDocuments',
+            'idox@workspaces',
             'leaks@list',
             'scheduled-tasks@create',
             'scheduled-tasks@list',
@@ -727,10 +729,10 @@ class CywiseSeeder extends Seeder
 
                 Log::debug("Action {$name} schema loaded : ", $schema);
 
-                if (empty($schema)) {
-                    Log::warning("Action {$name} schema has no properties. Skipped.");
-                    continue;
-                }
+                // if (empty($schema)) {
+                    // Log::warning("Action {$name} schema has no properties. Skipped.");
+                    // continue;
+                // }
 
                 Log::debug("Updating or creating action {$name}...");
 

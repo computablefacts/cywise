@@ -6,11 +6,11 @@ use App\Events\SendAuditReport;
 use App\Http\Procedures\EventsProcedure;
 use App\Http\Procedures\LeaksProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\SimpleEmail;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\User;
 use App\Models\YnhServer;
+use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Collection;
@@ -97,7 +97,7 @@ class SendAuditReportListener extends AbstractListener
 
         Log::debug("Sending audit report to {$user->email}...");
 
-        SimpleEmail::sendEmail($subject, '', implode("\n", $body), $to, $from);
+        $user->notify(Notification::viaEmail(implode("\n", $body), $subject, $from));
     }
 
     private function buildEmailCta(User $user): string
@@ -111,11 +111,21 @@ class SendAuditReportListener extends AbstractListener
 
         return "
             <tr>
+              <td style=\"padding-top: 20px;\">
+                <p><b>Dernière étape pour créer votre compte utilisateur :</b> cliquez ci-dessous pour choisir votre mot de passe et activer votre compte. Ce lien expirera dans 60 minutes.</p>
+              </td>
+            </tr>
+            <tr>
                 <td align=\"center\" style=\"background-color: #fbca3e; padding: 10px 20px; border-radius: 5px;\">                    
                     <a href=\"{$link}\" target=\"_blank\" style=\"color: white; text-decoration: none; font-weight: bold;\">
-                      je me connecte à Cywise
+                      je crée mon mot de passe
                     </a>
                 </td>
+            </tr>
+            <tr>
+              <td style=\"padding-bottom: 20px;\">
+                <p>Si le bouton ne fonctionne pas, <a href=\"https://www.cywise.io/auth/password/reset\" target=\"_blank\"><b>cliquez ici</b></a>.</p>
+              </td>
             </tr>
         ";
     }
@@ -155,7 +165,6 @@ class SendAuditReportListener extends AbstractListener
         if ($nbNewAssets > 0) {
             return "Cywise - {$nbNewAssets} nouveaux actifs ont été ajoutés !";
         }
-
         return 'Cywise - Une fuite de données ou compromission a été détectée !';
     }
 

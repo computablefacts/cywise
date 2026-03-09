@@ -1,5 +1,5 @@
-<header
-    x-data="{
+<header 
+    x-data="{ 
         mobileMenuOpen: false, 
         scrolled: false, 
         showOverlay: false, 
@@ -30,7 +30,7 @@
     class="box-content sticky top-0 z-50 w-full h-24"
     style="background-color: white !important;"
 >
-    <div
+    <div 
         x-show="showOverlay"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0"
@@ -42,7 +42,7 @@
         <div class="z-30 flex items-center justify-between h-24 md:space-x-8">
             <div class="z-20 flex items-center justify-between w-full md:w-auto">
                 <div class="relative z-20 inline-flex">
-                    <a href="{{ route('home') }}" class="flex items-center justify-center space-x-3 font-bold text-zinc-900">
+                    <a href="{{ route('home') }}" wire:navigate class="flex items-center justify-center space-x-3 font-bold text-zinc-900">
                     <x-logo class="w-auto h-8 md:h-9"></x-logo>
                     </a>
                 </div>
@@ -53,6 +53,7 @@
                     </button>
                 </div>
             </div>
+
             <nav :class="{ 'hidden' : !mobileMenuOpen, 'block md:relative absolute top-0 left-0 md:w-auto w-screen md:h-auto h-screen pointer-events-none md:z-10 z-10' : mobileMenuOpen }" class="h-full md:flex">
                 <ul :class="{ 'hidden md:flex' : !mobileMenuOpen, 'flex flex-col absolute md:relative md:w-auto w-screen h-full md:h-full md:overflow-auto overflow-scroll md:pt-0 mt-24 md:pb-0 pb-48 bg-white md:bg-transparent' : mobileMenuOpen }" id="menu" class="flex items-stretch justify-start flex-1 w-full h-full ml-0 border-t border-gray-100 pointer-events-auto md:items-center md:justify-center gap-x-8 md:w-auto md:border-t-0 md:flex-row">
                     <li x-data="{ open: false }" @mouseenter="showOverlay=true" @mouseleave="showOverlay=false" class="z-30 flex flex-col items-start h-auto border-b border-gray-100 md:h-full md:border-b-0 group md:flex-row md:items-center">
@@ -101,24 +102,24 @@
                             </ul>
                         </div>
                     </li>
-                    <!-- <li class="flex-shrink-0 h-16 border-b border-gray-100 md:border-b-0 md:h-full">
+                    <!-- <li class="shrink-0 h-16 border-b border-gray-100 md:border-b-0 md:h-full">
                         <a href="{{ route('pricing') }}" class="flex items-center h-full text-sm font-semibold text-gray-700 transition duration-300 md:px-0 px-7 hover:bg-gray-100 md:hover:bg-transparent hover:text-gray-900">
                             {{ __('Pricing') }}
                         </a>
                     </li> -->
-                    <li class="flex-shrink-0 h-16 border-b border-gray-100 md:border-b-0 md:h-full">
+                    <li class="shrink-0 h-16 border-b border-gray-100 md:border-b-0 md:h-full">
                       <a href="{{ route('a-propos') }}" class="flex items-center h-full text-sm font-semibold text-gray-700 transition duration-300 md:px-0 px-7 hover:bg-gray-100 md:hover:bg-transparent hover:text-gray-900">
                         {{ __('About') }}
                       </a>
                     </li>
-                    <li class="flex-shrink-0 h-16 border-b border-gray-100 md:border-b-0 md:h-full">
+                    <li class="shrink-0 h-16 border-b border-gray-100 md:border-b-0 md:h-full">
                         <a href="{{ route('blog') }}" class="flex items-center h-full text-sm font-semibold text-gray-700 transition duration-300 md:px-0 px-7 hover:bg-gray-100 md:hover:bg-transparent hover:text-gray-900">
                           Blog
                         </a>
                     </li>
 
                     @guest
-                        <li class="relative z-30 flex flex-col items-center justify-center flex-shrink-0 w-full h-auto pt-3 space-y-3 text-sm md:hidden px-7">
+                        <li class="relative z-30 flex flex-col items-center justify-center shrink-0 w-full h-auto pt-3 space-y-3 text-sm md:hidden px-7">
                             <x-button href="{{ route('login') }}" tag="a" class="w-full text-sm" color="secondary">
                               {{ __('Login') }}
                             </x-button>
@@ -137,7 +138,7 @@
                 </ul>
             </nav>
             @guest
-                <div class="relative z-30 items-center justify-center flex-shrink-0 hidden h-full space-x-3 text-sm md:flex">
+                <div class="relative z-30 items-center justify-center shrink-0 hidden h-full space-x-3 text-sm md:flex">
                     <x-button href="{{ route('login') }}" tag="a" class="text-sm" color="secondary">
                       {{ __('Login') }}
                     </x-button>
@@ -146,7 +147,7 @@
                     </x-button>
                 </div>
             @else
-                <x-button href="{{ route('dashboard') }}" tag="a" class="text-sm" class="relative z-20 flex-shrink-0 hidden ml-2 md:block">
+                <x-button href="{{ route('dashboard') }}" tag="a" class="text-sm" class="relative z-20 shrink-0 hidden ml-2 md:block">
                   {{ __('View Dashboard') }}
                 </x-button>
             @endguest

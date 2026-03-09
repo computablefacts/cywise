@@ -4,11 +4,14 @@ use App\Events\BeginVulnsScan;
 use App\Events\EndPortsScan;
 use App\Events\EndVulnsScan;
 use App\Http\Controllers\TablesUploadController;
-use App\Mail\SimpleEmail;
+use App\Http\Controllers\TelegramWebhookController;
+use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\Asset;
 use App\Models\Honeypot;
 use App\Models\Port;
 use App\Models\Scan;
+use App\Notifications\Notifiables\FreshdeskNotifiable;
+use App\Notifications\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +19,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Sajya\Server\Middleware\GzipCompress;
 use Wave\Facades\Wave;
-use App\Http\Controllers\TelegramWebhookController;
-use App\Http\Controllers\WhatsAppWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,13 +55,11 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
         'message' => ['required', 'string', 'min:5', 'max:1000'],
     ]);
 
-    SimpleEmail::sendEmail(
-        "{$params['email']} vous a contacté !",
-        '',
+    (new FreshdeskNotifiable)->notify(Notification::viaEmail(
         "<b>Fullname:</b> {$params['fullName']}<br><b>Email:</b> {$params['email']}<br><b>Phone:</b> {$params['phone']}<br><b>Message:</b> {$params['message']}",
-        null,
+        "{$params['email']} vous a contacté !",
         $params['email']
-    );
+    ));
 
     return response()->json([
         'ok' => true,
@@ -228,6 +227,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\FilesProcedure::class,
             \App\Http\Procedures\FrameworksProcedure::class,
             \App\Http\Procedures\HoneypotsProcedure::class,
+            \App\Http\Procedures\IdoxProcedure::class,
             \App\Http\Procedures\InvitationsProcedure::class,
             \App\Http\Procedures\LeaksProcedure::class,
             \App\Http\Procedures\NotesProcedure::class,

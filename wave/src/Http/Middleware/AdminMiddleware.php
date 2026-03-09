@@ -3,19 +3,21 @@
 namespace Wave\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 
 class AdminMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        if( !auth()->user()->hasRole('admin') ){
+        $user = auth()->user();
+
+        // Use cached admin check from User model
+        if (! $user->isAdmin()) {
             return redirect()->route('home');
         }
 

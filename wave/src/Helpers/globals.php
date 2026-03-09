@@ -1,9 +1,12 @@
 <?php
 
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use Wave\Plan;
+use Wave\Setting;
 
-if (!function_exists('setting')) {
+if (! function_exists('setting')) {
     function setting($key, $default = null)
     {
         static $settingsCache = null;
@@ -11,7 +14,7 @@ if (!function_exists('setting')) {
         // Fetch all settings from cache or database
         if ($settingsCache === null) {
             $settingsCache = Cache::rememberForever('wave_settings', function () {
-                return Wave\Setting::pluck('value', 'key')->toArray();
+                return Setting::pluck('value', 'key')->toArray();
             });
         }
 
@@ -20,40 +23,42 @@ if (!function_exists('setting')) {
     }
 }
 
-if (!function_exists('blade')) {
-    function blade($string){
-        return \Illuminate\Support\Facades\Blade::render($string);
+if (! function_exists('blade')) {
+    function blade($string)
+    {
+        return Blade::render($string);
     }
 }
 
-if (!function_exists('getMorphAlias')) {
+if (! function_exists('getMorphAlias')) {
     /**
      * Get the morph alias for a given class.
      *
-     * @param string $class
+     * @param  string  $class
      * @return string|null
      */
     function getMorphAlias($class)
     {
         $morphMap = Relation::morphMap();
         $alias = array_search($class, $morphMap);
+
         return $alias ?: null;
     }
 }
 
-if (!function_exists('has_monthly_yearly_toggle')){
-    function has_monthly_yearly_toggle() : bool
+if (! function_exists('has_monthly_yearly_toggle')) {
+    function has_monthly_yearly_toggle(): bool
     {
-        $plans = Wave\Plan::where('active', 1)->get();
+        $plans = Plan::where('active', 1)->get();
         $hasMonthly = false;
         $hasYearly = false;
 
         foreach ($plans as $plan) {
             if ($plan->active) {
-                if (!empty($plan->monthly_price_id)) {
+                if (! empty($plan->monthly_price_id)) {
                     $hasMonthly = true;
                 }
-                if (!empty($plan->yearly_price_id)) {
+                if (! empty($plan->yearly_price_id)) {
                     $hasYearly = true;
                 }
             }
@@ -69,32 +74,48 @@ if (!function_exists('has_monthly_yearly_toggle')){
     }
 }
 
-if (!function_exists('get_default_billing_cycle')){
-    function get_default_billing_cycle(){
-        $plans = Wave\Plan::where('active', 1)->get();
+if (! function_exists('get_default_billing_cycle')) {
+    function get_default_billing_cycle()
+    {
+        $plans = Plan::where('active', 1)->get();
         $hasMonthly = false;
         $hasYearly = false;
 
         foreach ($plans as $plan) {
-            if (!empty($plan->monthly_price_id)) {
+            if (! empty($plan->monthly_price_id)) {
                 $hasMonthly = true;
             }
-            if (!empty($plan->yearly_price_id)) {
+            if (! empty($plan->yearly_price_id)) {
                 $hasYearly = true;
             }
         }
 
         // Return 'Yearly' if only yearly ID is present
-        if ($hasYearly && !$hasMonthly) {
+        if ($hasYearly && ! $hasMonthly) {
             return 'Yearly';
         }
 
-        // Return 'Monthly' if only monthly ID is present
-        if (!$hasYearly && $hasMonthly) {
-            return 'Monthly';
+        // Return null or a default value if neither is present
+        return 'Monthly'; // or any default value you prefer
+    }
+}
+
+if (! function_exists('wave_version')) {
+    /**
+     * Get the current Wave version
+     *
+     * @return string
+     */
+    function wave_version()
+    {
+        $waveJsonPath = base_path('wave/wave.json');
+
+        if (file_exists($waveJsonPath)) {
+            $waveData = json_decode(file_get_contents($waveJsonPath), true);
+
+            return $waveData['version'] ?? 'Unknown';
         }
 
-        // Return null or a default value if neither is present
-        return 'Yearly'; // or any default value you prefer
+        return 'Unknown';
     }
 }

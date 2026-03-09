@@ -5,10 +5,10 @@ namespace App\Jobs;
 use App\AgentSquad\Providers\LlmsProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Requests\JsonRpcRequest;
-use App\Mail\SimpleEmail;
 use App\Models\Conversation;
 use App\Models\ScheduledTask;
 use App\Models\User;
+use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -33,73 +33,86 @@ class RunScheduledTasks implements ShouldQueue
 
     public function handle()
     {
-        ScheduledTask::query()
+        $tasks = ScheduledTask::query()
+            ->withoutGlobalScope('tenant_scope')
             ->where('enabled', true)
             ->where('next_run_date', '<=', Carbon::now())
-            ->get()
-            ->each(function (ScheduledTask $task) {
-                try {
+            ->get();
 
-                    // Retrieve the user who created the task
-                    /** @var ?User $user */
-                    $user = User::find($task->created_by);
+        Log::debug("[RunScheduledTasks] Executing {$tasks->count()} tasks...");
 
-                    if (!$user) {
-                        Log::warning("[RunScheduledTasks] Skipping task {$task->id} — user not found: {$task->created_by}");
-                        return;
-                    }
+        $tasks->each(function (ScheduledTask $task) {
+            try {
 
-                    $user->actAs();
-                    $threadId = Str::random(10);
+                Log::debug("[RunScheduledTasks] Executing task {$task->id}...");
 
-                    /** @var Conversation $conversation */
-                    $conversation = Conversation::where('thread_id', $threadId)
-                        ->where('format', Conversation::FORMAT_V1)
-                        ->where('created_by', $user->id)
-                        ->first();
+                // Retrieve the user who created the task
+                /** @var ?User $user */
+                $user = User::find($task->created_by);
 
-                    $conversation = $conversation ?? Conversation::create([
-                        'thread_id' => $threadId,
-                        'dom' => json_encode([]),
-                        'autosaved' => true,
-                        'created_by' => $user->id,
-                        'format' => Conversation::FORMAT_V1,
-                    ]);
-
-                    // Step 1: Check condition (if provided)
-                    $runTask = true;
-                    $condition = Str::trim($task->trigger);
-
-                    if (!empty($condition)) {
-                        $answer = LlmsProvider::provide("Answer only with YES or NO and nothing else. Question: {$condition}");
-                        $runTask = Str::contains($answer, ['oui', 'yes'], true);
-                        Log::debug("[RunScheduledTasks] Condition evaluated for task {$task->id}: '{$condition}' => {$answer}");
-                    }
-
-                    // Step 2: Execute the task and email the result (only once per day)
-                    $tsk = Str::trim($task->task);
-
-                    if (!$runTask || empty($tsk)) {
-                        Log::debug("[RunScheduledTasks] Skipping task {$task->id} because condition evaluated to false");
-                    } else if ($task->emailSentToday()) {
-                        Log::debug("[RunScheduledTasks] Skipping task {$task->id} because an email has already been sent today");
-                    } else {
-                        $response = $this->ask($user, $threadId, $tsk);
-                        $answer = $response['html'] ?? '';
-                        $summary = LlmsProvider::provide("Summarize this text in about 10 words :\n\n{$answer}");
-                        SimpleEmail::sendEmail("Cywise : {$summary}", "CyberBuddy vous répond !", $answer, $user->email);
-                        Log::debug("[RunScheduledTasks] Emailed result for task {$task->id} to {$user->email}");
-                        $task->last_email_sent_at = Carbon::now();
-                    }
-
-                    $task->prev_run_date = Carbon::now();
-                    $task->next_run_date = Carbon::instance($task->cron()->getNextRunDate());
-                    $task->save();
-
-                } catch (\Exception $exception) {
-                    Log::error($exception->getMessage());
+                if (!$user) {
+                    Log::warning("[RunScheduledTasks] Skipping task {$task->id} — user not found: {$task->created_by}");
+                    return;
                 }
-            });
+
+                $user->actAs();
+                $threadId = Str::random(10);
+
+                /** @var Conversation $conversation */
+                $conversation = Conversation::where('thread_id', $threadId)
+                    ->where('format', Conversation::FORMAT_V1)
+                    ->where('created_by', $user->id)
+                    ->first();
+
+                $conversation = $conversation ?? Conversation::create([
+                    'thread_id' => $threadId,
+                    'dom' => json_encode([]),
+                    'autosaved' => true,
+                    'created_by' => $user->id,
+                    'format' => Conversation::FORMAT_V1,
+                ]);
+
+                // Step 1: Check condition (if provided)
+                $runTask = true;
+                $condition = Str::trim($task->trigger);
+
+                if (!empty($condition)) {
+                    $answer = LlmsProvider::provide("Answer only with YES or NO and nothing else. Question: {$condition}");
+                    $runTask = Str::contains($answer, ['oui', 'yes'], true);
+                    Log::debug("[RunScheduledTasks] Condition evaluated for task {$task->id}: '{$condition}' => {$answer}");
+                }
+
+                // Step 2: Execute the task and email the result (only once per day)
+                $tsk = Str::trim($task->task);
+                $ran = false;
+
+                if (!$runTask || empty($tsk)) {
+                    Log::debug("[RunScheduledTasks] Skipping task {$task->id} because condition evaluated to false");
+                } else if ($task->emailSentToday()) {
+                    Log::debug("[RunScheduledTasks] Skipping task {$task->id} because an email has already been sent today");
+                } else {
+                    $response = $this->ask($user, $threadId, $tsk);
+                    $answer = $response['html'] ?? '';
+                    $summary = LlmsProvider::provide("Summarize this text in about 10 words :\n\n{$answer}");
+                    $user->notify(new Notification($answer, "Cywise : {$summary}"));
+                    Log::debug("[RunScheduledTasks] Emailed result for task {$task->id} to {$user->email}");
+                    $task->last_email_sent_at = Carbon::now();
+                    $ran = true;
+                }
+
+                $task->prev_run_date = Carbon::now();
+                $task->next_run_date = Carbon::instance($task->cron()->getNextRunDate());
+                $task->save();
+
+                // If the task should only run once, delete it after successful execution
+                if ($task->run_once && $ran) {
+                    Log::debug("[RunScheduledTasks] Deleting 'run_once' task {$task->id} after execution");
+                    $task->delete();
+                }
+            } catch (\Exception $exception) {
+                Log::error($exception->getMessage());
+            }
+        });
     }
 
     private function ask(User $user, string $threadId, string $question): array

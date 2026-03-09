@@ -5,6 +5,7 @@ namespace App\Models;
 use App\AgentSquad\ActionsRegistry;
 use App\Helpers\MailCoach;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -30,14 +31,16 @@ use Wave\User as WaveUser;
  * @property boolean gets_audit_report
  * @property ?string telegram_bot_token
  * @property ?string telegram_webhook_secret
+ * @property ?string telegram_chat_id
  * @property ?string whatsapp_access_token
  * @property ?string whatsapp_phone_number_id
  * @property ?string whatsapp_webhook_secret
+ * @property ?string whatsapp_phone_number
  * @property ?int superset_id
  */
 class User extends WaveUser
 {
-    use HasFactory, HasApiTokens, Notifiable, HasProfileKeyValues;
+    use HasFactory, HasApiTokens, Notifiable, HasProfileKeyValues, SoftDeletes;
 
     public $guard_name = 'web';
 
@@ -64,9 +67,11 @@ class User extends WaveUser
         'gets_audit_report',
         'telegram_bot_token',
         'telegram_webhook_secret',
+        'telegram_chat_id',
         'whatsapp_access_token',
         'whatsapp_phone_number_id',
         'whatsapp_webhook_secret',
+        'whatsapp_phone_number',
     ];
 
     /**
@@ -80,10 +85,32 @@ class User extends WaveUser
         'remember_token',
         'telegram_bot_token',
         'telegram_webhook_secret',
+        'telegram_chat_id',
         'whatsapp_access_token',
         'whatsapp_phone_number_id',
         'whatsapp_webhook_secret',
+        'whatsapp_phone_number',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'notification_preferences' => 'array',
+            'social_links' => 'array',
+            'privacy_settings' => 'array',
+            'deletion_scheduled_at' => 'datetime',
+        ];
+    }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
 
     protected static function boot()
     {
@@ -97,7 +124,7 @@ class User extends WaveUser
                 $username = Str::slug($user->name, '');
                 $i = 1;
                 while (self::where('username', $username)->exists()) {
-                    $username = Str::slug($user->name, '') . $i;
+                    $username = Str::slug($user->name, '').$i;
                     $i++;
                 }
                 $user->username = $username;
@@ -105,7 +132,9 @@ class User extends WaveUser
         });
 
         // Listen for the created event of the model
-        static::created(function (User $user) {
+        static::created(function ($user) {
+            // Remove all roles
+            $user->syncRoles([]);
 
             if (!$user->tenant_id) {
                 /** @var Tenant $tenant */
@@ -114,9 +143,11 @@ class User extends WaveUser
                 $user->save();
             }
 
-            // Assign the default roles
-            $user->assignRole(config('wave.default_user_role', 'registered'));
-
+            // Assign the default role if it exists
+            $defaultRole = config('wave.default_user_role', 'registered');
+            if (\Spatie\Permission\Models\Role::where('name', $defaultRole)->where('guard_name', 'web')->exists()) {
+                $user->assignRole($defaultRole);
+            }
             // Set frameworks, templates and roles
             $user->actAs();
             $user->init();

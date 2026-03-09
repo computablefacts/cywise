@@ -22,35 +22,11 @@ class HealthServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // See: https://spatie.be/docs/laravel-health/v1/available-checks/overview
-        Health::checks([
-            // Custom checks
-            AssetsDiscoverCheck::new()->name('cywise.ioAssetsDiscover')
-                ->domain('cywise.io'),
-            VulnerabilityScannerApiCheck::new()->name('ApiVulnerabilityScanner'),
-
-            // Standard checks
-            QueueCheck::new()->name('QueueCritical')->onQueue('critical')
-                ->failWhenHealthJobTakesLongerThanMinutes(2),
-            QueueCheck::new()->name('QueueMedium')->onQueue('medium')
-                ->failWhenHealthJobTakesLongerThanMinutes(5),
-            QueueCheck::new()->name('QueueLow')->onQueue('low')
-                ->failWhenHealthJobTakesLongerThanMinutes(10),
-            QueueCheck::new()->name('QueueScout')->onQueue('scout')
-                ->failWhenHealthJobTakesLongerThanMinutes(10),
-            QueueCheck::new()->name('QueueDefault')->onQueue('default')
-                ->failWhenHealthJobTakesLongerThanMinutes(10),
-            CacheCheck::new(),
-            DatabaseCheck::new(),
-            DatabaseTableSizeCheck::new()
-                ->table('telescope_entries', 6000),
-            DebugModeCheck::new()->unless(app()->environment('local')),
-            OptimizedAppCheck::new()->unless(app()->environment('local')),
-            ScheduleCheck::new()->heartbeatMaxAgeInMinutes(2),
-            UsedDiskSpaceCheck::new()
-                ->warnWhenUsedSpaceIsAbovePercentage(80)
-                ->failWhenUsedSpaceIsAbovePercentage(90),
-        ]);
+        Health::checks(array_merge(
+            $this->getCriticalChecks(),
+            $this->getMediumChecks(),
+            $this->getInfoChecks()
+        ));
     }
 
     /**
@@ -59,5 +35,120 @@ class HealthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+    }
+
+    /**
+     * Critical level checks - strictest thresholds for immediate alerts
+     */
+    protected function getCriticalChecks(): array
+    {
+        // See: https://spatie.be/docs/laravel-health/v1/available-checks/overview
+        return [
+            // Core services
+            DatabaseCheck::new()->name('critical.DatabaseCheck'),
+            CacheCheck::new()->name('critical.CacheCheck'),
+            VulnerabilityScannerApiCheck::new()->name('critical.ApiVulnerabilityScanner'),
+
+            // Queue checks
+            QueueCheck::new()->name('critical.QueueCritical')
+                ->onQueue('critical')
+                ->failWhenHealthJobTakesLongerThanMinutes(25),
+            QueueCheck::new()->name('critical.QueueMedium')
+                ->onQueue('medium')
+                ->failWhenHealthJobTakesLongerThanMinutes(100),
+            QueueCheck::new()->name('critical.QueueLow')
+                ->onQueue('low')
+                ->failWhenHealthJobTakesLongerThanMinutes(200),
+            QueueCheck::new()->name('critical.QueueScout')
+                ->onQueue('scout')
+                ->failWhenHealthJobTakesLongerThanMinutes(200),
+            QueueCheck::new()->name('critical.QueueDefault')
+                ->onQueue('default')
+                ->failWhenHealthJobTakesLongerThanMinutes(100),
+
+            // Schedule check
+            ScheduleCheck::new()->name('critical.ScheduleCheck')
+                ->heartbeatMaxAgeInMinutes(25),
+
+            // Disk space
+            UsedDiskSpaceCheck::new()->name('critical.UsedDiskSpaceCheck')
+                ->warnWhenUsedSpaceIsAbovePercentage(95)
+                ->failWhenUsedSpaceIsAbovePercentage(95),
+
+            // Assets discover
+            AssetsDiscoverCheck::new()->name('critical.cywise.ioAssetsDiscover')
+                ->domain('cywise.io')
+                ->warnAfterSeconds(90)
+                ->failAfterSeconds(90),
+        ];
+    }
+
+    /**
+     * Medium level checks - normal thresholds for standard operations
+     */
+    protected function getMediumChecks(): array
+    {
+        // See: https://spatie.be/docs/laravel-health/v1/available-checks/overview
+        return [
+            // Queue checks
+            QueueCheck::new()->name('medium.QueueCritical')
+                ->onQueue('critical')
+                ->failWhenHealthJobTakesLongerThanMinutes(5),
+            QueueCheck::new()->name('medium.QueueMedium')
+                ->onQueue('medium')
+                ->failWhenHealthJobTakesLongerThanMinutes(20),
+            QueueCheck::new()->name('medium.QueueLow')
+                ->onQueue('low')
+                ->failWhenHealthJobTakesLongerThanMinutes(40),
+            QueueCheck::new()->name('medium.QueueScout')
+                ->onQueue('scout')
+                ->failWhenHealthJobTakesLongerThanMinutes(40),
+            QueueCheck::new()->name('medium.QueueDefault')
+                ->onQueue('default')
+                ->failWhenHealthJobTakesLongerThanMinutes(20),
+
+            // Schedule check
+            ScheduleCheck::new()->name('medium.ScheduleCheck')
+                ->heartbeatMaxAgeInMinutes(5),
+
+            // Disk space
+            UsedDiskSpaceCheck::new()->name('medium.UsedDiskSpaceCheck')
+                ->warnWhenUsedSpaceIsAbovePercentage(90)
+                ->failWhenUsedSpaceIsAbovePercentage(90),
+
+            // Assets discover
+            AssetsDiscoverCheck::new()->name('medium.cywise.ioAssetsDiscover')
+                ->domain('cywise.io')
+                ->warnAfterSeconds(60)
+                ->failAfterSeconds(60),
+
+            // Database table size for telescope
+            DatabaseTableSizeCheck::new()->name('medium.DatabaseTableSizeCheck')
+                ->table('telescope_entries', 6000),
+
+            // Debug and optimization checks
+            DebugModeCheck::new()->name('medium.DebugModeCheck')
+                ->unless(app()->environment('local')),
+            OptimizedAppCheck::new()->name('medium.OptimizedAppCheck')
+                ->unless(app()->environment('local')),
+        ];
+    }
+
+    /**
+     * Info level checks - relaxed thresholds for monitoring
+     */
+    protected function getInfoChecks(): array
+    {
+        // See: https://spatie.be/docs/laravel-health/v1/available-checks/overview
+        return [
+            // Disk space
+            UsedDiskSpaceCheck::new()->name('info.UsedDiskSpaceCheck')
+                ->warnWhenUsedSpaceIsAbovePercentage(80)
+                ->failWhenUsedSpaceIsAbovePercentage(80),
+
+            // Database table size for telescope
+            DatabaseTableSizeCheck::new()->name('info.DatabaseTableSizeCheck')
+                ->table('telescope_entries', 4000),
+        ];
     }
 }
