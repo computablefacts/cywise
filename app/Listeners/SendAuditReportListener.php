@@ -201,8 +201,8 @@ class SendAuditReportListener extends AbstractListener
 
         $newAssets = match ($nbNewAssets) {
             0 => '',
-            1 => "<li>J'ai mis sous surveillance <b>{$nbNewAssets}</b> nouvel actif durant ces dernières 24h.</li>",
-            default => "<li>J'ai mis sous surveillance <b>{$nbNewAssets}</b> nouveaux actifs durant ces dernières 24h.</li>",
+            1 => "<li>J'ai mis sous surveillance <b>{$nbNewAssets}</b> nouvel actif.</li>",
+            default => "<li>J'ai mis sous surveillance <b>{$nbNewAssets}</b> nouveaux actifs.</li>",
         };
 
         $leaks = match ($nbLeaks) {
