@@ -284,10 +284,11 @@ class SendAuditReportListener extends AbstractListener
             </ul>";
     }
 
-    private function buildSectionLeaks(User $user): string
+    private function buildSectionLeaks(User $user, int $maxLeaks = 10): string
     {
         $leaks = $this->fetchLeaks($user, Carbon::now()->utc()->subDays(7))
             ->reverse()
+            ->take($maxLeaks)
             ->map(function (object $leak) {
 
                 $date = empty($leak->leak_date) ? '' : " (date est. {$leak->leak_date})";
@@ -301,7 +302,7 @@ class SendAuditReportListener extends AbstractListener
             ->join("\n");
 
         return empty($leaks) ? '' : "
-            <h3>Identifiants fuités ou compromis</h3>
+            <h3>Vos {$maxLeaks} derniers dentifiants fuités ou compromis</h3>
             <p>Cywise surveille également les fuites de données et compromissions !<p>
             <ul>{$leaks}</ul>
             <p>Si aucune action n'a encore été entreprise, <b>demandez aux utilisateurs concernés de modifier leur mot de passe.</b></p>
