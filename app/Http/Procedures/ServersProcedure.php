@@ -21,7 +21,7 @@ class ServersProcedure extends Procedure
     public static string $name = 'servers';
 
     #[RpcMethod(
-        description: "List servers where an agent has been deployed.",
+        description: "List servers where an agent has been deployed, e.g. servers for which the internal perimeter is monitored.",
         params: [],
         result: [],
         ai_examples: [
@@ -34,7 +34,6 @@ class ServersProcedure extends Procedure
     {
         return [
             "servers" => YnhServer::query()
-                ->where('created_by', $request->user()->id)
                 ->orderBy('name')
                 ->get()
                 ->map(fn(YnhServer $server) => [

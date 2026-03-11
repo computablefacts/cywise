@@ -80,7 +80,7 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Get everything known about a single asset.",
+        description: "Returns all the information known about an asset concerning its external perimeter. This method does not return any information concerning the asset's internal perimeter e.g. security events and IoCs.",
         params: [
             "asset" => "The asset name. (string|required|min:1|max:191)",
             "trial_id" => "If any, the trial id this asset belongs to.",
@@ -397,7 +397,7 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "List the user's assets.",
+        description: "List the user's assets, e.g. servers for which the external perimeter is monitored.",
         params: [
             "type" => "The type of asset to list: domain or ip_address. (string|nullable|in:domain,ip_address)",
             "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets. (boolean|nullable)",

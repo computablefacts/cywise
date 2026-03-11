@@ -67,7 +67,7 @@ class EventsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "List collected events.",
+        description: "Returns the security events and IoCs collected by the agent deployed on the server. This method does not return any information concerning the asset's external perimeter e.g. vulnerabilities.",
         params: [
             "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise. (integer|required|min:0|max:100)",
             "max_score" => "An optional maximum score to filter events by. (integer|nullable|min:0|max:100)",
@@ -198,7 +198,7 @@ class EventsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Analyze security events and IoCs for a given server to detect suspicious activity.",
+        description: "Analyze security events and IoCs collected by the agent deployed on the server to detect suspicious activity. This method does not take into account any information concerning the asset's external perimeter e.g. vulnerabilities.",
         params: [
             "server_id" => "If the IP address is not specified, the server id.",
             "ip_address" => "If the server id is not specified, the server IP address. (string|min:4|max:15|exists:ynh_servers,ip_address)"
