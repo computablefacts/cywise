@@ -6,6 +6,7 @@ use App\AgentSquad\Providers\SqlQueriesProvider;
 use App\Events\ImportVirtualTable;
 use App\Helpers\ClickhouseClient;
 use App\Models\Table;
+use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -24,6 +25,7 @@ class ImportVirtualTableListener extends AbstractListener
         $description = $event->description;
 
         $user->actAs(); // otherwise the tenant will not be properly set
+        $user->notify(new Notification(__("Import of table :table started.", ['table' => $table])));
 
         $tableName = SqlQueriesProvider::normalizeTableName($table);
         /** @var Table $tbl */
@@ -55,6 +57,7 @@ class ImportVirtualTableListener extends AbstractListener
             if (!$output) {
                 $tbl->last_error = 'Error #10';
                 $tbl->save();
+                $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                 return;
             }
 
@@ -64,6 +67,7 @@ class ImportVirtualTableListener extends AbstractListener
             if (!$output) {
                 $tbl->last_error = 'Error #11';
                 $tbl->save();
+                $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                 return;
             }
 
@@ -73,6 +77,7 @@ class ImportVirtualTableListener extends AbstractListener
             if (!$output) {
                 $tbl->last_error = 'Error #12';
                 $tbl->save();
+                $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                 return;
             }
 
@@ -82,7 +87,7 @@ class ImportVirtualTableListener extends AbstractListener
             $tbl->nb_rows = ClickhouseClient::numberOfRows($tableName) ?? 0;
             $tbl->save();
 
-            // TODO : create tmp_* view in clickhouse server for backward compatibility
+            $user->notify(new Notification(__("Import of table :table finished successfully.", ['table' => $table])));
 
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());

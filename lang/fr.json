@@ -1,7 +1,9 @@
 {
   "+ new": "+ ajouter",
   "1. What kind of table would you like to create?": "1. Quel type de table souhaitez-vous créer ?",
-  "2.1 Where are the files you want to import?": "2.1 Où se trouvent les fichiers que vous souhaitez importer ?",
+  "Import of table :table started.": "L'importation de la table :table a commencé.",
+  "Import of table :table finished successfully.": "L'importation de la table :table s'est terminée avec succès.",
+  "Import of table :table failed: :error": "L'importation de la table :table a échoué : :error",
   "2.2 What are the credentials for your AWS S3 Bucket?": "2.2 Quels sont les identifiants de votre bucket S3 AWS ?",
   "2.2 What are the credentials for your Azure Blob Storage?": "2.2 Quels sont les identifiants de votre Blob Storage Azure ?",
   "3. Which table would you like to import?": "3. Quelle table souhaitez-vous importer ?",

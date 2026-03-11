@@ -8,6 +8,7 @@ use App\Helpers\ClickhouseClient;
 use App\Helpers\ClickhouseLocal;
 use App\Helpers\TableStorage;
 use App\Models\Table;
+use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -30,6 +31,7 @@ class ImportTableListener extends AbstractListener
         $description = $event->description;
 
         $user->actAs(); // otherwise the tenant will not be properly set
+        $user->notify(new Notification(__("Import of table :table started.", ['table' => $table])));
 
         // Misc. parameters
         $clickhouseHost = config('towerify.clickhouse.host');
@@ -92,6 +94,7 @@ class ImportTableListener extends AbstractListener
                         $tbl->last_error = null;
                         $tbl->last_warning = $message;
                         $tbl->save();
+                        $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_warning])));
                         return;
                     }
                 }
@@ -104,6 +107,7 @@ class ImportTableListener extends AbstractListener
             if (!$output) {
                 $tbl->last_error = 'Error #1';
                 $tbl->save();
+                $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                 return;
             }
 
@@ -114,6 +118,7 @@ class ImportTableListener extends AbstractListener
             if (!$output) {
                 $tbl->last_error = 'Error #2';
                 $tbl->save();
+                $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                 return;
             }
 
@@ -138,6 +143,7 @@ class ImportTableListener extends AbstractListener
                         $tbl->last_error = null;
                         $tbl->last_warning = $message;
                         $tbl->save();
+                        $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_warning])));
                         return;
                     }
                 }
@@ -154,6 +160,7 @@ class ImportTableListener extends AbstractListener
                 if (!$output) {
                     $tbl->last_error = 'Error #3';
                     $tbl->save();
+                    $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                     return;
                 }
 
@@ -166,6 +173,7 @@ class ImportTableListener extends AbstractListener
                 if (!$output) {
                     $tbl->last_error = 'Error #4';
                     $tbl->save();
+                    $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                     return;
                 }
 
@@ -175,6 +183,7 @@ class ImportTableListener extends AbstractListener
                 if (!$output) {
                     $tbl->last_error = 'Error #5';
                     $tbl->save();
+                    $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                     return;
                 }
 
@@ -189,6 +198,7 @@ class ImportTableListener extends AbstractListener
                 if (!$output) {
                     $tbl->last_error = 'Error #6';
                     $tbl->save();
+                    $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                     return;
                 }
 
@@ -200,6 +210,7 @@ class ImportTableListener extends AbstractListener
             if (!$output) {
                 $tbl->last_error = 'Error #7';
                 $tbl->save();
+                $user->notify(new Notification(__("Import of table :table failed: :error", ['table' => $table, 'error' => $tbl->last_error])));
                 return;
             }
 
@@ -213,7 +224,7 @@ class ImportTableListener extends AbstractListener
 
             TableStorage::deleteOldOutFiles($credentials, $normalizedTableName, 10);
 
-            // TODO : create tmp_* view in clickhouse server for backward compatibility
+            $user->notify(new Notification(__("Import of table :table finished successfully.", ['table' => $table])));
 
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
