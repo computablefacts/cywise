@@ -145,6 +145,8 @@ des messageries [Telegram](https://telegram.org) et [WhatsApp](https://www.whats
 
 ## Fonctionnement
 
+### CyberBuddy
+
 CyberBuddy est au coeur de l'expérience Cywise. Il agit comme un orchestrateur intelligent capable de comprendre vos
 demandes en langage naturel et d'y répondre en interrogeant différentes sources de données.
 
@@ -201,6 +203,41 @@ Les composants clefs de cette architecture sont :
   consommant leurs API JSON-RPC. Par exemple : 
   - « Ouvre un ticket Jira pour cette vulnérabilité »
   - « Liste mes instances actives sur AWS. »
+
+### Opérateur SOC
+
+L'Opérateur SOC est un agent spécialisé dans l'analyse d'événements de sécurité. Il agit comme un analyste de niveau
+1 capable de traiter de gros volumes d'événements techniques pour en extraire des signaux faibles et des comportements
+anormaux.
+
+```text
+   SERVEUR UTILISATEUR                   OPERATEUR SOC (IA)
+   +-----------------+      +--------------------------------------------+
+   |  - Événements   |      |  - Collecte & Compression                  |
+   |  - IoC          | ---> |  - Contexte (Mémos)                        |
+   +-----------------+      |  - Analyse d'intention (IA)                |
+                            +---------------------+----------------------+
+                                                  |
+                                                  v
+                                              RÉSULTATS
+                                        +-------------------+
+                                        |  - Verdict        |
+                                        |  - Criticité      |
+                                        |  - Rapport        |
+                                        +-------------------+
+```
+
+Contrairement à CyberBuddy qui répond aux questions de l'utilisateur, l'Opérateur SOC travaille de manière autonome
+pour :
+
+- **Analyser les événements de sécurité.** Il traite les logs système collectés par Osquery sur vos serveurs Linux et
+  Windows.
+- **Prendre en compte le contexte.** Il utilise vos notes et procédures internes (mémos) pour adapter son analyse à
+  votre environnement spécifique.
+- **Qualifier la menace.** Il émet un verdict (NORMAL, SUSPECT, ANORMAL) accompagné d'un score de confiance et d'une
+  justification détaillée.
+- **Suggérer des actions.** En cas de détection suspecte, il recommande immédiatement les premières étapes de
+  remédiation.
 
 ## Divers
 
