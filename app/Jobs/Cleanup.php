@@ -185,33 +185,39 @@ class Cleanup implements ShouldQueue
     {
         Asset::withoutGlobalScope('tenant_scope')
             ->whereNotNull('ynh_trial_id')
-            ->chunkById(100, function ($assets) {
-                $assets->each(function (Asset $asset) {
+            ->get()
+            ->each(function (Asset $asset) {
 
-                    /** @var ?Trial $trial */
-                    $trial = Trial::withoutGlobalScope('tenant_scope')->find($asset->ynh_trial_id);
+                Log::debug("Processing {$asset->asset} with trial id {$asset->ynh_trial_id}...");
 
-                    if (!$trial || $trial->created_at->lt(now()->subDays(15))) {
+                /** @var ?Trial $trial */
+                $trial = Trial::withoutGlobalScope('tenant_scope')->find($asset->ynh_trial_id);
 
-                        /** @var ?User $user */
-                        $user = User::withoutGlobalScope('tenant_scope')->find($asset->created_by);
-                        $tenantId = $user?->tenant_id;
+                if (!$trial || $trial->created_at->lt(now()->subDays(15))) {
 
-                        if (!$tenantId) {
-                            $asset->delete();
-                            return;
-                        }
+                    /** @var ?User $user */
+                    $user = User::withoutGlobalScope('tenant_scope')->find($asset->created_by);
+                    $tenantId = $user?->tenant_id;
 
-                        $users = User::withoutGlobalScope('tenant_scope')->where('tenant_id', $tenantId)->get();
-                        $hasPayingUser = $users->contains(fn(User $user) => $user->subscriber());
-
-                        // If the tenant has a subscription, the trial asset is now an asset
-                        if ($hasPayingUser) {
-                            $asset->ynh_trial_id = null;
-                            $asset->save();
-                        }
+                    if (!$tenantId) {
+                        $asset->delete();
+                        Log::debug("Asset {$asset->asset} with trial id {$asset->ynh_trial_id} removed.");
+                        return;
                     }
-                });
+
+                    $users = User::withoutGlobalScope('tenant_scope')->where('tenant_id', $tenantId)->get();
+                    $hasPayingUser = $users->contains(fn(User $user) => $user->subscriber());
+
+                    // If the tenant has a subscription, the trial asset is now an asset
+                    if (!$hasPayingUser) {
+                        $asset->delete();
+                        Log::debug("Asset {$asset->asset} with trial id {$asset->ynh_trial_id} removed.");
+                    } else {
+                        Log::debug("Trial id {$asset->ynh_trial_id} removed for {$asset->asset}.");
+                        $asset->ynh_trial_id = null;
+                        $asset->save();
+                    }
+                }
             });
     }
 

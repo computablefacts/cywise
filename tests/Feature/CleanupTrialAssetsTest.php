@@ -4,16 +4,47 @@ namespace Tests\Feature;
 
 use App\Jobs\Cleanup;
 use App\Models\Asset;
+use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\Trial;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCaseWithDb;
+use Wave\Plan;
 use Wave\Subscription;
 
 class CleanupTrialAssetsTest extends TestCaseWithDb
 {
+    private function makeUserPaying(User $user)
+    {
+        $role = Role::firstOrCreate(['name' => Role::STANDARD_PLAN, 'guard_name' => 'web']);
+        $plan = Plan::create([
+            'name' => 'Basic Plan',
+            'description' => 'A basic plan',
+            'features' => 'Feature 1, Feature 2',
+            'active' => 1,
+            'role_id' => $role->id,
+            'monthly_price' => 9.99,
+            'yearly_price' => 99.99,
+            'onetime_price' => 0,
+            'default' => 0,
+            'currency' => 'EUR',
+        ]);
+        Subscription::create([
+            'billable_id' => $user->id,
+            'billable_type' => 'user',
+            'plan_id' => $plan->id,
+            'status' => 'active',
+            'vendor_slug' => 'slug',
+            'vendor_product_id' => 'prod',
+            'vendor_transaction_id' => 'trans',
+            'vendor_customer_id' => 'cust',
+            'vendor_subscription_id' => 'sub',
+            'cycle' => 'month',
+        ]);
+    }
+
     public function test_cleanup_deletes_old_trial_assets_without_subscription()
     {
         // Disable foreign key checks for this test or create necessary relations
@@ -49,19 +80,7 @@ class CleanupTrialAssetsTest extends TestCaseWithDb
         $tenant = Tenant::create(['name' => 'Subscribed Tenant']);
         $user = User::factory()->create(['tenant_id' => $tenant->id]);
 
-        // Create a subscription for the user
-        Subscription::create([
-            'billable_type' => get_class($user),
-            'billable_id' => $user->id,
-            'plan_id' => 1, // Assume plan 1 exists or use a real ID
-            'status' => 'active',
-            'vendor_slug' => 'paddle',
-            'vendor_product_id' => 'prod_123',
-            'vendor_transaction_id' => 'trans_123',
-            'vendor_customer_id' => 'cust_123',
-            'vendor_subscription_id' => 'sub_123',
-            'cycle' => 'month',
-        ]);
+        $this->makeUserPaying($user);
 
         $oldTrial = Trial::create([
             'hash' => 'subscribed_trial',
