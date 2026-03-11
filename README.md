@@ -180,21 +180,21 @@ demandes en langage naturel et d'y répondre en interrogeant différentes source
          +------------------------+------------------------+-----------------------------+
          |                        |                        |                             |
          v                        v                        v                             v
-   [ DONNÉES STRUCTURÉES ]   [ BASE DE CONNAISSANCES ]  [ ACTIONS LOCALES ]           [ ACTIONS DISTANTES ]
+   [ DONNÉES STRUCTURÉES ]    [ BASE DE CONNAISSANCES ]  [ ACTIONS LOCALES ]           [ ACTIONS DISTANTES ]
    
-   +-----------------------+ +-----------------------+  +----------------------------+  +---------------------------------+
-   |  TABLES ANALYTIQUES   | |   RECHERCHE HYBRIDE   |  |   APIS INTERNES JSON-RPC   |  |      APIS EXTERNES JSON-RPC     |
-   |      (ClickHouse)     | |    (MariaDB / RAG)    |  |       (Annotations)        |  |          (HTTP Request)         |
-   +-----------------------+ +-----------------------+  +-------------+--------------+  +---------------------------------+
-   | - Tables de données   | | - Mémos               |                |                 | - URL & Headers                 |
-   | - Génération SQL      | | - Collections         |                v                 | - Payload JSON                  |
-   | - Résultats TSV       | | - Documents / Chunks  |  +----------------------------+  | - Response JSON                 |
-   |                       | | - Vecteurs (Cosine)   |  |    PROCÉDURES JSON-RPC     |  +---------------------------------+
-   +-----------------------+ +-----------------------+  +----------------------------+ 
-                                                        | - #[RpcMethod]             | 
-                                                        | - Payload JsonRequest      | 
-                                                        | - Response array           |
-                                                        +----------------------------+
+   +-----------------------+  +-----------------------+  +----------------------------+  +---------------------------------+
+   |  TABLES ANALYTIQUES   |  |   RECHERCHE HYBRIDE   |  |   APIS INTERNES JSON-RPC   |  |      APIS EXTERNES JSON-RPC     |
+   |      (ClickHouse)     |  |    (MariaDB / RAG)    |  |       (Annotations)        |  |          (HTTP Request)         |
+   +-----------------------+  +-----------------------+  +-------------+--------------+  +---------------------------------+
+   | - Tables de données   |  | - Mémos               |                |                 | - URL & Headers                 |
+   | - Génération SQL      |  | - Collections         |                v                 | - Payload JSON                  |
+   | - Résultats TSV       |  | - Documents / Chunks  |  +----------------------------+  | - Response JSON                 |
+   |                       |  | - Vecteurs (Cosine)   |  |    PROCÉDURES JSON-RPC     |  +---------------------------------+
+   +-----------------------+  +-----------------------+  +----------------------------+ 
+                                                         | - #[RpcMethod]             | 
+                                                         | - Payload JsonRequest      | 
+                                                         | - Response array           |
+                                                         +----------------------------+
 ```
 
 Le schéma ci-dessus illustre le flux de traitement d'une demande. Par exemple, si vous envoyez dans votre client de
