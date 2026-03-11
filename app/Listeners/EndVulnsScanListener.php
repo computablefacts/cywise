@@ -13,6 +13,7 @@ use App\Models\Port;
 use App\Models\Scan;
 use App\Models\Trial;
 use App\Models\User;
+use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -175,6 +176,17 @@ class EndVulnsScanListener extends AbstractListener
                         'flarum_slug' => null, // TODO : remove?
                     ]);
 
+                    if ($a->isHigh()) {
+
+                        /** @var Asset $asset */
+                        $asset = $port->scan->asset;
+                        $users = User::where('tenant_id', $asset->createdBy->tenant_id)->get();
+
+                        foreach ($users as $u) {
+                            $u->notify(new Notification($a->vulnerability, "{$asset->asset} > {$a->title}"));
+                        }
+                    }
+
                     // Cache translations
                     $a->translated('title');
                     $a->translated('vulnerability');
@@ -235,6 +247,17 @@ class EndVulnsScanListener extends AbstractListener
                         'title' => $title,
                         'flarum_slug' => null, // TODO : remove?
                     ]);
+
+                    if ($a->isHigh()) {
+
+                        /** @var Asset $asset */
+                        $asset = $port->scan->asset;
+                        $users = User::where('tenant_id', $asset->createdBy->tenant_id)->get();
+
+                        foreach ($users as $u) {
+                            $u->notify(new Notification($a->vulnerability, "{$asset->asset} > {$a->title}"));
+                        }
+                    }
 
                     // Cache translations
                     $a->translated('title');
