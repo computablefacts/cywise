@@ -116,16 +116,16 @@ class AssetsProcedure extends Procedure
             @endif
             @if(!empty(\$result['timeline']['sentinel']['end']))
             A full scan of {{ \$result['asset'] }} returned {{ count(\$result['vulnerabilities']) }} vulnerabilities and {{ count(\$result['ports']) }} open ports.
-            The last scan of {{ \$result['asset'] }} completed on {{ \$result['timeline']['sentinel']['end']->format('Y-m-d') }}.
-            The next scan of {{ \$result['asset'] }} will be on {{ \$result['timeline']['next_scan']->format('Y-m-d') }}.
+            The last scan of {{ \$result['asset'] }} completed on {{ \$result['timeline']['sentinel']['end'] }}.
+            The next scan of {{ \$result['asset'] }} will be on {{ \$result['timeline']['next_scan'] }}.
             @elseif(!empty(\$result['timeline']['sentinel']['start']))
-            A port scan completed on {{ \$result['timeline']['nmap']['end']->format('Y-m-d H:i:s') }} for {{ \$result['asset'] }}.
-            A vulnerability scan is running since {{ \$result['timeline']['sentinel']['start']->format('Y-m-d H:i:s') }} for {{ \$result['asset'] }}.
+            A port scan completed on {{ \$result['timeline']['nmap']['end'] }} for {{ \$result['asset'] }}.
+            A vulnerability scan is running since {{ \$result['timeline']['sentinel']['start'] }} for {{ \$result['asset'] }}.
             @elseif(!empty(\$result['timeline']['nmap']['end']))
-            A port scan completed on {{ \$result['timeline']['nmap']['end']->format('Y-m-d H:i:s') }} for {{ \$result['asset'] }}.
+            A port scan completed on {{ \$result['timeline']['nmap']['end'] }} for {{ \$result['asset'] }}.
             A vulnerability scan will start soon for {{ \$result['asset'] }}.
             @elseif(!empty(\$result['timeline']['nmap']['start']))
-            A port scan is running since {{ \$result['timeline']['nmap']['start']->format('Y-m-d H:i:s') }} for {{ \$result['asset'] }}.
+            A port scan is running since {{ \$result['timeline']['nmap']['start'] }} for {{ \$result['asset'] }}.
             @else
             A port scan will start soon for {{ \$result['asset'] }}.
             @endif
