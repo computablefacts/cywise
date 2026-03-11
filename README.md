@@ -199,6 +199,7 @@ demandes en langage naturel et d'y répondre en interrogeant différentes source
 
 Le schéma ci-dessus illustre le flux de traitement d'une demande. Par exemple, si vous envoyez dans votre client de
 messagerie « surveille www.example.com », CyberBuddy :
+
 - identifie votre intention ;
 - choisit l'action appropriée ;
 - appelle la procédure JSON-RPC associée à cette action avec le domaine fourni ;
@@ -208,21 +209,22 @@ Les composants clefs de cette architecture sont :
 
 - **CyberBuddy.** A partir de votre demande en langage naturel, planifie les outils à appeler pour atteindre votre
   objectif. Par exemple :
-  - « Quelles sont mes priorités ce matin ? »
+    - « Quelles sont mes priorités ce matin ? »
 - **Données structurées.** Utilise ClickHouse pour effectuer des analyses complexes et des calculs statistiques sur de
   grands volumes de données techniques (fuites de données ou imports de vos données tabulaires). Par exemple :
-  - « Quels sont mes identifiants fuités ? »
+    - « Quels sont mes identifiants fuités ? »
 - **Base de connaissance.** Système de RAG (Retrieval Augmented Generation) qui fouille dans vos documents (Chartes
   informatiques, PSSI, PDF) et vos notes personnelles (mémos) par recherche sémantique pour vous renvoyer des réponses
   factuelles et sourcées. Par exemple :
-  - « Comment isoler un serveur compromis d'après nos procédures ? »
-- **Actions locales.** Permettent de piloter directement les fonctionnalités de Cywise via ses API JSON-RPC. Par exemple :
-  - « Surveille www.example.com »
-  - « Envoie-moi un rapport de sécurité tous les mercredi à 11h. »
+    - « Comment isoler un serveur compromis d'après nos procédures ? »
+- **Actions locales.** Permettent de piloter directement les fonctionnalités de Cywise via ses API JSON-RPC. Par
+  exemple :
+    - « Surveille www.example.com »
+    - « Envoie-moi un rapport de sécurité tous les mercredi à 11h. »
 - **Actions distantes.** Permettent à Cywise d'interagir avec des systèmes tiers (SIEM, outils de ticketing, Cloud) en
   consommant leurs API JSON-RPC. Par exemple :
-  - « Ouvre un ticket Jira pour cette vulnérabilité »
-  - « Liste mes instances actives sur AWS. »
+    - « Ouvre un ticket Jira pour cette vulnérabilité »
+    - « Liste mes instances actives sur AWS. »
 
 ## Opérateur SOC
 
@@ -250,6 +252,21 @@ pour :
   justification détaillée.
 - **Suggérer des actions.** En cas de détection suspecte, il recommande immédiatement les premières étapes de
   remédiation.
+
+## Mémos
+
+Les mémos sont des notes personnelles ou des procédures spécifiques que vous pouvez créer directement dans l'interface
+de Cywise. Ils constituent le "contexte local" indispensable pour transformer une IA générique en un assistant
+véritablement au fait de vos contraintes.
+
+Leur importance est capitale car ils permettent de :
+
+- **Personnaliser l'analyse.** En indiquant que tel serveur est un serveur de test, l'Opérateur SOC pourra qualifier
+  certains comportements de "normaux" alors qu'ils seraient jugés "suspects" ailleurs.
+- **Capitaliser sur votre savoir-faire.** En renseignant vos procédures d'astreinte ou vos contacts d'urgence,
+  CyberBuddy peut les restituer immédiatement en cas de crise.
+- **Réduire les faux positifs.** Plus l'IA connaît votre environnement (plages horaires, outils d'administration
+  utilisés), plus son diagnostic est précis.
 
 # Installation
 
