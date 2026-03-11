@@ -143,6 +143,65 @@ des messageries [Telegram](https://telegram.org) et [WhatsApp](https://www.whats
 > [!WARNING]
 > Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
 
+## Fonctionnement
+
+CyberBuddy est au coeur de l'expérience Cywise. Il agit comme un orchestrateur intelligent capable de comprendre vos
+demandes en langage naturel et d'y répondre en interrogeant différentes sources de données.
+
+```text
+   UTILISATEUR           MESSAGERIES              CYWISE WEBHOOK                   CYBERBUDDY (IA)
+   +----------+        +-------------+        +-------------------+      +--------------------------------+
+   |  Mobile  | <----> | - Telegram  | <----> |  - Validation     | <--> |  - Orchestrateur               |
+   |   App    |        | - WhatsApp  |        |  - Mapping Thread |      |  - AgentSquad                  |
+   +----------+        +-------------+        +-------------------+      |  - Thought/Action/Observation  |
+                                                                         +---------------+----------------+
+                                                                                         |
+         +------------------------+------------------------+-----------------------------+
+         |                        |                        |                             |
+         v                        v                        v                             v
+   [ DONNÉES STRUCTURÉES ]   [ BASE DE CONNAISSANCES ]  [ ACTIONS LOCALES ]           [ ACTIONS DISTANTES ]
+   
+   +-----------------------+ +-----------------------+  +--------------------------+  +---------------------------------+
+   |  TABLES ANALYTIQUES   | |   RECHERCHE HYBRIDE   |  |   API INTERNE JSON-RPC   |  |      APIS EXTERNES JSON-RPC     |
+   |      (ClickHouse)     | |    (MariaDB / RAG)    |  |      (Annotations)       |  |          (HTTP Request)         |
+   +-----------------------+ +-----------------------+  +------------+-------------+  +---------------------------------+
+   | - Tables de données   | | - Collections         |               |                | - URL & Headers                 |
+   | - Génération SQL      | | - Documents / Chunks  |               v                | - Payload JSON                  |
+   | - Résultats TSV       | | - Vecteurs (Cosine)   |  +--------------------------+  | - Response JSON                 |
+   +-----------------------+ +-----------------------+  |  PROCÉDURES JSON-RPC     |  +---------------------------------+
+                                                        +--------------------------+ 
+                                                        | - #[RpcMethod]           | 
+                                                        | - Payload JsonRequest    | 
+                                                        | - Response array         |
+                                                        +--------------------------+
+```
+
+Le schéma ci-dessus illustre le flux de traitement d'une demande. Par exemple, si vous envoyez dans votre client de
+messagerie « surveille www.example.com », CyberBuddy :
+- identifie votre intention ;
+- choisit l'action appropriée, ici `assets@create` ;
+- appelle la procédure JSON-RPC de création de l'actif avec le domaine fourni ;
+- confirme la mise en place de la surveillance après avoir reçu la réponse de la procédure.
+
+Les composants clefs de cette architecture sont :
+
+- **CyberBuddy.** A partir de votre demande en langage naturel, planifie les outils à appeler pour atteindre votre
+  objectif. Par exemple :
+  - « Quelles sont mes priorités ce matin ? »
+- **Données structurées.** Utilise ClickHouse pour effectuer des analyses complexes et des calculs statistiques sur de
+  grands volumes de données techniques (fuites de données ou imports de vos données tabulaires). Par exemple :
+  - « Quels sont mes identifiants fuités ? »
+- **Base de connaissance.** Système de RAG (Retrieval Augmented Generation) qui fouille dans vos documents (Chartes
+  informatiques, PSSI, PDF) par recherche sémantique pour vous renvoyer des réponses factuelles et sourcées. Par exemple :
+  - « Comment isoler un serveur compromis d'après nos procédures ? »
+- **Actions locales.** Permettent de piloter directement les fonctionnalités de Cywise via ses API JSON-RPC. Par exemple : 
+  - « Surveille www.example.com »
+  - « Envoie-moi un rapport de sécurité tous les mercredi à 11h. »
+- **Actions distantes.** Permettent à Cywise d'interagir avec des systèmes tiers (SIEM, outils de ticketing, Cloud) en
+  consommant leurs API JSON-RPC. Par exemple : 
+  - « Ouvre un ticket Jira pour cette vulnérabilité »
+  - « Liste mes instances actives sur AWS. »
+
 ## Divers
 
 ### Fond documentaire
