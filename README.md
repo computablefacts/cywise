@@ -143,9 +143,28 @@ des messageries [Telegram](https://telegram.org) et [WhatsApp](https://www.whats
 > [!WARNING]
 > Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
 
-## Fonctionnement
+## Divers
 
-### CyberBuddy
+### Fond documentaire
+
+:white_check_mark: auto-hébergé :white_check_mark: SaaS
+
+**Intégrez votre fond documentaire (Charte Informatique, PSSI, etc.) à CyberBuddy.** Offrez à vos équipes un accès
+instantané et intuitif à l'information. Il leur suffit de poser une question en langage naturel, comme « CyberBuddy,
+quelles sont les règles de télétravail dans notre PSSI ? », pour obtenir une réponse précise, extraite directement de
+vos ressources internes. Une manière simple et efficace de diffuser vos bonnes pratiques et de faciliter l'accès à
+l'information au quotidien.
+
+### Single Sign-On (SSO)
+
+:white_check_mark: auto-hébergé :white_check_mark: SaaS
+
+**En 2026, le SSO n'est plus une option.** Cywise intègre un module SSO moderne, compatible avec les standards du
+marché (OAuth 2.0, SAML, OpenID Connect), pour vous permettre de contrôler les accès de manière unifiée.
+
+# Fonctionnement
+
+## CyberBuddy
 
 CyberBuddy est au coeur de l'expérience Cywise. Il agit comme un orchestrateur intelligent capable de comprendre vos
 demandes en langage naturel et d'y répondre en interrogeant différentes sources de données.
@@ -197,15 +216,15 @@ Les composants clefs de cette architecture sont :
   informatiques, PSSI, PDF) et vos notes personnelles (mémos) par recherche sémantique pour vous renvoyer des réponses
   factuelles et sourcées. Par exemple :
   - « Comment isoler un serveur compromis d'après nos procédures ? »
-- **Actions locales.** Permettent de piloter directement les fonctionnalités de Cywise via ses API JSON-RPC. Par exemple : 
+- **Actions locales.** Permettent de piloter directement les fonctionnalités de Cywise via ses API JSON-RPC. Par exemple :
   - « Surveille www.example.com »
   - « Envoie-moi un rapport de sécurité tous les mercredi à 11h. »
 - **Actions distantes.** Permettent à Cywise d'interagir avec des systèmes tiers (SIEM, outils de ticketing, Cloud) en
-  consommant leurs API JSON-RPC. Par exemple : 
+  consommant leurs API JSON-RPC. Par exemple :
   - « Ouvre un ticket Jira pour cette vulnérabilité »
   - « Liste mes instances actives sur AWS. »
 
-### Opérateur SOC
+## Opérateur SOC
 
 L'Opérateur SOC est un agent spécialisé dans l'analyse d'événements de sécurité. Il agit comme un analyste de niveau
 1 capable de traiter de gros volumes d'événements techniques pour en extraire des signaux faibles et des comportements
@@ -231,25 +250,6 @@ pour :
   justification détaillée.
 - **Suggérer des actions.** En cas de détection suspecte, il recommande immédiatement les premières étapes de
   remédiation.
-
-## Divers
-
-### Fond documentaire
-
-:white_check_mark: auto-hébergé :white_check_mark: SaaS
-
-**Intégrez votre fond documentaire (Charte Informatique, PSSI, etc.) à CyberBuddy.** Offrez à vos équipes un accès
-instantané et intuitif à l'information. Il leur suffit de poser une question en langage naturel, comme « CyberBuddy,
-quelles sont les règles de télétravail dans notre PSSI ? », pour obtenir une réponse précise, extraite directement de
-vos ressources internes. Une manière simple et efficace de diffuser vos bonnes pratiques et de faciliter l'accès à
-l'information au quotidien.
-
-### Single Sign-On (SSO)
-
-:white_check_mark: auto-hébergé :white_check_mark: SaaS
-
-**En 2026, le SSO n'est plus une option.** Cywise intègre un module SSO moderne, compatible avec les standards du
-marché (OAuth 2.0, SAML, OpenID Connect), pour vous permettre de contrôler les accès de manière unifiée.
 
 # Installation
 
