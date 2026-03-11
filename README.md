@@ -177,10 +177,10 @@ demandes en langage naturel et d'y répondre en interrogeant différentes source
    +----------+        +-------------+        +-------------------+      |  - Thought/Action/Observation  |
                                                                          +---------------+----------------+
                                                                                          |
-         +------------------------+------------------------+-----------------------------+
-         |                        |                        |                             |
-         v                        v                        v                             v
-   [ DONNÉES STRUCTURÉES ]    [ BASE DE CONNAISSANCES ]  [ ACTIONS LOCALES ]           [ ACTIONS DISTANTES ]
+         +------------------------+------------------------+-----------------------------+--+
+         |                        |                        |                                |
+         v                        v                        v                                v
+   [ DONNÉES STRUCTURÉES ]    [ BASE DE CONNAISSANCES ]  [ ACTIONS LOCALES ]             [ ACTIONS DISTANTES ]
    
    +-----------------------+  +-----------------------+  +----------------------------+  +---------------------------------+
    |  TABLES ANALYTIQUES   |  |   RECHERCHE HYBRIDE   |  |   APIS INTERNES JSON-RPC   |  |      APIS EXTERNES JSON-RPC     |
