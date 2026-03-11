@@ -255,6 +255,13 @@ $user = \Auth::user();
                           Request::is('traces') ||
                           Request::is('actions')
                         ) ? '1' : '0'">
+            @if($user->canView('iframes.scheduled-tasks'))
+            <x-app.sidebar-link href="{{ route('scheduled-tasks') }}"
+                                icon="phosphor-clock"
+                                :active="Request::is('scheduled-tasks')">
+              {{ __('Scheduled Tasks') }}
+            </x-app.sidebar-link>
+            @endif
             @if($user->canView('iframes.prompts'))
             <x-app.sidebar-link href="{{ route('prompts') }}"
                                 icon="phosphor-notepad"
@@ -267,13 +274,6 @@ $user = \Auth::user();
                                 icon="phosphor-wrench"
                                 :active="Request::is('actions')">
               {{ __('Actions') }}
-            </x-app.sidebar-link>
-            @endif
-            @if($user->canView('iframes.scheduled-tasks'))
-            <x-app.sidebar-link href="{{ route('scheduled-tasks') }}"
-                                icon="phosphor-clock"
-                                :active="Request::is('scheduled-tasks')">
-              {{ __('Scheduled Tasks') }}
             </x-app.sidebar-link>
             @endif
             @if($user->canView('iframes.shares'))
