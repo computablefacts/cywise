@@ -358,4 +358,14 @@ if (!function_exists('app_config_override')) {
         }
     }
 }
-
+if (!function_exists('cywise_truncate_string')) {
+    function cywise_truncate_string(string $str, int $size = 500): string
+    {
+        if (mb_strlen($str) <= $size) {
+            return $str;
+        }
+        $start = mb_substr($str, 0, 50);
+        $end = mb_substr($str, -50);
+        return $start . '[...]' . $end;
+    }
+}

@@ -167,3 +167,56 @@ test('compress log buffer (4l x 2l)', function () {
         "[END 2x REPEATED LINE]",
     ]);
 });
+
+test('truncate string shorter than limit', function () {
+    $str = 'Short string';
+    expect(cywise_truncate_string($str, 50))->toEqual($str);
+});
+
+test('truncate string equal to limit', function () {
+    $str = str_repeat('a', 100);
+    expect(cywise_truncate_string($str, 100))->toEqual($str);
+});
+
+test('truncate string longer than limit', function () {
+
+    $start = str_repeat('a', 50);
+    $middle = str_repeat('b', 10);
+    $end = str_repeat('c', 50);
+    $str = $start . $middle . $end;
+
+    // Total length is 110, limit is 100
+    $expected = $start . '[...]' . $end;
+    expect(cywise_truncate_string($str, 100))->toEqual($expected);
+});
+
+test('truncate string with default limit (500)', function () {
+    $str = str_repeat('a', 501);
+    $expected = str_repeat('a', 50) . '[...]' . str_repeat('a', 50);
+    expect(cywise_truncate_string($str))->toEqual($expected);
+});
+
+test('truncate string with multibyte characters', function () {
+
+    $start = str_repeat('é', 50);
+    $middle = '🚀';
+    $end = str_repeat('à', 50);
+    $str = $start . $middle . $end;
+
+    // Total mb_length is 101, limit is 100
+    $expected = $start . '[...]' . $end;
+    expect(cywise_truncate_string($str, 100))->toEqual($expected);
+});
+
+test('truncate string with very short string but limit smaller than 100', function () {
+
+    $str = "This is a string that is longer than ten characters."; // 52 chars
+    $limit = 10;
+
+    // Since length (52) > limit (10), it will take first 50 and last 50.
+    $start = mb_substr($str, 0, 50);
+    $end = mb_substr($str, -50);
+    $expected = $start . '[...]' . $end;
+
+    expect(cywise_truncate_string($str, $limit))->toEqual($expected);
+});
