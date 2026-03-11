@@ -111,15 +111,21 @@ class AssetsProcedure extends Procedure
             "if the request is 'retrieve detailed information about 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\"}",
         ],
         ai_result: "
+            @if(!empty(\$result['tags']))
             The user's tags associated to {{ \$result['asset'] }} are {{ implode(', ', \$result['tags']) }}.
+            @endif
             @if(!empty(\$result['timeline']['sentinel']['end']))
             A full scan of {{ \$result['asset'] }} returned {{ count(\$result['vulnerabilities']) }} vulnerabilities and {{ count(\$result['ports']) }} open ports.
+            The last scan of {{ \$result['asset'] }} completed on {{ \$result['timeline']['sentinel']['end']->format('Y-m-d') }}.
+            The next scan of {{ \$result['asset'] }} will be on {{ \$result['timeline']['next_scan']->format('Y-m-d') }}.
             @elseif(!empty(\$result['timeline']['sentinel']['start']))
-            A vulnerability scan is running for {{ \$result['asset'] }}.
+            A port scan completed on {{ \$result['timeline']['nmap']['end']->format('Y-m-d H:i:s') }} for {{ \$result['asset'] }}.
+            A vulnerability scan is running since {{ \$result['timeline']['sentinel']['start']->format('Y-m-d H:i:s') }} for {{ \$result['asset'] }}.
             @elseif(!empty(\$result['timeline']['nmap']['end']))
+            A port scan completed on {{ \$result['timeline']['nmap']['end']->format('Y-m-d H:i:s') }} for {{ \$result['asset'] }}.
             A vulnerability scan will start soon for {{ \$result['asset'] }}.
             @elseif(!empty(\$result['timeline']['nmap']['start']))
-            A port scan is running for {{ \$result['asset'] }}.
+            A port scan is running since {{ \$result['timeline']['nmap']['start']->format('Y-m-d H:i:s') }} for {{ \$result['asset'] }}.
             @else
             A port scan will start soon for {{ \$result['asset'] }}.
             @endif
