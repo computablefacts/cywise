@@ -140,66 +140,12 @@ class EndVulnsScanListener extends AbstractListener
             $port->tags()->create(['tag' => Str::lower($label)]);
         });
 
-        $this->setAlertsV1($port, $task);
-        $this->setAlertsV2($port, $task);
+        $this->setAlerts($port, $task);
         $this->setScreenshot($port, $task);
         $this->markScanAsCompleted($scan);
     }
 
-    private function setAlertsV1(Port $port, array $task): void
-    {
-        collect($task['data'] ?? [])
-            ->filter(fn(array $data) => isset($data['tool']) && $data['tool'] === 'alerter' && isset($data['rawOutput']) && $data['rawOutput'])
-            ->flatMap(fn(array $data) => collect(preg_split('/\r\n|\r|\n/', $data['rawOutput'])))
-            ->filter(fn(string $alert) => $alert !== '')
-            ->map(fn(string $alert) => json_decode($alert, true))
-            ->filter(fn(?array $alert) => $alert !== null)
-            ->each(function (array $alert) use ($port) {
-                try {
-
-                    /** @var Alert $a */
-                    $a = Alert::updateOrCreate([
-                        'port_id' => $port->id,
-                        'uid' => trim($alert['values'][7])
-                    ], [
-                        'port_id' => $port->id,
-                        'type' => trim($alert['type']),
-                        'vulnerability' => trim($alert['values'][4]),
-                        'remediation' => trim($alert['values'][5]),
-                        'level' => trim($alert['values'][6]),
-                        'uid' => trim($alert['values'][7]),
-                        'cve_id' => empty($alert['values'][8]) ? null : $alert['values'][8],
-                        'cve_cvss' => empty($alert['values'][9]) ? null : $alert['values'][9],
-                        'cve_vendor' => empty($alert['values'][10]) ? null : $alert['values'][10],
-                        'cve_product' => empty($alert['values'][11]) ? null : $alert['values'][11],
-                        'title' => trim($alert['values'][12]),
-                        'flarum_slug' => null, // TODO : remove?
-                    ]);
-
-                    if ($a->isHigh()) {
-
-                        /** @var Asset $asset */
-                        $asset = $port->scan->asset;
-                        $users = User::where('tenant_id', $asset->createdBy->tenant_id)->get();
-
-                        foreach ($users as $u) {
-                            $u->notify(new Notification($a->vulnerability, "{$asset->asset} > {$a->title}"));
-                        }
-                    }
-
-                    // Cache translations
-                    $a->translated('title');
-                    $a->translated('vulnerability');
-                    $a->translated('remediation');
-
-                } catch (\Exception $exception) {
-                    Log::error($exception);
-                    Log::error($alert);
-                }
-            });
-    }
-
-    private function setAlertsV2(Port $port, array $task): void
+    private function setAlerts(Port $port, array $task): void
     {
         /** @var User $user */
         $user = $port->scan->asset->createdBy;
