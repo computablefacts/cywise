@@ -114,6 +114,13 @@ class Orchestrator
             }
         }
 
+        $history = '';
+
+        foreach ($messages as $message) {
+            $prefix = ($message['role'] ?? '') === RoleEnum::USER->value ? 'user > ' : 'assistant > ';
+            $history .= $prefix . ($message['content'] ?? '') . "\n";
+        }
+
         $template = '{"thought":"describe here succinctly your thoughts about the question you have been asked", "action_name":"set here the name of the action to execute", "action_input":"set here the input for the action"}';
         $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
         $actions = implode("\n", array_map(fn(AbstractAction $action) => "[ACTION][NAME]{$action->name()}[/NAME][DESCRIPTION]{$action->description()}[/DESCRIPTION][/ACTION]", array_filter($this->agents, fn(AbstractAction $action) => $action->isInvokable())));
@@ -122,14 +129,10 @@ class Orchestrator
             'COT' => $cot,
             'ACTIONS' => $actions,
             'INPUT' => $input,
+            'HISTORY' => $history,
             'MEMOS' => MemosProvider::provide($user, NotesProcedure::SCOPE_IS_ORCHESTRATOR),
         ]);
-        $messages[] = [
-            'role' => RoleEnum::USER->value,
-            'content' => $prompt,
-        ];
-        $result = LlmsProvider::provideJson($messages, $this->model);
-        array_pop($messages);
+        $result = LlmsProvider::provideJson($prompt, $this->model);
         /** @var string $answer */
         $answer = $result->raw;
         /** @var array $json */
