@@ -44,7 +44,7 @@ class LlmsProvider extends AbstractProvider
 
         $after = microtime(true);
 
-        if (isset($answer)) {
+        if (!empty($answer)) {
             self::traceSuccess('llms/' . Str::lower($model), $before, $after);
             return $answer;
         }
