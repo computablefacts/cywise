@@ -74,7 +74,7 @@ class ScheduledTasksProcedure extends Procedure
             "if the request is 'préviens-moi si www.example.com devient vulnérable', the input should be '{\"cron\":\"* * * * *\",\"trigger\":\"Le site www.example.com est-il vulnérable ?\",\"task\":\"Liste les vulnérabilités de www.example.com\"}'",
             "if the request is 'envoie-moi un email tous les matins à 9h si www.example.com est vulnérable', the input should be '{\"cron\":\"0 9 * * *\",\"trigger\":\"Le site www.example.com est-il vulnérable ?\",\"task\":\"Liste les vulnérabilités de www.example.com\"}'",
         ],
-        ai_result: "\$result['msg']",
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function create(JsonRpcRequest $request): array
     {
@@ -151,7 +151,7 @@ class ScheduledTasksProcedure extends Procedure
             "if the request is 'stop la tâche 6789', the input should be '{\"task_id\":6789,\"enabled\":false}'",
             "if the request is 'redémarre la tâche 19', the input should be '{\"task_id\":19,\"enabled\":true}'",
         ],
-        ai_result: "\$result['msg']",
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function toggle(JsonRpcRequest $request): array
     {
@@ -181,7 +181,7 @@ class ScheduledTasksProcedure extends Procedure
         ai_examples: [
             "if the request is 'supprime la tâche 1234', the input should be '{\"task_id\":6789}'",
         ],
-        ai_result: "\$result['msg']",
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function delete(JsonRpcRequest $request): array
     {
