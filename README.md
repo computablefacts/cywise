@@ -179,8 +179,8 @@ demandes en langage naturel et d'y répondre en interrogeant différentes source
 Le schéma ci-dessus illustre le flux de traitement d'une demande. Par exemple, si vous envoyez dans votre client de
 messagerie « surveille www.example.com », CyberBuddy :
 - identifie votre intention ;
-- choisit l'action appropriée, ici `assets@create` ;
-- appelle la procédure JSON-RPC de création de l'actif avec le domaine fourni ;
+- choisit l'action appropriée ;
+- appelle la procédure JSON-RPC associée à cette action avec le domaine fourni ;
 - confirme la mise en place de la surveillance après avoir reçu la réponse de la procédure.
 
 Les composants clefs de cette architecture sont :
