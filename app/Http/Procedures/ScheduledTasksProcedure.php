@@ -33,12 +33,12 @@ class ScheduledTasksProcedure extends Procedure
                 Below is the list of your scheduled tasks:
                 @foreach(\$tasks as \$task)
                 @if(empty(\$task->trigger))
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}). @if(isset(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}). @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
                 @else
                 @if(\$task->cron === '* * * * *')
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}. @if(isset(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}. @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
                 @else
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }} ({{ \$task->readableCron() }}). @if(isset(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }} ({{ \$task->readableCron() }}). @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
                 @endif
                 @endif
                 @endforeach
