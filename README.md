@@ -167,11 +167,11 @@ demandes en langage naturel et d'y répondre en interrogeant différentes source
    |  TABLES ANALYTIQUES   | |   RECHERCHE HYBRIDE   |  |   API INTERNE JSON-RPC   |  |      APIS EXTERNES JSON-RPC     |
    |      (ClickHouse)     | |    (MariaDB / RAG)    |  |      (Annotations)       |  |          (HTTP Request)         |
    +-----------------------+ +-----------------------+  +------------+-------------+  +---------------------------------+
-   | - Tables de données   | | - Collections         |               |                | - URL & Headers                 |
-   | - Génération SQL      | | - Documents / Chunks  |               v                | - Payload JSON                  |
-   | - Résultats TSV       | | - Vecteurs (Cosine)   |  +--------------------------+  | - Response JSON                 |
-   +-----------------------+ +-----------------------+  |  PROCÉDURES JSON-RPC     |  +---------------------------------+
-                                                        +--------------------------+ 
+   | - Tables de données   | | - Mémos               |               |                | - URL & Headers                 |
+   | - Génération SQL      | | - Collections         |               v                | - Payload JSON                  |
+   | - Résultats TSV       | | - Documents / Chunks  |  +--------------------------+  | - Response JSON                 |
+   |                       | | - Vecteurs (Cosine)   |  |  PROCÉDURES JSON-RPC     |  +---------------------------------+
+   +-----------------------+ +-----------------------+  +--------------------------+ 
                                                         | - #[RpcMethod]           | 
                                                         | - Payload JsonRequest    | 
                                                         | - Response array         |
@@ -194,7 +194,8 @@ Les composants clefs de cette architecture sont :
   grands volumes de données techniques (fuites de données ou imports de vos données tabulaires). Par exemple :
   - « Quels sont mes identifiants fuités ? »
 - **Base de connaissance.** Système de RAG (Retrieval Augmented Generation) qui fouille dans vos documents (Chartes
-  informatiques, PSSI, PDF) par recherche sémantique pour vous renvoyer des réponses factuelles et sourcées. Par exemple :
+  informatiques, PSSI, PDF) et vos notes personnelles (mémos) par recherche sémantique pour vous renvoyer des réponses
+  factuelles et sourcées. Par exemple :
   - « Comment isoler un serveur compromis d'après nos procédures ? »
 - **Actions locales.** Permettent de piloter directement les fonctionnalités de Cywise via ses API JSON-RPC. Par exemple : 
   - « Surveille www.example.com »
@@ -211,20 +212,12 @@ L'Opérateur SOC est un agent spécialisé dans l'analyse d'événements de séc
 anormaux.
 
 ```text
-   SERVEUR UTILISATEUR                   OPERATEUR SOC (IA)
-   +-----------------+      +--------------------------------------------+
-   |  - Événements   |      |  - Collecte & Compression                  |
-   |  - IoC          | ---> |  - Contexte (Mémos)                        |
-   +-----------------+      |  - Analyse d'intention (IA)                |
-                            +---------------------+----------------------+
-                                                  |
-                                                  v
-                                              RÉSULTATS
-                                        +-------------------+
-                                        |  - Verdict        |
-                                        |  - Criticité      |
-                                        |  - Rapport        |
-                                        +-------------------+
+   SERVEUR UTILISATEUR                   OPÉRATEUR SOC (IA)                          RÉSULTATS
+   +-----------------+      +--------------------------------------------+      +-------------------+
+   |  - Événements   |      |  - Collecte & Compression                  |      |  - Verdict        |
+   |  - IoC          | ---> |  - Contexte (Mémos)                        | ---> |  - Criticité      |
+   +-----------------+      |  - Analyse d'intention (IA)                |      |  - Remédiation    |
+                            +--------------------------------------------+      +-------------------+
 ```
 
 Contrairement à CyberBuddy qui répond aux questions de l'utilisateur, l'Opérateur SOC travaille de manière autonome
