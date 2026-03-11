@@ -10,6 +10,7 @@ use App\Models\Chunk;
 use App\Models\Collection;
 use App\Models\File;
 use App\Models\Vector;
+use App\Notifications\Notification;
 use App\Rules\IsValidCollectionName;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -46,6 +47,8 @@ class IngestFileListener extends AbstractListener
             if (!$file) {
                 throw new \Exception("Invalid file id : {$event->fileId}");
             }
+
+            $event->user->notify(new Notification(__("Import of document :document started.", ['document' => $file->name])));
 
             // webm to mp3
             if ($file->mime_type === 'audio/webm') {
@@ -396,8 +399,16 @@ class IngestFileListener extends AbstractListener
                 $file->is_embedded = true;
                 $file->save();
             }
+
+            $event->user->notify(new Notification(__("Import of document :document finished successfully.", ['document' => $file->name])));
+
         } catch (\Exception $exception) {
+
             Log::error($exception->getMessage());
+
+            if (isset($file)) {
+                $event->user->notify(new Notification(__("Import of document :document failed: :error", ['document' => $file->name, 'error' => $exception->getMessage()])));
+            }
         }
     }
 
