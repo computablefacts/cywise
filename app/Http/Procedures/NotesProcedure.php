@@ -3,13 +3,13 @@
 namespace App\Http\Procedures;
 
 use App\Http\Controllers\Iframes\TimelineController;
+use App\Http\Procedures\RpcMethod as RpcMethod;
 use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
 use App\Models\TimelineItem;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
 class NotesProcedure extends Procedure
@@ -23,13 +23,18 @@ class NotesProcedure extends Procedure
     #[RpcMethod(
         description: 'Create a note.',
         params: [
-            'subject' => 'An optional subject of the note.',
-            'note' => 'The note content.',
-            'scopes' => "An optional set of scopes associated with the note such as 'CyberBuddy', 'Orchestrator' or 'SOC Operator'",
+            'subject' => 'An optional subject of the note. (string|nullable|min:1)',
+            'note' => 'The note content. (string|required|min:1|max:1000)',
+            'scopes' => "An optional set of scopes associated with the note such as 'CyberBuddy', 'Orchestrator' or 'SOC Operator' (array|nullable|min:0|max:3)",
         ],
         result: [
             'msg' => 'A success message.',
-        ]
+        ],
+        ai_examples: [
+            "if the request is 'save the SOC Operator analysis for 192.168.0.242 as a note', the input should be {\"note\":\"...\",\"subject\":\"Analysis of 192.168.0.242\"}",
+            "if the request is 'save a note: the server is down', the input should be {\"note\":\"the server is down\"}",
+        ],
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function create(JsonRpcRequest $request): array
     {

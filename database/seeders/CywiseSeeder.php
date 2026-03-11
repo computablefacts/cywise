@@ -681,6 +681,7 @@ class CywiseSeeder extends Seeder
             'idox@listDocuments',
             'idox@workspaces',
             'leaks@list',
+            'notes@create',
             'scheduled-tasks@create',
             'scheduled-tasks@list',
             'scheduled-tasks@toggle',
