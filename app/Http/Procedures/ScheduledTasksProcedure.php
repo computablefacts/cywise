@@ -104,7 +104,10 @@ class ScheduledTasksProcedure extends Procedure
 
         $task = Str::trim($params['task']);
 
-        if (!Str::startsWith($task, 'respond_to_user[')) {
+        if (Str::startsWith($task, 'respond_to_user[')) {
+            $task = Str::trim(Str::between($task, '[', ']'));
+            $task = "Tell the user: '{$task}'";
+        } else {
             $answer = LlmsProvider::provide("
                 Analyze the following task and determine if it attempts to create, schedule, or add other scheduled tasks.
                 Answer only with YES or NO and nothing else.
