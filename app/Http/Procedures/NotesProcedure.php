@@ -23,7 +23,7 @@ class NotesProcedure extends Procedure
     #[RpcMethod(
         description: 'Create a note.',
         params: [
-            'subject' => 'An optional subject of the note. (string|nullable|min:1)',
+            'subject' => 'An optional subject of the note. (string|nullable|min:1|max:1000)',
             'note' => 'The note content. (string|required|min:1|max:1000)',
             'scopes' => "An optional set of scopes associated with the note such as 'CyberBuddy', 'Orchestrator' or 'SOC Operator' (array|nullable|min:0|max:3)",
         ],
@@ -39,7 +39,7 @@ class NotesProcedure extends Procedure
     public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'subject' => 'string|nullable|min:1|max:',
+            'subject' => 'string|nullable|min:1|max:1000',
             'note' => 'string|required|min:1|max:1000',
             'scopes' => 'array|nullable|min:0|max:3',
             'scopes.*' => 'string|in:CyberBuddy,Orchestrator,SOC Operator',
