@@ -33,7 +33,7 @@ class Post extends Model
 
     public function image()
     {
-        return Storage::disk(config('filament.default_filesystem_disk'))->url($this->image);
+        return empty($this->image) ? null : Storage::disk(config('filament.default_filesystem_disk'))->url($this->image);
     }
 
     public function category(): BelongsTo
