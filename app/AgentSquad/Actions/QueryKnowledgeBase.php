@@ -33,7 +33,7 @@ class QueryKnowledgeBase extends AbstractAction
             "type" => "function",
             "function" => [
                 "name" => "query_knowledge_base",
-                "description" => "Answer questions by querying the user's documents (PDF, DOCX, WAV, etc.). The action's input must use the same language as the user's input: if the user asks their question in French, the input must be in French; if they ask in English, the input must be in English.",
+                "description" => "Retrieve answers by searching the organization's internal knowledge base—including documents such as PDFs, Word files (DOCX) and audio recordings (WAV, MP3) to quickly locate relevant rules, security policies, procedures, or other institutional information. The action's input must use the same language as the user's input: if the user asks their question in French, the input must be in French; if they ask in English, the input must be in English.",
                 "parameters" => [
                     "type" => "object",
                     "properties" => [
