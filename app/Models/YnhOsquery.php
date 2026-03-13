@@ -457,6 +457,15 @@ class YnhOsquery extends Model
                 if ($this->isRemoved()) {
                     $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} ({$type}) a été désinstallé.";
                 }
+            } else {
+                $msg = isset($this->columns['text']) ? $this->columns['text'] : "Un événement de type {$this->name} est arrivé.";
+                $msg = isset($this->columns['text'])
+                    ? $this->columns['text']
+                    : "Un événement de type {$this->name} est arrivé. Champs disponibles : " . implode(', ', array_map(
+                        fn($k, $v) => "$k=$v",
+                        array_keys($this->columns),
+                        $this->columns
+                    ));
             }
         }
         return $msg;
