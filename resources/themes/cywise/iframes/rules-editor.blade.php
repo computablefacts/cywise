@@ -105,7 +105,7 @@
   const editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/sql");
-  editor.setValue(@json($rule->query ?? ''));
+  editor.setValue(@json($rule->query ?? 'SELECT * FROM processes WHERE 1==0;'));
 
   const btnDelete = document.querySelector('#delete-rule');
   const btnCreate = document.querySelector('#create-rule');

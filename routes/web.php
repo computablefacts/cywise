@@ -266,11 +266,31 @@ Route::post('/logalert/{secret}', function (string $secret, \Illuminate\Http\Req
         $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
         if (! $server) {
-            return new JsonResponse([
-                'status' => 'failure',
-                'message' => 'server not found',
-                'payload' => $payload,
-            ], 200, ['Access-Control-Allow-Origin' => '*']);
+            $apiToken = \Wave\ApiKey::query()->where('key', '=', $secret)->first();
+
+            if (! $apiToken) {
+                return new JsonResponse([
+                    'status' => 'failure',
+                    'message' => 'server not found',
+                    'payload' => $payload,
+                ], 200, ['Access-Control-Allow-Origin' => '*']);
+            }
+
+            /** @var \App\Models\User $user */
+            $user = $apiToken->user()->first();
+            $user->actAs();
+
+            $server = \App\Models\YnhServer::where('name', $payload['hostname'])
+                ->where('created_by', $user->id)
+                ->first();
+
+            if (! $server) {
+                return new JsonResponse([
+                    'status' => 'failure',
+                    'message' => 'server not found',
+                    'payload' => $payload,
+                ], 200, ['Access-Control-Allow-Origin' => '*']);
+            }
         }
 
         $events = collect($request->input('lines'))
