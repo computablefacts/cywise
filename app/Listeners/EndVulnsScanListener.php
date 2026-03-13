@@ -194,6 +194,11 @@ class EndVulnsScanListener extends AbstractListener
                         'flarum_slug' => null, // TODO : remove?
                     ]);
 
+                    // Cache translations
+                    $a->translated('title');
+                    $a->translated('vulnerability');
+                    $a->translated('remediation');
+
                     if ($a->isHigh()) {
 
                         /** @var Asset $asset */
@@ -201,15 +206,9 @@ class EndVulnsScanListener extends AbstractListener
                         $users = User::where('tenant_id', $asset->createdBy->tenant_id)->get();
 
                         foreach ($users as $u) {
-                            $u->notify(new Notification($a->vulnerability, "{$asset->asset} > {$a->title}"));
+                            $u->notify(new Notification("{$asset->asset} ({$port->ip}) - {$a->translated('title')}"));
                         }
                     }
-
-                    // Cache translations
-                    $a->translated('title');
-                    $a->translated('vulnerability');
-                    $a->translated('remediation');
-
                 } catch (\Exception $exception) {
                     Log::error($exception);
                     Log::error($alert);
