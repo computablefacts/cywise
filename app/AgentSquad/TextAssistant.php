@@ -20,6 +20,24 @@ class TextAssistant
         return new TextAssistant();
     }
 
+    public function withTimeout(int $timeoutInSeconds): TextAssistant
+    {
+        $this->timeoutInSeconds = $timeoutInSeconds <= 0 ? 60 : $timeoutInSeconds;
+        return $this;
+    }
+
+    public function withDeepInfra(string $model): TextAssistant
+    {
+        return $this->withProvider('deepinfra', $model);
+    }
+
+    public function withProvider(string $provider, string $model): TextAssistant
+    {
+        $this->provider = $provider;
+        $this->model = $model;
+        return $this;
+    }
+
     public function withMessagesAndPrompt(array $messages, string $prompt, array $variables = []): TextAssistant
     {
         $messages[] = [
@@ -43,24 +61,6 @@ class TextAssistant
     public function withRawPrompt(string $prompt): TextAssistant
     {
         $this->messages = $prompt;
-        return $this;
-    }
-
-    public function withTimeout(int $timeoutInSeconds): TextAssistant
-    {
-        $this->timeoutInSeconds = $timeoutInSeconds <= 0 ? 60 : $timeoutInSeconds;
-        return $this;
-    }
-
-    public function withDeepInfra(string $model)
-    {
-        return $this->withProvider('deepinfra', $model);
-    }
-
-    public function withProvider(string $provider, string $model): TextAssistant
-    {
-        $this->provider = $provider;
-        $this->model = $model;
         return $this;
     }
 
