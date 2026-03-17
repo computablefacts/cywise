@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Log;
 class ChunkAssistant
 {
     private string $chunk;
-    private string $provider = 'deepinfra';
-    private string $model = 'BAAI/bge-m3-multi';
     private int $timeoutInSeconds = 60;
     private LanguageEnum $lang = LanguageEnum::FRENCH;
 
@@ -23,18 +21,6 @@ class ChunkAssistant
     public function withTimeout(int $timeoutInSeconds): ChunkAssistant
     {
         $this->timeoutInSeconds = $timeoutInSeconds <= 0 ? 60 : $timeoutInSeconds;
-        return $this;
-    }
-
-    public function withDeepInfra(string $model): ChunkAssistant
-    {
-        return $this->withProvider('deepinfra', $model);
-    }
-
-    public function withProvider(string $provider, string $model): ChunkAssistant
-    {
-        $this->provider = $provider;
-        $this->model = $model;
         return $this;
     }
 
@@ -71,7 +57,7 @@ class ChunkAssistant
                     'TEXT' => $this->chunk,
                     'LANG' => $lang->value,
                 ])
-                ->withDeepInfra('meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo')
+                ->withDeepInfraModel('meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo')
                 ->text();
 
             if ($answer === '') {
@@ -119,12 +105,8 @@ class ChunkAssistant
         $key = 'embeddings_provider_' . md5($this->chunk);
 
         return \Cache::remember($key, now()->addDays(7), function () use ($metadata) {
-            if ($this->provider === 'deepinfra') {
-                $embedding = $this->callDeepInfra()['data'][0]['embedding'] ?? [];
-                return empty($embedding) ? null : new Vector($this->chunk, $embedding, $metadata);
-            }
-            Log::error('ChunkAssistant uses an unknown provider: ' . $this->provider);
-            return null;
+            $embedding = $this->callDeepInfra()['data'][0]['embedding'] ?? [];
+            return empty($embedding) ? null : new Vector($this->chunk, $embedding, $metadata);
         });
     }
 
@@ -140,7 +122,7 @@ class ChunkAssistant
             ])
                 ->timeout($this->timeoutInSeconds)
                 ->post($url, [
-                    'model' => $this->model,
+                    'model' => 'BAAI/bge-m3-multi',
                     'input' => $this->chunk,
                     'encoding_format' => 'float',
                 ]);

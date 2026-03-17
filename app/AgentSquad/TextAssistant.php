@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 
 class TextAssistant
 {
-    private string $provider = 'deepinfra';
     private string $model = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
     private int $timeoutInSeconds = 60;
     private string|array|null $messages = null;
@@ -26,14 +25,8 @@ class TextAssistant
         return $this;
     }
 
-    public function withDeepInfra(string $model): TextAssistant
+    public function withDeepInfraModel(string $model): TextAssistant
     {
-        return $this->withProvider('deepinfra', $model);
-    }
-
-    public function withProvider(string $provider, string $model): TextAssistant
-    {
-        $this->provider = $provider;
         $this->model = $model;
         return $this;
     }
@@ -74,17 +67,13 @@ class TextAssistant
         } else if (is_array($this->messages)) {
             $messages = $this->messages;
         } else {
-            Log::error('TextAssistant messages must be a string or an array');
+            Log::error('TextAssistant messages must be either a string or an array');
             return '';
         }
-        if ($this->provider === 'deepinfra') {
-            $response = $this->callDeepInfra($messages);
-            $answer = $response['choices'][0]['message']['content'] ?? '';
-            $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
-            return Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
-        }
-        Log::error('TextAssistant uses an unknown provider: ' . $this->provider);
-        return '';
+        $response = $this->callDeepInfra($messages);
+        $answer = $response['choices'][0]['message']['content'] ?? '';
+        $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
+        return Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
     }
 
     public function structured(): object

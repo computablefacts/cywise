@@ -59,7 +59,7 @@ The action's input must always be in French, regardless of the user's language.
         $tocs = \File::get("{$this->dir}/tocs.txt");
         $answer = TextAssistant::use()
             ->withTimeout(30 * 60)
-            ->withDeepInfra('google/gemini-2.5-flash')
+            ->withDeepInfraModel('google/gemini-2.5-flash')
             ->withRawPrompt("
                 En te basant sur les exemples (entre [TOCS] et [/TOCS]) de tables des matières (entre [TOC] et [/TOC]) propose moi une table des matières pour le contexte (entre [CTX] et [/CTX]) ci-dessous.
                 Renvoie uniquement la table des matières sans commentaires additionnels.
@@ -93,7 +93,7 @@ The action's input must always be in French, regardless of the user's language.
         $arguments = "[ARGS]\n" . implode("\n", array_map(fn(string $section) => "[ARG]\n{$section}\n[/ARG]", $sections)) . "\n[/ARGS]";
         $answer = TextAssistant::use()
             ->withTimeout(30 * 60)
-            ->withDeepInfra('google/gemini-2.5-flash')
+            ->withDeepInfraModel('google/gemini-2.5-flash')
             ->withRawPrompt("
                 En te basant sur les exemples (entre [ARGS] et [/ARGS]) d'argumentaires propose pour chaque entrée de la table des matières (entre [TOC] et [/TOC]) un argumentaire tenant compte du contexte (entre [CTX] et [/CTX]) ci-dessous.
                 Lorsque tu réutilises un argument, vérifie que les faits du contexte suffisent pour rendre celui-ci opérant.

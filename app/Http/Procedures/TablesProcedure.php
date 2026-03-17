@@ -2,7 +2,7 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\Providers\SqlQueriesProvider;
+use App\AgentSquad\SqlAssistant;
 use App\Enums\StorageType;
 use App\Events\ImportVirtualTable;
 use App\Helpers\ClickhouseClient;
@@ -192,7 +192,7 @@ class TablesProcedure extends Procedure
                 ];
             }
 
-            $tableName = SqlQueriesProvider::normalizeTableName($name);
+            $tableName = SqlAssistant::normalizeTableName($name);
             /** @var Table $tbl */
             $tbl = Table::updateOrCreate([
                 'name' => $tableName,
@@ -360,8 +360,10 @@ class TablesProcedure extends Procedure
             'prompt' => 'required|string|min:1|max:5000',
         ]);
 
-        $prompt = $params['prompt'];
-        $query = SqlQueriesProvider::provide(Table::all(), $prompt);
+        $query = SqlAssistant::use()
+            ->withTables(Table::all())
+            ->withAnalyticalQuestion($params['prompt'])
+            ->sql();
 
         if (empty($query)) {
             throw new \Exception('The query generation has failed.');
