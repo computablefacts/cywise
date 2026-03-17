@@ -12,7 +12,6 @@ class TextAssistant
     private string $model = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
     private int $timeoutInSeconds = 60;
     private string|array|null $messages = null;
-    private string|array|null $response = null;
 
     public static function use(): TextAssistant
     {
@@ -65,17 +64,11 @@ class TextAssistant
 
     public function text(): string
     {
-        if (empty($this->response)) {
-            $this->response = LlmsProvider::provide($this->messages, $this->model, $this->timeoutInSeconds);
-        }
-        return $this->response ?? '';
+        return LlmsProvider::provide($this->messages, $this->model, $this->timeoutInSeconds);
     }
 
     public function structured(): object
     {
-        if (empty($this->response)) {
-            $this->response = LlmsProvider::provideJson($this->messages, $this->model, $this->timeoutInSeconds);
-        }
-        return $this->response ?? (object)[];
+        return LlmsProvider::provideJson($this->messages, $this->model, $this->timeoutInSeconds);
     }
 }
