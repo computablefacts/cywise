@@ -73,7 +73,11 @@ class ProcessIncomingEmails implements ShouldQueue
                     ];
                 } else {
                     try {
-                        $content = WebpagesProvider::isHyperlink($url) ? WebpagesProvider::provide($url) : $url;
+                        $content = WebpagesProvider::isHyperlink($url) ?
+                            WebpagesProvider::use()
+                                ->withUrl($url)
+                                ->provide() :
+                            $url;
                         $summary = TextAssistant::use()
                             ->withRawPrompt(Str::replace('[TEXT]', $content, $prompt))
                             ->text();
