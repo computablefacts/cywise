@@ -5,6 +5,7 @@ namespace App\AgentSquad\Providers;
 use App\AgentSquad\TextAssistant;
 use Illuminate\Support\Facades\Log;
 
+/** @deprecated */
 class HypotheticalQuestionsProvider extends AbstractProvider
 {
     public static function provide(string $language, string $text, string $prompt = 'default_hypothetical_questions'): array

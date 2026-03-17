@@ -2,7 +2,8 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
+use App\AgentSquad\ChunkAssistant;
+use App\Enums\LanguageEnum;
 use App\Models\Chunk;
 use App\Models\Collection;
 use App\Models\File;
@@ -53,7 +54,10 @@ class EmbedChunks implements ShouldQueue
                         foreach ($chunks as $chunk) {
 
                             $lang = $chunk->language();
-                            $questions = HypotheticalQuestionsProvider::provide($lang, $chunk->text);
+                            $questions = ChunkAssistant::use()
+                                ->withLang(LanguageEnum::tryFrom($lang) ?? LanguageEnum::FRENCH)
+                                ->withChunk($chunk->text)
+                                ->hypotheticalQuestions();
 
                             foreach ($questions as $question) {
                                 if (Vector::isSupportedByMariaDb()) {
