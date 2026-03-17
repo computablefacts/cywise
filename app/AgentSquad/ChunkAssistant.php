@@ -36,10 +36,10 @@ class ChunkAssistant
 
     public function embedding(array $metadata = []): array
     {
-        return $this->embed($metadata)?->embedding() ?? [];
+        return $this->vector($metadata)?->embedding() ?? [];
     }
 
-    public function embed(array $metadata = []): ?Vector
+    public function vector(array $metadata = []): ?Vector
     {
         return EmbeddingsProvider::provide($this->chunk, $metadata);
     }

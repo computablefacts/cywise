@@ -44,7 +44,7 @@ class PrepareRowdenDataset extends Command
                     $source = $item['sourceURL'];
                     $vector = ChunkAssistant::use()
                         ->withChunk($question)
-                        ->embed([
+                        ->vector([
                             'answer' => $answer,
                             'source' => $source,
                         ]);

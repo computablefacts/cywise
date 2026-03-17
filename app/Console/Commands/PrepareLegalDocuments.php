@@ -201,12 +201,12 @@ class PrepareLegalDocuments extends Command
 
         foreach ($sections as $section => $subsections) {
 
-            $vector = ChunkAssistant::use()->withChunk($section)->embed([$section => $subsections]);
+            $vector = ChunkAssistant::use()->withChunk($section)->vector([$section => $subsections]);
             $vectors->addVector($vector);
 
             foreach ($subsections as $subsection => $lines) {
                 foreach ($lines as $line) {
-                    $vector = ChunkAssistant::use()->withChunk($line)->embed([$section => $subsections]);
+                    $vector = ChunkAssistant::use()->withChunk($line)->vector([$section => $subsections]);
                     $vectors->addVector($vector);
                 }
             }

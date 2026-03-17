@@ -70,7 +70,7 @@ The action's input must always be in French, regardless of the user's language.
             ->text();
 
         // Find similar arguments in the historical data and generate a list of arguments for each entry of the table of contents
-        $vector = ChunkAssistant::use()->withChunk($input)->embed();
+        $vector = ChunkAssistant::use()->withChunk($input)->vector();
         $sections = array_unique(array_map(function (array $vector) {
 
             /** @var Vector $vec */
