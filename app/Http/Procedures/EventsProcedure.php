@@ -261,13 +261,15 @@ class EventsProcedure extends Procedure
         }
 
         $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
-        $memos = MemosProvider::provide($user, NotesProcedure::SCOPE_IS_SOC_OPERATOR);
         $result = TextAssistant::use()
             ->withPrompt('default_soc_operator', [
                 'SERVER_NAME' => $server->name,
                 'SERVER_IP_ADDRESS' => $server->ip(),
                 'LOGS' => $logs,
-                'MEMOS' => $memos,
+                'MEMOS' => MemosProvider::use()
+                    ->withScope(NotesProcedure::SCOPE_IS_SOC_OPERATOR)
+                    ->withUser($user)
+                    ->provide(),
             ])
             ->structured();
         /** @var string $answer */

@@ -148,7 +148,12 @@ class QueryKnowledgeBase extends AbstractAction
         }
 
         // Fill context & answer question
-        $memos = empty($collection) ? MemosProvider::provide($user, NotesProcedure::SCOPE_IS_CYBERBUDDY) : '';
+        $memos = empty($collection) ?
+            MemosProvider::use()
+                ->withScope(NotesProcedure::SCOPE_IS_CYBERBUDDY)
+                ->withUser($user)
+                ->provide() :
+            '';
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
         $answer = TextAssistant::use()
             ->withMessagesAndPrompt($messages, 'default_answer_question', [
