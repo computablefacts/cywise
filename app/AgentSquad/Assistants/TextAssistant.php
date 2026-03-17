@@ -35,7 +35,10 @@ class TextAssistant
     {
         $messages[] = [
             'role' => RoleEnum::USER->value,
-            'content' => PromptsProvider::provide($prompt, $variables),
+            'content' => PromptsProvider::use()
+                ->withName($prompt)
+                ->withVariables($variables)
+                ->provide(),
         ];
         return $this->withMessages($messages);
     }
@@ -48,7 +51,12 @@ class TextAssistant
 
     public function withPrompt(string $prompt, array $variables = []): TextAssistant
     {
-        return $this->withRawPrompt(PromptsProvider::provide($prompt, $variables));
+        return $this->withRawPrompt(
+            PromptsProvider::use()
+                ->withName($prompt)
+                ->withVariables($variables)
+                ->provide()
+        );
     }
 
     public function withRawPrompt(string $prompt): TextAssistant
