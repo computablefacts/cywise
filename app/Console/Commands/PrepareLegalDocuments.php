@@ -107,7 +107,7 @@ class PrepareLegalDocuments extends Command
             $content = \File::get($txt);
             $answer = TextAssistant::use()
                 ->withTimeout(30 * 60)
-                ->withDeepInfra('google/gemini-2.5-flash')
+                ->withDeepInfraModel('google/gemini-2.5-flash')
                 ->withRawPrompt("
                     Extrait de ce document en français tous les titres de sections et de sous-sections. 
                     Remplace les noms de personnes par 'XXX', les noms de sociétés par 'YYY' et les noms de rues, de boulevards, d'avenues et de villes par 'ZZZ'.
@@ -132,7 +132,7 @@ class PrepareLegalDocuments extends Command
             $content = \File::get($txt);
             $answer = TextAssistant::use()
                 ->withTimeout(30 * 60)
-                ->withDeepInfra('google/gemini-2.5-flash')
+                ->withDeepInfraModel('google/gemini-2.5-flash')
                 ->withRawPrompt("
                     Extrait les faits, les textes de lois ainsi que la jurisprudence utilisée pour chaque demande de la partie adverse du document de conclusions juridiques entre [CONCL] et [/CONCL]. 
                     Remplace les noms de personnes par 'XXX', les noms de sociétés par 'YYY' et les noms de rues, de boulevards, d'avenues et de ville par 'ZZZ'.

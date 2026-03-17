@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\AgentSquad\Providers\SqlQueriesProvider;
+use App\AgentSquad\SqlAssistant;
 use App\Events\ImportVirtualTable;
 use App\Helpers\ClickhouseClient;
 use App\Models\Table;
@@ -27,7 +27,7 @@ class ImportVirtualTableListener extends AbstractListener
         $user->actAs(); // otherwise the tenant will not be properly set
         $user->notify(new Notification(__("Import of table :table started.", ['table' => $table])));
 
-        $tableName = SqlQueriesProvider::normalizeTableName($table);
+        $tableName = SqlAssistant::normalizeTableName($table);
         /** @var Table $tbl */
         $tbl = Table::updateOrCreate([
             'name' => $tableName,
