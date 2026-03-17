@@ -9,7 +9,6 @@ use App\AgentSquad\Answers\SuccessfulAnswer;
 use App\AgentSquad\Assistants\ChunkAssistant;
 use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\ChunksProvider;
-use App\AgentSquad\Providers\ChunksProvider2;
 use App\AgentSquad\Providers\MemosProvider;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
@@ -168,27 +167,37 @@ class QueryKnowledgeBase extends AbstractAction
     private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): string
     {
         $start = microtime(true);
-        $fullTextSearchEn = $this->fullTextSearch($user, 'en', $keywordsEn, $collection);
-        $fullTextSearchFr = $this->fullTextSearch($user, 'fr', $keywordsFr, $collection);
+
+        $chunksEn = ChunksProvider::use()
+            ->withLang(LanguageEnum::ENGLISH)
+            ->withCollections($this->englishCollections($collection))
+            ->withKeywords($keywordsEn)
+            ->withText($questionEn)
+            ->withLimit(20)
+            ->provide();
+
         $stop = microtime(true);
-        $nbResults = $fullTextSearchEn->count() + $fullTextSearchFr->count();
-        Log::debug("[LOAD_CHUNKS] Full-text search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+        Log::debug("[LOAD_CHUNKS] Search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunksEn->count()} results");
         $start = microtime(true);
-        $vectorSearchEn = $this->vectorSearch($user, 'en', $questionEn, $collection);
-        $vectorSearchFr = $this->vectorSearch($user, 'fr', $questionFr, $collection);
+
+        $chunksFr = ChunksProvider::use()
+            ->withLang(LanguageEnum::FRENCH)
+            ->withCollections($this->frenchCollections($collection))
+            ->withKeywords($keywordsFr)
+            ->withText($questionFr)
+            ->withLimit(20)
+            ->provide();
+
         $stop = microtime(true);
-        $nbResults = $vectorSearchEn->count() + $vectorSearchFr->count();
-        Log::debug("[LOAD_CHUNKS] Vector search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+        Log::debug("[LOAD_CHUNKS] Search for '{$questionFr}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunksFr->count()} results");
         $start = microtime(true);
-        $chunks = $fullTextSearchEn
-            ->merge($fullTextSearchFr)
-            ->merge($vectorSearchEn)
-            ->merge($vectorSearchFr)
+
+        $chunks = $chunksEn
+            ->merge($chunksFr)
             ->groupBy(fn(Chunk $chunk) => $chunk->text)
             ->map(fn(Collection $group) => $group->sortByDesc('_score')->first()) // the higher the better
             ->values() // associative array => array
             ->sortByDesc('_score')
-            ->sortBy('priority')
             ->take(20)
             ->map(function (Chunk $chunk) {
 
@@ -204,41 +213,10 @@ class QueryKnowledgeBase extends AbstractAction
 
                 return "## Note {$chunk->id}\n\n{$text}\n\n**Tags:** {$tags}\n**Score:** {$chunk->{'_score'}}";
             });
+
         $stop = microtime(true);
         Log::debug("[LOAD_CHUNKS] Loading chunks for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
         return $chunks->join("\n\n");
-    }
-
-    /** @return Collection<Chunk> */
-    private function fullTextSearch(User $user, string $lang, array $input, ?string $collection = null): Collection
-    {
-        /** @var array<string> $keywords */
-        $keywords = $this->combine($input, 5);
-        /** @var Collection<Chunk> $chunks */
-        $chunks = collect();
-        foreach ($keywords as $k) {
-            if ($lang === 'en') {
-                $chunkz = ChunksProvider::provide($this->englishCollections($collection), 'en', $k, 5);
-            } else if ($lang === 'fr') {
-                $chunkz = ChunksProvider::provide($this->frenchCollections($collection), 'fr', $k, 5);
-            } else {
-                $chunkz = collect();
-            }
-            $chunks = $chunks->merge($chunkz);
-        }
-        return $chunks;
-    }
-
-    /** @return Collection<Chunk> */
-    private function vectorSearch(User $user, string $lang, string $input, ?string $collection = null): Collection
-    {
-        if ($lang === 'en') {
-            return ChunksProvider2::provide($this->englishCollections($collection), 'en', $input, 4);
-        }
-        if ($lang === 'fr') {
-            return ChunksProvider2::provide($this->frenchCollections($collection), 'fr', $input, 4);
-        }
-        return collect();
     }
 
     private function englishCollections(?string $collection = null): Collection
@@ -267,35 +245,6 @@ class QueryKnowledgeBase extends AbstractAction
             ->orderBy('cb_collections.priority')
             ->orderBy('cb_collections.name')
             ->get();
-    }
-
-    private function combine(array $arrays, int $sample = -1): array
-    {
-        if (empty($arrays)) {
-            return [];
-        }
-
-        /** @var array<array<string>> $combinations */
-        $combinations = array_map(fn(string $word) => [$word], $arrays[0]);
-
-        for ($i = 1; $i < count($arrays); $i++) {
-
-            /** @var array<string> $cur */
-            $cur = $arrays[$i];
-            $new = [];
-
-            foreach ($combinations as $existing) {
-                foreach ($cur as $word) {
-                    $new[] = array_merge($existing, [$word]);
-                }
-            }
-            $combinations = $new;
-        }
-        if ($sample > 0) {
-            shuffle($combinations);
-            $combinations = array_slice($combinations, 0, min(count($combinations), $sample));
-        }
-        return array_map(fn(array $combination) => implode(" ", $combination), $combinations);
     }
 
     private function enhanceWithSources(string $answer): string
