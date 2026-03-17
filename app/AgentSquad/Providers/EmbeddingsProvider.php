@@ -6,6 +6,7 @@ use App\AgentSquad\Vectors\Vector;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/** @deprecated */
 class EmbeddingsProvider extends AbstractProvider
 {
     public static function provide(string $text, array $metadata = []): ?Vector

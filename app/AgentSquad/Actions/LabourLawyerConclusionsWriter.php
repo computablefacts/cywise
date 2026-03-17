@@ -6,8 +6,8 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
+use App\AgentSquad\ChunkAssistant;
 use App\AgentSquad\TextAssistant;
-use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Vectors\AbstractVectorStore;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
@@ -70,7 +70,7 @@ The action's input must always be in French, regardless of the user's language.
             ->text();
 
         // Find similar arguments in the historical data and generate a list of arguments for each entry of the table of contents
-        $vector = EmbeddingsProvider::provide($input);
+        $vector = ChunkAssistant::use()->withChunk($input)->embed();
         $sections = array_unique(array_map(function (array $vector) {
 
             /** @var Vector $vec */

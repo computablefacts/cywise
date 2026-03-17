@@ -2,6 +2,7 @@
 
 namespace App\AgentSquad\Providers;
 
+use App\AgentSquad\ChunkAssistant;
 use App\AgentSquad\TextAssistant;
 use Illuminate\Support\Facades\Log;
 
@@ -26,7 +27,9 @@ class HypotheticalQuestionsProvider extends AbstractProvider
                 $questions = array_map(fn(string $question) => [
                     'question' => $question,
                     'language' => $language,
-                    'embedding' => EmbeddingsProvider::provide($question)->embedding(),
+                    'embedding' => ChunkAssistant::use()
+                        ->withChunk($question)
+                        ->embedding(),
                 ], $questions);
             } catch (\Exception $e) {
                 Log::error($e->getMessage());

@@ -6,13 +6,14 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\AgentSquad\TextAssistant;
+use App\AgentSquad\ChunkAssistant;
 use App\AgentSquad\Providers\ChunksProvider;
 use App\AgentSquad\Providers\ChunksProvider2;
-use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\MemosProvider;
+use App\AgentSquad\TextAssistant;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
+use App\Enums\LanguageEnum;
 use App\Http\Procedures\NotesProcedure;
 use App\Models\Chunk;
 use App\Models\ChunkTag;
@@ -94,7 +95,10 @@ class QueryKnowledgeBase extends AbstractAction
 
         if (!empty($json['question_fr'] ?? '')) {
 
-            $embedding = EmbeddingsProvider::provide($json['question_fr'] ?? '')?->embedding() ?? [];
+            $embedding = ChunkAssistant::use()
+                ->withLang(LanguageEnum::FRENCH)
+                ->withChunk($json['question_fr'] ?? '')
+                ->embedding();
 
             if (!empty($embedding)) {
                 $start = microtime(true);
@@ -119,7 +123,10 @@ class QueryKnowledgeBase extends AbstractAction
 
         if (!empty($json['question_en'] ?? '')) {
 
-            $embedding = EmbeddingsProvider::provide($json['question_en'] ?? '')?->embedding() ?? [];
+            $embedding = ChunkAssistant::use()
+                ->withLang(LanguageEnum::ENGLISH)
+                ->withChunk($json['question_en'] ?? '')
+                ->embedding();
 
             if (!empty($embedding)) {
                 $start = microtime(true);

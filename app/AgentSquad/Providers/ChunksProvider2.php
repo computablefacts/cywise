@@ -2,6 +2,7 @@
 
 namespace App\AgentSquad\Providers;
 
+use App\AgentSquad\ChunkAssistant;
 use App\AgentSquad\Vectors\MemoryVectorStore;
 use App\Models\Chunk;
 use App\Models\Vector;
@@ -23,7 +24,7 @@ class ChunksProvider2 extends AbstractProvider
 
             try {
                 if (Vector::isSupportedByMariaDb()) {
-                    $embedding = json_encode(EmbeddingsProvider::provide($input)?->embedding() ?? []);
+                    $embedding = json_encode(ChunkAssistant::use()->withChunk($input)->embedding());
                     $chunks = collect(DB::select("
                         SELECT DISTINCT
                           chunk_id, 
@@ -40,7 +41,7 @@ class ChunksProvider2 extends AbstractProvider
                         return $chunk;
                     });
                 } else {
-                    $embedding = EmbeddingsProvider::provide($input)?->embedding() ?? [];
+                    $embedding = ChunkAssistant::use()->withChunk($input)->embedding();
                     $vectorStore = new MemoryVectorStore($take);
                     $vectorStore->addVectors(collect(DB::select("
                         SELECT DISTINCT *
