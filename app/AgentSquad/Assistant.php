@@ -21,12 +21,11 @@ class Assistant
 
     public function withMessagesAndPrompt(array $messages, string $prompt, array $variables = []): Assistant
     {
-        $this->messages = $messages;
-        $this->messages[] = [
+        $messages[] = [
             'role' => RoleEnum::USER->value,
             'content' => PromptsProvider::provide($prompt, $variables),
         ];
-        return $this;
+        return $this->withMessages($messages);
     }
 
     public function withMessages(array $messages): Assistant
