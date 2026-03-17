@@ -36,13 +36,10 @@ class PromptsProvider
             $request->setUserResolver(fn() => auth()->user());
             $prompt = (new PromptsProcedure())->get($request)['prompt'];
             $prompt = $prompt ? $prompt->template : '';
-
             foreach ($this->variables as $key => $value) {
                 $prompt = Str::replace('{' . $key . '}', $value, $prompt);
             }
-
             return $prompt;
-
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
