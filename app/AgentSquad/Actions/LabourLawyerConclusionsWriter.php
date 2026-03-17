@@ -6,8 +6,8 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
+use App\AgentSquad\Assistant;
 use App\AgentSquad\Providers\EmbeddingsProvider;
-use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Vectors\AbstractVectorStore;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
@@ -57,14 +57,17 @@ The action's input must always be in French, regardless of the user's language.
     {
         // Build a table of contents from the context
         $tocs = \File::get("{$this->dir}/tocs.txt");
-        $prompt = "
-            En te basant sur les exemples (entre [TOCS] et [/TOCS]) de tables des matières (entre [TOC] et [/TOC]) propose moi une table des matières pour le contexte (entre [CTX] et [/CTX]) ci-dessous.
-            Renvoie uniquement la table des matières sans commentaires additionnels.
-            
-            [CTX]{$input}[/CTX]
-            {$tocs}
-        ";
-        $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 30 * 60);
+        $answer = Assistant::use()
+            ->withTimeout(30 * 60)
+            ->withDeepInfra('google/gemini-2.5-flash')
+            ->withRawPrompt("
+                En te basant sur les exemples (entre [TOCS] et [/TOCS]) de tables des matières (entre [TOC] et [/TOC]) propose moi une table des matières pour le contexte (entre [CTX] et [/CTX]) ci-dessous.
+                Renvoie uniquement la table des matières sans commentaires additionnels.
+                
+                [CTX]{$input}[/CTX]
+                {$tocs}
+            ")
+            ->text();
 
         // Find similar arguments in the historical data and generate a list of arguments for each entry of the table of contents
         $vector = EmbeddingsProvider::provide($input);
@@ -88,17 +91,20 @@ The action's input must always be in French, regardless of the user's language.
             return $text;
         }, $this->vectorStore->search($vector->embedding())));
         $arguments = "[ARGS]\n" . implode("\n", array_map(fn(string $section) => "[ARG]\n{$section}\n[/ARG]", $sections)) . "\n[/ARGS]";
-        $prompt = "
-            En te basant sur les exemples (entre [ARGS] et [/ARGS]) d'argumentaires propose pour chaque entrée de la table des matières (entre [TOC] et [/TOC]) un argumentaire tenant compte du contexte (entre [CTX] et [/CTX]) ci-dessous.
-            Lorsque tu réutilises un argument, vérifie que les faits du contexte suffisent pour rendre celui-ci opérant.
-            N'invente pas de textes de lois ni de jurisprudences.
-            Renvoie uniquement la table des matières augmentée de ton argumentaire détaillé.
-
-            [CTX]{$input}[/CTX]
-            [TOC]{$answer}[/TOC]
-            {$arguments}
-        ";
-        $answer = LlmsProvider::provide($prompt, 'google/gemini-2.5-flash', 30 * 60);
+        $answer = Assistant::use()
+            ->withTimeout(30 * 60)
+            ->withDeepInfra('google/gemini-2.5-flash')
+            ->withRawPrompt("
+                En te basant sur les exemples (entre [ARGS] et [/ARGS]) d'argumentaires propose pour chaque entrée de la table des matières (entre [TOC] et [/TOC]) un argumentaire tenant compte du contexte (entre [CTX] et [/CTX]) ci-dessous.
+                Lorsque tu réutilises un argument, vérifie que les faits du contexte suffisent pour rendre celui-ci opérant.
+                N'invente pas de textes de lois ni de jurisprudences.
+                Renvoie uniquement la table des matières augmentée de ton argumentaire détaillé.
+    
+                [CTX]{$input}[/CTX]
+                [TOC]{$answer}[/TOC]
+                {$arguments}
+            ")
+            ->text();
         $answer = collect(explode("\n", $answer))
             ->map(fn(string $line) => "{$line}\n")
             ->values()

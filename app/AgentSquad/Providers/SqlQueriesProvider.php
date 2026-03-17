@@ -2,6 +2,7 @@
 
 namespace App\AgentSquad\Providers;
 
+use App\AgentSquad\Assistant;
 use App\Models\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -22,19 +23,19 @@ class SqlQueriesProvider extends AbstractProvider
     {
         $before = microtime(true);
 
-        $prompt = PromptsProvider::provide('default_clickhouse_query_generation', [
-            'SCHEMA' => $tables
-                ->map(function (Table $table) {
-                    $columns = collect($table->schema)
-                        ->map(fn(array $column) => "- {$column['new_name']} ({$column['type']})")
-                        ->join("\n");
-                    return "Table: {$table->name}\nDescription: {$table->description}\nColonnes:\n{$columns}";
-                })
-                ->join("\n\n"),
-            'QUESTION' => $question,
-        ]);
-
-        $answer = LlmsProvider::provide($prompt);
+        $answer = Assistant::use()
+            ->withPrompt('default_clickhouse_query_generation', [
+                'SCHEMA' => $tables
+                    ->map(function (Table $table) {
+                        $columns = collect($table->schema)
+                            ->map(fn(array $column) => "- {$column['new_name']} ({$column['type']})")
+                            ->join("\n");
+                        return "Table: {$table->name}\nDescription: {$table->description}\nColonnes:\n{$columns}";
+                    })
+                    ->join("\n\n"),
+                'QUESTION' => $question,
+            ])
+            ->text();
 
         $after = microtime(true);
 

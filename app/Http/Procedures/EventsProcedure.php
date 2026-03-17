@@ -2,9 +2,8 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Assistant;
 use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\Providers\PromptsProvider;
 use App\AgentSquad\Providers\TranslationsProvider;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\YnhOsquery;
@@ -262,22 +261,20 @@ class EventsProcedure extends Procedure
 
         $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
         $memos = MemosProvider::provide($user, NotesProcedure::SCOPE_IS_SOC_OPERATOR);
-        $prompt = PromptsProvider::provide('default_soc_operator', [
-            'SERVER_NAME' => $server->name,
-            'SERVER_IP_ADDRESS' => $server->ip(),
-            'LOGS' => $logs,
-            'MEMOS' => $memos,
-        ]);
-        $result = LlmsProvider::provideJson($prompt);
+        $result = Assistant::use()
+            ->withPrompt('default_soc_operator', [
+                'SERVER_NAME' => $server->name,
+                'SERVER_IP_ADDRESS' => $server->ip(),
+                'LOGS' => $logs,
+                'MEMOS' => $memos,
+            ])
+            ->structured();
         /** @var string $answer */
         $answer = $result->raw;
         /** @var array $json */
         $json = $result->parsed;
 
-        Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): " . json_encode([
-                "prompt" => $prompt,
-                "answer" => $answer,
-            ]));
+        Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): {$answer}");
 
         if (empty($json)) {
             Log::error('Failed to parse SOC operator answer (json): ' . $answer);

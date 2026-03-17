@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Assistant;
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Conversation;
@@ -77,7 +77,9 @@ class RunScheduledTasks implements ShouldQueue
                 $condition = Str::trim($task->trigger);
 
                 if (!empty($condition)) {
-                    $answer = LlmsProvider::provide("Answer only with YES or NO and nothing else. Question: {$condition}");
+                    $answer = Assistant::use()
+                        ->withRawPrompt("Answer only with YES or NO and nothing else. Question: {$condition}")
+                        ->text();
                     $runTask = Str::contains($answer, ['oui', 'yes'], true);
                     Log::debug("[RunScheduledTasks] Condition evaluated for task {$task->id}: '{$condition}' => {$answer}");
                 }
@@ -93,9 +95,11 @@ class RunScheduledTasks implements ShouldQueue
                 } else {
                     $response = $this->ask($user, $threadId, $tsk);
                     $answer = $response['html'] ?? '';
-                    $summary = LlmsProvider::provide("Summarize this text in about 10 words :\n\n{$answer}");
-                    $user->notify(new Notification($answer));
-                    Log::debug("[RunScheduledTasks] Emailed result for task {$task->id} to {$user->email}");
+                    $summary = Assistant::use()
+                        ->withRawPrompt("Summarize this text in about 10 words :\n\n{$answer}")
+                        ->text();
+                    $user->notify(new Notification($summary));
+                    Log::debug("[RunScheduledTasks] Notified result for task {$task->id} to {$user->email}");
                     $task->last_email_sent_at = Carbon::now();
                     $ran = true;
                 }
