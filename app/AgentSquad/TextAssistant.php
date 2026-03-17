@@ -6,7 +6,7 @@ use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
 
-class Assistant
+class TextAssistant
 {
     private string $provider = 'deepinfra';
     private string $model = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
@@ -14,12 +14,12 @@ class Assistant
     private string|array|null $messages = null;
     private string|array|null $response = null;
 
-    public static function use(): Assistant
+    public static function use(): TextAssistant
     {
-        return new Assistant();
+        return new TextAssistant();
     }
 
-    public function withMessagesAndPrompt(array $messages, string $prompt, array $variables = []): Assistant
+    public function withMessagesAndPrompt(array $messages, string $prompt, array $variables = []): TextAssistant
     {
         $messages[] = [
             'role' => RoleEnum::USER->value,
@@ -28,24 +28,24 @@ class Assistant
         return $this->withMessages($messages);
     }
 
-    public function withMessages(array $messages): Assistant
+    public function withMessages(array $messages): TextAssistant
     {
         $this->messages = $messages;
         return $this;
     }
 
-    public function withPrompt(string $prompt, array $variables = []): Assistant
+    public function withPrompt(string $prompt, array $variables = []): TextAssistant
     {
         return $this->withRawPrompt(PromptsProvider::provide($prompt, $variables));
     }
 
-    public function withRawPrompt(string $prompt): Assistant
+    public function withRawPrompt(string $prompt): TextAssistant
     {
         $this->messages = $prompt;
         return $this;
     }
 
-    public function withTimeout(int $timeoutInSeconds): Assistant
+    public function withTimeout(int $timeoutInSeconds): TextAssistant
     {
         $this->timeoutInSeconds = $timeoutInSeconds <= 0 ? 60 : $timeoutInSeconds;
         return $this;
@@ -56,7 +56,7 @@ class Assistant
         return $this->withProvider('deepinfra', $model);
     }
 
-    public function withProvider(string $provider, string $model): Assistant
+    public function withProvider(string $provider, string $model): TextAssistant
     {
         $this->provider = $provider;
         $this->model = $model;

@@ -6,7 +6,7 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\AgentSquad\Providers\ChunksProvider;
 use App\AgentSquad\Providers\ChunksProvider2;
 use App\AgentSquad\Providers\EmbeddingsProvider;
@@ -65,7 +65,7 @@ class QueryKnowledgeBase extends AbstractAction
         }
 
         // Reformulate question in both english and french
-        $result = Assistant::use()
+        $result = TextAssistant::use()
             ->withTimeout(30 * 60)
             ->withMessagesAndPrompt($messages, 'default_reformulate_question', [
                 'QUESTION' => htmlspecialchars($input, ENT_QUOTES, 'UTF-8'),
@@ -144,7 +144,7 @@ class QueryKnowledgeBase extends AbstractAction
         // Fill context & answer question
         $memos = empty($collection) ? MemosProvider::provide($user, NotesProcedure::SCOPE_IS_CYBERBUDDY) : '';
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
-        $answer = Assistant::use()
+        $answer = TextAssistant::use()
             ->withMessagesAndPrompt($messages, 'default_answer_question', [
                 'LANGUAGE' => $json['lang'],
                 'NOTES' => $chunks . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),

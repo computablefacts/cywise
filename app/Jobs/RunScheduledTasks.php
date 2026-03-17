@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Conversation;
@@ -77,7 +77,7 @@ class RunScheduledTasks implements ShouldQueue
                 $condition = Str::trim($task->trigger);
 
                 if (!empty($condition)) {
-                    $answer = Assistant::use()
+                    $answer = TextAssistant::use()
                         ->withRawPrompt("Answer only with YES or NO and nothing else. Question: {$condition}")
                         ->text();
                     $runTask = Str::contains($answer, ['oui', 'yes'], true);
@@ -95,7 +95,7 @@ class RunScheduledTasks implements ShouldQueue
                 } else {
                     $response = $this->ask($user, $threadId, $tsk);
                     $answer = $response['html'] ?? '';
-                    $summary = Assistant::use()
+                    $summary = TextAssistant::use()
                         ->withRawPrompt("Summarize this text in about 10 words :\n\n{$answer}")
                         ->text();
                     $user->notify(new Notification($summary));

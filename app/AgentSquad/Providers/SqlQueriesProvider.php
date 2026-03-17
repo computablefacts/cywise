@@ -2,7 +2,7 @@
 
 namespace App\AgentSquad\Providers;
 
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\Models\Table;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -23,7 +23,7 @@ class SqlQueriesProvider extends AbstractProvider
     {
         $before = microtime(true);
 
-        $answer = Assistant::use()
+        $answer = TextAssistant::use()
             ->withPrompt('default_clickhouse_query_generation', [
                 'SCHEMA' => $tables
                     ->map(function (Table $table) {

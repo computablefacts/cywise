@@ -2,7 +2,7 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\AgentSquad\Providers\MemosProvider;
 use App\AgentSquad\Providers\TranslationsProvider;
 use App\Http\Requests\JsonRpcRequest;
@@ -261,7 +261,7 @@ class EventsProcedure extends Procedure
 
         $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
         $memos = MemosProvider::provide($user, NotesProcedure::SCOPE_IS_SOC_OPERATOR);
-        $result = Assistant::use()
+        $result = TextAssistant::use()
             ->withPrompt('default_soc_operator', [
                 'SERVER_NAME' => $server->name,
                 'SERVER_IP_ADDRESS' => $server->ip(),

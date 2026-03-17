@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\AgentSquad\Providers\WebpagesProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
@@ -72,7 +72,7 @@ class ProcessIncomingEmails implements ShouldQueue
                 } else {
                     try {
                         $content = WebpagesProvider::isHyperlink($url) ? WebpagesProvider::provide($url) : $url;
-                        $summary = Assistant::use()
+                        $summary = TextAssistant::use()
                             ->withRawPrompt(Str::replace('[TEXT]', $content, $prompt))
                             ->text();
                         $result[] = [
