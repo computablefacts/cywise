@@ -4,6 +4,7 @@ namespace App\AgentSquad;
 
 use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
+use App\AgentSquad\Providers\TranslationsProvider;
 use App\AgentSquad\Vectors\Vector;
 use App\Enums\LanguageEnum;
 
@@ -27,6 +28,13 @@ class ChunkAssistant
     {
         $this->lang = $lang;
         return $this;
+    }
+
+    // Translates a string from english to another language
+    public function translate(LanguageEnum $lang = LanguageEnum::FRENCH): string
+    {
+        // Here, the assumption is that $this->chunk is in english, e.g. $this->lang = LanguageEnum::ENGLISH, and $lang is the target language
+        return TranslationsProvider::provide($this->chunk, $lang);
     }
 
     public function hypotheticalQuestions(): array
