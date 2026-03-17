@@ -5,6 +5,7 @@ namespace App\AgentSquad\Providers;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/** @deprecated */
 class AudioToTextProvider extends AbstractProvider
 {
     public static function provide(string $url, string $lang = 'fr'): string

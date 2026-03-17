@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+/** @deprecated */
 class LlmsProvider extends AbstractProvider
 {
     public static function provideJson(string|array $messages, ?string $model = null, int $timeoutInSeconds = 60): object
