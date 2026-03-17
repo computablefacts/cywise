@@ -2,7 +2,9 @@
 
 namespace App\AgentSquad;
 
+use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
+use App\AgentSquad\Vectors\Vector;
 use App\Enums\LanguageEnum;
 
 class ChunkAssistant
@@ -30,5 +32,15 @@ class ChunkAssistant
     public function hypotheticalQuestions(): array
     {
         return HypotheticalQuestionsProvider::provide($this->lang->value, $this->chunk);
+    }
+
+    public function embedding(array $metadata = []): array
+    {
+        return $this->embed($metadata)?->embedding() ?? [];
+    }
+
+    public function embed(array $metadata = []): ?Vector
+    {
+        return EmbeddingsProvider::provide($this->chunk, $metadata);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\AgentSquad\ChunkAssistant;
 use App\AgentSquad\TextAssistant;
-use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Vectors\FileVectorStore;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -201,12 +201,12 @@ class PrepareLegalDocuments extends Command
 
         foreach ($sections as $section => $subsections) {
 
-            $vector = EmbeddingsProvider::provide($section, [$section => $subsections]);
+            $vector = ChunkAssistant::use()->withChunk($section)->embed([$section => $subsections]);
             $vectors->addVector($vector);
 
             foreach ($subsections as $subsection => $lines) {
                 foreach ($lines as $line) {
-                    $vector = EmbeddingsProvider::provide($line, [$section => $subsections]);
+                    $vector = ChunkAssistant::use()->withChunk($line)->embed([$section => $subsections]);
                     $vectors->addVector($vector);
                 }
             }
