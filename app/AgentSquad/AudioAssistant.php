@@ -9,7 +9,6 @@ class AudioAssistant
 {
     private string $url;
     private LanguageEnum $lang = LanguageEnum::FRENCH;
-    private string|null $response = null;
 
     public static function use(): AudioAssistant
     {
@@ -30,9 +29,6 @@ class AudioAssistant
 
     public function text(): string
     {
-        if (empty($this->response)) {
-            $this->response = AudioToTextProvider::provide($this->url, $this->lang->value);
-        }
-        return $this->response ?? '';
+        return AudioToTextProvider::provide($this->url, $this->lang->value);
     }
 }
