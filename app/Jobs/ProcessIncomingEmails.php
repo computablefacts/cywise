@@ -49,7 +49,9 @@ class ProcessIncomingEmails implements ShouldQueue
         $urls = array_values(array_unique(array_map('html_entity_decode', $matches[0])));
         /** @var User $user */
         $user = Auth::user();
-        $prompt = PromptsProvider::provide('default_summarize');
+        $prompt = PromptsProvider::use()
+            ->withName('default_summarize')
+            ->provide();
         $result = [];
 
         foreach ($urls as $url) {
