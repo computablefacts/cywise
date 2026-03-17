@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AgentSquad;
+namespace App\AgentSquad\Assistants;
 
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;

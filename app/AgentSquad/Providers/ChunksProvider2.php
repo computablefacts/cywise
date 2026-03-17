@@ -2,7 +2,7 @@
 
 namespace App\AgentSquad\Providers;
 
-use App\AgentSquad\ChunkAssistant;
+use App\AgentSquad\Assistants\ChunkAssistant;
 use App\AgentSquad\Vectors\MemoryVectorStore;
 use App\Models\Chunk;
 use App\Models\Vector;

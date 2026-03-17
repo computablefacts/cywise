@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\AgentSquad\SqlAssistant;
+use App\AgentSquad\Assistants\SqlAssistant;
 use App\Events\ImportTable;
 use App\Helpers\ClickhouseClient;
 use App\Helpers\ClickhouseLocal;

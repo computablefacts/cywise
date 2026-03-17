@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AgentSquad;
+namespace App\AgentSquad\Assistants;
 
 use App\AgentSquad\Vectors\Vector;
 use App\Enums\LanguageEnum;

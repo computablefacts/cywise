@@ -5,6 +5,7 @@ namespace App\AgentSquad;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\MemosProvider;
 use App\Enums\RoleEnum;
 use App\Http\Procedures\NotesProcedure;

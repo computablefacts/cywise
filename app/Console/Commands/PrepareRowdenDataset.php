@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\AgentSquad\ChunkAssistant;
+use App\AgentSquad\Assistants\ChunkAssistant;
 use App\AgentSquad\Vectors\FileVectorStore;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;

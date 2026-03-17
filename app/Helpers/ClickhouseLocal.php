@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use App\AgentSquad\SqlAssistant;
+use App\AgentSquad\Assistants\SqlAssistant;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\ChunkAssistant;
+use App\AgentSquad\Assistants\ChunkAssistant;
 use App\Enums\LanguageEnum;
 use App\Models\Chunk;
 use App\Models\Collection;

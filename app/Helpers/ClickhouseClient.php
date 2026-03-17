@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use App\AgentSquad\SqlAssistant;
+use App\AgentSquad\Assistants\SqlAssistant;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;

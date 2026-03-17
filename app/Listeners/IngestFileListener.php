@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\AgentSquad\AudioAssistant;
+use App\AgentSquad\Assistants\AudioAssistant;
 use App\Events\IngestFile;
 use App\Helpers\ApiUtilsFacade as ApiUtils;
 use App\Http\Controllers\CyberBuddyController;

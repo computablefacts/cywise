@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\AgentSquad\ChunkAssistant;
+use App\AgentSquad\Assistants\ChunkAssistant;
 use App\Enums\LanguageEnum;
 use App\Models\YnhFramework;
 use Illuminate\Console\Command;

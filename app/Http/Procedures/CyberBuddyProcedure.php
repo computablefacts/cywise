@@ -5,7 +5,7 @@ namespace App\Http\Procedures;
 use App\AgentSquad\Actions\LabourLawyerConclusionsWriter;
 use App\AgentSquad\ActionsRegistry;
 use App\AgentSquad\Answers\FailedAnswer;
-use App\AgentSquad\TextAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Orchestrator;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\Enums\RoleEnum;

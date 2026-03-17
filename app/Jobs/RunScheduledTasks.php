@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\TextAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Conversation;
