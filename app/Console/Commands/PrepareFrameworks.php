@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
+use App\AgentSquad\ChunkAssistant;
+use App\Enums\LanguageEnum;
 use App\Models\YnhFramework;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -132,7 +133,10 @@ class PrepareFrameworks extends Command
                     'tags' => $this->extractTitlesFromMarkdown($block),
                     // 'text' => "**Provider.** {$framework->provider}\n**Title.** {$framework->name}\n**Description.** {$framework->description}\n\n" . trim($block),
                     'text' => $block,
-                    'hypothetical_questions' => HypotheticalQuestionsProvider::provide($framework->locale, $block),
+                    'hypothetical_questions' => ChunkAssistant::use()
+                        ->withLang(LanguageEnum::tryFrom($framework->locale) ?? LanguageEnum::FRENCH)
+                        ->withChunk($block)
+                        ->hypotheticalQuestions(),
                 ];
 
                 file_put_contents($filename, json_encode($chunk) . PHP_EOL, FILE_APPEND);
