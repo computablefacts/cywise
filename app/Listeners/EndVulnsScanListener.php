@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\AgentSquad\TextAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\Events\EndVulnsScan;
 use App\Events\SendAuditReport;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AgentSquad;
+namespace App\AgentSquad\Assistants;
 
 use App\Enums\LanguageEnum;
 use Illuminate\Support\Facades\Http;

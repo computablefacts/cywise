@@ -2,7 +2,7 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\TextAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\ScheduledTask;
 use Carbon\Carbon;

@@ -2,7 +2,7 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\SqlAssistant;
+use App\AgentSquad\Assistants\SqlAssistant;
 use App\Enums\StorageType;
 use App\Events\ImportVirtualTable;
 use App\Helpers\ClickhouseClient;

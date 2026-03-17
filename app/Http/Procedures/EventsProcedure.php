@@ -2,9 +2,9 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\ChunkAssistant;
+use App\AgentSquad\Assistants\ChunkAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\TextAssistant;
 use App\Enums\LanguageEnum;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\YnhOsquery;

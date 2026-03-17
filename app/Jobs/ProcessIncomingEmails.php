@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\TextAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\AgentSquad\Providers\WebpagesProvider;
 use App\Http\Procedures\CyberBuddyProcedure;

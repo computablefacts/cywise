@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\SqlAssistant;
+use App\AgentSquad\Assistants\SqlAssistant;
 use App\Events\ImportTable;
 use App\Helpers\TableStorage;
 use App\Models\Table;

@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\AgentSquad\ChunkAssistant;
+use App\AgentSquad\Assistants\ChunkAssistant;
 use App\Enums\LanguageEnum;
 
 /**

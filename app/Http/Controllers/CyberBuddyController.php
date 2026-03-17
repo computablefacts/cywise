@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AgentSquad\Actions\QueryKnowledgeBase;
-use App\AgentSquad\TextAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\Events\IngestFile;
 use App\Models\Chunk;
 use App\Models\File;
