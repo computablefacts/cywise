@@ -2,8 +2,7 @@
 
 namespace App\Listeners;
 
-use App\AgentSquad\Providers\LlmsProvider;
-use App\AgentSquad\Providers\PromptsProvider;
+use App\AgentSquad\Assistant;
 use App\Events\EndVulnsScan;
 use App\Events\SendAuditReport;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
@@ -452,13 +451,15 @@ class EndVulnsScanListener extends AbstractListener
         $fileContent = $context['file_content'] ?? '';
 
         if ($category === 'file_exposed' && !empty($fileContent) && $type === 'explanation') {
-            $fpPrompt = PromptsProvider::provide('false_positive_prompt', array_merge($context, [
-                'content' => $fileContent,
-                'title' => $title,
-                'type' => $alertType,
-            ]));
 
-            $fpResult = LlmsProvider::provide($fpPrompt);
+            $fpResult = Assistant::use()
+                ->withPrompt('false_positive_prompt', array_merge($context, [
+                    'content' => $fileContent,
+                    'title' => $title,
+                    'type' => $alertType,
+                ]))
+                ->text();
+
             if (Str::contains(Str::lower($fpResult), '<is_false_positive>true</is_false_positive>')) {
                 return $fpResult;
             }
@@ -496,7 +497,11 @@ class EndVulnsScanListener extends AbstractListener
         }
 
         $timeout = ($type === 'explanation') ? 120 : 60;
-        return LlmsProvider::provide(PromptsProvider::provide($template, $vars), null, $timeout);
+
+        return Assistant::use()
+            ->withTimeout($timeout)
+            ->withPrompt($template, $vars)
+            ->text();
     }
 
     private function resolveTemplate(string $category, string $type): string

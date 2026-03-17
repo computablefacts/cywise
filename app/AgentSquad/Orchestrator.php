@@ -5,9 +5,7 @@ namespace App\AgentSquad;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
 use App\Http\Procedures\NotesProcedure;
 use App\Models\User;
@@ -124,15 +122,17 @@ class Orchestrator
         $template = '{"thought":"describe here succinctly your thoughts about the question you have been asked", "action_name":"set here the name of the action to execute", "action_input":"set here the input for the action"}';
         $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
         $actions = implode("\n", array_map(fn(AbstractAction $action) => "[ACTION][NAME]{$action->name()}[/NAME][DESCRIPTION]{$action->description()}[/DESCRIPTION][/ACTION]", array_filter($this->agents, fn(AbstractAction $action) => $action->isInvokable())));
-        $prompt = PromptsProvider::provide('default_orchestrator', [
-            'TEMPLATE' => $template,
-            'COT' => $cot,
-            'ACTIONS' => $actions,
-            'INPUT' => $input,
-            'HISTORY' => $history,
-            'MEMOS' => MemosProvider::provide($user, NotesProcedure::SCOPE_IS_ORCHESTRATOR),
-        ]);
-        $result = LlmsProvider::provideJson($prompt, $this->model);
+        $result = Assistant::use()
+            ->withDeepInfra($this->model)
+            ->withPrompt('default_orchestrator', [
+                'TEMPLATE' => $template,
+                'COT' => $cot,
+                'ACTIONS' => $actions,
+                'INPUT' => $input,
+                'HISTORY' => $history,
+                'MEMOS' => MemosProvider::provide($user, NotesProcedure::SCOPE_IS_ORCHESTRATOR),
+            ])
+            ->structured();
         /** @var string $answer */
         $answer = $result->raw;
         /** @var array $json */

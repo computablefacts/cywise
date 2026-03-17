@@ -2,6 +2,7 @@
 
 namespace App\AgentSquad\Providers;
 
+use App\AgentSquad\Assistant;
 use App\Enums\LanguageEnum;
 use Illuminate\Support\Facades\Log;
 
@@ -25,12 +26,13 @@ class TranslationsProvider extends AbstractProvider
 
             try {
 
-                $prompt = PromptsProvider::provide('default_translate', [
-                    'TEXT' => $value,
-                    'LANG' => $lang->value,
-                ]);
-
-                $answer = LlmsProvider::provide($prompt, 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo');
+                $answer = Assistant::use()
+                    ->withPrompt('default_translate', [
+                        'TEXT' => $value,
+                        'LANG' => $lang->value,
+                    ])
+                    ->withDeepInfra('meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo')
+                    ->text();
 
                 if ($answer === '') {
                     Log::warning("Unable to translate {$value} in {$lang->value} language.");

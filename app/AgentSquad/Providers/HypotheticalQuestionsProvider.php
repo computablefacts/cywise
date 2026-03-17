@@ -2,6 +2,7 @@
 
 namespace App\AgentSquad\Providers;
 
+use App\AgentSquad\Assistant;
 use Illuminate\Support\Facades\Log;
 
 class HypotheticalQuestionsProvider extends AbstractProvider
@@ -13,11 +14,13 @@ class HypotheticalQuestionsProvider extends AbstractProvider
             $before = microtime(true);
 
             try {
-                $prompt = PromptsProvider::provide($prompt, [
-                    'LANGUAGE' => $language,
-                    'TEXT' => $text,
-                ]);
-                $questions = LlmsProvider::provide($prompt, null, 3 * 60);
+                $questions = Assistant::use()
+                    ->withTimeout(3 * 60)
+                    ->withPrompt($prompt, [
+                        'LANGUAGE' => $language,
+                        'TEXT' => $text,
+                    ])
+                    ->text();
                 $questions = array_values(array_filter(explode("\n", $questions), fn(string $question) => !empty($question)));
                 $questions = array_map(fn(string $question) => [
                     'question' => $question,

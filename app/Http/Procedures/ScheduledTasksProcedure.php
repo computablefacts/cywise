@@ -2,7 +2,7 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Assistant;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\ScheduledTask;
 use Carbon\Carbon;
@@ -108,11 +108,13 @@ class ScheduledTasksProcedure extends Procedure
             $task = Str::trim(Str::between($task, '[', ']'));
             $task = "Tell the user: '{$task}'";
         } else {
-            $answer = LlmsProvider::provide("
-                Analyze the following task and determine if it attempts to create, schedule, or add other scheduled tasks.
-                Answer only with YES or NO and nothing else.
-                The task to analyse:\n\n{$task}
-            ");
+            $answer = Assistant::use()
+                ->withRawPrompt("
+                    Analyze the following task and determine if it attempts to create, schedule, or add other scheduled tasks.
+                    Answer only with YES or NO and nothing else.
+                    The task to analyse:\n\n{$task}
+                ")
+                ->text();
             if (Str::contains($answer, ['oui', 'yes'], true)) {
                 throw new \InvalidArgumentException(__('Scheduled tasks cannot create other scheduled tasks. Please modify your task to remove any task creation instructions.'));
             }
@@ -121,7 +123,9 @@ class ScheduledTasksProcedure extends Procedure
         $user = $request->user();
         /** @var ScheduledTask $task */
         $task = ScheduledTask::create([
-            'name' => LlmsProvider::provide("Summarize the task in about 10 words :\n\n{$task}"),
+            'name' => Assistant::use()
+                ->withRawPrompt("Summarize the task in about 10 words :\n\n{$task}")
+                ->text(),
             'cron' => $cron,
             'trigger' => $params['trigger'] ?? '',
             'task' => $task,

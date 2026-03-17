@@ -6,15 +6,13 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
+use App\AgentSquad\Assistant;
 use App\AgentSquad\Providers\ChunksProvider;
 use App\AgentSquad\Providers\ChunksProvider2;
 use App\AgentSquad\Providers\EmbeddingsProvider;
-use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\Providers\PromptsProvider;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
-use App\Enums\RoleEnum;
 use App\Http\Procedures\NotesProcedure;
 use App\Models\Chunk;
 use App\Models\ChunkTag;
@@ -67,15 +65,12 @@ class QueryKnowledgeBase extends AbstractAction
         }
 
         // Reformulate question in both english and french
-        $prompt = PromptsProvider::provide('default_reformulate_question', [
-            'QUESTION' => htmlspecialchars($input, ENT_QUOTES, 'UTF-8'),
-        ]);
-        $messages[] = [
-            'role' => RoleEnum::USER->value,
-            'content' => $prompt,
-        ];
-        $result = LlmsProvider::provideJson($messages, 'Qwen/Qwen3-Next-80B-A3B-Instruct', 3 * 60);
-        array_pop($messages);
+        $result = Assistant::use()
+            ->withTimeout(30 * 60)
+            ->withMessagesAndPrompt($messages, 'default_reformulate_question', [
+                'QUESTION' => htmlspecialchars($input, ENT_QUOTES, 'UTF-8'),
+            ])
+            ->structured();
         /** @var string $answer */
         $answer = $result->raw;
         /** @var array $json */
@@ -149,20 +144,16 @@ class QueryKnowledgeBase extends AbstractAction
         // Fill context & answer question
         $memos = empty($collection) ? MemosProvider::provide($user, NotesProcedure::SCOPE_IS_CYBERBUDDY) : '';
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
-        $prompt = PromptsProvider::provide('default_answer_question', [
-            'LANGUAGE' => $json['lang'],
-            'NOTES' => $chunks . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
-            'MEMOS' => $memos,
-            'QUESTION' => $json['lang'] === 'english' ?
-                $json['question_en'] :
-                ($json['lang'] === 'french' ? $json['question_fr'] : $input),
-        ]);
-        $messages[] = [
-            'role' => RoleEnum::USER->value,
-            'content' => $prompt,
-        ];
-        $answer = LlmsProvider::provide($messages);
-        array_pop($messages);
+        $answer = Assistant::use()
+            ->withMessagesAndPrompt($messages, 'default_answer_question', [
+                'LANGUAGE' => $json['lang'],
+                'NOTES' => $chunks . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
+                'MEMOS' => $memos,
+                'QUESTION' => $json['lang'] === 'english' ?
+                    $json['question_en'] :
+                    ($json['lang'] === 'french' ? $json['question_fr'] : $input),
+            ])
+            ->text();
 
         return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))), [], !empty($answer));
     }
