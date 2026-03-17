@@ -3,11 +3,12 @@
 namespace App\AgentSquad;
 
 use App\AgentSquad\Providers\AudioToTextProvider;
+use App\Enums\LanguageEnum;
 
 class AudioAssistant
 {
     private string $url;
-    private string $lang = 'fr';
+    private LanguageEnum $lang = LanguageEnum::FRENCH;
     private string|null $response = null;
 
     public static function use(): AudioAssistant
@@ -21,7 +22,7 @@ class AudioAssistant
         return $this;
     }
 
-    public function withLang(string $lang): AudioAssistant
+    public function withLang(LanguageEnum $lang): AudioAssistant
     {
         $this->lang = $lang;
         return $this;
@@ -30,7 +31,7 @@ class AudioAssistant
     public function text(): string
     {
         if (empty($this->response)) {
-            $this->response = AudioToTextProvider::provide($this->url, $this->lang);
+            $this->response = AudioToTextProvider::provide($this->url, $this->lang->value);
         }
         return $this->response ?? '';
     }
