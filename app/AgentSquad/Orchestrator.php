@@ -131,7 +131,10 @@ class Orchestrator
                 'ACTIONS' => $actions,
                 'INPUT' => $input,
                 'HISTORY' => $history,
-                'MEMOS' => MemosProvider::provide($user, NotesProcedure::SCOPE_IS_ORCHESTRATOR),
+                'MEMOS' => MemosProvider::use()
+                    ->withScope(NotesProcedure::SCOPE_IS_ORCHESTRATOR)
+                    ->withUser($user)
+                    ->provide(),
             ])
             ->structured();
         /** @var string $answer */
