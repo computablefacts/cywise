@@ -2,7 +2,7 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\ScheduledTask;
 use Carbon\Carbon;
@@ -108,7 +108,7 @@ class ScheduledTasksProcedure extends Procedure
             $task = Str::trim(Str::between($task, '[', ']'));
             $task = "Tell the user: '{$task}'";
         } else {
-            $answer = Assistant::use()
+            $answer = TextAssistant::use()
                 ->withRawPrompt("
                     Analyze the following task and determine if it attempts to create, schedule, or add other scheduled tasks.
                     Answer only with YES or NO and nothing else.
@@ -123,7 +123,7 @@ class ScheduledTasksProcedure extends Procedure
         $user = $request->user();
         /** @var ScheduledTask $task */
         $task = ScheduledTask::create([
-            'name' => Assistant::use()
+            'name' => TextAssistant::use()
                 ->withRawPrompt("Summarize the task in about 10 words :\n\n{$task}")
                 ->text(),
             'cron' => $cron,

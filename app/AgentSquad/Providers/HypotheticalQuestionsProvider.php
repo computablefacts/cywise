@@ -2,7 +2,7 @@
 
 namespace App\AgentSquad\Providers;
 
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use Illuminate\Support\Facades\Log;
 
 class HypotheticalQuestionsProvider extends AbstractProvider
@@ -14,7 +14,7 @@ class HypotheticalQuestionsProvider extends AbstractProvider
             $before = microtime(true);
 
             try {
-                $questions = Assistant::use()
+                $questions = TextAssistant::use()
                     ->withTimeout(3 * 60)
                     ->withPrompt($prompt, [
                         'LANGUAGE' => $language,

@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\Events\EndVulnsScan;
 use App\Events\SendAuditReport;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
@@ -452,7 +452,7 @@ class EndVulnsScanListener extends AbstractListener
 
         if ($category === 'file_exposed' && !empty($fileContent) && $type === 'explanation') {
 
-            $fpResult = Assistant::use()
+            $fpResult = TextAssistant::use()
                 ->withPrompt('false_positive_prompt', array_merge($context, [
                     'content' => $fileContent,
                     'title' => $title,
@@ -498,7 +498,7 @@ class EndVulnsScanListener extends AbstractListener
 
         $timeout = ($type === 'explanation') ? 120 : 60;
 
-        return Assistant::use()
+        return TextAssistant::use()
             ->withTimeout($timeout)
             ->withPrompt($template, $vars)
             ->text();

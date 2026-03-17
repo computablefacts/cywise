@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AgentSquad\Actions\QueryKnowledgeBase;
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\Events\IngestFile;
 use App\Models\Chunk;
 use App\Models\File;
@@ -234,14 +234,14 @@ class CyberBuddyController extends Controller
             ->map(fn(array $qa) => "Question: {$qa['question']}\nRéponse: {$qa['answer']}")
             ->join("\n\n");
         if (empty($params['prompt'])) {
-            return Assistant::use()
+            return TextAssistant::use()
                 ->withPrompt('default_cyberscribe', [
                     'EXAMPLE' => $template,
                     'QA' => $input,
                 ])
                 ->text();
         }
-        return Assistant::use()
+        return TextAssistant::use()
             ->withRawPrompt($params['prompt'])
             ->text();
     }

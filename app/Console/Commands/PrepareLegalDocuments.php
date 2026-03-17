@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Vectors\FileVectorStore;
 use Illuminate\Console\Command;
@@ -105,7 +105,7 @@ class PrepareLegalDocuments extends Command
         if (!file_exists($toc)) {
             $this->info("Extracting table of contents from {$txt}...");
             $content = \File::get($txt);
-            $answer = Assistant::use()
+            $answer = TextAssistant::use()
                 ->withTimeout(30 * 60)
                 ->withDeepInfra('google/gemini-2.5-flash')
                 ->withRawPrompt("
@@ -130,7 +130,7 @@ class PrepareLegalDocuments extends Command
         if (!file_exists($facts)) {
             $this->info("Extracting facts from {$txt}...");
             $content = \File::get($txt);
-            $answer = Assistant::use()
+            $answer = TextAssistant::use()
                 ->withTimeout(30 * 60)
                 ->withDeepInfra('google/gemini-2.5-flash')
                 ->withRawPrompt("

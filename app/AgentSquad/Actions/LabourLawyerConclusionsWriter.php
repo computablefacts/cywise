@@ -6,7 +6,7 @@ use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\AgentSquad\Providers\EmbeddingsProvider;
 use App\AgentSquad\Vectors\AbstractVectorStore;
 use App\AgentSquad\Vectors\FileVectorStore;
@@ -57,7 +57,7 @@ The action's input must always be in French, regardless of the user's language.
     {
         // Build a table of contents from the context
         $tocs = \File::get("{$this->dir}/tocs.txt");
-        $answer = Assistant::use()
+        $answer = TextAssistant::use()
             ->withTimeout(30 * 60)
             ->withDeepInfra('google/gemini-2.5-flash')
             ->withRawPrompt("
@@ -91,7 +91,7 @@ The action's input must always be in French, regardless of the user's language.
             return $text;
         }, $this->vectorStore->search($vector->embedding())));
         $arguments = "[ARGS]\n" . implode("\n", array_map(fn(string $section) => "[ARG]\n{$section}\n[/ARG]", $sections)) . "\n[/ARGS]";
-        $answer = Assistant::use()
+        $answer = TextAssistant::use()
             ->withTimeout(30 * 60)
             ->withDeepInfra('google/gemini-2.5-flash')
             ->withRawPrompt("

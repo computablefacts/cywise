@@ -2,7 +2,7 @@
 
 namespace App\AgentSquad\Providers;
 
-use App\AgentSquad\Assistant;
+use App\AgentSquad\TextAssistant;
 use App\Enums\LanguageEnum;
 use Illuminate\Support\Facades\Log;
 
@@ -26,7 +26,7 @@ class TranslationsProvider extends AbstractProvider
 
             try {
 
-                $answer = Assistant::use()
+                $answer = TextAssistant::use()
                     ->withPrompt('default_translate', [
                         'TEXT' => $value,
                         'LANG' => $lang->value,
