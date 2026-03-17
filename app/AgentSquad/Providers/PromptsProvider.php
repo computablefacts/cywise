@@ -7,6 +7,7 @@ use App\Http\Requests\JsonRpcRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+/** @deprecated */
 class PromptsProvider extends AbstractProvider
 {
     public static function provide(string $name, array $variables = []): string
