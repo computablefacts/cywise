@@ -2,9 +2,10 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\TextAssistant;
+use App\AgentSquad\ChunkAssistant;
 use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\Providers\TranslationsProvider;
+use App\AgentSquad\TextAssistant;
+use App\Enums\LanguageEnum;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
@@ -337,8 +338,15 @@ class EventsProcedure extends Procedure
             ];
         }
 
-        $reasoning = TranslationsProvider::provide($json['reasoning']);
-        $suggestedAction = TranslationsProvider::provide($json['suggested_action']);
+        $reasoning = ChunkAssistant::use()
+            ->withLang(LanguageEnum::ENGLISH)
+            ->withChunk($json['reasoning'])
+            ->translate();
+
+        $suggestedAction = ChunkAssistant::use()
+            ->withLang(LanguageEnum::ENGLISH)
+            ->withChunk($json['suggested_action'])
+            ->translate();
 
         if ($json['activity'] === "NORMAL") {
             return [

@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\AgentSquad\Providers\TranslationsProvider;
+use App\AgentSquad\ChunkAssistant;
 use App\Enums\LanguageEnum;
 
 /**
@@ -13,6 +13,9 @@ trait HasTranslatableAttributes
 {
     public function translated(string $key, LanguageEnum $lang = LanguageEnum::FRENCH): mixed
     {
-        return TranslationsProvider::provide($this->{$key}, $lang);
+        return ChunkAssistant::use()
+            ->withLang(LanguageEnum::ENGLISH)
+            ->withChunk($this->{$key})
+            ->translate($lang);
     }
 }

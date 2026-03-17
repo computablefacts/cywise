@@ -7,6 +7,8 @@ use App\Enums\LanguageEnum;
 use Illuminate\Support\Facades\Log;
 
 /** Translates a string from english to another language. */
+
+/** @deprecated */
 class TranslationsProvider extends AbstractProvider
 {
     public static function provide(string $value, LanguageEnum $lang = LanguageEnum::FRENCH): string
