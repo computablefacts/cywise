@@ -2,9 +2,11 @@
 
 namespace App\AgentSquad;
 
-use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class TextAssistant
 {
@@ -64,11 +66,65 @@ class TextAssistant
 
     public function text(): string
     {
-        return LlmsProvider::provide($this->messages, $this->model, $this->timeoutInSeconds);
+        if (is_string($this->messages)) {
+            $messages = [[
+                'role' => 'user',
+                'content' => $this->messages
+            ]];
+        } else if (is_array($this->messages)) {
+            $messages = $this->messages;
+        } else {
+            Log::error('TextAssistant messages must be a string or an array');
+            return '';
+        }
+        if ($this->provider === 'deepinfra') {
+            $response = $this->callDeepInfra($messages);
+            $answer = $response['choices'][0]['message']['content'] ?? '';
+            $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
+            return Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
+        }
+        Log::error('TextAssistant uses an unknown provider: ' . $this->provider);
+        return '';
     }
 
     public function structured(): object
     {
-        return LlmsProvider::provideJson($this->messages, $this->model, $this->timeoutInSeconds);
+        $matches = null;
+        preg_match_all('/(?:```json\s*)?(.*)(?:\s*```)?/s', $this->text(), $matches);
+        $raw = '{' . Str::after(Str::beforeLast(Str::trim($matches[1][0] ?? ''), '}'), '{') . '}'; //  deal with "}<｜end▁of▁sentence｜>"
+        return (object)[
+            'raw' => $raw,
+            'parsed' => json_decode($raw, true),
+        ];
+    }
+
+    private function callDeepInfra(array $messages): array
+    {
+        try {
+
+            $url = config('towerify.deepinfra.api') . '/chat/completions';
+            $bearer = config('towerify.deepinfra.api_key');
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$bearer}",
+                'Accept' => 'application/json',
+            ])
+                ->timeout($this->timeoutInSeconds)
+                ->post($url, [
+                    'model' => $this->model,
+                    'messages' => $messages,
+                    'temperature' => 0.7,
+                    'stream' => false,
+                ]);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            Log::error($response->body());
+
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
+        return [];
     }
 }
