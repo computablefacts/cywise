@@ -2,7 +2,6 @@
 
 namespace App\AgentSquad\Actions;
 
-use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;

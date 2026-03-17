@@ -2,6 +2,7 @@
 
 namespace App\AgentSquad;
 
+use App\AgentSquad\Actions\AbstractAction;
 use App\AgentSquad\Actions\QueryKnowledgeBase;
 use App\AgentSquad\Actions\QueryTables;
 use App\Models\ActionSetting;
