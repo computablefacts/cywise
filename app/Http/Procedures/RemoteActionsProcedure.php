@@ -107,7 +107,7 @@ class RemoteActionsProcedure extends Procedure
         ];
 
         foreach ($blacklist as $pattern) {
-            if (preg_match($pattern, $params['response_template'])) {
+            if (preg_match($pattern, $params['response_template'] ?? '')) {
                 throw new \Exception('This pattern is not allowed in response_template: ' . $pattern);
             }
         }
