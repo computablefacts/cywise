@@ -174,17 +174,17 @@ class EventsProcedure extends Procedure
             "if the request is 'Are offensive security tools (e.g., Metasploit, Cobalt Strike, Mimikatz) running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_offensive_tools_execution\"}",
         ],
         ai_result: "
-            @php
-                \$events = collect(\$result['events'] ?? [])->map(fn(array \$event) => (new \App\Models\YnhOsquery())->forceFill(\$event));
-            @endphp
-            @if(\$events->isEmpty())
-                No security events found.
-            @else
-                Below is a list of security events sorted from the most recent to the oldest. The severity of each event is indicated by a score between 0 (system events) and 100 (critical IoCs).
-                @foreach(\$events as \$event)
-                - {{ \$event->calendar_time->utc()->format('Y-m-d H:i:s') }} - {{ \$event->server_name }} ({{ \$event->server_ip_address }}) - {{ \$event->message() }} (severity: {{ \$event->score }})
-                @endforeach
-            @endif
+@php
+\$events = collect(\$result['events'] ?? [])->map(fn(array \$event) => (new \App\Models\YnhOsquery())->forceFill(\$event));
+@endphp
+@if(\$events->isEmpty())
+No security events found.
+@else
+Below is a list of security events sorted from the most recent to the oldest. The severity of each event is indicated by a score between 0 (system events) and 100 (critical IoCs).
+@foreach(\$events as \$event)
+- {{ \$event->calendar_time->utc()->format('Y-m-d H:i:s') }} - {{ \$event->server_name }} ({{ \$event->server_ip_address }}) - {{ \$event->message() }} (severity: {{ \$event->score }})
+@endforeach
+@endif
         "
     )]
     public function list(JsonRpcRequest $request): array

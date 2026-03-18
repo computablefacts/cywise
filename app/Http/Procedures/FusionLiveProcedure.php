@@ -23,10 +23,10 @@ class FusionLiveProcedure extends Procedure
             "if the request is 'list FusionLive workspaces', the input should be {}",
         ],
         ai_result: "
-            J'ai trouvé {{ count(\$result['workspaces']) }} espaces de travail :
-            @foreach(\$result['workspaces'] as \$w)
-            - L'espace de travail '{{ \$w['name'] }}' a été créé le {{ \$w['creation_date'] }} par {{ \$w['created_by'] }} et a pour identifiant {{ \$w['id'] }}. Il est associé à la société {{ \$w['company'] }} et a pour statut '{{ \$w['status'] }}'.
-            @endforeach
+J'ai trouvé {{ count(\$result['workspaces']) }} espaces de travail :
+@foreach(\$result['workspaces'] as \$w)
+- L'espace de travail '{{ \$w['name'] }}' a été créé le {{ \$w['creation_date'] }} par {{ \$w['created_by'] }} et a pour identifiant {{ \$w['id'] }}. Il est associé à la société {{ \$w['company'] }} et a pour statut '{{ \$w['status'] }}'.
+@endforeach
         ",
     )]
     public function workspaces(JsonRpcRequest $request): array
@@ -89,26 +89,26 @@ class FusionLiveProcedure extends Procedure
             "if the request is 'list files whose status is 'MAJ - Pour mise à jour' in 1458', the input should be {\"workspace_id\":1458,\"status\":\"MAJ - Pour mise à jour\"}",
         ],
         ai_result: "
-            I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column(\$result['documents'], 'count')) }} documents.
-            
-            @foreach(\$result['documents'] as \$folder)
-            
-            # {{ \$folder['location'] }} ({{ \$folder['count'] }} documents)
-            
-            @foreach(\$folder['documents'] as \$doc)
-            
-            ## {{ \$doc['title'] }}
-            
-            - **Company Name.** {{ \$doc['company_name'] }}
-            - **Uploaded At.** {{ \$doc['upload_date'] }}
-            - **Size.** {{ \$doc['size'] }} bytes
-            - **Reference.** {{ \$doc['reference'] }}
-            - **Status.** {{ \$doc['status'] }}
-            - **Revision.** {{ \$doc['revision'] }}
-            - **Locked.** {{ \$doc['is_locked'] ? 'true' : 'false' }}
-            
-            @endforeach
-            @endforeach
+I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column(\$result['documents'], 'count')) }} documents.
+
+@foreach(\$result['documents'] as \$folder)
+
+# {{ \$folder['location'] }} ({{ \$folder['count'] }} documents)
+
+@foreach(\$folder['documents'] as \$doc)
+
+## {{ \$doc['title'] }}
+
+- **Company Name.** {{ \$doc['company_name'] }}
+- **Uploaded At.** {{ \$doc['upload_date'] }}
+- **Size.** {{ \$doc['size'] }} bytes
+- **Reference.** {{ \$doc['reference'] }}
+- **Status.** {{ \$doc['status'] }}
+- **Revision.** {{ \$doc['revision'] }}
+- **Locked.** {{ \$doc['is_locked'] ? 'true' : 'false' }}
+
+@endforeach
+@endforeach
         ",
     )]
     public function documents(JsonRpcRequest $request): array

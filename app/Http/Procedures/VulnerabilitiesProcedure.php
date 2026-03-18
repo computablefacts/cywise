@@ -55,35 +55,35 @@ class VulnerabilitiesProcedure extends Procedure
             "if the request is 'quelles sont les vulnérabilités de criticité moyenne du serveur 192.168.1.1 ?', the input should be '{\"asset\":\"192.168.1.1\",\"level\":\"medium\"}'",
         ],
         ai_result: "
-            @foreach(\$result as \$key => \$value)
-            @if(!empty(\$value))
-            @php
-            \$alerts = collect(\$value ?? [])->map(fn(array \$event) => (new \App\Models\Alert())->forceFill(\$event));
-            @endphp
-            # Vulnerabilities of {{ \$key }} severity
-            @foreach(\$alerts as \$alert)
-            @php
-            if (empty(\$alert->cve_id)) {
-               \$cve = '';
-            } else {
-               \$cve = '**Note.** Cette vulnérabilité a pour identifiant [' . \$alert->cve_id . '](https://nvd.nist.gov/vuln/detail/' . \$alert->cve_id . ').';
-            }
-            \$vulnerability = \$alert->translated('vulnerability');
-            \$remediation = \$alert->translated('remediation');
-            @endphp
-            ## {{ \$alert->title }}
-            
-            **Actif concerné.** L'actif concerné est {{ \$alert->asset()?->asset }} pointant vers le serveur {{ \$alert->port?->ip }}. Le port {{ \$alert->port?->port }} de ce serveur est ouvert et expose un service {{ \$alert->port?->service }} ({{ \$alert->port?->product }}).
-            
-            **Description détaillée.** {{ \$vulnerability }}
-            
-            **Remédiation.** {{ \$remediation }}
-            
-            {{ \$cve }}
-            
-            @endforeach
-            @endif
-            @endforeach
+@foreach(\$result as \$key => \$value)
+@if(!empty(\$value))
+@php
+\$alerts = collect(\$value ?? [])->map(fn(array \$event) => (new \App\Models\Alert())->forceFill(\$event));
+@endphp
+# Vulnerabilities of {{ \$key }} severity
+@foreach(\$alerts as \$alert)
+@php
+if (empty(\$alert->cve_id)) {
+   \$cve = '';
+} else {
+   \$cve = '**Note.** Cette vulnérabilité a pour identifiant [' . \$alert->cve_id . '](https://nvd.nist.gov/vuln/detail/' . \$alert->cve_id . ').';
+}
+\$vulnerability = \$alert->translated('vulnerability');
+\$remediation = \$alert->translated('remediation');
+@endphp
+## {{ \$alert->title }}
+
+**Actif concerné.** L'actif concerné est {{ \$alert->asset()?->asset }} pointant vers le serveur {{ \$alert->port?->ip }}. Le port {{ \$alert->port?->port }} de ce serveur est ouvert et expose un service {{ \$alert->port?->service }} ({{ \$alert->port?->product }}).
+
+**Description détaillée.** {{ \$vulnerability }}
+
+**Remédiation.** {{ \$remediation }}
+
+{{ \$cve }}
+
+@endforeach
+@endif
+@endforeach
         ",
     )]
     public function list(JsonRpcRequest $request): array
