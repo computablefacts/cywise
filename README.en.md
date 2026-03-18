@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://cywise.io" target="_blank">
-        <img src="/public/cywise/img/cywise-catchphrase-en.png" width="300">
+        <img src="/public/cywise/img/cywise-catchphrase-fr.png" width="300">
     </a>
 </p>
 <p align="center">
