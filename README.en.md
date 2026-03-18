@@ -108,7 +108,7 @@ Cywise integrates all essential features for SMEs.
 **Your cybersecurity expert, available 24/7.** With Cywise, ask all your questions about cybersecurity or your scan results. CyberBuddy, our virtual assistant, guides you in real-time based on verified knowledge bases and recognized best practices. Expertise accessible wherever you are.
 
 > [!WARNING]
-> To enable this feature in the self-hosted version, you will need to provide your own DeepInfra API key.
+> To enable this feature in the self-hosted version, you will need to provide your own [DeepInfra](https://deepinfra.com/) API key.
 
 ### CyberScribe
 
@@ -117,7 +117,7 @@ Cywise integrates all essential features for SMEs.
 **Assisted drafting of your cyber documents.** Need to create an IT Charter or an Information Systems Security Policy (ISSP)? CyberScribe, our intelligent editor, accompanies you step-by-step to write clear, compliant, and adapted documents, thanks to artificial intelligence.
 
 > [!WARNING]
-> To enable this feature in the self-hosted version, you will need to provide your own DeepInfra API key.
+> To enable this feature in the self-hosted version, you will need to provide your own [DeepInfra](https://deepinfra.com/) API key.
 
 ### Telegram & WhatsApp
 
@@ -126,7 +126,7 @@ Cywise integrates all essential features for SMEs.
 **Stay informed, wherever you are.** Cywise allows you to interact with the platform in natural language using [Telegram](https://telegram.org) and [WhatsApp](https://www.whatsapp.com/) messaging.
 
 > [!WARNING]
-> To enable this feature in the self-hosted version, you will need to provide your own DeepInfra API key.
+> To enable this feature in the self-hosted version, you will need to provide your own [DeepInfra](https://deepinfra.com/) API key.
 
 ## Miscellaneous
 
@@ -345,7 +345,7 @@ You can delete the entire stack including all associated data with the command:
 
 ### CyberBuddy and CyberScribe
 
-To activate CyberBuddy and CyberScribe, you must have created an API key at [deepinfra](https://deepinfra.com/).
+To activate CyberBuddy and CyberScribe, you must have created an API key at [DeepInfra](https://deepinfra.com/).
 
 You must then set up this key in Cywise.
 
