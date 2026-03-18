@@ -73,6 +73,7 @@ class EventsProcedure extends Procedure
             "max_score" => "An optional maximum score to filter events by. (integer|nullable|min:0|max:100)",
             "rule_name" => "An optional rule name to filter events by. (string|nullable|min:0|max:191)",
             "server_id" => "An optional server id to filter events by.",
+            "server_name" => "An optional server name to filter events by. (string|nullable|min:0|max:191|exists:ynh_servers,name)",
             "ip_address" => "An optional server IP address to filter events by. (string|nullable|min:4|max:15|exists:ynh_servers,ip_address)",
             "window" => "An optional window of time [min_date, max_date] to filter events by."
         ],
@@ -192,13 +193,13 @@ class EventsProcedure extends Procedure
             'min_score' => 'integer|required|min:0|max:100',
             'max_score' => 'integer|nullable|min:0|max:100',
             'rule_name' => 'string|nullable|min:0|max:191',
-            'server_id' => 'integer|nullable|prohibits:ip_address|exists:ynh_servers,id',
-            'ip_address' => 'string|nullable|prohibits:server_id|min:4|max:15|exists:ynh_servers,ip_address',
+            'server_name' => 'string|nullable|min:0|max:191|prohibits:ip_address,server_id|exists:ynh_servers,name',
+            'server_id' => 'integer|nullable|prohibits:ip_address,server_name|exists:ynh_servers,id',
+            'ip_address' => 'string|nullable|prohibits:server_id,server_name|min:4|max:15|exists:ynh_servers,ip_address',
             'window' => 'array|nullable|min:2|max:2',
             'window.*' => 'date|required',
         ]);
 
-        $serverId = $params['server_id'] ?? null;
         $minScore = $params['min_score'] ?? 0;
         $maxScore = $params['max_score'] ?? 100;
         $ruleName = $params['rule_name'] ?? null;
@@ -216,6 +217,8 @@ class EventsProcedure extends Procedure
             $servers = YnhServer::where('id', $params['server_id'])->get();
         } else if (isset($params['ip_address'])) {
             $servers = YnhServer::where('ip_address', $params['ip_address'])->get();
+        } else if (isset($params['server_name'])) {
+            $servers = YnhServer::where('name', $params['server_name'])->get();
         } else {
             $servers = YnhServer::all();
         }
