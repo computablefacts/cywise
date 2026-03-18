@@ -13,6 +13,7 @@ class ActionsController extends Controller
     public function __invoke(Request $request)
     {
         $actions = ActionsRegistry::all();
+        ksort($actions);
         $user = $request->user();
         $tenantSettings = ActionSetting::query()
             ->where('scope_type', 'tenant')
