@@ -102,13 +102,13 @@ class QueryKnowledgeBase extends AbstractAction
                 $start = microtime(true);
                 $dir = FileVectorStore::unpack("anssi.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
-                $anssi = array_map(function (array $vector) {
+                $anssi = array_map(function (array $vector, int $index) {
                     /** @var Vector $vec */
                     $vec = $vector['vector'];
                     $question = $vec->text();
                     $answer = preg_replace('/#+/', '', $vec->metadata('answer'));
                     $similarity = $vector['similarity'];
-                    return "## Note 0\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** ANSSI\n**Score:** {$similarity}";
+                    return "## Memo A{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** ANSSI\n**Score:** {$similarity}";
                 }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
                 $stop = microtime(true);
                 $nbResults = count($anssi);
@@ -130,7 +130,7 @@ class QueryKnowledgeBase extends AbstractAction
                 $start = microtime(true);
                 $dir = FileVectorStore::unpack("rowden_cybersecurityqaa.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
-                $rowden = array_map(function (array $vector) {
+                $rowden = array_map(function (array $vector, int $index) {
                     /** @var Vector $vec */
                     $vec = $vector['vector'];
                     $question = $vec->text();
@@ -138,7 +138,7 @@ class QueryKnowledgeBase extends AbstractAction
                     $source = $vec->metadata('source');
                     $source = empty($source) ? 'n/a' : $source;
                     $similarity = $vector['similarity'];
-                    return "## Note 0\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** {$source}\n**Score:** {$similarity}";
+                    return "## Memo R{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** {$source}\n**Score:** {$similarity}";
                 }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
                 $stop = microtime(true);
                 $nbResults = count($rowden);
@@ -157,8 +157,8 @@ class QueryKnowledgeBase extends AbstractAction
         $answer = TextAssistant::use()
             ->withMessagesAndPrompt($messages, 'default_answer_question', [
                 'LANGUAGE' => $json['lang'],
-                'NOTES' => $chunks . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
-                'MEMOS' => $memos,
+                'NOTES' => $chunks,
+                'MEMOS' => $memos . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
                 'QUESTION' => $json['lang'] === 'english' ?
                     $json['question_en'] :
                     ($json['lang'] === 'french' ? $json['question_fr'] : $input),
