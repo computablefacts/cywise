@@ -126,7 +126,7 @@ résultats de vos scans. CyberBuddy, notre assistant virtuel, vous guide en temp
 connaissances vérifiées et des bonnes pratiques reconnues. Une expertise accessible, où que vous soyez.
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API [DeepInfra](https://deepinfra.com/).
 
 ### CyberScribe
 
@@ -137,7 +137,7 @@ Systèmes d'Information (PSSI) ? CyberScribe, notre éditeur intelligent, vous a
 documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence artificielle.
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API [DeepInfra](https://deepinfra.com/).
 
 ### Telegram & WhatsApp
 
@@ -147,7 +147,7 @@ documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence
 des messageries [Telegram](https://telegram.org) et [WhatsApp](https://www.whatsapp.com/).
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API [DeepInfra](https://deepinfra.com/).
 
 ## Divers
 
@@ -394,7 +394,7 @@ Vous pouvez supprimer l'intégralité de la stack y compris toutes les données 
 
 ### CyberBuddy et CyberScribe
 
-Pour activer CyberBuddy et CyberScribe, vous devez avoir créé une clé d'API chez [deepinfra](https://deepinfra.com/).
+Pour activer CyberBuddy et CyberScribe, vous devez avoir créé une clé d'API chez [DeepInfra](https://deepinfra.com/).
 
 Vous devez ensuite mettre en place cette clé dans Cywise.
 
