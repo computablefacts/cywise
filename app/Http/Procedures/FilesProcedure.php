@@ -77,7 +77,6 @@ class FilesProcedure extends Procedure
         $user = $request->user();
         $query = File::select('cb_files.*')
             ->join('cb_collections', 'cb_collections.id', '=', 'cb_files.collection_id')
-            ->where('cb_files.created_by', $user->id)
             ->where('cb_files.is_deleted', false)
             ->where('cb_collections.is_deleted', false)
             ->where(function ($query) use ($user) {
