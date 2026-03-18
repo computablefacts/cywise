@@ -24,5 +24,6 @@ RÈGLES DE RÉPONSE :
 - N'ajoute AUCUNE explication textuelle avant ou après.
 - N'utilise PAS de blocs de code markdown (pas de ```bash).
 - Le script doit être prêt à l'emploi.
+- Si aucun script fiable et pertinent ne peut être proposé pour ce cas, retourne EXACTEMENT `<NO_SCRIPT>`.
 
 Ta réponse doit commencer par #!/bin/bash.

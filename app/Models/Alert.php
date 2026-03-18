@@ -22,6 +22,7 @@ use Illuminate\Support\Str;
  * @property ?string vulnerability
  * @property ?string ai_remediation
  * @property ?string remediation
+ * @property bool false_positive
  * @property ?string cve_id
  * @property ?string cve_cvss
  * @property ?string cve_vendor
@@ -39,6 +40,7 @@ class Alert extends Model
         'vulnerability',
         'remediation',
         'ai_remediation',
+        'false_positive',
         'level',
         'uid',
         'cve_id',
@@ -52,6 +54,7 @@ class Alert extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'false_positive' => 'boolean',
     ];
 
     protected $hidden = [
