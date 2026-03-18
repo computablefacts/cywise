@@ -4,19 +4,25 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://github.com/computablefacts/towerify/releases" target="_blank">
-        <img src="https://img.shields.io/github/v/release/computablefacts/towerify" alt="Latest Stable Version">
+    <a href="https://github.com/computablefacts/cywise/blob/main/README.md" target="_blank">
+        <img src="https://img.shields.io/badge/lang-fr-lightyellow.svg" alt="fr">
     </a>
-    <a href="https://github.com/computablefacts/towerify/actions" target="_blank">
-        <img src="https://github.com/computablefacts/towerify/actions/workflows/tests.yml/badge.svg" alt="Build Status">
+    <a href="https://github.com/computablefacts/cywise/blob/main/README.en.md" target="_blank">
+        <img src="https://img.shields.io/badge/lang-en-lightyellow.svg" alt="en">
     </a>
-    <a href="https://github.com/computablefacts/towerify/commits" target="_blank">
-        <img src="https://img.shields.io/github/commit-activity/y/computablefacts/towerify.svg" alt="GitHub commit activity">
+    <a href="https://github.com/computablefacts/cywise/releases" target="_blank">
+        <img src="https://img.shields.io/github/v/release/computablefacts/cywise" alt="Latest Stable Version">
     </a>
-    <a href="https://github.com/computablefacts/towerify/graphs/contributors" target="_blank">
-        <img src="https://img.shields.io/github/contributors-anon/computablefacts/towerify.svg" alt="GitHub contributors">
+    <a href="https://github.com/computablefacts/cywise/actions" target="_blank">
+        <img src="https://github.com/computablefacts/cywise/actions/workflows/tests.yml/badge.svg" alt="Build Status">
     </a>
-    <a href="https://github.com/computablefacts/towerify/LICENSE.md" target="_blank">
+    <a href="https://github.com/computablefacts/cywise/commits" target="_blank">
+        <img src="https://img.shields.io/github/commit-activity/y/computablefacts/cywise.svg" alt="GitHub commit activity">
+    </a>
+    <a href="https://github.com/computablefacts/cywise/graphs/contributors" target="_blank">
+        <img src="https://img.shields.io/github/contributors-anon/computablefacts/cywise.svg" alt="GitHub contributors">
+    </a>
+    <a href="https://github.com/computablefacts/cywise/LICENSE.md" target="_blank">
         <img src="https://img.shields.io/badge/license-AGPLv3-green" alt="License">
     </a>
 </p>
