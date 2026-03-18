@@ -88,7 +88,28 @@ class FusionLiveProcedure extends Procedure
             "if the request is 'list files in 1458', the input should be {\"workspace_id\":1458}",
             "if the request is 'list files whose status is 'MAJ - Pour mise à jour' in 1458', the input should be {\"workspace_id\":1458,\"status\":\"MAJ - Pour mise à jour\"}",
         ],
-        ai_result: "{{ json_encode(\$result) }}",
+        ai_result: "
+            I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column(\$result['documents'], 'count')) }} documents.
+            
+            @foreach(\$result['documents'] as \$folder)
+            
+            # {{ \$folder['location'] }} ({{ \$folder['count'] }} documents)
+            
+            @foreach(\$folder['documents'] as \$doc)
+            
+            ## {{ \$doc['title'] }}
+            
+            - **Company Name.** {{ \$doc['company_name'] }}
+            - **Uploaded At.** {{ \$doc['upload_date'] }}
+            - **Size.** {{ \$doc['size'] }} bytes
+            - **Reference.** {{ \$doc['reference'] }}
+            - **Status.** {{ \$doc['status'] }}
+            - **Revision.** {{ \$doc['revision'] }}
+            - **Locked.** {{ \$doc['is_locked'] ? 'true' : 'false' }}
+            
+            @endforeach
+            @endforeach
+        ",
     )]
     public function documents(JsonRpcRequest $request): array
     {
