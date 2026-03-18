@@ -80,7 +80,7 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Get everything known about a single asset.",
+        description: "Returns all the information known about an asset concerning its external perimeter. This method does not return any information concerning the asset's internal perimeter e.g. security events and IoCs.",
         params: [
             "asset" => "The asset name. (string|required|min:1|max:191)",
             "trial_id" => "If any, the trial id this asset belongs to.",
@@ -111,15 +111,21 @@ class AssetsProcedure extends Procedure
             "if the request is 'retrieve detailed information about 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\"}",
         ],
         ai_result: "
+            @if(!empty(\$result['tags']))
             The user's tags associated to {{ \$result['asset'] }} are {{ implode(', ', \$result['tags']) }}.
+            @endif
             @if(!empty(\$result['timeline']['sentinel']['end']))
             A full scan of {{ \$result['asset'] }} returned {{ count(\$result['vulnerabilities']) }} vulnerabilities and {{ count(\$result['ports']) }} open ports.
+            The last scan of {{ \$result['asset'] }} completed on {{ \$result['timeline']['sentinel']['end'] }}.
+            The next scan of {{ \$result['asset'] }} will be on {{ \$result['timeline']['next_scan'] }}.
             @elseif(!empty(\$result['timeline']['sentinel']['start']))
-            A vulnerability scan is running for {{ \$result['asset'] }}.
+            A port scan completed on {{ \$result['timeline']['nmap']['end'] }} for {{ \$result['asset'] }}.
+            A vulnerability scan is running since {{ \$result['timeline']['sentinel']['start'] }} for {{ \$result['asset'] }}.
             @elseif(!empty(\$result['timeline']['nmap']['end']))
+            A port scan completed on {{ \$result['timeline']['nmap']['end'] }} for {{ \$result['asset'] }}.
             A vulnerability scan will start soon for {{ \$result['asset'] }}.
             @elseif(!empty(\$result['timeline']['nmap']['start']))
-            A port scan is running for {{ \$result['asset'] }}.
+            A port scan is running since {{ \$result['timeline']['nmap']['start'] }} for {{ \$result['asset'] }}.
             @else
             A port scan will start soon for {{ \$result['asset'] }}.
             @endif
@@ -391,7 +397,7 @@ class AssetsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "List the user's assets.",
+        description: "List the user's assets, e.g. servers for which the external perimeter is monitored.",
         params: [
             "type" => "The type of asset to list: domain or ip_address. (string|nullable|in:domain,ip_address)",
             "is_monitored" => "The asset status: true to get only monitored assets, false to get only unmonitored assets, null to get all assets. (boolean|nullable)",

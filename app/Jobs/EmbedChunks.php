@@ -2,16 +2,19 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\Providers\HypotheticalQuestionsProvider;
+use App\AgentSquad\Assistants\ChunkAssistant;
+use App\Enums\LanguageEnum;
 use App\Models\Chunk;
 use App\Models\Collection;
 use App\Models\File;
+use App\Models\User;
 use App\Models\Vector;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class EmbedChunks implements ShouldQueue
 {
@@ -32,7 +35,15 @@ class EmbedChunks implements ShouldQueue
             ->get()
             ->each(function (Collection $collection) {
 
-                $collection->createdBy->actAs();
+                /** @var User $user */
+                $user = $collection->createdBy;
+
+                if (!$user) {
+                    Log::error("Collection has no createdBy user : {$collection->name} ({$collection->id})");
+                    return;
+                }
+
+                $user->actAs();
 
                 $collection->chunks()
                     ->where('is_embedded', false)
@@ -43,7 +54,10 @@ class EmbedChunks implements ShouldQueue
                         foreach ($chunks as $chunk) {
 
                             $lang = $chunk->language();
-                            $questions = HypotheticalQuestionsProvider::provide($lang, $chunk->text);
+                            $questions = ChunkAssistant::use()
+                                ->withLang(LanguageEnum::tryFrom($lang) ?? LanguageEnum::FRENCH)
+                                ->withChunk($chunk->text)
+                                ->hypotheticalQuestions();
 
                             foreach ($questions as $question) {
                                 if (Vector::isSupportedByMariaDb()) {

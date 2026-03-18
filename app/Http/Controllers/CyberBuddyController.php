@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AgentSquad\Actions\QueryKnowledgeBase;
-use App\AgentSquad\Providers\LlmsProvider;
-use App\AgentSquad\Providers\PromptsProvider;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\Events\IngestFile;
 use App\Models\Chunk;
 use App\Models\File;
@@ -234,11 +233,17 @@ class CyberBuddyController extends Controller
         $input = collect($params['q_and_a'] ?? [])
             ->map(fn(array $qa) => "Question: {$qa['question']}\nRéponse: {$qa['answer']}")
             ->join("\n\n");
-        $prompt = !empty($params['prompt']) ? $params['prompt'] : PromptsProvider::provide('default_cyberscribe', [
-            'EXAMPLE' => $template,
-            'QA' => $input,
-        ]);
-        return LlmsProvider::provide($prompt);
+        if (empty($params['prompt'])) {
+            return TextAssistant::use()
+                ->withPrompt('default_cyberscribe', [
+                    'EXAMPLE' => $template,
+                    'QA' => $input,
+                ])
+                ->text();
+        }
+        return TextAssistant::use()
+            ->withRawPrompt($params['prompt'])
+            ->text();
     }
 
     public function streamFile(string $secret, Request $request)

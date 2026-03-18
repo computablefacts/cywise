@@ -211,7 +211,7 @@ class CleanupTenantDataTest extends TestCaseWithDb
             'chunk_id' => $chunk->id,
             'locale' => 'fr',
             'hypothetical_question' => 'test?',
-            'embedding' => [0.1, 0.2],
+            'embedding' => array_fill(0, 1024, 0.1),
             'created_by' => $user->id,
         ]);
         $leak = TimelineItem::createItem($user->id, 'leak', now(), 0, [
@@ -234,9 +234,9 @@ class CleanupTenantDataTest extends TestCaseWithDb
         $this->assertDatabaseMissing('cb_files', ['id' => $file->id]);
         $this->assertDatabaseMissing('cb_collections', ['id' => $collection->id]);
         $this->assertDatabaseMissing('cb_vectors', ['id' => $vector->id]);
-        $this->assertDatabaseMissing('ynh_trials', ['id' => $trial->id]);
         $this->assertDatabaseMissing('t_items', ['id' => $leak->id]);
         $this->assertDatabaseMissing('t_facts', ['id' => $fact->id]);
+        $this->assertDatabaseHas('ynh_trials', ['id' => $trial->id]);
         $this->assertDatabaseHas('users', ['id' => $user->id]);
 
         NotificationFacade::assertSentTo(

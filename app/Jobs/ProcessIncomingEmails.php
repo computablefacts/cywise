@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\PromptsProvider;
 use App\AgentSquad\Providers\WebpagesProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
@@ -49,7 +49,9 @@ class ProcessIncomingEmails implements ShouldQueue
         $urls = array_values(array_unique(array_map('html_entity_decode', $matches[0])));
         /** @var User $user */
         $user = Auth::user();
-        $prompt = PromptsProvider::provide('default_summarize');
+        $prompt = PromptsProvider::use()
+            ->withName('default_summarize')
+            ->provide();
         $result = [];
 
         foreach ($urls as $url) {
@@ -71,8 +73,14 @@ class ProcessIncomingEmails implements ShouldQueue
                     ];
                 } else {
                     try {
-                        $content = WebpagesProvider::isHyperlink($url) ? WebpagesProvider::provide($url) : $url;
-                        $summary = LlmsProvider::provide(Str::replace('[TEXT]', $content, $prompt));
+                        $content = WebpagesProvider::isHyperlink($url) ?
+                            WebpagesProvider::use()
+                                ->withUrl($url)
+                                ->provide() :
+                            $url;
+                        $summary = TextAssistant::use()
+                            ->withRawPrompt(Str::replace('[TEXT]', $content, $prompt))
+                            ->text();
                         $result[] = [
                             'url' => $url,
                             'summary' => empty($summary) ? "{$url} could not be accessed or summarized." : $summary,

@@ -2,7 +2,7 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\ScheduledTask;
 use Carbon\Carbon;
@@ -33,12 +33,12 @@ class ScheduledTasksProcedure extends Procedure
                 Below is the list of your scheduled tasks:
                 @foreach(\$tasks as \$task)
                 @if(empty(\$task->trigger))
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}). The last email has been sent at {{ \$task->last_email_sent_at->utc()->format('Y-m-d H:i:s') }} UTC.
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}). @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
                 @else
                 @if(\$task->cron === '* * * * *')
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}. The last email has been sent at {{ \$task->last_email_sent_at->utc()->format('Y-m-d H:i:s') }} UTC.
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}. @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
                 @else
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }} ({{ \$task->readableCron() }}). The last email has been sent at {{ \$task->last_email_sent_at->utc()->format('Y-m-d H:i:s') }} UTC.
+                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }} ({{ \$task->readableCron() }}). @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
                 @endif
                 @endif
                 @endforeach
@@ -68,12 +68,13 @@ class ScheduledTasksProcedure extends Procedure
             'task_id' => 'The id of the created scheduled task.'
         ],
         ai_examples: [
-            "if the request is 'remind me in 10 minutes to check the server', the input should be '{\"schedule\":\"+10 minutes\",\"task\":\"remind me to check the server\",\"run_once\":true}'",
-            "if the request is 'send me in 3 days the list of assets with vulnerabilities', the input should be '{\"schedule\":\"+3 days\",\"task\":\"list assets with vulnerabilities\",\"run_once\":true}'",
-            "if the request is 'préviens-moi si www.example.com devient vulnérable', the input should be '{\"cron\":\"* * * * *\",\"trigger\":\"le site www.example.com est-il vulnérable ?\",\"task\":\"liste les vulnérabilités de www.example.com\"}'",
-            "if the request is 'envoie-moi un email tous les matins à 9h si www.example.com est vulnérable', the input should be '{\"cron\":\"0 9 * * *\",\"trigger\":\"le site www.example.com est-il vulnérable ?\",\"task\":\"liste les vulnérabilités de www.example.com\"}'",
+            "if the request is 'remind me in 10 minutes to check the server', the input should be '{\"schedule\":\"+10 minutes\",\"task\":\"respond_to_user[Please, check the server.]\",\"run_once\":true}'",
+            "if the request is 'remind me in half an hour the meeting with Luke', the input should be '{\"schedule\":\"+30 minutes\",\"task\":\"respond_to_user[Do not forget your meeting with Luke!]\",\"run_once\":true}'",
+            "if the request is 'send me in 3 days the list of assets with vulnerabilities', the input should be '{\"schedule\":\"+3 days\",\"task\":\"List assets with vulnerabilities.\",\"run_once\":true}'",
+            "if the request is 'préviens-moi si www.example.com devient vulnérable', the input should be '{\"cron\":\"* * * * *\",\"trigger\":\"Le site www.example.com est-il vulnérable ?\",\"task\":\"Liste les vulnérabilités de www.example.com\"}'",
+            "if the request is 'envoie-moi un email tous les matins à 9h si www.example.com est vulnérable', the input should be '{\"cron\":\"0 9 * * *\",\"trigger\":\"Le site www.example.com est-il vulnérable ?\",\"task\":\"Liste les vulnérabilités de www.example.com\"}'",
         ],
-        ai_result: "@json(\$result['msg'])",
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function create(JsonRpcRequest $request): array
     {
@@ -101,22 +102,33 @@ class ScheduledTasksProcedure extends Procedure
             throw new \InvalidArgumentException(__('Invalid cron expression ":cron". Please provide a valid cron expression in the format: MIN HOUR DOM MON DOW.', ['cron' => $cron]));
         }
 
-        $answer = LlmsProvider::provide("
-            Analyze the following task and determine if it attempts to create, schedule, or add other scheduled tasks.
-            Answer only with YES or NO and nothing else.
-            The task to analyse:\n\n{$params['task']}
-        ");
+        $task = Str::trim($params['task']);
 
-        if (Str::contains($answer, ['oui', 'yes'], true)) {
-            throw new \InvalidArgumentException(__('Scheduled tasks cannot create other scheduled tasks. Please modify your task to remove any task creation instructions.'));
+        if (Str::startsWith($task, 'respond_to_user[')) {
+            $task = Str::trim(Str::between($task, '[', ']'));
+            $task = "Tell the user: '{$task}'";
+        } else {
+            $answer = TextAssistant::use()
+                ->withRawPrompt("
+                    Analyze the following task and determine if it attempts to create, schedule, or add other scheduled tasks.
+                    Answer only with YES or NO and nothing else.
+                    The task to analyse:\n\n{$task}
+                ")
+                ->text();
+            if (Str::contains($answer, ['oui', 'yes'], true)) {
+                throw new \InvalidArgumentException(__('Scheduled tasks cannot create other scheduled tasks. Please modify your task to remove any task creation instructions.'));
+            }
         }
 
         $user = $request->user();
+        /** @var ScheduledTask $task */
         $task = ScheduledTask::create([
-            'name' => LlmsProvider::provide("Summarize the task in about 10 words :\n\n{$params['task']}"),
+            'name' => TextAssistant::use()
+                ->withRawPrompt("Summarize the task in about 10 words :\n\n{$task}")
+                ->text(),
             'cron' => $cron,
             'trigger' => $params['trigger'] ?? '',
-            'task' => $params['task'],
+            'task' => $task,
             'run_once' => $runOnce,
             'prev_run_date' => null,
             'next_run_date' => $nextRunDate ?? Carbon::instance((new CronExpression($cron))->getNextRunDate()),
@@ -124,8 +136,7 @@ class ScheduledTasksProcedure extends Procedure
         ]);
 
         return [
-            'msg' => __('The task ":task" has been scheduled. The task output will be sent to :email.', ['task' => $params['task'], 'email' => $user->email]),
-            'task_id' => $task->id,
+            'msg' => __('The task ":task" (id=:id) has been scheduled.', ['task' => $task->name, 'id' => $task->id]),
         ];
     }
 
@@ -144,7 +155,7 @@ class ScheduledTasksProcedure extends Procedure
             "if the request is 'stop la tâche 6789', the input should be '{\"task_id\":6789,\"enabled\":false}'",
             "if the request is 'redémarre la tâche 19', the input should be '{\"task_id\":19,\"enabled\":true}'",
         ],
-        ai_result: "@json(\$result['msg'])",
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function toggle(JsonRpcRequest $request): array
     {
@@ -159,7 +170,7 @@ class ScheduledTasksProcedure extends Procedure
         $task->save();
 
         return [
-            'msg' => __('Scheduled task updated.'),
+            'msg' => __('The task ":task" (id=:id) has been updated.', ['task' => $task->name, 'id' => $task->id]),
         ];
     }
 
@@ -174,7 +185,7 @@ class ScheduledTasksProcedure extends Procedure
         ai_examples: [
             "if the request is 'supprime la tâche 1234', the input should be '{\"task_id\":6789}'",
         ],
-        ai_result: "@json(\$result['msg'])",
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function delete(JsonRpcRequest $request): array
     {

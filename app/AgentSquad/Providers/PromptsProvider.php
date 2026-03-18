@@ -7,33 +7,42 @@ use App\Http\Requests\JsonRpcRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class PromptsProvider extends AbstractProvider
+class PromptsProvider
 {
-    public static function provide(string $name, array $variables = []): string
-    {
-        $before = microtime(true);
+    private string $name;
+    private array $variables = [];
 
+    public static function use(): PromptsProvider
+    {
+        return new PromptsProvider();
+    }
+
+    public function withName(string $name): PromptsProvider
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function withVariables(array $variables): PromptsProvider
+    {
+        $this->variables = $variables;
+        return $this;
+    }
+
+    public function provide(): string
+    {
         try {
-            $request = new JsonRpcRequest(['name' => $name]);
+            $request = new JsonRpcRequest(['name' => $this->name]);
             $request->setUserResolver(fn() => auth()->user());
             $prompt = (new PromptsProcedure())->get($request)['prompt'];
             $prompt = $prompt ? $prompt->template : '';
-            foreach ($variables as $key => $value) {
+            foreach ($this->variables as $key => $value) {
                 $prompt = Str::replace('{' . $key . '}', $value, $prompt);
             }
+            return $prompt;
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-            $prompt = null;
         }
-
-        $after = microtime(true);
-
-        if (isset($prompt)) {
-            self::traceSuccess('prompts', $before, $after);
-            return $prompt;
-        }
-
-        self::traceError('prompts', $before, $after);
         return '';
     }
 }

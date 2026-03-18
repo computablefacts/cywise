@@ -47,7 +47,7 @@ class TriggerDiscoveryShallow implements ShouldQueue
 
                         $discovered = $this->discover($tld);
 
-                        if (isset($discovered['subdomains']) && count($discovered['subdomains'])) {
+                        if (($response['fallback'] ?? false) === true && !empty($discovered['subdomains'])) {
                             collect($discovered['subdomains'])
                                 ->filter(fn(?string $domain) => !empty($domain))
                                 ->filter(fn(string $domain) => $user->email === config('towerify.admin.email') || !Str::endsWith($domain, ['computablefacts.com', 'computablefacts.io', 'towerify.io', 'cywise.io']))

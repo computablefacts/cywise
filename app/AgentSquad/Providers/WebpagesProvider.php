@@ -2,40 +2,49 @@
 
 namespace App\AgentSquad\Providers;
 
+use App\Enums\LanguageEnum;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class WebpagesProvider extends AbstractProvider
+class WebpagesProvider
 {
-    public static function provide(string $url, string $country = 'fr'): string
-    {
-        $before = microtime(true);
-
-        try {
-            $answer = self::callScrapfly($url, $country);
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            $answer = null;
-        }
-
-        $after = microtime(true);
-
-        if (isset($answer)) {
-            self::traceSuccess('webpages', $before, $after);
-            return $answer;
-        }
-
-        self::traceError('webpages', $before, $after);
-        return '';
-    }
+    private string $url;
+    private LanguageEnum $proxyCountry = LanguageEnum::FRENCH;
 
     public static function isHyperlink(string $text): bool
     {
         return Str::startsWith(Str::lower($text), ["https://", "http://"]);
     }
 
-    private static function callScrapfly(string $text, string $country = 'fr'): string
+    public static function use(): WebpagesProvider
+    {
+        return new WebpagesProvider();
+    }
+
+    public function withUrl(string $url): WebpagesProvider
+    {
+        $this->url = $url;
+        return $this;
+    }
+
+    public function withProxyCountry(LanguageEnum $country): WebpagesProvider
+    {
+        $this->proxyCountry = $country;
+        return $this;
+    }
+
+    public function provide(): string
+    {
+        try {
+            return self::callScrapflyOrScraperApi($this->url, $this->proxyCountry->value);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
+        return '';
+    }
+
+    private static function callScrapflyOrScraperApi(string $text, string $country): string
     {
         if (self::isHyperlink($text)) {
             if (config('towerify.scrapfly.api_key')) {

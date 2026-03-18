@@ -2,7 +2,7 @@
 
 namespace App\Http\Procedures;
 
-class IdoxXmlElement
+class FusionLiveXmlElement
 {
     private \SimpleXMLElement $xml;
     private array $fields = [];

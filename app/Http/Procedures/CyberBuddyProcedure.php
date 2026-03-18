@@ -5,8 +5,8 @@ namespace App\Http\Procedures;
 use App\AgentSquad\Actions\LabourLawyerConclusionsWriter;
 use App\AgentSquad\ActionsRegistry;
 use App\AgentSquad\Answers\FailedAnswer;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Orchestrator;
-use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\Enums\RoleEnum;
 use App\Http\Requests\JsonRpcRequest;
@@ -114,7 +114,9 @@ class CyberBuddyProcedure extends Procedure
                     return Str::upper("> " . $message['role']) . " : {$msg}";
                 })
                 ->join("\n\n");
-            $conversation->description = LlmsProvider::provide("Summarize the conversation in about 10 words :\n\n{$exchange}");
+            $conversation->description = TextAssistant::use()
+                ->withRawPrompt("Summarize the conversation in about 10 words :\n\n{$exchange}")
+                ->text();
             $conversation->save();
         }
         return [

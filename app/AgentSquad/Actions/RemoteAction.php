@@ -2,7 +2,6 @@
 
 namespace App\AgentSquad\Actions;
 
-use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
@@ -161,15 +160,15 @@ class RemoteAction extends AbstractAction
             return new FailedAnswer("Remote action call failed for action {$this->name()}", $chainOfThought);
         }
 
-        $chainOfThought[] = new ThoughtActionObservation("Call the remote action {$this->name()} endpoint.", "call[{$action->url}]", "The endpoint has been called and the call succeeded: " . json_encode($data));
+        $chainOfThought[] = new ThoughtActionObservation("Call the remote action {$this->name()} endpoint.", "call[{$action->url}]", "The endpoint has been called and the call succeeded: " . cywise_truncate_string(json_encode($data)));
 
         // Build the response
         if (empty($action->response_template)) {
             $transformation = $data;
-            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} as-is.", "transform[" . json_encode($data) . "]", "The data have not been transformed: " . json_encode($transformation));
+            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} as-is.", "transform[" . cywise_truncate_string(json_encode($data)) . "]", "The data have not been transformed: " . json_encode($transformation));
         } else {
             $transformation = $this->buildResponse($action->response_template, $payload['params'], $data);
-            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} after transformation.", "transform[" . json_encode($data) . "]", "The data have been transformed: {$transformation}");
+            $chainOfThought[] = new ThoughtActionObservation("Return data from action {$this->name()} after transformation.", "transform[" . cywise_truncate_string(json_encode($data)) . "]", "The data have been transformed: {$transformation}");
         }
         return new SuccessfulAnswer(
             is_string($transformation) ? $transformation : json_encode($transformation),

@@ -478,64 +478,6 @@
 </div>
 @endif
 <!-- HONEYPOTS : END -->
-<!-- APPS : BEGIN -->
-@php
-$apps = \App\Models\YnhServer::forUser(request()->user())
-->flatMap(fn(\App\Models\YnhServer $server) => $server->applications)
-->sortBy([
-['server.name', 'asc'],
-['name', 'asc'],
-], SORT_NATURAL | SORT_FLAG_CASE);
-@endphp
-@if($apps->isNotEmpty())
-<div class="row pt-3">
-  <div class="col">
-    <div class="card">
-      <div class="card-body p-0">
-        <table class="table table-sm">
-          <thead>
-          <tr>
-            <th style="color:var(--bs-body-color);">{{ __('Server') }}</th>
-            <th style="color:var(--bs-body-color);">{{ __('Name') }}</th>
-            <th style="color:var(--bs-body-color);">{{ __('Description') }}</th>
-            <th style="color:var(--bs-body-color);">{{ __('Sku') }}</th>
-            <th style="color:var(--bs-body-color);">{{ __('Version') }}</th>
-          </tr>
-          </thead>
-          <tbody>
-          @foreach($apps as $app)
-          <tr>
-            <td style="color:var(--bs-body-color);">
-              <span class="font-lg mb-3 fw-bold">
-                {{ $app->server->name }}
-              </span>
-            </td>
-            <td style="color:var(--bs-body-color);">
-              <span class="font-lg mb-3 fw-bold">
-                <a href="https://{{ $app->path }}" target="_blank">
-                  {{ $app->name }}
-                </a>
-              </span>
-            </td>
-            <td style="color:var(--bs-body-color);">
-              {{ $app->description }}
-            </td>
-            <td style="color:var(--bs-body-color);">
-              {{ $app->sku }}
-            </td>
-            <td style="color:var(--bs-body-color);">
-              {{ $app->version }}
-            </td>
-          </tr>
-          @endforeach
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-@endif
-<!-- APPS : END -->
 <!-- ACTIONS : BEGIN -->
 <div class="row pt-3">
   <!-- ACTION PROTECT : BEGIN -->

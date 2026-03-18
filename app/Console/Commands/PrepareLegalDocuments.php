@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\AgentSquad\Providers\EmbeddingsProvider;
-use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Assistants\ChunkAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Vectors\FileVectorStore;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -105,12 +105,16 @@ class PrepareLegalDocuments extends Command
         if (!file_exists($toc)) {
             $this->info("Extracting table of contents from {$txt}...");
             $content = \File::get($txt);
-            $answer = LlmsProvider::provide("
-                Extrait de ce document en français tous les titres de sections et de sous-sections. 
-                Remplace les noms de personnes par 'XXX', les noms de sociétés par 'YYY' et les noms de rues, de boulevards, d'avenues et de villes par 'ZZZ'.
-                
-                {$content}
-            ", 'google/gemini-2.5-flash', 30 * 60);
+            $answer = TextAssistant::use()
+                ->withTimeout(30 * 60)
+                ->withDeepInfraModel('google/gemini-2.5-flash')
+                ->withRawPrompt("
+                    Extrait de ce document en français tous les titres de sections et de sous-sections. 
+                    Remplace les noms de personnes par 'XXX', les noms de sociétés par 'YYY' et les noms de rues, de boulevards, d'avenues et de villes par 'ZZZ'.
+                    
+                    {$content}
+                ")
+                ->text();
             $sections = collect(explode("\n", $answer))
                 ->filter(fn(string $line) => !empty($line))
                 // ->filter(fn(string $line) => Str::startsWith(Str::trim($line), '* '))
@@ -126,21 +130,25 @@ class PrepareLegalDocuments extends Command
         if (!file_exists($facts)) {
             $this->info("Extracting facts from {$txt}...");
             $content = \File::get($txt);
-            $answer = LlmsProvider::provide("
-                Extrait les faits, les textes de lois ainsi que la jurisprudence utilisée pour chaque demande de la partie adverse du document de conclusions juridiques entre [CONCL] et [/CONCL]. 
-                Remplace les noms de personnes par 'XXX', les noms de sociétés par 'YYY' et les noms de rues, de boulevards, d'avenues et de ville par 'ZZZ'.
-                Formate la sortie sous forme d'un fichier markdown où :
-                - Chaque titre de section est une demande de la partie adverse
-                - Chaque section est divisée en quatre sous-sections :
-                  - Une section de titre 'Conclusion' explicitant ce que cherche à prouver l'auteur des conclusions dans cette section, i.e. l'argument principal.
-                  - Une section de titre 'Loi de passage' explicitant les liens sous-entendus ou explicites entre la conclusion et les faits.
-                  - Une section de titre 'En droit' listant les textes de lois et la jurisprudence utilisés. Résume l'esprit du texte en une phrase.
-                  - Une section de titre 'Au cas présent' listant les faits.
-                
-                [CONCL]
-                {$content}
-                [/CONCL]
-            ", 'google/gemini-2.5-flash', 30 * 60);
+            $answer = TextAssistant::use()
+                ->withTimeout(30 * 60)
+                ->withDeepInfraModel('google/gemini-2.5-flash')
+                ->withRawPrompt("
+                    Extrait les faits, les textes de lois ainsi que la jurisprudence utilisée pour chaque demande de la partie adverse du document de conclusions juridiques entre [CONCL] et [/CONCL]. 
+                    Remplace les noms de personnes par 'XXX', les noms de sociétés par 'YYY' et les noms de rues, de boulevards, d'avenues et de ville par 'ZZZ'.
+                    Formate la sortie sous forme d'un fichier markdown où :
+                    - Chaque titre de section est une demande de la partie adverse
+                    - Chaque section est divisée en quatre sous-sections :
+                      - Une section de titre 'Conclusion' explicitant ce que cherche à prouver l'auteur des conclusions dans cette section, i.e. l'argument principal.
+                      - Une section de titre 'Loi de passage' explicitant les liens sous-entendus ou explicites entre la conclusion et les faits.
+                      - Une section de titre 'En droit' listant les textes de lois et la jurisprudence utilisés. Résume l'esprit du texte en une phrase.
+                      - Une section de titre 'Au cas présent' listant les faits.
+                    
+                    [CONCL]
+                    {$content}
+                    [/CONCL]
+                ")
+                ->text();
             \File::put($facts, $answer);
             $this->info("Facts extracted.");
         }
@@ -193,12 +201,12 @@ class PrepareLegalDocuments extends Command
 
         foreach ($sections as $section => $subsections) {
 
-            $vector = EmbeddingsProvider::provide($section, [$section => $subsections]);
+            $vector = ChunkAssistant::use()->withChunk($section)->vector([$section => $subsections]);
             $vectors->addVector($vector);
 
             foreach ($subsections as $subsection => $lines) {
                 foreach ($lines as $line) {
-                    $vector = EmbeddingsProvider::provide($line, [$section => $subsections]);
+                    $vector = ChunkAssistant::use()->withChunk($line)->vector([$section => $subsections]);
                     $vectors->addVector($vector);
                 }
             }

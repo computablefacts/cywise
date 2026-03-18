@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AgentSquad;
+namespace App\AgentSquad\Actions;
 
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\Models\User;

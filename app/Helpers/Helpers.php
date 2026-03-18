@@ -197,7 +197,7 @@ if (!function_exists('cywise_unpack_files')) {
     }
 }
 if (!function_exists('cywise_compress_log_buffer')) {
-    function cywise_compress_log_buffer(array $buffer): array
+    function cywise_compress_log_buffer(array $buffer, float $threshold = 0.9): array
     {
         if (empty($buffer)) {
             return [];
@@ -218,7 +218,7 @@ if (!function_exists('cywise_compress_log_buffer')) {
                 $nextLine = $buffer[$i + 1];
                 $ratio = 1.0 - cywise_levenshtein_ratio(mb_strtolower($line), mb_strtolower($nextLine));
 
-                if ($ratio > 0.9) {
+                if ($ratio > $threshold) {
                     $lineCount++;
                     $i++;
                 } else {
@@ -245,7 +245,7 @@ if (!function_exists('cywise_compress_log_buffer')) {
                     $nextBlock = $buffer[$j] . "\n" . $buffer[$j + 1];
                     $ratio = 1.0 - cywise_levenshtein_ratio(mb_strtolower($block), mb_strtolower($nextBlock));
 
-                    if ($ratio > 0.9) {
+                    if ($ratio > $threshold) {
                         $blockCount++;
                         $j += 2;
                     } else {
@@ -358,4 +358,14 @@ if (!function_exists('app_config_override')) {
         }
     }
 }
-
+if (!function_exists('cywise_truncate_string')) {
+    function cywise_truncate_string(string $str, int $size = 500): string
+    {
+        if (mb_strlen($str) <= $size) {
+            return $str;
+        }
+        $start = mb_substr($str, 0, 50);
+        $end = mb_substr($str, -50);
+        return $start . '[...]' . $end;
+    }
+}

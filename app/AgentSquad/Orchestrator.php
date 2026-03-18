@@ -2,12 +2,12 @@
 
 namespace App\AgentSquad;
 
+use App\AgentSquad\Actions\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
 use App\Http\Procedures\NotesProcedure;
 use App\Models\User;
@@ -114,22 +114,30 @@ class Orchestrator
             }
         }
 
+        $history = '';
+
+        foreach ($messages as $message) {
+            $prefix = ($message['role'] ?? '') === RoleEnum::USER->value ? 'user > ' : 'assistant > ';
+            $history .= $prefix . ($message['content'] ?? '') . "\n";
+        }
+
         $template = '{"thought":"describe here succinctly your thoughts about the question you have been asked", "action_name":"set here the name of the action to execute", "action_input":"set here the input for the action"}';
         $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
         $actions = implode("\n", array_map(fn(AbstractAction $action) => "[ACTION][NAME]{$action->name()}[/NAME][DESCRIPTION]{$action->description()}[/DESCRIPTION][/ACTION]", array_filter($this->agents, fn(AbstractAction $action) => $action->isInvokable())));
-        $prompt = PromptsProvider::provide('default_orchestrator', [
-            'TEMPLATE' => $template,
-            'COT' => $cot,
-            'ACTIONS' => $actions,
-            'INPUT' => $input,
-            'MEMOS' => MemosProvider::provide($user, NotesProcedure::SCOPE_IS_ORCHESTRATOR),
-        ]);
-        $messages[] = [
-            'role' => RoleEnum::USER->value,
-            'content' => $prompt,
-        ];
-        $result = LlmsProvider::provideJson($messages, $this->model);
-        array_pop($messages);
+        $result = TextAssistant::use()
+            ->withDeepInfraModel($this->model)
+            ->withPrompt('default_orchestrator', [
+                'TEMPLATE' => $template,
+                'COT' => $cot,
+                'ACTIONS' => $actions,
+                'INPUT' => $input,
+                'HISTORY' => $history,
+                'MEMOS' => MemosProvider::use()
+                    ->withScope(NotesProcedure::SCOPE_IS_ORCHESTRATOR)
+                    ->withUser($user)
+                    ->provide(),
+            ])
+            ->structured();
         /** @var string $answer */
         $answer = $result->raw;
         /** @var array $json */

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\AgentSquad\Providers\EmbeddingsProvider;
+use App\AgentSquad\Assistants\ChunkAssistant;
 use App\AgentSquad\Vectors\FileVectorStore;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -42,10 +42,12 @@ class PrepareRowdenDataset extends Command
                     $question = $item['question'];
                     $answer = $item['answer'];
                     $source = $item['sourceURL'];
-                    $vector = EmbeddingsProvider::provide($question, [
-                        'answer' => $answer,
-                        'source' => $source,
-                    ]);
+                    $vector = ChunkAssistant::use()
+                        ->withChunk($question)
+                        ->vector([
+                            'answer' => $answer,
+                            'source' => $source,
+                        ]);
                     $vectors->addVector($vector);
                 });
 

@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\AgentSquad\Providers\AudioToTextProvider;
+use App\AgentSquad\Assistants\AudioAssistant;
 use App\Events\IngestFile;
 use App\Helpers\ApiUtilsFacade as ApiUtils;
 use App\Http\Controllers\CyberBuddyController;
@@ -10,6 +10,7 @@ use App\Models\Chunk;
 use App\Models\Collection;
 use App\Models\File;
 use App\Models\Vector;
+use App\Notifications\Notification;
 use App\Rules\IsValidCollectionName;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -46,6 +47,8 @@ class IngestFileListener extends AbstractListener
             if (!$file) {
                 throw new \Exception("Invalid file id : {$event->fileId}");
             }
+
+            $event->user->notify(new Notification(__("Import of document :document started.", ['document' => $file->name])));
 
             // webm to mp3
             if ($file->mime_type === 'audio/webm') {
@@ -94,7 +97,7 @@ class IngestFileListener extends AbstractListener
             // Speech-to-text
             if ($file->mime_type === 'audio/mpeg' || $file->mime_type === 'audio/wav') {
 
-                $text = AudioToTextProvider::provide($file->downloadUrl());
+                $text = AudioAssistant::use()->withUrl($file->downloadUrl())->text();
 
                 if ($text === '') {
                     throw new \Exception('Error transforming audio into text.');
@@ -396,8 +399,16 @@ class IngestFileListener extends AbstractListener
                 $file->is_embedded = true;
                 $file->save();
             }
+
+            $event->user->notify(new Notification(__("Import of document :document finished successfully.", ['document' => $file->name])));
+
         } catch (\Exception $exception) {
+
             Log::error($exception->getMessage());
+
+            if (isset($file)) {
+                $event->user->notify(new Notification(__("Import of document :document failed: :error", ['document' => $file->name, 'error' => $exception->getMessage()])));
+            }
         }
     }
 

@@ -4,19 +4,25 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://github.com/computablefacts/towerify/releases" target="_blank">
-        <img src="https://img.shields.io/github/v/release/computablefacts/towerify" alt="Latest Stable Version">
+    <a href="https://github.com/computablefacts/cywise/blob/main/README.md" target="_blank">
+        <img src="https://img.shields.io/badge/lang-fr-lightyellow.svg" alt="fr">
     </a>
-    <a href="https://github.com/computablefacts/towerify/actions" target="_blank">
-        <img src="https://github.com/computablefacts/towerify/actions/workflows/tests.yml/badge.svg" alt="Build Status">
+    <a href="https://github.com/computablefacts/cywise/blob/main/README.en.md" target="_blank">
+        <img src="https://img.shields.io/badge/lang-en-lightyellow.svg" alt="en">
     </a>
-    <a href="https://github.com/computablefacts/towerify/commits" target="_blank">
-        <img src="https://img.shields.io/github/commit-activity/y/computablefacts/towerify.svg" alt="GitHub commit activity">
+    <a href="https://github.com/computablefacts/cywise/releases" target="_blank">
+        <img src="https://img.shields.io/github/v/release/computablefacts/cywise" alt="Latest Stable Version">
     </a>
-    <a href="https://github.com/computablefacts/towerify/graphs/contributors" target="_blank">
-        <img src="https://img.shields.io/github/contributors-anon/computablefacts/towerify.svg" alt="GitHub contributors">
+    <a href="https://github.com/computablefacts/cywise/actions" target="_blank">
+        <img src="https://github.com/computablefacts/cywise/actions/workflows/tests.yml/badge.svg" alt="Build Status">
     </a>
-    <a href="https://github.com/computablefacts/towerify/LICENSE.md" target="_blank">
+    <a href="https://github.com/computablefacts/cywise/commits" target="_blank">
+        <img src="https://img.shields.io/github/commit-activity/y/computablefacts/cywise.svg" alt="GitHub commit activity">
+    </a>
+    <a href="https://github.com/computablefacts/cywise/graphs/contributors" target="_blank">
+        <img src="https://img.shields.io/github/contributors-anon/computablefacts/cywise.svg" alt="GitHub contributors">
+    </a>
+    <a href="https://github.com/computablefacts/cywise/LICENSE.md" target="_blank">
         <img src="https://img.shields.io/badge/license-AGPLv3-green" alt="License">
     </a>
 </p>
@@ -120,7 +126,7 @@ résultats de vos scans. CyberBuddy, notre assistant virtuel, vous guide en temp
 connaissances vérifiées et des bonnes pratiques reconnues. Une expertise accessible, où que vous soyez.
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API [DeepInfra](https://deepinfra.com/).
 
 ### CyberScribe
 
@@ -131,7 +137,7 @@ Systèmes d'Information (PSSI) ? CyberScribe, notre éditeur intelligent, vous a
 documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence artificielle.
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API [DeepInfra](https://deepinfra.com/).
 
 ### Telegram & WhatsApp
 
@@ -141,7 +147,7 @@ documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence
 des messageries [Telegram](https://telegram.org) et [WhatsApp](https://www.whatsapp.com/).
 
 > [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API DeepInfra.
+> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API [DeepInfra](https://deepinfra.com/).
 
 ## Divers
 
@@ -161,6 +167,112 @@ l'information au quotidien.
 
 **En 2026, le SSO n'est plus une option.** Cywise intègre un module SSO moderne, compatible avec les standards du
 marché (OAuth 2.0, SAML, OpenID Connect), pour vous permettre de contrôler les accès de manière unifiée.
+
+# Fonctionnement
+
+## CyberBuddy
+
+CyberBuddy est au coeur de l'expérience Cywise. Il agit comme un orchestrateur intelligent capable de comprendre vos
+demandes en langage naturel et d'y répondre en interrogeant différentes sources de données.
+
+```text
+   UTILISATEUR           MESSAGERIES              CYWISE WEBHOOK                   CYBERBUDDY (IA)
+   +----------+        +-------------+        +-------------------+      +--------------------------------+
+   |  Mobile  | <----> | - Telegram  | <----> |  - Validation     | <--> |  - Orchestrateur               |
+   |   App    |        | - WhatsApp  |        |  - Mapping Thread |      |  - AgentSquad                  |
+   +----------+        +-------------+        +-------------------+      |  - Thought/Action/Observation  |
+                                                                         +---------------+----------------+
+                                                                                         |
+         +------------------------+------------------------+-----------------------------+--+
+         |                        |                        |                                |
+         v                        v                        v                                v
+   [ DONNÉES STRUCTURÉES ]    [ BASE DE CONNAISSANCES ]  [ ACTIONS LOCALES ]             [ ACTIONS DISTANTES ]
+   
+   +-----------------------+  +-----------------------+  +----------------------------+  +---------------------------------+
+   |  TABLES ANALYTIQUES   |  |   RECHERCHE HYBRIDE   |  |   APIS INTERNES JSON-RPC   |  |      APIS EXTERNES JSON-RPC     |
+   |      (ClickHouse)     |  |    (MariaDB / RAG)    |  |       (Annotations)        |  |          (HTTP Request)         |
+   +-----------------------+  +-----------------------+  +-------------+--------------+  +---------------------------------+
+   | - Tables de données   |  | - Mémos               |                |                 | - URL & Headers                 |
+   | - Génération SQL      |  | - Collections         |                v                 | - Payload JSON                  |
+   | - Résultats TSV       |  | - Documents / Chunks  |  +----------------------------+  | - Response JSON                 |
+   |                       |  | - Vecteurs (Cosine)   |  |    PROCÉDURES JSON-RPC     |  +---------------------------------+
+   +-----------------------+  +-----------------------+  +----------------------------+ 
+                                                         | - #[RpcMethod]             | 
+                                                         | - Payload JsonRequest      | 
+                                                         | - Response array           |
+                                                         +----------------------------+
+```
+
+Le schéma ci-dessus illustre le flux de traitement d'une demande. Par exemple, si vous envoyez dans votre client de
+messagerie « surveille www.example.com », CyberBuddy :
+
+- identifie votre intention ;
+- choisit l'action appropriée ;
+- appelle la procédure JSON-RPC associée à cette action avec le domaine fourni ;
+- confirme la mise en place de la surveillance après avoir reçu la réponse de la procédure.
+
+Les composants clefs de cette architecture sont :
+
+- **CyberBuddy.** A partir de votre demande en langage naturel, planifie les outils à appeler pour atteindre votre
+  objectif. Par exemple :
+    - « Quelles sont mes priorités ce matin ? »
+- **Données structurées.** Utilise ClickHouse pour effectuer des analyses complexes et des calculs statistiques sur de
+  grands volumes de données techniques (fuites de données ou imports de vos données tabulaires). Par exemple :
+    - « Quels sont mes identifiants fuités ? »
+- **Base de connaissance.** Système de RAG (Retrieval Augmented Generation) qui fouille dans vos documents (Chartes
+  informatiques, PSSI, PDF) et vos notes personnelles (mémos) par recherche sémantique pour vous renvoyer des réponses
+  factuelles et sourcées. Par exemple :
+    - « Comment isoler un serveur compromis d'après nos procédures ? »
+- **Actions locales.** Permettent de piloter directement les fonctionnalités de Cywise via ses API JSON-RPC. Par
+  exemple :
+    - « Surveille www.example.com »
+    - « Envoie-moi un rapport de sécurité tous les mercredi à 11h. »
+- **Actions distantes.** Permettent à Cywise d'interagir avec des systèmes tiers (SIEM, outils de ticketing, Cloud) en
+  consommant leurs API JSON-RPC. Par exemple :
+    - « Ouvre un ticket Jira pour cette vulnérabilité »
+    - « Liste mes instances actives sur AWS. »
+
+## Opérateur SOC
+
+L'Opérateur SOC est un agent spécialisé dans l'analyse d'événements de sécurité. Il agit comme un analyste de niveau
+1 capable de traiter de gros volumes d'événements techniques pour en extraire des signaux faibles et des comportements
+anormaux.
+
+```text
+   SERVEUR UTILISATEUR                   OPÉRATEUR SOC (IA)                          RÉSULTATS
+   +-----------------+      +--------------------------------------------+      +-------------------+
+   |  - Événements   |      |  - Collecte & Compression                  |      |  - Verdict        |
+   |  - IoC          | ---> |  - Contexte (Mémos)                        | ---> |  - Criticité      |
+   +-----------------+      |  - Analyse d'intention (IA)                |      |  - Remédiation    |
+                            +--------------------------------------------+      +-------------------+
+```
+
+Contrairement à CyberBuddy qui répond aux questions de l'utilisateur, l'Opérateur SOC travaille de manière autonome
+pour :
+
+- **Analyser les événements de sécurité.** Il traite les logs système collectés par Osquery sur vos serveurs Linux et
+  Windows.
+- **Prendre en compte le contexte.** Il utilise vos notes et procédures internes (mémos) pour adapter son analyse à
+  votre environnement spécifique.
+- **Qualifier la menace.** Il émet un verdict (NORMAL, SUSPECT, ANORMAL) accompagné d'un score de confiance et d'une
+  justification détaillée.
+- **Suggérer des actions.** En cas de détection suspecte, il recommande immédiatement les premières étapes de
+  remédiation.
+
+## Mémos
+
+Les mémos sont des notes personnelles ou des procédures spécifiques que vous pouvez créer directement dans l'interface
+de Cywise. Ils constituent le "contexte local" indispensable pour transformer une IA générique en un assistant
+véritablement au fait de vos contraintes.
+
+Leur importance est capitale car ils permettent de :
+
+- **Personnaliser l'analyse.** En indiquant que tel serveur est un serveur de test, l'Opérateur SOC pourra qualifier
+  certains comportements de "normaux" alors qu'ils seraient jugés "suspects" ailleurs.
+- **Capitaliser sur votre savoir-faire.** En renseignant vos procédures d'astreinte ou vos contacts d'urgence,
+  CyberBuddy peut les restituer immédiatement en cas de crise.
+- **Réduire les faux positifs.** Plus l'IA connaît votre environnement (plages horaires, outils d'administration
+  utilisés), plus son diagnostic est précis.
 
 # Installation
 
@@ -282,7 +394,7 @@ Vous pouvez supprimer l'intégralité de la stack y compris toutes les données 
 
 ### CyberBuddy et CyberScribe
 
-Pour activer CyberBuddy et CyberScribe, vous devez avoir créé une clé d'API chez [deepinfra](https://deepinfra.com/).
+Pour activer CyberBuddy et CyberScribe, vous devez avoir créé une clé d'API chez [DeepInfra](https://deepinfra.com/).
 
 Vous devez ensuite mettre en place cette clé dans Cywise.
 

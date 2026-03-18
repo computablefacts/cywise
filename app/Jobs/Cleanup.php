@@ -45,58 +45,12 @@ class Cleanup implements ShouldQueue
 
     public function handle()
     {
-        Log::debug("Cleaning up non-paying customers...");
-
-        $this->cleanupTenants();
-
-        Log::debug("Non-paying customers cleaned.");
-        Log::debug("Cleaning up empty tenants...");
-
-        $this->deleteEmptyTenants();
-
-        Log::debug("Empty tenants cleaned.");
-        Log::debug("Cleaning up trials...");
-
-        Trial::whereNull('created_by')
-            ->where('updated_at', '<', now()->subDays(10))
-            ->delete();
-
-        Log::debug("Trials cleaned up.");
-        Log::debug("Removing events associated to disabled osquery rules...");
-
-        // When a rule is disabled, cleanup the history
-        $rules = YnhOsqueryRule::where('enabled', false)->get()->pluck('name');
-        YnhOsquery::whereIn('name', $rules)->limit(10000)->delete();
-        YnhOsqueryLatestEvent::whereIn('event_name', $rules)->delete();
-
-        Log::debug("Events removed.");
-        Log::debug("Finding overflowing events...");
-
-        // When the list of cached events "overflow" for a given (server, rule), remove the oldest events
-        $threshold = 1000;
-
-        $overflowingEvents = DB::table('ynh_osquery_latest_events')
-            ->select('ynh_server_id', 'server_name', 'event_name', DB::raw('COUNT(*) as event_count'))
-            ->whereNotIn('event_name', $rules)
-            ->groupBy('ynh_server_id', 'server_name', 'event_name')
-            ->having('event_count', '>', $threshold)
-            ->get();
-
-        Log::debug("{$overflowingEvents->count()} overflowing events found.");
-        Log::debug("Removing overflowing events...");
-
-        foreach ($overflowingEvents as $event) {
-            Log::debug("Compacting events {$event->event_name} for server {$event->server_name}...");
-            DB::table('ynh_osquery_latest_events')
-                ->where('ynh_server_id', $event->ynh_server_id)
-                ->where('event_name', $event->event_name)
-                ->orderBy('calendar_time')
-                ->limit($event->event_count - $threshold)
-                ->delete();
-            Log::debug("Events {$event->event_name} for server {$event->server_name} compacted.");
-        }
-
-        Log::debug("Overflowing events removed.");
+        $this->deleteTenantsWithoutUsers();
+        $this->removeTrialsWithoutDomains();
+        $this->deleteAssetsOfTenantsWithoutSubscription();
+        $this->upgradeTrialAssetsToAssets();
+        $this->removeEventsAssociatedWithDisabledOsqueryRules();
+        $this->removeOverflowingEvents();
 
         User::all()->each(function (User $user) {
 
@@ -181,7 +135,93 @@ class Cleanup implements ShouldQueue
         });
     }
 
-    private function deleteEmptyTenants(): void
+    private function removeEventsAssociatedWithDisabledOsqueryRules(): void
+    {
+        // When a rule is disabled, cleanup the history
+        $rules = YnhOsqueryRule::where('enabled', false)->get()->pluck('name');
+        YnhOsquery::whereIn('name', $rules)->limit(10000)->delete();
+        YnhOsqueryLatestEvent::whereIn('event_name', $rules)->delete();
+    }
+
+    private function removeOverflowingEvents(): void
+    {
+        Log::debug("Finding overflowing events...");
+
+        // When the list of cached events "overflow" for a given (server, rule), remove the oldest events
+        $threshold = 1000;
+        $rules = YnhOsqueryRule::where('enabled', false)->get()->pluck('name');
+        $overflowingEvents = DB::table('ynh_osquery_latest_events')
+            ->select('ynh_server_id', 'server_name', 'event_name', DB::raw('COUNT(*) as event_count'))
+            ->whereNotIn('event_name', $rules)
+            ->groupBy('ynh_server_id', 'server_name', 'event_name')
+            ->having('event_count', '>', $threshold)
+            ->get();
+
+        Log::debug("{$overflowingEvents->count()} overflowing events found.");
+        Log::debug("Removing overflowing events...");
+
+        foreach ($overflowingEvents as $event) {
+            Log::debug("Compacting events {$event->event_name} for server {$event->server_name}...");
+            DB::table('ynh_osquery_latest_events')
+                ->where('ynh_server_id', $event->ynh_server_id)
+                ->where('event_name', $event->event_name)
+                ->orderBy('calendar_time')
+                ->limit($event->event_count - $threshold)
+                ->delete();
+            Log::debug("Events {$event->event_name} for server {$event->server_name} compacted.");
+        }
+
+        Log::debug("Overflowing events removed.");
+    }
+
+    private function removeTrialsWithoutDomains(): void
+    {
+        Trial::whereNull('domain')
+            ->where('updated_at', '<', now()->subDays(5))
+            ->delete();
+    }
+
+    private function upgradeTrialAssetsToAssets(): void
+    {
+        Asset::withoutGlobalScope('tenant_scope')
+            ->whereNotNull('ynh_trial_id')
+            ->get()
+            ->each(function (Asset $asset) {
+
+                Log::debug("Processing {$asset->asset} with trial id {$asset->ynh_trial_id}...");
+
+                /** @var ?Trial $trial */
+                $trial = Trial::withoutGlobalScope('tenant_scope')->find($asset->ynh_trial_id);
+
+                if (!$trial || $trial->created_at->lt(now()->subDays(15))) {
+
+                    /** @var ?User $user */
+                    $user = User::withoutGlobalScope('tenant_scope')->find($asset->created_by);
+                    $tenantId = $user?->tenant_id;
+
+                    if (!$tenantId) {
+                        $asset->delete();
+                        Log::debug("Asset {$asset->asset} with trial id {$asset->ynh_trial_id} removed.");
+                        return;
+                    }
+
+                    $users = User::withoutGlobalScope('tenant_scope')->where('tenant_id', $tenantId)->get();
+                    $hasPayingUser = $users->contains(fn(User $user) => $user->subscriber());
+
+                    // If the tenant has a subscription, the trial asset is now an asset
+                    if (!$hasPayingUser) {
+                        $asset->delete();
+                        Log::debug("Asset {$asset->asset} with trial id {$asset->ynh_trial_id} removed.");
+                    } else {
+                        Log::debug("Trial id {$asset->ynh_trial_id} removed for {$asset->asset}.");
+                        $asset->ynh_trial_id = null;
+                        $asset->save();
+                    }
+                }
+            });
+    }
+
+    private function deleteTenantsWithoutUsers(): void
     {
         Tenant::where('created_at', '<=', now()->subDays(15))
             ->get()
@@ -197,7 +237,7 @@ class Cleanup implements ShouldQueue
             });
     }
 
-    private function cleanupTenants(): void
+    private function deleteAssetsOfTenantsWithoutSubscription(): void
     {
         Tenant::where('cleanup', true)
             ->where('created_at', '<=', now()->subDays(15))
@@ -277,7 +317,7 @@ class Cleanup implements ShouldQueue
             || Conversation::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || File::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || Collection::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            // || Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || Vector::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || TimelineItem::whereIn('owned_by', $userIds)->exists()
             || TimelineFact::whereIn('owned_by', $userIds)->exists();
@@ -331,7 +371,7 @@ class Cleanup implements ShouldQueue
         Vector::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
         File::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
         Collection::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
-        Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
+        // Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
 
         // 4. Leaks & co
         TimelineItem::whereIn('owned_by', $userIds)->delete();

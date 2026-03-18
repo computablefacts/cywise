@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\AgentSquad\Providers\SqlQueriesProvider;
+use App\AgentSquad\Assistants\SqlAssistant;
 use App\Events\ImportTable;
 use App\Helpers\TableStorage;
 use App\Models\Table;
@@ -40,7 +40,7 @@ class UpdateTables implements ShouldQueue
                 $disk = TableStorage::inDisk($table->credentials);
 
                 collect($disk->files())->filter(function ($file) use ($table) {
-                    return SqlQueriesProvider::normalizeTableName($file) === $table->name;
+                    return SqlAssistant::normalizeTableName($file) === $table->name;
                 })->filter(function ($file) use ($disk, $table) {
                     return (!$table->finished_at || Carbon::createFromTimestamp($disk->lastModified($file))->isAfter($table->finished_at));
                 })->each(function ($file) use ($user, $table) {

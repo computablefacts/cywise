@@ -28,7 +28,7 @@ class UsersProcedure extends Procedure
             "if the request is 'réactive l'envoie du rapport pour alice@example.com', the input should be '{\"email\":\"alice@example.com\",\"gets_audit_report\":true}'",
             "if the request is 'désactive l'envoie du rapport hebdomadaire', the input should be '{\"email\":null,\"gets_audit_report\":false}'",
         ],
-        ai_result: "@json(\$result['msg'])",
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function toggleGetsAuditReport(JsonRpcRequest $request): array
     {
@@ -80,7 +80,7 @@ class UsersProcedure extends Procedure
             "if the request is 'envoie une copie du rapport à alice@example.com', the input should be '{\"email\":\"alice@example.com\"}",
             "if the request is 'renvoie moi le rapport', the input should be '{\"email\":null}",
         ],
-        ai_result: "@json(\$result['msg'])",
+        ai_result: "{{ \$result['msg'] }}",
     )]
     public function sendAuditReport(JsonRpcRequest $request): array
     {

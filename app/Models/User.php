@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\AgentSquad\ActionsRegistry;
 use App\Helpers\MailCoach;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -37,6 +39,8 @@ use Wave\User as WaveUser;
  * @property ?string whatsapp_webhook_secret
  * @property ?string whatsapp_phone_number
  * @property ?int superset_id
+ * @property ?string fusionlive_username
+ * @property ?string fusionlive_password
  */
 class User extends WaveUser
 {
@@ -72,6 +76,8 @@ class User extends WaveUser
         'whatsapp_phone_number_id',
         'whatsapp_webhook_secret',
         'whatsapp_phone_number',
+        'fusionlive_username',
+        'fusionlive_password',
     ];
 
     /**
@@ -90,6 +96,8 @@ class User extends WaveUser
         'whatsapp_phone_number_id',
         'whatsapp_webhook_secret',
         'whatsapp_phone_number',
+        'fusionlive_username',
+        'fusionlive_password',
     ];
 
     /**
@@ -107,9 +115,17 @@ class User extends WaveUser
         ];
     }
 
-    public function activityLogs()
+    public function activityLogs(): HasMany
     {
         return $this->hasMany(ActivityLog::class);
+    }
+
+    protected function fusionlivePassword(): Attribute
+    {
+        return Attribute::make(
+            get: fn(?string $value) => cywise_unhash($value),
+            set: fn(?string $value) => cywise_hash($value),
+        );
     }
 
     protected static function boot()
@@ -124,7 +140,7 @@ class User extends WaveUser
                 $username = Str::slug($user->name, '');
                 $i = 1;
                 while (self::where('username', $username)->exists()) {
-                    $username = Str::slug($user->name, '').$i;
+                    $username = Str::slug($user->name, '') . $i;
                     $i++;
                 }
                 $user->username = $username;

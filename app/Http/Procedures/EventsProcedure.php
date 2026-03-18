@@ -2,10 +2,10 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\Providers\LlmsProvider;
+use App\AgentSquad\Assistants\ChunkAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\Providers\PromptsProvider;
-use App\AgentSquad\Providers\TranslationsProvider;
+use App\Enums\LanguageEnum;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
@@ -67,12 +67,13 @@ class EventsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "List collected events.",
+        description: "Returns the security events and IoCs collected by the agent deployed on the server. This method does not return any information concerning the asset's external perimeter e.g. vulnerabilities.",
         params: [
             "min_score" => "A score of 0 indicates a system event; any score above 0 indicates an IoC, with values closer to 100 reflecting a higher probability of compromise. (integer|required|min:0|max:100)",
             "max_score" => "An optional maximum score to filter events by. (integer|nullable|min:0|max:100)",
             "rule_name" => "An optional rule name to filter events by. (string|nullable|min:0|max:191)",
             "server_id" => "An optional server id to filter events by.",
+            "server_name" => "An optional server name to filter events by. (string|nullable|min:0|max:191|exists:ynh_servers,name)",
             "ip_address" => "An optional server IP address to filter events by. (string|nullable|min:4|max:15|exists:ynh_servers,ip_address)",
             "window" => "An optional window of time [min_date, max_date] to filter events by."
         ],
@@ -81,12 +82,96 @@ class EventsProcedure extends Procedure
         ],
         ai_examples: [
             "if the request is 'List recent security events', the input should be {\"min_score\":0}",
+            "if the request is 'What is the available disk space on 192.168.0.40?', the input should be {\"min_score\":0,\"ip_address\":\"192.168.0.40\"}",
             "If the request is 'List recent security events excluding indicators of compromise (IoCs)', the input should be {\"max_score\":0}",
             "if the request is 'Show IoCs for server 192.168.0.38', the input should be {\"min_score\":1,\"ip_address\":\"192.168.0.38\"}",
             "If the request is 'Show suspicious events for server 192.168.0.39', the input should be {\"min_score\":1,\"max_score\":24,\"ip_address\":\"192.168.0.39\"}",
             "If the request is 'Show low severity events for server 192.168.0.40', the input should be {\"min_score\":25,\"max_score\":49,\"ip_address\":\"192.168.0.40\"}",
             "If the request is 'Show medium severity events for server 192.168.0.41', the input should be {\"min_score\":50,\"max_score\":74,\"ip_address\":\"192.168.0.41\"}",
             "If the request is 'Show high severity events for server 192.168.0.42', the input should be {\"min_score\":75,\"ip_address\":\"192.168.0.42\"}",
+            "if the request is 'Was a new SSH authorized key added to a user account?', the input should be {\"min_score\":0,\"rule_name\":\"authorized_keys\"}",
+            "if the request is 'Is a `bash` process sending data via POST requests unexpectedly?', the input should be {\"min_score\":0,\"rule_name\":\"bash_exfiltration\"}",
+            "if the request is 'Is a shell process (`sh` or `bash`) with open sockets to a remote address indicative of a reverse shell?', the input should be {\"min_score\":0,\"rule_name\":\"behavioral_reverse_shell\"}",
+            "if the request is 'Was Busybox installed?', the input should be {\"min_score\":0,\"rule_name\":\"busybox_installed\"}",
+            "if the request is 'Is a running `busybox` process expected, or could it be malicious?', the input should be {\"min_score\":0,\"rule_name\":\"busybox_usage\"}",
+            "if the request is 'Is Busybox running with `nc` (netcat) in its command line for legitimate purposes?', the input should be {\"min_score\":0,\"rule_name\":\"busybox_netcat_usage\"}",
+            "if the request is 'Was a Busybox web server (`busybox httpd`) intentionally started?', the input should be {\"min_score\":0,\"rule_name\":\"busybox_server\"}",
+            "if the request is 'Is the `cancel` command-line tool being used for data exfiltration?', the input should be {\"min_score\":0,\"rule_name\":\"cancel_exfiltration\"}",
+            "if the request is 'Were new Chocolatey packages installed on a Windows system?', the input should be {\"min_score\":0,\"rule_name\":\"chocolatey_packages\"}",
+            "if the request is 'Was a new job added to the crontab?', the input should be {\"min_score\":0,\"rule_name\":\"crontab\"}",
+            "if the request is 'Is `curl` being used to send data via POST requests unexpectedly?', the input should be {\"min_score\":0,\"rule_name\":\"curl_exfiltration\"}",
+            "if the request is 'Was a file downloaded using `curl`?', the input should be {\"min_score\":0,\"rule_name\":\"curl_file_download\"}",
+            "if the request is 'Were new DEB packages installed on a Linux system?', the input should be {\"min_score\":0,\"rule_name\":\"deb_packages\"}",
+            "if the request is 'Is the `dig` command being used with `@` for DNS exfiltration?', the input should be {\"min_score\":0,\"rule_name\":\"dns_exfiltration\"}",
+            "if the request is 'Was the `dsniff` package installed?', the input should be {\"min_score\":0,\"rule_name\":\"dsniff_installed\"}",
+            "if the request is 'Were new entries added to the `/etc/hosts` file?', the input should be {\"min_score\":0,\"rule_name\":\"etc_hosts\"}",
+            "if the request is 'Was a new service added to `/etc/services`?', the input should be {\"min_score\":0,\"rule_name\":\"etc_services\"}",
+            "if the request is 'Is an FTP process running unexpectedly?', the input should be {\"min_score\":0,\"rule_name\":\"ftp_process\"}",
+            "if the request is 'Were new groups added to the system?', the input should be {\"min_score\":0,\"rule_name\":\"groups\"}",
+            "if the request is 'Were hidden directories discovered in `/home/` or `/root/`?', the input should be {\"min_score\":0,\"rule_name\":\"hidden_directories\"}",
+            "if the request is 'Were hidden files discovered in `/home/` or `/root/`?', the input should be {\"min_score\":0,\"rule_name\":\"hidden_files\"}",
+            "if the request is 'Were new Homebrew packages installed on a macOS system?', the input should be {\"min_score\":0,\"rule_name\":\"homebrew_packages\"}",
+            "if the request is 'Was the `hping3` package installed?', the input should be {\"min_score\":0,\"rule_name\":\"hping3_installed\"}",
+            "if the request is 'Were new network interfaces added?', the input should be {\"min_score\":0,\"rule_name\":\"interface_addresses\"}",
+            "if the request is 'Is IP forwarding enabled on a machine?', the input should be {\"min_score\":0,\"rule_name\":\"ip_forwarding\"}",
+            "if the request is 'Was a new kernel module loaded?', the input should be {\"min_score\":0,\"rule_name\":\"kernel_modules\"}",
+            "if the request is 'Is manual manipulation of kernel modules expected?', the input should be {\"min_score\":0,\"rule_name\":\"kernel_modules_and_extensions\"}",
+            "if the request is 'Did an unauthorized user log in via SSH?', the input should be {\"min_score\":0,\"rule_name\":\"last\"}",
+            "if the request is 'Is a process running with the `LD_PRELOAD` environment variable set?', the input should be {\"min_score\":0,\"rule_name\":\"ld_preload_snapshot\"}",
+            "if the request is 'Was the `nmap` package installed?', the input should be {\"min_score\":0,\"rule_name\":\"nmap_installed\"}",
+            "if the request is 'Is the `nmap` process running?', the input should be {\"min_score\":0,\"rule_name\":\"nmap_process\"}",
+            "if the request is 'Were new NPM packages installed?', the input should be {\"min_score\":0,\"rule_name\":\"npm_packages\"}",
+            "if the request is 'Was the `nbtscan` package installed?', the input should be {\"min_score\":0,\"rule_name\":\"nbtscan_installed\"}",
+            "if the request is 'Was the `netcat` package installed?', the input should be {\"min_score\":0,\"rule_name\":\"netcat_installed\"}",
+            "if the request is 'Is Netcat listening or executing commands?', the input should be {\"min_score\":0,\"rule_name\":\"netcat_listener\"}",
+            "if the request is 'Is the `openssl` command being used with `connect` for data exfiltration?', the input should be {\"min_score\":0,\"rule_name\":\"openssl_exfiltration\"}",
+            "if the request is 'Was the operating system version updated?', the input should be {\"min_score\":0,\"rule_name\":\"os_version\"}",
+            "if the request is 'Was a PHP server started?', the input should be {\"min_score\":0,\"rule_name\":\"php_server\"}",
+            "if the request is 'Were new packages installed via Portage?', the input should be {\"min_score\":0,\"rule_name\":\"portage_packages\"}",
+            "if the request is 'Were new Python packages installed?', the input should be {\"min_score\":0,\"rule_name\":\"python_packages\"}",
+            "if the request is 'Was a Python HTTP server started?', the input should be {\"min_score\":0,\"rule_name\":\"python_server\"}",
+            "if the request is 'Is a RAM disk mounted?', the input should be {\"min_score\":0,\"rule_name\":\"ramdisk\"}",
+            "if the request is 'Were new RPM packages installed?', the input should be {\"min_score\":0,\"rule_name\":\"rpm_packages\"}",
+            "if the request is 'Was a Ruby HTTP server started?', the input should be {\"min_score\":0,\"rule_name\":\"ruby_server\"}",
+            "if the request is 'Was the `scapy` package installed?', the input should be {\"min_score\":0,\"rule_name\":\"scapy_installed\"}",
+            "if the request is 'Was a new scheduled task added on a Windows system?', the input should be {\"min_score\":0,\"rule_name\":\"scheduled_tasks\"}",
+            "if the request is 'Is `scp` being used for unauthorized file transfers?', the input should be {\"min_score\":0,\"rule_name\":\"scp_secure_copy\"}",
+            "if the request is 'Was a new Windows service added?', the input should be {\"min_score\":0,\"rule_name\":\"services\"}",
+            "if the request is 'Is a shell process (`sh` or `bash`) with open sockets indicative of a reverse shell?', the input should be {\"min_score\":0,\"rule_name\":\"shell_check\"}",
+            "if the request is 'Do new commands in the shell history indicate malicious activity?', the input should be {\"min_score\":0,\"rule_name\":\"shell_history\"}",
+            "if the request is 'Was a new user added to the sudoers file?', the input should be {\"min_score\":0,\"rule_name\":\"sudoers\"}",
+            "if the request is 'Was a new SUID binary discovered?', the input should be {\"min_score\":0,\"rule_name\":\"suid_bin\"}",
+            "if the request is 'Was a new systemd unit added?', the input should be {\"min_score\":0,\"rule_name\":\"systemd\"}",
+            "if the request is 'Was a tar archive created?', the input should be {\"min_score\":0,\"rule_name\":\"tar_archive_created\"}",
+            "if the request is 'Was the `tcpdump` package installed?', the input should be {\"min_score\":0,\"rule_name\":\"tcpdump_installed\"}",
+            "if the request is 'Was a new user account created?', the input should be {\"min_score\":0,\"rule_name\":\"users\"}",
+            "if the request is 'Is the `whois` command being used with `-h` for data exfiltration?', the input should be {\"min_score\":0,\"rule_name\":\"whois_exfiltration\"}",
+            "if the request is 'Were new programs installed on a Windows system?', the input should be {\"min_score\":0,\"rule_name\":\"win_packages\"}",
+            "if the request is 'Was the `wireshark` package installed?', the input should be {\"min_score\":0,\"rule_name\":\"wireshark_installed\"}",
+            "if the request is 'Are Netcat (`nc`, `ncat`, or `netcat`) processes running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_netcat_usage\"}",
+            "if the request is 'Is the `ettercap` tool running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_ettercap_usage\"}",
+            "if the request is 'Is the `nmap` tool scanning the network?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_nmap_usage\"}",
+            "if the request is 'Is the `tcpdump` tool capturing network traffic?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_tcpdump_usage\"}",
+            "if the request is 'Is the `socat` tool running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_socat_usage\"}",
+            "if the request is 'Is the `hping3` tool running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_hping3_usage\"}",
+            "if the request is 'Is the `nuclei` tool scanning for vulnerabilities?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_nuclei_usage\"}",
+            "if the request is 'Is the `nbtscan` tool scanning the network?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_nbtscan_usage\"}",
+            "if the request is 'Is the `mitmv6` tool running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_mitmv6_usage\"}",
+            "if the request is 'Is the `responder` tool running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_responder_usage\"}",
+            "if the request is 'Is a Bash process using `/dev/tcp` or `/dev/udp` for a reverse shell?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_bash_reverse_shell\"}",
+            "if the request is 'Is a Python process using the `socket` module for a reverse shell?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_python_reverse_shell\"}",
+            "if the request is 'Is a PHP process using `fsockopen` for a reverse shell?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_php_reverse_shell\"}",
+            "if the request is 'Is a Perl process using the `Socket` module for a reverse shell?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_perl_reverse_shell\"}",
+            "if the request is 'Is a Ruby process using `TCPSocket` or `exec` for a reverse shell?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_ruby_reverse_shell\"}",
+            "if the request is 'Is a Go process using `net.Dial` or `exec.Command` for a reverse shell?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_golang_reverse_shell\"}",
+            "if the request is 'Is a PowerShell process making network connections for a reverse shell?', the input should be {\"min_score\":0,\"rule_name\":\"powershell_reverse_shell\"}",
+            "if the request is 'Is the `ngrok` tool running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_ngrok_detection\"}",
+            "if the request is 'Is the `frp` (Fast Reverse Proxy) tool running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_frp_detection\"}",
+            "if the request is 'Is the `lt` (LocalTunnel) tool running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_localtunnel_detection\"}",
+            "if the request is 'Is a reverse SSH tunnel (`-R`) being established?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_reverse_ssh_tunnel\"}",
+            "if the request is 'Is the `serveo.net` service being used over SSH?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_serveo_detection\"}",
+            "if the request is 'Are tools from the `dsniff` suite running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_dsniff_suite_detection\"}",
+            "if the request is 'Are offensive security tools (e.g., Metasploit, Cobalt Strike, Mimikatz) running?', the input should be {\"min_score\":0,\"rule_name\":\"cywise_offensive_tools_execution\"}",
         ],
         ai_result: "
             @php
@@ -108,13 +193,13 @@ class EventsProcedure extends Procedure
             'min_score' => 'integer|required|min:0|max:100',
             'max_score' => 'integer|nullable|min:0|max:100',
             'rule_name' => 'string|nullable|min:0|max:191',
-            'server_id' => 'integer|nullable|prohibits:ip_address|exists:ynh_servers,id',
-            'ip_address' => 'string|nullable|prohibits:server_id|min:4|max:15|exists:ynh_servers,ip_address',
+            'server_name' => 'string|nullable|min:0|max:191|prohibits:ip_address,server_id|exists:ynh_servers,name',
+            'server_id' => 'integer|nullable|prohibits:ip_address,server_name|exists:ynh_servers,id',
+            'ip_address' => 'string|nullable|prohibits:server_id,server_name|min:4|max:15|exists:ynh_servers,ip_address',
             'window' => 'array|nullable|min:2|max:2',
             'window.*' => 'date|required',
         ]);
 
-        $serverId = $params['server_id'] ?? null;
         $minScore = $params['min_score'] ?? 0;
         $maxScore = $params['max_score'] ?? 100;
         $ruleName = $params['rule_name'] ?? null;
@@ -132,6 +217,8 @@ class EventsProcedure extends Procedure
             $servers = YnhServer::where('id', $params['server_id'])->get();
         } else if (isset($params['ip_address'])) {
             $servers = YnhServer::where('ip_address', $params['ip_address'])->get();
+        } else if (isset($params['server_name'])) {
+            $servers = YnhServer::where('name', $params['server_name'])->get();
         } else {
             $servers = YnhServer::all();
         }
@@ -198,7 +285,7 @@ class EventsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "Analyze security events and IoCs for a given server to detect suspicious activity.",
+        description: "Analyze security events and IoCs collected by the agent deployed on the server to detect suspicious activity. This method does not take into account any information concerning the asset's external perimeter e.g. vulnerabilities.",
         params: [
             "server_id" => "If the IP address is not specified, the server id.",
             "ip_address" => "If the server id is not specified, the server IP address. (string|min:4|max:15|exists:ynh_servers,ip_address)"
@@ -230,7 +317,7 @@ class EventsProcedure extends Procedure
         }
 
         $user = $request->user();
-        $minDate = Carbon::now()->utc()->startOfDay()->subWeek();
+        $minDate = Carbon::now()->utc()->startOfDay()->subDays(5);
         $maxDate = Carbon::now()->utc()->endOfDay();
 
         Log::debug("Building SOC operator report for server {$server->name} ({$server->ip()})...");
@@ -260,24 +347,24 @@ class EventsProcedure extends Procedure
             ];
         }
 
-        $logs = implode("\n", cywise_compress_log_buffer($events->toArray()));
-        $memos = MemosProvider::provide($user, NotesProcedure::SCOPE_IS_SOC_OPERATOR);
-        $prompt = PromptsProvider::provide('default_soc_operator', [
-            'SERVER_NAME' => $server->name,
-            'SERVER_IP_ADDRESS' => $server->ip(),
-            'LOGS' => $logs,
-            'MEMOS' => $memos,
-        ]);
-        $result = LlmsProvider::provideJson($prompt);
+        $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
+        $result = TextAssistant::use()
+            ->withPrompt('default_soc_operator', [
+                'SERVER_NAME' => $server->name,
+                'SERVER_IP_ADDRESS' => $server->ip(),
+                'LOGS' => $logs,
+                'MEMOS' => MemosProvider::use()
+                    ->withScope(NotesProcedure::SCOPE_IS_SOC_OPERATOR)
+                    ->withUser($user)
+                    ->provide(),
+            ])
+            ->structured();
         /** @var string $answer */
         $answer = $result->raw;
         /** @var array $json */
         $json = $result->parsed;
 
-        Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): " . json_encode([
-                "prompt" => $prompt,
-                "answer" => $answer,
-            ]));
+        Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): {$answer}");
 
         if (empty($json)) {
             Log::error('Failed to parse SOC operator answer (json): ' . $answer);
@@ -340,8 +427,15 @@ class EventsProcedure extends Procedure
             ];
         }
 
-        $reasoning = TranslationsProvider::provide($json['reasoning']);
-        $suggestedAction = TranslationsProvider::provide($json['suggested_action']);
+        $reasoning = ChunkAssistant::use()
+            ->withLang(LanguageEnum::ENGLISH)
+            ->withChunk($json['reasoning'])
+            ->translate();
+
+        $suggestedAction = ChunkAssistant::use()
+            ->withLang(LanguageEnum::ENGLISH)
+            ->withChunk($json['suggested_action'])
+            ->translate();
 
         if ($json['activity'] === "NORMAL") {
             return [

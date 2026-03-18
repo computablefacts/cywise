@@ -227,7 +227,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\FilesProcedure::class,
             \App\Http\Procedures\FrameworksProcedure::class,
             \App\Http\Procedures\HoneypotsProcedure::class,
-            \App\Http\Procedures\IdoxProcedure::class,
+            \App\Http\Procedures\FusionLiveProcedure::class,
             \App\Http\Procedures\InvitationsProcedure::class,
             \App\Http\Procedures\LeaksProcedure::class,
             \App\Http\Procedures\NotesProcedure::class,

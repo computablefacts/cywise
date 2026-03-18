@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Sajya\Server\Procedure;
 
-class IdoxProcedure extends Procedure
+class FusionLiveProcedure extends Procedure
 {
-    public static string $name = 'idox';
+    public static string $name = 'fusionlive';
 
     #[RpcMethod(
-        description: "List the user's workspaces.",
+        description: "Retrieve a list of the user's FusionLive workspaces.",
         params: [],
         result: [
             'workspaces' => 'A list of workspaces.',
@@ -31,6 +31,14 @@ class IdoxProcedure extends Procedure
     )]
     public function workspaces(JsonRpcRequest $request): array
     {
+        $user = $request->user();
+        $username = $user?->fusionlive_username ?? '';
+        $password = $user?->fusionlive_password ?? '';
+
+        if (empty($username) || empty($password)) {
+            throw new \Exception('Missing FusionLive credentials.');
+        }
+
         $token = $this->token($username, $password);
         $result = $this->post('/pws/users', "<listworkspaces mode=\"detail\"><authentication token=\"{$token}\"/></listworkspaces>");
 
@@ -40,7 +48,7 @@ class IdoxProcedure extends Procedure
             ];
         }
 
-        $el = new IdoxXmlElement($result['data'], [
+        $el = new FusionLiveXmlElement($result['data'], [
             'workspaces' => [
                 'xpath' => '/status/workspaces/workspace',
                 'many' => true
@@ -50,25 +58,25 @@ class IdoxProcedure extends Procedure
         return [
             'workspaces' => array_map(function (\SimpleXMLElement $w) {
                 return [
-                    'id' => (int)(IdoxXmlElement::attr($w, 'id') ?? 0),
-                    'company_id' => (int)(IdoxXmlElement::attr($w, 'company_id') ?? 0),
-                    'company' => (string)(IdoxXmlElement::attr($w, 'company') ?? ''),
-                    'name' => (string)(IdoxXmlElement::attr($w, 'name') ?? ''),
-                    'status' => (string)(IdoxXmlElement::attr($w, 'status') ?? ''),
-                    'uri' => (string)(IdoxXmlElement::attr($w, 'uri') ?? ''),
-                    'creation_date' => (string)(IdoxXmlElement::attr($w, 'creationdate') ?? ''),
-                    'created_by' => (string)(IdoxXmlElement::attr($w, 'initiator') ?? ''),
-                    'is_default' => (IdoxXmlElement::attr($w, 'is_default') === 'true'),
-                    'is_inbox_enabled' => (IdoxXmlElement::attr($w, 'isInboxEnabled') === 'true'),
-                    'is_dcl_enabled' => (IdoxXmlElement::attr($w, 'isDLCEnabled') === 'true'),
-                    'is_br_enabled' => (IdoxXmlElement::attr($w, 'isBREnabled') === 'true'),
+                    'id' => (int)(FusionLiveXmlElement::attr($w, 'id') ?? 0),
+                    'company_id' => (int)(FusionLiveXmlElement::attr($w, 'company_id') ?? 0),
+                    'company' => (string)(FusionLiveXmlElement::attr($w, 'company') ?? ''),
+                    'name' => (string)(FusionLiveXmlElement::attr($w, 'name') ?? ''),
+                    'status' => (string)(FusionLiveXmlElement::attr($w, 'status') ?? ''),
+                    'uri' => (string)(FusionLiveXmlElement::attr($w, 'uri') ?? ''),
+                    'creation_date' => (string)(FusionLiveXmlElement::attr($w, 'creationdate') ?? ''),
+                    'created_by' => (string)(FusionLiveXmlElement::attr($w, 'initiator') ?? ''),
+                    'is_default' => (FusionLiveXmlElement::attr($w, 'is_default') === 'true'),
+                    'is_inbox_enabled' => (FusionLiveXmlElement::attr($w, 'isInboxEnabled') === 'true'),
+                    'is_dcl_enabled' => (FusionLiveXmlElement::attr($w, 'isDLCEnabled') === 'true'),
+                    'is_br_enabled' => (FusionLiveXmlElement::attr($w, 'isBREnabled') === 'true'),
                 ];
             }, $el->workspaces),
         ];
     }
 
     #[RpcMethod(
-        description: "List all folders and documents for a workspace.",
+        description: "List all folders and documents for a given FusionLive workspace.",
         params: [
             'workspace_id' => 'The workspace ID. (integer|required|min:0)',
             'status' => 'An optional document status to filter by. (string|nullable|min:1|max:50)'
@@ -82,7 +90,7 @@ class IdoxProcedure extends Procedure
         ],
         ai_result: "{{ json_encode(\$result) }}",
     )]
-    public function listDocuments(JsonRpcRequest $request): array
+    public function documents(JsonRpcRequest $request): array
     {
         $params = $request->validate([
             'workspace_id' => 'integer|required|min:0',
@@ -90,6 +98,14 @@ class IdoxProcedure extends Procedure
         ]);
         $workspaceId = $params['workspace_id'];
         $status = $params['status'] ?? null;
+        $user = $request->user();
+        $username = $user?->fusionlive_username ?? '';
+        $password = $user?->fusionlive_password ?? '';
+
+        if (empty($username) || empty($password)) {
+            throw new \Exception('Missing FusionLive credentials.');
+        }
+
         $token = $this->token($username, $password);
         $documents = collect($this->crawlFolders($token, $workspaceId, 0))
             ->filter(fn(array $location) => ($location['count'] ?? 0) > 0)
@@ -130,7 +146,7 @@ class IdoxProcedure extends Procedure
             return [];
         }
 
-        $el = new IdoxXmlElement($result['data'], [
+        $el = new FusionLiveXmlElement($result['data'], [
             'folders' => [
                 'xpath' => '/status/folders/folder',
                 'many' => true
@@ -139,8 +155,8 @@ class IdoxProcedure extends Procedure
 
         return array_map(function (\SimpleXMLElement $f) {
             return [
-                'id' => (int)IdoxXmlElement::attr($f, 'id'),
-                'name' => (string)IdoxXmlElement::attr($f, 'name'),
+                'id' => (int)FusionLiveXmlElement::attr($f, 'id'),
+                'name' => (string)FusionLiveXmlElement::attr($f, 'name'),
             ];
         }, $el->folders);
     }
@@ -154,7 +170,7 @@ class IdoxProcedure extends Procedure
             return [];
         }
 
-        $el = new IdoxXmlElement($result['data'], [
+        $el = new FusionLiveXmlElement($result['data'], [
             'location' => '/status/documents/@location',
             'count' => '/status/documents/@count',
             'documents' => [
@@ -172,23 +188,23 @@ class IdoxProcedure extends Procedure
             'count' => $count,
             'documents' => array_map(function (\SimpleXMLElement $d) {
                 return [
-                    'id' => (int)IdoxXmlElement::attr($d, 'id'),
-                    'upload_date' => (string)IdoxXmlElement::attr($d, 'uploaded'),
-                    'first_version_id' => (int)IdoxXmlElement::attr($d, 'firstVersionId'),
-                    'reference' => (string)IdoxXmlElement::attr($d, 'reference'),
-                    'title' => (string)IdoxXmlElement::attr($d, 'title'),
-                    'revision' => (string)IdoxXmlElement::attr($d, 'revision'),
-                    'status' => (string)IdoxXmlElement::attr($d, 'status'),
-                    'version' => (string)IdoxXmlElement::attr($d, 'version'),
-                    'is_latest' => (IdoxXmlElement::attr($d, 'islatest') === 'true'),
-                    'has_content' => (IdoxXmlElement::attr($d, 'hascontent') === 'true'),
-                    'has_link' => (IdoxXmlElement::attr($d, 'haslink') === 'true'),
-                    'is_link' => (IdoxXmlElement::attr($d, 'islink') === 'true'),
-                    'is_locked' => (IdoxXmlElement::attr($d, 'islocked') === 'true'),
-                    'has_attachment' => (IdoxXmlElement::attr($d, 'hasattachment') === 'true'),
-                    'has_markup' => (IdoxXmlElement::attr($d, 'hasmarkup') === 'true'),
-                    'size' => (int)IdoxXmlElement::attr($d, 'size'),
-                    'company_name' => (string)IdoxXmlElement::attr($d, 'companyname'),
+                    'id' => (int)FusionLiveXmlElement::attr($d, 'id'),
+                    'upload_date' => (string)FusionLiveXmlElement::attr($d, 'uploaded'),
+                    'first_version_id' => (int)FusionLiveXmlElement::attr($d, 'firstVersionId'),
+                    'reference' => (string)FusionLiveXmlElement::attr($d, 'reference'),
+                    'title' => (string)FusionLiveXmlElement::attr($d, 'title'),
+                    'revision' => (string)FusionLiveXmlElement::attr($d, 'revision'),
+                    'status' => (string)FusionLiveXmlElement::attr($d, 'status'),
+                    'version' => (string)FusionLiveXmlElement::attr($d, 'version'),
+                    'is_latest' => (FusionLiveXmlElement::attr($d, 'islatest') === 'true'),
+                    'has_content' => (FusionLiveXmlElement::attr($d, 'hascontent') === 'true'),
+                    'has_link' => (FusionLiveXmlElement::attr($d, 'haslink') === 'true'),
+                    'is_link' => (FusionLiveXmlElement::attr($d, 'islink') === 'true'),
+                    'is_locked' => (FusionLiveXmlElement::attr($d, 'islocked') === 'true'),
+                    'has_attachment' => (FusionLiveXmlElement::attr($d, 'hasattachment') === 'true'),
+                    'has_markup' => (FusionLiveXmlElement::attr($d, 'hasmarkup') === 'true'),
+                    'size' => (int)FusionLiveXmlElement::attr($d, 'size'),
+                    'company_name' => (string)FusionLiveXmlElement::attr($d, 'companyname'),
                 ];
             }, $el->documents),
         ];
@@ -200,11 +216,11 @@ class IdoxProcedure extends Procedure
         return $result ? $result->session : '';
     }
 
-    private function authenticate(string $username, string $password): ?IdoxXmlElement
+    private function authenticate(string $username, string $password): ?FusionLiveXmlElement
     {
         $result = $this->post('/pws/users', "<authenticate login=\"{$username}\" password=\"{$password}\" />");
         if ($result['code'] === 0) {
-            return new IdoxXmlElement($result['data'], [
+            return new FusionLiveXmlElement($result['data'], [
                 'userid' => '/status/result/userid',
                 'partyid' => '/status/result/partyid',
                 'companyid' => '/status/result/companyid',

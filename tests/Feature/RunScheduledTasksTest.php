@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\AgentSquad\Providers\LlmsProvider;
 use App\Http\Procedures\CyberBuddyProcedure;
 use App\Jobs\RunScheduledTasks;
 use App\Models\ScheduledTask;
@@ -89,7 +88,7 @@ class RunScheduledTasksTest extends TestCaseWithDb
         // LlmsProvider::provide is static, so we need to mock it carefully if it's possible
         // Since it's a static call in RunScheduledTasks, we might need to use Mockery::mockAlias or just rely on the fact that it will probably fail in testing env if not handled.
         // Wait, LlmsProvider uses Http facade, so we can mock Http.
-        
+
         \Illuminate\Support\Facades\Http::fake([
             '*' => \Illuminate\Support\Facades\Http::response([
                 'choices' => [
@@ -101,11 +100,11 @@ class RunScheduledTasksTest extends TestCaseWithDb
                 ]
             ], 200),
         ]);
-        
+
         // Actually, RunScheduledTasks calls LlmsProvider::provide twice.
         // 1. for condition
         // 2. for summary
-        
+
         \Illuminate\Support\Facades\Http::fakeSequence()
             ->push(['choices' => [['message' => ['content' => $conditionResponse]]]])
             ->push(['choices' => [['message' => ['content' => $summaryResponse]]]]);

@@ -2,19 +2,16 @@
 
 namespace App\AgentSquad\Actions;
 
-use App\AgentSquad\AbstractAction;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
+use App\AgentSquad\Assistants\ChunkAssistant;
+use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\ChunksProvider;
-use App\AgentSquad\Providers\ChunksProvider2;
-use App\AgentSquad\Providers\EmbeddingsProvider;
-use App\AgentSquad\Providers\LlmsProvider;
 use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\Providers\PromptsProvider;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
-use App\Enums\RoleEnum;
+use App\Enums\LanguageEnum;
 use App\Http\Procedures\NotesProcedure;
 use App\Models\Chunk;
 use App\Models\ChunkTag;
@@ -33,7 +30,7 @@ class QueryKnowledgeBase extends AbstractAction
             "type" => "function",
             "function" => [
                 "name" => "query_knowledge_base",
-                "description" => "Answer questions by querying the user's documents (PDF, DOCX, WAV, etc.). The action's input must use the same language as the user's input: if the user asks their question in French, the input must be in French; if they ask in English, the input must be in English.",
+                "description" => "Retrieve answers by searching the organization's internal knowledge base—including documents such as PDFs, Word files (DOCX) and audio recordings (WAV, MP3) to quickly locate relevant rules, security policies, procedures, or other institutional information. The action's input must use the same language as the user's input: if the user asks their question in French, the input must be in French; if they ask in English, the input must be in English.",
                 "parameters" => [
                     "type" => "object",
                     "properties" => [
@@ -67,15 +64,12 @@ class QueryKnowledgeBase extends AbstractAction
         }
 
         // Reformulate question in both english and french
-        $prompt = PromptsProvider::provide('default_reformulate_question', [
-            'QUESTION' => htmlspecialchars($input, ENT_QUOTES, 'UTF-8'),
-        ]);
-        $messages[] = [
-            'role' => RoleEnum::USER->value,
-            'content' => $prompt,
-        ];
-        $result = LlmsProvider::provideJson($messages, 'Qwen/Qwen3-Next-80B-A3B-Instruct', 3 * 60);
-        array_pop($messages);
+        $result = TextAssistant::use()
+            ->withTimeout(30 * 60)
+            ->withMessagesAndPrompt($messages, 'default_reformulate_question', [
+                'QUESTION' => htmlspecialchars($input, ENT_QUOTES, 'UTF-8'),
+            ])
+            ->structured();
         /** @var string $answer */
         $answer = $result->raw;
         /** @var array $json */
@@ -99,19 +93,22 @@ class QueryKnowledgeBase extends AbstractAction
 
         if (!empty($json['question_fr'] ?? '')) {
 
-            $embedding = EmbeddingsProvider::provide($json['question_fr'] ?? '')?->embedding() ?? [];
+            $embedding = ChunkAssistant::use()
+                ->withLang(LanguageEnum::FRENCH)
+                ->withChunk($json['question_fr'] ?? '')
+                ->embedding();
 
             if (!empty($embedding)) {
                 $start = microtime(true);
                 $dir = FileVectorStore::unpack("anssi.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
-                $anssi = array_map(function (array $vector) {
+                $anssi = array_map(function (array $vector, int $index) {
                     /** @var Vector $vec */
                     $vec = $vector['vector'];
                     $question = $vec->text();
                     $answer = preg_replace('/#+/', '', $vec->metadata('answer'));
                     $similarity = $vector['similarity'];
-                    return "## Note 0\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** ANSSI\n**Score:** {$similarity}";
+                    return "## Memo A{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** ANSSI\n**Score:** {$similarity}";
                 }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
                 $stop = microtime(true);
                 $nbResults = count($anssi);
@@ -124,13 +121,16 @@ class QueryKnowledgeBase extends AbstractAction
 
         if (!empty($json['question_en'] ?? '')) {
 
-            $embedding = EmbeddingsProvider::provide($json['question_en'] ?? '')?->embedding() ?? [];
+            $embedding = ChunkAssistant::use()
+                ->withLang(LanguageEnum::ENGLISH)
+                ->withChunk($json['question_en'] ?? '')
+                ->embedding();
 
             if (!empty($embedding)) {
                 $start = microtime(true);
                 $dir = FileVectorStore::unpack("rowden_cybersecurityqaa.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
-                $rowden = array_map(function (array $vector) {
+                $rowden = array_map(function (array $vector, int $index) {
                     /** @var Vector $vec */
                     $vec = $vector['vector'];
                     $question = $vec->text();
@@ -138,7 +138,7 @@ class QueryKnowledgeBase extends AbstractAction
                     $source = $vec->metadata('source');
                     $source = empty($source) ? 'n/a' : $source;
                     $similarity = $vector['similarity'];
-                    return "## Note 0\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** {$source}\n**Score:** {$similarity}";
+                    return "## Memo R{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** {$source}\n**Score:** {$similarity}";
                 }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
                 $stop = microtime(true);
                 $nbResults = count($rowden);
@@ -147,22 +147,23 @@ class QueryKnowledgeBase extends AbstractAction
         }
 
         // Fill context & answer question
-        $memos = empty($collection) ? MemosProvider::provide($user, NotesProcedure::SCOPE_IS_CYBERBUDDY) : '';
+        $memos = empty($collection) ?
+            MemosProvider::use()
+                ->withScope(NotesProcedure::SCOPE_IS_CYBERBUDDY)
+                ->withUser($user)
+                ->provide() :
+            '';
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
-        $prompt = PromptsProvider::provide('default_answer_question', [
-            'LANGUAGE' => $json['lang'],
-            'NOTES' => $chunks . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
-            'MEMOS' => $memos,
-            'QUESTION' => $json['lang'] === 'english' ?
-                $json['question_en'] :
-                ($json['lang'] === 'french' ? $json['question_fr'] : $input),
-        ]);
-        $messages[] = [
-            'role' => RoleEnum::USER->value,
-            'content' => $prompt,
-        ];
-        $answer = LlmsProvider::provide($messages);
-        array_pop($messages);
+        $answer = TextAssistant::use()
+            ->withMessagesAndPrompt($messages, 'default_answer_question', [
+                'LANGUAGE' => $json['lang'],
+                'NOTES' => $chunks,
+                'MEMOS' => $memos . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
+                'QUESTION' => $json['lang'] === 'english' ?
+                    $json['question_en'] :
+                    ($json['lang'] === 'french' ? $json['question_fr'] : $input),
+            ])
+            ->text();
 
         return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))), [], !empty($answer));
     }
@@ -170,27 +171,37 @@ class QueryKnowledgeBase extends AbstractAction
     private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): string
     {
         $start = microtime(true);
-        $fullTextSearchEn = $this->fullTextSearch($user, 'en', $keywordsEn, $collection);
-        $fullTextSearchFr = $this->fullTextSearch($user, 'fr', $keywordsFr, $collection);
+
+        $chunksEn = ChunksProvider::use()
+            ->withLang(LanguageEnum::ENGLISH)
+            ->withCollections($this->englishCollections($collection))
+            ->withKeywords($keywordsEn)
+            ->withText($questionEn)
+            ->withLimit(20)
+            ->provide();
+
         $stop = microtime(true);
-        $nbResults = $fullTextSearchEn->count() + $fullTextSearchFr->count();
-        Log::debug("[LOAD_CHUNKS] Full-text search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+        Log::debug("[LOAD_CHUNKS] Search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunksEn->count()} results");
         $start = microtime(true);
-        $vectorSearchEn = $this->vectorSearch($user, 'en', $questionEn, $collection);
-        $vectorSearchFr = $this->vectorSearch($user, 'fr', $questionFr, $collection);
+
+        $chunksFr = ChunksProvider::use()
+            ->withLang(LanguageEnum::FRENCH)
+            ->withCollections($this->frenchCollections($collection))
+            ->withKeywords($keywordsFr)
+            ->withText($questionFr)
+            ->withLimit(20)
+            ->provide();
+
         $stop = microtime(true);
-        $nbResults = $vectorSearchEn->count() + $vectorSearchFr->count();
-        Log::debug("[LOAD_CHUNKS] Vector search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+        Log::debug("[LOAD_CHUNKS] Search for '{$questionFr}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunksFr->count()} results");
         $start = microtime(true);
-        $chunks = $fullTextSearchEn
-            ->merge($fullTextSearchFr)
-            ->merge($vectorSearchEn)
-            ->merge($vectorSearchFr)
+
+        $chunks = $chunksEn
+            ->merge($chunksFr)
             ->groupBy(fn(Chunk $chunk) => $chunk->text)
             ->map(fn(Collection $group) => $group->sortByDesc('_score')->first()) // the higher the better
             ->values() // associative array => array
             ->sortByDesc('_score')
-            ->sortBy('priority')
             ->take(20)
             ->map(function (Chunk $chunk) {
 
@@ -206,41 +217,10 @@ class QueryKnowledgeBase extends AbstractAction
 
                 return "## Note {$chunk->id}\n\n{$text}\n\n**Tags:** {$tags}\n**Score:** {$chunk->{'_score'}}";
             });
+
         $stop = microtime(true);
         Log::debug("[LOAD_CHUNKS] Loading chunks for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
         return $chunks->join("\n\n");
-    }
-
-    /** @return Collection<Chunk> */
-    private function fullTextSearch(User $user, string $lang, array $input, ?string $collection = null): Collection
-    {
-        /** @var array<string> $keywords */
-        $keywords = $this->combine($input, 5);
-        /** @var Collection<Chunk> $chunks */
-        $chunks = collect();
-        foreach ($keywords as $k) {
-            if ($lang === 'en') {
-                $chunkz = ChunksProvider::provide($this->englishCollections($collection), 'en', $k, 5);
-            } else if ($lang === 'fr') {
-                $chunkz = ChunksProvider::provide($this->frenchCollections($collection), 'fr', $k, 5);
-            } else {
-                $chunkz = collect();
-            }
-            $chunks = $chunks->merge($chunkz);
-        }
-        return $chunks;
-    }
-
-    /** @return Collection<Chunk> */
-    private function vectorSearch(User $user, string $lang, string $input, ?string $collection = null): Collection
-    {
-        if ($lang === 'en') {
-            return ChunksProvider2::provide($this->englishCollections($collection), 'en', $input, 4);
-        }
-        if ($lang === 'fr') {
-            return ChunksProvider2::provide($this->frenchCollections($collection), 'fr', $input, 4);
-        }
-        return collect();
     }
 
     private function englishCollections(?string $collection = null): Collection
@@ -269,35 +249,6 @@ class QueryKnowledgeBase extends AbstractAction
             ->orderBy('cb_collections.priority')
             ->orderBy('cb_collections.name')
             ->get();
-    }
-
-    private function combine(array $arrays, int $sample = -1): array
-    {
-        if (empty($arrays)) {
-            return [];
-        }
-
-        /** @var array<array<string>> $combinations */
-        $combinations = array_map(fn(string $word) => [$word], $arrays[0]);
-
-        for ($i = 1; $i < count($arrays); $i++) {
-
-            /** @var array<string> $cur */
-            $cur = $arrays[$i];
-            $new = [];
-
-            foreach ($combinations as $existing) {
-                foreach ($cur as $word) {
-                    $new[] = array_merge($existing, [$word]);
-                }
-            }
-            $combinations = $new;
-        }
-        if ($sample > 0) {
-            shuffle($combinations);
-            $combinations = array_slice($combinations, 0, min(count($combinations), $sample));
-        }
-        return array_map(fn(array $combination) => implode(" ", $combination), $combinations);
     }
 
     private function enhanceWithSources(string $answer): string

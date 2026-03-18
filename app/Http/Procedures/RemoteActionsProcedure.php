@@ -95,6 +95,23 @@ class RemoteActionsProcedure extends Procedure
             'examples' => 'nullable|array',
         ]);
 
+        // Hard block obvious executable / dangerous patterns
+        $blacklist = [
+            '/<\?(?:php)?/i',
+            '/@(?:php|include|extends|section|yield|stack|inject)\b/i',
+            '/\b(?:env|config|app|DB|Auth|request|session|view|resolve|resolveFacade|call_user_func|eval)\s*\(/i',
+            '/->\s*[a-zA-Z_][a-zA-Z0-9_]*\s*\(/', // method calls like $x->foo()
+            '/::\s*[a-zA-Z_][a-zA-Z0-9_]*\s*\(/', // static calls like Class::foo()
+            '/\bfunction\b/i', // function declarations
+            '/\bfn\s*\(/i', // arrow functions
+        ];
+
+        foreach ($blacklist as $pattern) {
+            if (preg_match($pattern, $params['response_template'] ?? '')) {
+                throw new \Exception('This pattern is not allowed in response_template: ' . $pattern);
+            }
+        }
+
         /** @var RemoteAction $action */
         $action = RemoteAction::where('name', $params['name'])->first();
 
