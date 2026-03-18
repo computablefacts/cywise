@@ -47,12 +47,13 @@ class Vector extends Model
 
     public static function isSupportedByMariaDb(): bool
     {
-        return \Illuminate\Support\Facades\Cache::remember("is_vector_supported", now()->addDays(120), function () {
+        return \Illuminate\Support\Facades\Cache::remember('is_vector_supported', now()->addDays(120), function () {
             try {
                 $version = DB::select('SELECT VERSION() as version')[0]->version;
 
-                if (!str_contains(strtolower($version), 'mariadb')) {
+                if (! str_contains(strtolower($version), 'mariadb')) {
                     Log::warning('The current database is not MariaDB');
+
                     return false;
                 }
 
@@ -63,11 +64,13 @@ class Vector extends Model
                     return true;
                 }
 
-                Log::warning('MariaDB must be at least 11.7 to support vectors. Current version is ' . $version);
+                Log::warning('MariaDB must be at least 11.7 to support vectors. Current version is '.$version);
+
                 return false;
 
             } catch (\Exception $e) {
                 Log::warning($e->getMessage());
+
                 return false;
             }
         });
@@ -75,19 +78,43 @@ class Vector extends Model
 
     public static function insertVector(int $collectionId, int $fileId, int $chunkId, string $locale, string $hypotheticalQuestion, array $embedding): bool
     {
-        if (!empty($embedding)) {
-            $sql = "INSERT INTO cb_vectors (collection_id, file_id, locale, hypothetical_question, embedding, chunk_id, created_by, updated_at, created_at) VALUES (?, ?, ?, ?, VEC_FromText(?), ?, ?, NOW(), NOW())";
+        if (! empty($embedding)) {
+            $sql = 'INSERT INTO cb_vectors (collection_id, file_id, locale, hypothetical_question, embedding, chunk_id, created_by, updated_at, created_at) VALUES (?, ?, ?, ?, VEC_FromText(?), ?, ?, NOW(), NOW())';
+
             return DB::statement($sql, [
                 $collectionId,
                 $fileId,
                 $locale,
                 $hypotheticalQuestion,
-                '[' . implode(",", $embedding) . ']',
+                self::formatEmbedding($embedding),
                 $chunkId,
-                Auth::user()?->id
+                Auth::user()?->id,
             ]);
         }
+
         return false;
+    }
+
+    public function setEmbeddingAttribute($value): void
+    {
+        if (! is_array($value)) {
+            $this->attributes['embedding'] = $value;
+
+            return;
+        }
+
+        if (self::isSupportedByMariaDb()) {
+            $this->attributes['embedding'] = DB::raw("VEC_FromText('".self::formatEmbedding($value)."')");
+
+            return;
+        }
+
+        $this->attributes['embedding'] = json_encode($value);
+    }
+
+    private static function formatEmbedding(array $embedding): string
+    {
+        return '['.implode(',', array_map(static fn ($value) => (string) $value, $embedding)).']';
     }
 
     public function collection(): HasOne
