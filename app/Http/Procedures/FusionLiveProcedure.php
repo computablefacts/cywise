@@ -93,11 +93,11 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
 
 @foreach(\$result['documents'] as \$folder)
 
-# {{ \$folder['location'] }} ({{ \$folder['count'] }} documents)
+# Folder: {{ \$folder['location'] }} ({{ \$folder['count'] }} documents)
 
 @foreach(\$folder['documents'] as \$doc)
 
-## {{ \$doc['file']['name'] ?? \$doc['title'] }}
+## File: {{ \$doc['file']['name'] ?? \$doc['title'] }}
 
 - **Company Name.** {{ \$doc['company_name'] }}
 - **Uploaded At.** {{ \$doc['upload_date'] }}
@@ -143,6 +143,79 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
 
         return [
             'documents' => $documents,
+        ];
+    }
+
+    #[RpcMethod(
+        description: "List all users for a given FusionLive workspace.",
+        params: [
+            'workspace_id' => 'The workspace ID. (integer|required|min:0)',
+        ],
+        result: [
+            'users' => 'A list of users.',
+        ],
+        ai_examples: [
+            "if the request is 'list users in workspace 1458', the input should be {\"workspace_id\":1458}",
+        ],
+        ai_result: "
+I found {{ count(\$result['users']) }} users in the workspace.
+
+@foreach(\$result['users'] as \$user)
+
+# {{ \$user['firstname'] }} {{ \$user['lastname'] }}
+
+- **Company.** {{ \$user['company'] }}
+- **Profession.** {{ \$user['profession'] }}
+- **Email.**{{ \$user['email'] }})
+- **Phone.** {{ \$user['phone'] }}
+- **Mobile.** {{ \$user['mobile'] }}
+
+@endforeach
+        ",
+    )]
+    public function users(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'workspace_id' => 'integer|required|min:0',
+        ]);
+        $workspaceId = $params['workspace_id'];
+        $user = $request->user();
+        $username = $user?->fusionlive_username ?? '';
+        $password = $user?->fusionlive_password ?? '';
+
+        if (empty($username) || empty($password)) {
+            throw new \Exception('Missing FusionLive credentials.');
+        }
+
+        $token = $this->token($username, $password);
+        $result = $this->post('/pws/workspaces', "<listusers mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/></listusers>");
+
+        if ($result['code'] != 0) {
+            return [
+                'users' => [],
+            ];
+        }
+
+        $el = new FusionLiveXmlElement($result['data'], [
+            'users' => [
+                'xpath' => '/status/users/user',
+                'many' => true
+            ],
+        ]);
+
+        return [
+            'users' => array_map(function (\SimpleXMLElement $u) {
+                return [
+                    'id' => (int)FusionLiveXmlElement::attr($u, 'id'),
+                    'firstname' => (string)FusionLiveXmlElement::attr($u, 'firstname'),
+                    'lastname' => (string)FusionLiveXmlElement::attr($u, 'lastname'),
+                    'email' => (string)FusionLiveXmlElement::attr($u, 'email'),
+                    'company' => (string)FusionLiveXmlElement::attr($u, 'company'),
+                    'profession' => (string)FusionLiveXmlElement::attr($u, 'profession'),
+                    'phone' => (string)FusionLiveXmlElement::attr($u, 'phone'),
+                    'mobile' => (string)FusionLiveXmlElement::attr($u, 'mobile'),
+                ];
+            }, $el->users),
         ];
     }
 
@@ -323,6 +396,7 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
 
     private function post(string $endpoint, string $payload): array
     {
+        // Log::debug($payload);
         try {
             $response = Http::withBody($payload, 'text/plain;charset=UTF-8')->post("https://uk.fusion.live{$endpoint}");
         } catch (ConnectionException $e) {
