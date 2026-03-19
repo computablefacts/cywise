@@ -22,6 +22,9 @@ class IngestFileListener extends AbstractListener
     // See: database/migrations/2025_06_08_114525_create_cb_chunks_table.php
     private const CHUNK_TEXT_MAX_LENGTH = 4999;
 
+    // See: database/migrations/2025_06_08_114525_create_cb_chunks_tags_table.php
+    private const CHUNK_TAG_MAX_LENGTH = 190;
+
     protected function handle2($event)
     {
         if (!($event instanceof IngestFile)) {
@@ -193,7 +196,7 @@ class IngestFileListener extends AbstractListener
 
                             if (isset($obj['tags'])) {
                                 foreach ($obj['tags'] as $tag) {
-                                    $chunk->tags()->create(['tag' => Str::lower($tag)]);
+                                    $chunk->tags()->create(['tag' => $this->truncateChunkTag(Str::lower($tag), $file->id, $obj['page'])]);
                                 }
                             }
                             if ($chunk->is_embedded) {
@@ -234,7 +237,7 @@ class IngestFileListener extends AbstractListener
 
                             if (isset($obj['tags'])) {
                                 foreach ($obj['tags'] as $tag) {
-                                    $chunk->tags()->create(['tag' => Str::lower($tag)]);
+                                    $chunk->tags()->create(['tag' => $this->truncateChunkTag(Str::lower($tag), $file->id, $obj['page'])]);
                                 }
                             }
                             if ($chunk->is_embedded) {
@@ -282,7 +285,7 @@ class IngestFileListener extends AbstractListener
 
                                         if (isset($obj['tags'])) {
                                             foreach ($obj['tags'] as $tag) {
-                                                $chunk->tags()->create(['tag' => Str::lower($tag)]);
+                                                $chunk->tags()->create(['tag' => $this->truncateChunkTag(Str::lower($tag), $file->id, $obj['page'])]);
                                             }
                                         }
                                         if ($chunk->is_embedded) {
@@ -325,7 +328,7 @@ class IngestFileListener extends AbstractListener
 
                                 if (isset($obj['tags'])) {
                                     foreach ($obj['tags'] as $tag) {
-                                        $chunk->tags()->create(['tag' => Str::lower($tag)]);
+                                        $chunk->tags()->create(['tag' => $this->truncateChunkTag(Str::lower($tag), $file->id, $obj['page'])]);
                                     }
                                 }
                                 if ($chunk->is_embedded) {
@@ -398,7 +401,7 @@ class IngestFileListener extends AbstractListener
                     ]);
 
                     foreach ($tags as $tag) {
-                        $chunk->tags()->create(['tag' => Str::lower($tag)]);
+                        $chunk->tags()->create(['tag' => $this->truncateChunkTag(Str::lower($tag), $file->id, $page)]);
                     }
                 }
             }
@@ -433,6 +436,17 @@ class IngestFileListener extends AbstractListener
         Log::warning("Chunk TEXT truncated for file {$fileId} on page {$page}");
 
         return Str::substr($text, 0, self::CHUNK_TEXT_MAX_LENGTH);
+    }
+
+    private function truncateChunkTag(string $tag, int $fileId, ?int $page): string
+    {
+        if (Str::length($tag) <= self::CHUNK_TAG_MAX_LENGTH) {
+            return $tag;
+        }
+
+        Log::warning("Chunk TAG truncated for file {$fileId} on page {$page}");
+
+        return Str::substr($tag, 0, self::CHUNK_TAG_MAX_LENGTH);
     }
 
     private function storageFilePath(\App\Models\Collection $collection): string
