@@ -679,6 +679,7 @@ class CywiseSeeder extends Seeder
             'events@list',
             'events@socOperator',
             'fusionlive@documents',
+            'fusionlive@groups',
             'fusionlive@users',
             'fusionlive@workspaces',
             'leaks@list',

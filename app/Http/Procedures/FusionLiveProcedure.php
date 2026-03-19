@@ -99,7 +99,7 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
 
 ## File: {{ \$doc['file']['name'] ?? \$doc['title'] }}
 
-- **Company Name.** {{ \$doc['company_name'] }}
+- **Company Name.** {{ \$doc['company'] }}
 - **Uploaded At.** {{ \$doc['upload_date'] }}
 - **Title.** {{ \$doc['title'] }}
 - **Size.** {{ \$doc['size'] }} bytes
@@ -219,6 +219,84 @@ I found {{ count(\$result['users']) }} users in the workspace.
         ];
     }
 
+    #[RpcMethod(
+        description: "List all groups for a given FusionLive workspace.",
+        params: [
+            'workspace_id' => 'The workspace ID. (integer|required|min:0)',
+        ],
+        result: [
+            'groups' => 'A list of groups.',
+        ],
+        ai_examples: [
+            "if the request is 'list groups in workspace 1458', the input should be {\"workspace_id\":1458}",
+        ],
+        ai_result: "
+I found {{ count(\$result['groups']) }} groups in the workspace.
+
+@foreach(\$result['groups'] as \$group)
+
+# {{ \$group['name'] }}
+
+- **Description.** {{ \$group['description'] }}
+- **Created At.** {{ \$group['created_at'] }}
+- **Updated At.** {{ \$group['updated_at'] }}
+- **Created By.** {{ \$group['created_by'] }}
+- **Updated By.** {{ \$group['updated_by'] }}
+- **Company.** {{ \$group['company'] }}
+
+@endforeach
+        ",
+    )]
+    public function groups(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'workspace_id' => 'integer|required|min:0',
+        ]);
+        $workspaceId = $params['workspace_id'];
+        $user = $request->user();
+        $username = $user?->fusionlive_username ?? '';
+        $password = $user?->fusionlive_password ?? '';
+
+        if (empty($username) || empty($password)) {
+            throw new \Exception('Missing FusionLive credentials.');
+        }
+
+        $token = $this->token($username, $password);
+        $result = $this->post('/pws/workspaces', "<listgroups mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/></listgroups>");
+
+        if ($result['code'] != 0) {
+            return [
+                'groups' => [],
+            ];
+        }
+
+        $el = new FusionLiveXmlElement($result['data'], [
+            'groups' => [
+                'xpath' => '/status/groups/group',
+                'many' => true
+            ],
+        ]);
+
+        return [
+            'groups' => array_map(function (\SimpleXMLElement $g) {
+                return [
+                    'id' => (int)FusionLiveXmlElement::attr($g, 'id'),
+                    'name' => (string)FusionLiveXmlElement::attr($g, 'name'),
+                    'description' => (string)FusionLiveXmlElement::attr($g, 'description'),
+                    'is_folder_group' => (FusionLiveXmlElement::attr($g, 'is_folder_group') === 'true'),
+                    'is_message_group' => (FusionLiveXmlElement::attr($g, 'is_message_group') === 'true'),
+                    'is_deleted' => (FusionLiveXmlElement::attr($g, 'isdeleted') === 'true'),
+                    'company' => (string)FusionLiveXmlElement::attr($g, 'company_name'),
+                    'created_by' => (string)FusionLiveXmlElement::attr($g, 'creator'),
+                    'created_at' => (string)FusionLiveXmlElement::attr($g, 'datecreated'),
+                    'updated_by' => (string)FusionLiveXmlElement::attr($g, 'updater'),
+                    'updated_at' => (string)FusionLiveXmlElement::attr($g, 'dateupdated'),
+                    'uri' => (string)FusionLiveXmlElement::attr($g, 'uri'),
+                ];
+            }, $el->groups),
+        ];
+    }
+
     private function crawlFolders(string $token, int $workspaceId, int $folderId): array
     {
         $documents = [$this->loadDocuments($token, $workspaceId, $folderId)];
@@ -307,7 +385,7 @@ I found {{ count(\$result['users']) }} users in the workspace.
                     'is_locked' => (FusionLiveXmlElement::attr($d, 'islocked') === 'true'),
                     'has_markup' => (FusionLiveXmlElement::attr($d, 'hasmarkup') === 'true'),
                     'size' => (int)FusionLiveXmlElement::attr($d, 'size'),
-                    'company_name' => (string)FusionLiveXmlElement::attr($d, 'companyname'),
+                    'company' => (string)FusionLiveXmlElement::attr($d, 'companyname'),
                     'uri' => (string)FusionLiveXmlElement::attr($d, 'uri'),
                     'file' => $d->file ? [
                         'name' => (string)FusionLiveXmlElement::attr($d->file, 'name'),
