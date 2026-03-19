@@ -483,7 +483,7 @@ I found {{ count(\$result['groups']) }} groups in the workspace.
 
     private function post(string $endpoint, string $payload): array
     {
-        Log::debug($payload);
+        // Log::debug($payload);
         try {
             $response = Http::withBody($payload, 'text/plain;charset=UTF-8')->post("https://uk.fusion.live{$endpoint}");
         } catch (ConnectionException $e) {
