@@ -221,7 +221,7 @@ class IngestFileListener extends AbstractListener
                             }
                         }
                     } else { // {"page":11,"tags":["titre","section","sous-section"], "text": "Bonjour monde."}
-                        if (Str::length($obj['text']) < 5000 /* database column size */) {
+                        if (Str::length($obj['text']) <= self::CHUNK_TEXT_MAX_LENGTH /* database column size */) {
 
                             /** @var Chunk $chunk */
                             $chunk = $collection->chunks()->create([
@@ -266,7 +266,7 @@ class IngestFileListener extends AbstractListener
                             $currentChunk = '';
 
                             foreach ($parts as $part) {
-                                if (Str::length($currentChunk . "\n\n" . $part) < 5000 /* database column size */) {
+                                if (Str::length($currentChunk . "\n\n" . $part) <= self::CHUNK_TEXT_MAX_LENGTH /* database column size */) {
                                     $currentChunk .= ($currentChunk ? "\n\n" : '') . $part;
                                 } else {
                                     if ($currentChunk) {
