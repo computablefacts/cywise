@@ -209,9 +209,17 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
             'id' => $folderId,
             'location' => $location,
             'count' => $count,
-            'documents' => array_map(function (\SimpleXMLElement $d) {
+            'documents' => array_map(function (\SimpleXMLElement $d) use ($token, $workspaceId) {
+
+                $attachments = [];
+                $docId = (int)FusionLiveXmlElement::attr($d, 'id');
+                $hasAttachments = (FusionLiveXmlElement::attr($d, 'hasattachment') === 'true');
+
+                if ($hasAttachments) {
+                    $attachments = $this->loadAttachments($token, $workspaceId, $docId);
+                }
                 return [
-                    'id' => (int)FusionLiveXmlElement::attr($d, 'id'),
+                    'id' => $docId,
                     'upload_date' => (string)FusionLiveXmlElement::attr($d, 'uploaded'),
                     'first_version_id' => (int)FusionLiveXmlElement::attr($d, 'firstVersionId'),
                     'reference' => (string)FusionLiveXmlElement::attr($d, 'reference'),
@@ -224,7 +232,6 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
                     'has_link' => (FusionLiveXmlElement::attr($d, 'haslink') === 'true'),
                     'is_link' => (FusionLiveXmlElement::attr($d, 'islink') === 'true'),
                     'is_locked' => (FusionLiveXmlElement::attr($d, 'islocked') === 'true'),
-                    'has_attachment' => (FusionLiveXmlElement::attr($d, 'hasattachment') === 'true'),
                     'has_markup' => (FusionLiveXmlElement::attr($d, 'hasmarkup') === 'true'),
                     'size' => (int)FusionLiveXmlElement::attr($d, 'size'),
                     'company_name' => (string)FusionLiveXmlElement::attr($d, 'companyname'),
@@ -235,9 +242,57 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
                         'mime_type' => (string)FusionLiveXmlElement::attr($d->file, 'mimetype'),
                         'code_format' => (string)FusionLiveXmlElement::attr($d->file, 'contentformatcode'),
                     ] : null,
+                    'attachments' => $attachments,
                 ];
             }, $el->documents),
         ];
+    }
+
+    private function loadAttachments(string $token, int $workspaceId, int $documentId): array
+    {
+        $payload = "<listattachments mode=\"list\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/><document id=\"{$documentId}\"/></listattachments>";
+        $result = $this->post('/pws/folders', $payload);
+
+        if ($result['code'] != 0) {
+            return [];
+        }
+
+        $el = new FusionLiveXmlElement($result['data'], [
+            'documents' => [
+                'xpath' => '/status/documents/document',
+                'many' => true
+            ],
+        ]);
+
+        return array_map(function (\SimpleXMLElement $d) use ($token, $workspaceId) {
+
+            $attachments = [];
+            $docId = (int)FusionLiveXmlElement::attr($d, 'id');
+            $hasAttachments = (FusionLiveXmlElement::attr($d, 'hasattachment') === 'true');
+
+            if ($hasAttachments) {
+                $attachments = $this->loadAttachments($token, $workspaceId, $docId);
+            }
+            return [
+                'id' => $docId,
+                'first_version_id' => (int)FusionLiveXmlElement::attr($d, 'firstVersionId'),
+                'reference' => (string)FusionLiveXmlElement::attr($d, 'reference'),
+                'title' => (string)FusionLiveXmlElement::attr($d, 'title'),
+                'revision' => (string)FusionLiveXmlElement::attr($d, 'revision'),
+                'status' => (string)FusionLiveXmlElement::attr($d, 'status'),
+                'version' => (string)FusionLiveXmlElement::attr($d, 'version'),
+                'is_latest' => (FusionLiveXmlElement::attr($d, 'islatest') === 'true'),
+                'has_content' => (FusionLiveXmlElement::attr($d, 'hascontent') === 'true'),
+                'has_link' => (FusionLiveXmlElement::attr($d, 'haslink') === 'true'),
+                'is_link' => (FusionLiveXmlElement::attr($d, 'islink') === 'true'),
+                'is_locked' => (FusionLiveXmlElement::attr($d, 'islocked') === 'true'),
+                'has_markup' => (FusionLiveXmlElement::attr($d, 'hasmarkup') === 'true'),
+                'size' => (int)FusionLiveXmlElement::attr($d, 'size'),
+                'company_name' => (string)FusionLiveXmlElement::attr($d, 'companyname'),
+                'uri' => (string)FusionLiveXmlElement::attr($d, 'uri'),
+                'attachments' => $attachments,
+            ];
+        }, $el->documents);
     }
 
     private function token(string $username, string $password): string
