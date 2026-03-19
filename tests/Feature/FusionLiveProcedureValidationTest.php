@@ -3,12 +3,15 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCaseWithDb;
 
 class FusionLiveProcedureValidationTest extends TestCaseWithDb
 {
     public function test_workspaces_throws_exception_when_credentials_missing()
     {
+        Config::set('towerify.hasher.nonce', 'azertyuiop1234567890');
+
         $user = User::factory()->create([
             'fusionlive_username' => null,
             'fusionlive_password' => null,
@@ -31,6 +34,8 @@ class FusionLiveProcedureValidationTest extends TestCaseWithDb
 
     public function test_list_documents_throws_exception_when_credentials_missing()
     {
+        Config::set('towerify.hasher.nonce', 'azertyuiop1234567890');
+
         $user = User::factory()->create([
             'fusionlive_username' => 'someuser',
             'fusionlive_password' => '', // empty string

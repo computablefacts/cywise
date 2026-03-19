@@ -123,8 +123,8 @@ class User extends WaveUser
     protected function fusionlivePassword(): Attribute
     {
         return Attribute::make(
-            get: fn(?string $value) => cywise_unhash($value),
-            set: fn(?string $value) => cywise_hash($value),
+            get: fn(?string $value) => $value ? cywise_unhash($value) : null,
+            set: fn(?string $value) => $value ? cywise_hash($value) : null,
         );
     }
 
