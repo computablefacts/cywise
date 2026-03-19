@@ -99,6 +99,7 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
 
 ## File: {{ \$doc['file']['name'] ?? \$doc['title'] }}
 
+- **Id.** {{ \$doc['id'] }}
 - **Company Name.** {{ \$doc['company'] }}
 - **Uploaded At.** {{ \$doc['upload_date'] }}
 - **Title.** {{ \$doc['title'] }}
@@ -107,7 +108,7 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
 - **Status.** {{ \$doc['status'] }}
 - **Revision.** {{ \$doc['revision'] }}
 - **Locked.** {{ \$doc['is_locked'] ? 'true' : 'false' }}
-- **Link.** {{ \$doc['uri'] }}
+- **Attachments.** {{ count(\$doc['attachments']) > 0 ? 'yes (' . count(\$doc['attachments']) . ')' : 'no' }}
 
 @endforeach
 @endforeach
@@ -150,12 +151,14 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
         description: "List all users for a given FusionLive workspace.",
         params: [
             'workspace_id' => 'The workspace ID. (integer|required|min:0)',
+            'group_id' => 'An optional group ID. (integer|nullable|min:0)',
         ],
         result: [
             'users' => 'A list of users.',
         ],
         ai_examples: [
             "if the request is 'list users in workspace 1458', the input should be {\"workspace_id\":1458}",
+            "if the request is 'list users in workspace 1458 and group 123', the input should be {\"workspace_id\":1458,\"group_id\":123}",
         ],
         ai_result: "
 I found {{ count(\$result['users']) }} users in the workspace.
@@ -164,11 +167,11 @@ I found {{ count(\$result['users']) }} users in the workspace.
 
 # {{ \$user['firstname'] }} {{ \$user['lastname'] }}
 
+- **Id.** {{ \$user['id'] }}
 - **Company.** {{ \$user['company'] }}
 - **Profession.** {{ \$user['profession'] }}
 - **Email.**{{ \$user['email'] }})
 - **Phone.** {{ \$user['phone'] }}
-- **Mobile.** {{ \$user['mobile'] }}
 
 @endforeach
         ",
@@ -177,8 +180,10 @@ I found {{ count(\$result['users']) }} users in the workspace.
     {
         $params = $request->validate([
             'workspace_id' => 'integer|required|min:0',
+            'group_id' => 'integer|nullable|min:0',
         ]);
         $workspaceId = $params['workspace_id'];
+        $groupId = $params['group_id'] ?? null;
         $user = $request->user();
         $username = $user?->fusionlive_username ?? '';
         $password = $user?->fusionlive_password ?? '';
@@ -188,7 +193,10 @@ I found {{ count(\$result['users']) }} users in the workspace.
         }
 
         $token = $this->token($username, $password);
-        $result = $this->post('/pws/workspaces', "<listusers mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/></listusers>");
+        $payload = isset($groupId) ?
+            "<listusers mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/><group id=\"{$groupId}\"/></listusers>" :
+            "<listusers mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/></listusers>";
+        $result = $this->post('/pws/workspaces', $payload);
 
         if ($result['code'] != 0) {
             return [
@@ -237,6 +245,7 @@ I found {{ count(\$result['groups']) }} groups in the workspace.
 
 # {{ \$group['name'] }}
 
+- **Id.** {{ \$group['id'] }}
 - **Description.** {{ \$group['description'] }}
 - **Created At.** {{ \$group['created_at'] }}
 - **Updated At.** {{ \$group['updated_at'] }}
@@ -474,7 +483,7 @@ I found {{ count(\$result['groups']) }} groups in the workspace.
 
     private function post(string $endpoint, string $payload): array
     {
-        // Log::debug($payload);
+        Log::debug($payload);
         try {
             $response = Http::withBody($payload, 'text/plain;charset=UTF-8')->post("https://uk.fusion.live{$endpoint}");
         } catch (ConnectionException $e) {
