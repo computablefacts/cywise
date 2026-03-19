@@ -280,6 +280,13 @@ class CyberBuddyController extends Controller
             'page' => 'integer|min:1',
         ]);
 
+        if (Str::startsWith($secret, 'vulns-report-')) {
+            return Storage::disk('files-s3')->download("/reports/{$secret}", null, [
+                'pragma' => 'private',
+                'Cache-Control' => 'private, max-age=3600',
+            ]);
+        }
+
         /** @var File $file */
         $file = File::where('secret', $secret)->where('is_deleted', false)->first();
 

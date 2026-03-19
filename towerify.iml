@@ -268,6 +268,15 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/ueberdosis/tiptap-php" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/webklex/laravel-imap" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/webklex/php-imap" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/anourvalar/office" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/maennchen/zipstream-php" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/markbaker/complex" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/markbaker/matrix" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/mpdf/mpdf" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/mpdf/psr-http-message-shim" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/mpdf/psr-log-aware-trait" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpoffice/phpspreadsheet" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/setasign/fpdi" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

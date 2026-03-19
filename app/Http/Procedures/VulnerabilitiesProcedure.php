@@ -6,6 +6,10 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\HiddenAlert;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Sajya\Server\Procedure;
 
 class VulnerabilitiesProcedure extends Procedure
@@ -45,8 +49,10 @@ class VulnerabilitiesProcedure extends Procedure
             "high" => "A list of vulnerabilities with critical severity.",
             "medium" => "A list of vulnerabilities with medium severity.",
             "low" => "A list of vulnerabilities with low severity.",
+            "xlsx" => "An optional list of vulnerabilities as an Excel spreadsheet.",
         ],
         ai_examples: [
+            "if the request is 'envoie moi un rapport de vulnérabilités au format Excel', the input should be '{}'",
             "if the request is 'quelles sont mes vulnérabilités ?', the input should be '{}'",
             "if the request is 'quelles sont mes vulnérabilités critiques ?', the input should be '{\"level\":\"high\"}'",
             "if the request is 'quelles sont les vulnérabilités de example.com ?', the input should be '{\"tld\":\"example.com\"}'",
@@ -55,6 +61,10 @@ class VulnerabilitiesProcedure extends Procedure
             "if the request is 'quelles sont les vulnérabilités de criticité moyenne du serveur 192.168.1.1 ?', the input should be '{\"asset\":\"192.168.1.1\",\"level\":\"medium\"}'",
         ],
         ai_result: "
+@if(!empty(\$result['xlsx']))
+The list of vulnerabilities is available here as a Microsoft Excel spreadsheet: {{ \$result['xlsx'] }}
+@php unset(\$result['xlsx']); @endphp
+@endif
 @foreach(\$result as \$key => \$value)
 @if(!empty(\$value))
 @php
@@ -130,10 +140,66 @@ if (empty(\$alert->cve_id)) {
             })
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 
+        $data = [
+            'alerts' => $alerts->map(fn(Alert $alert) => [
+                'id' => $alert->id,
+                'severity' => $alert->level,
+                'cve' => $alert->cve_id,
+                'asset' => $alert->asset()->asset,
+                'ip' => $alert->port->ip,
+                'port' => $alert->port->port,
+                'service' => $alert->port->service,
+                'product' => $alert->port->product,
+                'vulnerability' => $alert->vulnerability,
+                'remediation' => $alert->remediation,
+            ])
+                ->values()
+                ->toArray(),
+        ];
+
+        if (count($data['alerts']) === 0) {
+            $data = [];
+        }
+
+        /** @var User $user */
+        $user = $request->user();
+        $report = storage_path("app/private/vulns-report.xlsx");
+
+        if (file_exists($report)) {
+            unlink($report);
+        }
+
+        (new \AnourValar\Office\SheetsService())
+            ->generate(database_path('seeders/docx/vulns-report.xlsx'), $data)
+            ->saveAs($report, \AnourValar\Office\Format::Xlsx);
+
+        $uuid = Str::random(40);
+        $storage = Storage::disk('files-s3');
+        $filepath = "/reports";
+        $filename = "vulns-report-{$user->id}-{$uuid}.xlsx";
+
+        if (!$storage->exists($filepath)) {
+            if (!$storage->makeDirectory($filepath)) {
+                return [
+                    'high' => $alerts->filter(fn(Alert $alert) => $alert->isHigh())->values(),
+                    'medium' => $alerts->filter(fn(Alert $alert) => $alert->isMedium())->values(),
+                    'low' => $alerts->filter(fn(Alert $alert) => $alert->isLow())->values(),
+                ];
+            }
+        }
+        if (!$storage->putFileAs($filepath, $report, $filename)) {
+            return [
+                'high' => $alerts->filter(fn(Alert $alert) => $alert->isHigh())->values(),
+                'medium' => $alerts->filter(fn(Alert $alert) => $alert->isMedium())->values(),
+                'low' => $alerts->filter(fn(Alert $alert) => $alert->isLow())->values(),
+            ];
+        }
+        Log::debug(app_url() . "/files/download/{$filename}");
         return [
             'high' => $alerts->filter(fn(Alert $alert) => $alert->isHigh())->values(),
             'medium' => $alerts->filter(fn(Alert $alert) => $alert->isMedium())->values(),
             'low' => $alerts->filter(fn(Alert $alert) => $alert->isLow())->values(),
+            'xlsx' => app_url() . "/files/download/{$filename}",
         ];
     }
 
