@@ -19,6 +19,9 @@ use Symfony\Component\Process\Process;
 
 class IngestFileListener extends AbstractListener
 {
+    // See: database/migrations/2025_06_08_114525_create_cb_chunks_table.php
+    private const CHUNK_TEXT_MAX_LENGTH = 4999;
+
     protected function handle2($event)
     {
         if (!($event instanceof IngestFile)) {
@@ -177,12 +180,14 @@ class IngestFileListener extends AbstractListener
                             Log::error("File cannot be downloaded : " . $obj['file']);
                         } else {
 
+                            $text = $this->truncateChunkText($obj['text'], $file->id, $obj['page']);
+
                             /** @var Chunk $chunk */
                             $chunk = $collection->chunks()->create([
                                 'file_id' => $fileTmp->id,
                                 'url' => $fileTmp->downloadUrl(),
                                 'page' => $obj['page'],
-                                'text' => $obj['text'],
+                                'text' => $text,
                                 'is_embedded' => isset($obj['hypothetical_questions']),
                             ]);
 
@@ -382,6 +387,8 @@ class IngestFileListener extends AbstractListener
                         $text = trim($fragment['text']);
                     }
 
+                    $text = $this->truncateChunkText($text, $file->id, $page);
+
                     /** @var Chunk $chunk */
                     $chunk = $collection->chunks()->create([
                         'file_id' => $file->id,
@@ -415,6 +422,17 @@ class IngestFileListener extends AbstractListener
     private function storageFileName(File $file, string $extension): string
     {
         return "{$file->id}_{$file->name_normalized}.{$extension}";
+    }
+
+    private function truncateChunkText(string $text, int $fileId, ?int $page): string
+    {
+        if (Str::length($text) <= self::CHUNK_TEXT_MAX_LENGTH) {
+            return $text;
+        }
+
+        Log::warning("Chunk TEXT truncated for file {$fileId} on page {$page}");
+
+        return Str::substr($text, 0, self::CHUNK_TEXT_MAX_LENGTH);
     }
 
     private function storageFilePath(\App\Models\Collection $collection): string
