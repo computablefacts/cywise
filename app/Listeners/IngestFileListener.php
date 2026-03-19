@@ -377,7 +377,7 @@ class IngestFileListener extends AbstractListener
                     $page = $fragment['metadata']['page_idx'] + 1;
 
                     if ($fragment['metadata']['tag'] === 'list') {
-                        $text = trim($fragment['metadata']['prevPara']['text']) . "\n" . trim($fragment['text']);
+                        $text = trim($fragment['metadata']['prevPara']['text'] ?? '') . "\n" . trim($fragment['text']);
                     } else {
                         $text = trim($fragment['text']);
                     }
