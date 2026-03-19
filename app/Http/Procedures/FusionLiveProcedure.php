@@ -97,15 +97,17 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
 
 @foreach(\$folder['documents'] as \$doc)
 
-## {{ \$doc['title'] }}
+## {{ \$doc['file']['name'] ?? \$doc['title'] }}
 
 - **Company Name.** {{ \$doc['company_name'] }}
 - **Uploaded At.** {{ \$doc['upload_date'] }}
+- **Title.** {{ \$doc['title'] }}
 - **Size.** {{ \$doc['size'] }} bytes
 - **Reference.** {{ \$doc['reference'] }}
 - **Status.** {{ \$doc['status'] }}
 - **Revision.** {{ \$doc['revision'] }}
 - **Locked.** {{ \$doc['is_locked'] ? 'true' : 'false' }}
+- **Link.** {{ \$doc['uri'] }}
 
 @endforeach
 @endforeach
@@ -226,6 +228,13 @@ I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column
                     'has_markup' => (FusionLiveXmlElement::attr($d, 'hasmarkup') === 'true'),
                     'size' => (int)FusionLiveXmlElement::attr($d, 'size'),
                     'company_name' => (string)FusionLiveXmlElement::attr($d, 'companyname'),
+                    'uri' => (string)FusionLiveXmlElement::attr($d, 'uri'),
+                    'file' => $d->file ? [
+                        'name' => (string)FusionLiveXmlElement::attr($d->file, 'name'),
+                        'type' => (string)FusionLiveXmlElement::attr($d->file, 'type'),
+                        'mime_type' => (string)FusionLiveXmlElement::attr($d->file, 'mimetype'),
+                        'code_format' => (string)FusionLiveXmlElement::attr($d->file, 'contentformatcode'),
+                    ] : null,
                 ];
             }, $el->documents),
         ];
