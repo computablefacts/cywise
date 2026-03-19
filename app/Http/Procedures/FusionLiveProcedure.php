@@ -170,7 +170,7 @@ I found {{ count(\$result['users']) }} users in the workspace.
 - **Id.** {{ \$user['id'] }}
 - **Company.** {{ \$user['company'] }}
 - **Profession.** {{ \$user['profession'] }}
-- **Email.**{{ \$user['email'] }})
+- **Email.**{{ \$user['email'] }}
 - **Phone.** {{ \$user['phone'] }}
 
 @endforeach
