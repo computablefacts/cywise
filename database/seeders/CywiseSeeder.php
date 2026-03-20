@@ -684,6 +684,7 @@ class CywiseSeeder extends Seeder
             'fusionlive@workspaces',
             'leaks@list',
             'notes@create',
+            'reporting@create',
             'scheduled-tasks@create',
             'scheduled-tasks@list',
             'scheduled-tasks@toggle',

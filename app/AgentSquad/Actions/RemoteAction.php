@@ -35,7 +35,7 @@ class RemoteAction extends AbstractAction
             $parameters .= "- {$key}: {$properties['description']} ({$properties['type']})\n";
         }
 
-        $examples = empty($this->action->examples) ? "" : "For example:\n-" . implode("\n-", $this->action->examples);
+        $examples = empty($this->action->examples) ? "" : "For example:\n- " . implode("\n- ", $this->action->examples);
 
         return [
             "type" => "function",
