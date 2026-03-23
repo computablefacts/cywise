@@ -47,7 +47,7 @@ class ChunkAssistant
             return $this->chunk;
         }
 
-        $key = 'translation:' . $this->lang->value . ':' . $lang->value . ':' . md5($this->chunk);
+        $key = "translation:{$this->lang->value}:{$lang->value}:" . md5($this->chunk);
 
         return \Cache::remember($key, now()->addDays(120), function () use ($lang) {
 

@@ -15,6 +15,7 @@ class ChunksProvider
     private Collection $collections;
     private int $limit = 8;
     private LanguageEnum $lang = LanguageEnum::FRENCH;
+    /** @var array<array<string>> */
     private array $keywords = [];
     private string $text = '';
 
@@ -41,6 +42,7 @@ class ChunksProvider
         return $this;
     }
 
+    /** @param array<array<string>> $keywords */
     public function withKeywords(array $keywords): ChunksProvider
     {
         $this->keywords = $keywords;
@@ -60,7 +62,9 @@ class ChunksProvider
             return collect();
         }
 
-        $key = 'chunks_provider_' . md5($this->collections->pluck('id')->implode('_') . "{$this->lang->value}:" . implode('_', $this->keywords) . ":{$this->text}");
+        $collectionsPart = $this->collections->pluck('id')->implode('_');
+        $keywordsPart = implode('_', array_map(fn(array $keywords) => implode('|', $keywords), $this->keywords));
+        $key = 'chunks_provider_' . md5("{$collectionsPart}:{$this->lang->value}:{$keywordsPart}:{$this->text}");
 
         // TODO : take the collection priority into account
         return \Cache::remember($key, now()->addDays(7), function () {
