@@ -56,6 +56,7 @@ class Orchestrator
             }
             return $this->processInput($user, $threadId, $messages, $input);
         } catch (\Exception $e) {
+            Log::error($e);
             return new FailedAnswer(__("Sorry, an error occurred: :msg", ['msg' => $e->getMessage()]));
         }
     }

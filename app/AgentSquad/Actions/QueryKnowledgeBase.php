@@ -102,6 +102,7 @@ class QueryKnowledgeBase extends AbstractAction
                 $start = microtime(true);
                 $dir = FileVectorStore::unpack("anssi.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
+                $anssi = array_values(array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
                 $anssi = array_map(function (array $vector, int $index) {
                     /** @var Vector $vec */
                     $vec = $vector['vector'];
@@ -109,10 +110,10 @@ class QueryKnowledgeBase extends AbstractAction
                     $answer = preg_replace('/#+/', '', $vec->metadata('answer'));
                     $similarity = $vector['similarity'];
                     return "## Memo A{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** ANSSI\n**Score:** {$similarity}";
-                }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
+                }, $anssi, array_keys($anssi));
                 $stop = microtime(true);
                 $nbResults = count($anssi);
-                Log::debug("[ANSSI] Searching ANSSI's dataset took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+                Log::debug("[ANSSI] Searching ANSSI's dataset took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results for '{$json['question_fr']}'");
             }
         }
 
@@ -130,6 +131,7 @@ class QueryKnowledgeBase extends AbstractAction
                 $start = microtime(true);
                 $dir = FileVectorStore::unpack("rowden_cybersecurityqaa.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
+                $rowden = array_values(array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
                 $rowden = array_map(function (array $vector, int $index) {
                     /** @var Vector $vec */
                     $vec = $vector['vector'];
@@ -139,10 +141,10 @@ class QueryKnowledgeBase extends AbstractAction
                     $source = empty($source) ? 'n/a' : $source;
                     $similarity = $vector['similarity'];
                     return "## Memo R{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** {$source}\n**Score:** {$similarity}";
-                }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
+                }, $rowden, array_keys($rowden));
                 $stop = microtime(true);
                 $nbResults = count($rowden);
-                Log::debug("[ROWDEN_QAA] Searching Rowden's Cybersecurity QAA took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+                Log::debug("[ROWDEN_QAA] Searching Rowden's Cybersecurity QAA took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results for '{$json['question_en']}'");
             }
         }
 

@@ -60,7 +60,7 @@ class ChunksProvider
             return collect();
         }
 
-        $key = 'chunks_provider_' . md5($this->collections->pluck('id')->implode('_') . "{$this->lang->value}:{$this->keywords}:{$this->text}");
+        $key = 'chunks_provider_' . md5($this->collections->pluck('id')->implode('_') . "{$this->lang->value}:" . implode('_', $this->keywords) . ":{$this->text}");
 
         // TODO : take the collection priority into account
         return \Cache::remember($key, now()->addDays(7), function () {
