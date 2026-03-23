@@ -66,7 +66,7 @@ class SendAuditReportListener extends AbstractListener
 
         Log::debug("Assembling audit report for {$user->email}...");
 
-        $subject = $this->buildEmailSubject($user, $assets);
+        $subject = $this->buildEmailSubject($user, $assets, $isOnboarding);
         $body = ['<table cellspacing="0" cellpadding="0" style="margin: auto;"><tbody>'];
         $body[] = '<tr><td style="font-size: 28px; text-align: center;">Bonjour !</td></tr>';
         $body[] = '<tr><td style="font-size: 16px; line-height: 1.6;">';
@@ -129,7 +129,7 @@ class SendAuditReportListener extends AbstractListener
         ";
     }
 
-    private function buildEmailSubject(User $user, Collection $assets): string
+    private function buildEmailSubject(User $user, Collection $assets, bool $isOnboarding): string
     {
         Log::debug("Building subject for user {$user->email}...");
 
@@ -137,9 +137,14 @@ class SendAuditReportListener extends AbstractListener
 
         Log::debug("{$nbNewAssets} new assets found for user {$user->email}");
 
-        $nbLeaks = $this->fetchLeaks($user)->unique()->count();
-
-        Log::debug("{$nbLeaks} leaks found for user {$user->email}");
+        if ($isOnboarding) {
+            $nbLeaks = $this->fetchLeaks($user)->unique()->count();
+            Log::debug("{$nbLeaks} leaks found for user {$user->email}");
+        } else {
+            $minDate = Carbon::now()->utc()->subDays(7);
+            $nbLeaks = $this->fetchLeaks($user, $minDate)->unique()->count();
+            Log::debug("{$nbLeaks} new leaks found for user {$user->email} since {$minDate->format('Y-m-d')}");
+        }
 
         $nbHigh = $assets->flatMap(fn(Asset $asset) => $asset->alertsWithCriticalityHigh()->get())
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0)
@@ -178,7 +183,12 @@ class SendAuditReportListener extends AbstractListener
         if ($nbNewAssets > 0) {
             return "Cywise - {$nbNewAssets} nouveaux actifs ont été ajoutés !";
         }
-        return 'Cywise - Une fuite de données ou compromission a été détectée !';
+        if ($nbLeaks > 0) {
+            return $isOnboarding ?
+                "Cywise - {$nbLeaks} fuites de données ou compromissions ont été découvertes !" :
+                "Cywise - {$nbLeaks} nouvelles fuites de données ou compromissions ont été découvertes !";
+        }
+        return 'Cywise - Tout va bien !';
     }
 
     private function buildSummary(User $user, Collection $assets): string
