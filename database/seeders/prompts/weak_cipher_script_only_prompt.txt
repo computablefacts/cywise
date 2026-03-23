@@ -37,4 +37,5 @@ Dans la section `### CONFIGURATION - L'IA DOIT MODIFIER CES 2 LIGNES ###`, modif
 - N'utilise PAS de balises markdown (```bash) pour entourer le script
 - Le script doit commencer par "set -e" et se terminer par la dernière ligne du script
 - Le script doit être prêt à être copié-collé dans un fichier .bash et exécuté directement
+- Si aucun script fiable ne peut être produit pour cette cible, retourne EXACTEMENT `<NO_SCRIPT>`
 </instructions>

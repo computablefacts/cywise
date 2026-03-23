@@ -28,6 +28,7 @@ RÈGLES STRICTES :
 - N'utilise PAS de balises markdown (```bash) pour entourer le script
 - Le script doit commencer par "set -e" et se terminer par la dernière ligne du script
 - Chaque ligne du script doit être exactement comme dans le template, avec seulement les valeurs remplacées
+- Si le template est absent, incohérent, ou si aucun script utile ne peut être généré, retourne EXACTEMENT `<NO_SCRIPT>`
 
 IMPORTANT : Ta réponse doit être UNIQUEMENT le script bash brut, prêt à être copié-collé dans un fichier .bash et exécuté directement.
 </instructions>
