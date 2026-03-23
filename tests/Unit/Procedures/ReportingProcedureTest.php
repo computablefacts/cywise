@@ -23,7 +23,7 @@ it('creates a vulnerabilities report', function () {
 
     $response = $this
         ->setRpcRoute('v2.private.rpc.endpoint')
-        ->callProcedure('reporting@create', ['type' => 'vulnerabilities']);
+        ->callProcedure('reporting@create', ['report' => 'vulnerabilities']);
 
     $response->assertJsonStructure([
         'id',
@@ -50,7 +50,7 @@ it('creates a ports report', function () {
 
     $response = $this
         ->setRpcRoute('v2.private.rpc.endpoint')
-        ->callProcedure('reporting@create', ['type' => 'ports']);
+        ->callProcedure('reporting@create', ['type' => 'report']);
 
     $response->assertJsonStructure([
         'id',
@@ -73,7 +73,7 @@ it('creates an assets report', function () {
 
     $response = $this
         ->setRpcRoute('v2.private.rpc.endpoint')
-        ->callProcedure('reporting@create', ['type' => 'assets']);
+        ->callProcedure('reporting@create', ['report' => 'assets']);
 
     $response->assertJsonStructure([
         'id',
