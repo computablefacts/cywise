@@ -13,13 +13,13 @@ it('creates a vulnerabilities report', function () {
     asTenant1User();
 
     Storage::fake('files-s3');
-    Alert::factory()->for(
-        Port::factory()->for(
-            Scan::factory()->for(
-                Asset::factory()->monitored()->create()
-            )->vulnsScanEnded()->create()
-        )->create()
-    )->assetMonitored()->levelHigh()->create();
+    $asset = Asset::factory()->monitored()->create();
+    $scan = Scan::factory()->for($asset)->vulnsScanEnded()->create();
+    $asset->cur_scan_id = $scan->ports_scan_id;
+    $asset->save();
+    $asset->refresh();
+    $port = Port::factory()->for($scan)->create();
+    Alert::factory()->for($port)->assetMonitored()->levelHigh()->create();
 
     $response = $this
         ->setRpcRoute('v2.private.rpc.endpoint')
@@ -33,8 +33,8 @@ it('creates a vulnerabilities report', function () {
         ],
     ]);
 
-    $xlsx = $response->json('result.xlsx');
-    expect($xlsx)->toContain('/files/download/vulns-report-');
+    $reportUrl = $response->json('result.report');
+    expect($reportUrl)->toContain('/files/download/vulns-report-');
 });
 
 it('creates a ports report', function () {
@@ -42,15 +42,16 @@ it('creates a ports report', function () {
     asTenant1User();
 
     Storage::fake('files-s3');
-    Port::factory()->for(
-        Scan::factory()->for(
-            Asset::factory()->monitored()->create()
-        )->portsScanEnded()->create()
-    )->create();
+    $asset = Asset::factory()->monitored()->create();
+    $scan = Scan::factory()->for($asset)->portsScanEnded()->create();
+    $asset->cur_scan_id = $scan->ports_scan_id;
+    $asset->save();
+    $asset->refresh();
+    Port::factory()->for($scan)->create();
 
     $response = $this
         ->setRpcRoute('v2.private.rpc.endpoint')
-        ->callProcedure('reporting@create', ['type' => 'report']);
+        ->callProcedure('reporting@create', ['report' => 'ports']);
 
     $response->assertJsonStructure([
         'id',
@@ -60,8 +61,8 @@ it('creates a ports report', function () {
         ],
     ]);
 
-    $xlsx = $response->json('result.xlsx');
-    expect($xlsx)->toContain('/files/download/ports-report-');
+    $reportUrl = $response->json('result.report');
+    expect($reportUrl)->toContain('/files/download/ports-report-');
 });
 
 it('creates an assets report', function () {
@@ -83,6 +84,6 @@ it('creates an assets report', function () {
         ],
     ]);
 
-    $xlsx = $response->json('result.xlsx');
-    expect($xlsx)->toContain('/files/download/assets-report-');
+    $reportUrl = $response->json('result.report');
+    expect($reportUrl)->toContain('/files/download/assets-report-');
 });

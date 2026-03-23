@@ -124,7 +124,7 @@ class ReportingProcedure extends Procedure
     private function openPorts(JsonRpcRequest $request): array
     {
         $result = (new AssetsProcedure())->list(JsonRpcRequest::createFrom($request));
-        $ports = collect($result['assets'] ?? [])->flatMap(fn(array $asset) => Asset::find($asset['id'])->ports()->get());
+        $ports = collect($result['assets'] ?? [])->flatMap(fn(array $asset) => Asset::find($asset['uid'])->ports()->get());
         return [
             'data' => $ports
                 ->map(fn(Port $port) => [
