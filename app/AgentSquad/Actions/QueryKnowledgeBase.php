@@ -9,6 +9,7 @@ use App\AgentSquad\Assistants\ChunkAssistant;
 use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\ChunksProvider;
 use App\AgentSquad\Providers\MemosProvider;
+use App\AgentSquad\ThoughtActionObservation;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
 use App\Enums\LanguageEnum;
@@ -54,6 +55,8 @@ class QueryKnowledgeBase extends AbstractAction
 
     public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
+        $chainOfThought = [];
+
         // Extract collection (if any)
         $collection = Str::before($input, ':');
 
@@ -76,17 +79,23 @@ class QueryKnowledgeBase extends AbstractAction
         $json = $result->parsed;
 
         if (!$json) {
-            return new FailedAnswer(__("The answer is not a valid JSON: {$answer}"));
+            $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", "The answer is not a valid JSON: {$answer}");
+            return new FailedAnswer(__("The answer is not a valid JSON: {$answer}"), $chainOfThought);
         }
         if (($json['lang'] ?? '') !== 'french' && ($json['lang'] ?? '') !== 'english') {
-            return new FailedAnswer(__("The language is unknown: {$answer}"));
+            $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", "The language is unknown: {$answer}");
+            return new FailedAnswer(__("The language is unknown: {$answer}"), $chainOfThought);
         }
         if (empty($json['question_en'] ?? '') && empty($json['question_fr'] ?? '')) {
-            return new FailedAnswer(__("The questions are missing: {$answer}"));
+            $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", "The questions are missing: {$answer}");
+            return new FailedAnswer(__("The questions are missing: {$answer}"), $chainOfThought);
         }
         if (empty($json['keywords_en'] ?? []) && empty($json['keywords_fr'] ?? [])) {
-            return new FailedAnswer(__("The keywords are missing: {$answer}"));
+            $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", "The keywords are missing: {$answer}");
+            return new FailedAnswer(__("The keywords are missing: {$answer}"), $chainOfThought);
         }
+
+        $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", cywise_truncate_string(json_encode($json)));
 
         // Extract similar questions from ANSSI's dataset
         $anssi = [];
@@ -114,6 +123,7 @@ class QueryKnowledgeBase extends AbstractAction
                 $stop = microtime(true);
                 $nbResults = count($anssi);
                 Log::debug("[ANSSI] Searching ANSSI's dataset took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results for '{$json['question_fr']}'");
+                $chainOfThought[] = new ThoughtActionObservation("I need to search the ANSSI dataset.", "search[{$json['question_fr']}]", "I found {$nbResults} results.");
             }
         }
 
@@ -145,6 +155,7 @@ class QueryKnowledgeBase extends AbstractAction
                 $stop = microtime(true);
                 $nbResults = count($rowden);
                 Log::debug("[ROWDEN_QAA] Searching Rowden's Cybersecurity QAA took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results for '{$json['question_en']}'");
+                $chainOfThought[] = new ThoughtActionObservation("I need to search the ROWDEN dataset.", "search[{$json['question_en']}]", "I found {$nbResults} results.");
             }
         }
 
@@ -155,19 +166,23 @@ class QueryKnowledgeBase extends AbstractAction
                 ->withUser($user)
                 ->provide() :
             '';
+        $chainOfThought[] = new ThoughtActionObservation("I need to load the memos.", "load_memos[]", "Memos loaded.");
         $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
+        $chainOfThought[] = new ThoughtActionObservation("I need to load the chunks.", "load_chunks[]", "Chunks loaded.");
+        $question = $json['lang'] === 'english' ?
+            $json['question_en'] :
+            ($json['lang'] === 'french' ? $json['question_fr'] : $input);
         $answer = TextAssistant::use()
             ->withMessagesAndPrompt($messages, 'default_answer_question', [
                 'LANGUAGE' => $json['lang'],
                 'NOTES' => $chunks,
                 'MEMOS' => $memos . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
-                'QUESTION' => $json['lang'] === 'english' ?
-                    $json['question_en'] :
-                    ($json['lang'] === 'french' ? $json['question_fr'] : $input),
+                'QUESTION' => $question,
             ])
             ->text();
+        $chainOfThought[] = new ThoughtActionObservation("I need to answer the question.", "answer[{$question}]", cywise_truncate_string($answer));
 
-        return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))), [], !empty($answer));
+        return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))), $chainOfThought, !empty($answer));
     }
 
     private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): string
