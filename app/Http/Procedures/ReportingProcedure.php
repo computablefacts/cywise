@@ -18,7 +18,7 @@ class ReportingProcedure extends Procedure
     #[RpcMethod(
         description: "Create a report as an Excel spreadsheet.",
         params: [
-            "type" => "The type of report to create: vulnerabilities, open ports or assets. (string|in:vulnerabilities,ports,assets)",
+            "type" => "The type of report to create: vulnerabilities, open ports or assets. (string|min:5|max:15|in:vulnerabilities,ports,assets)",
         ],
         result: [
             "report" => "A link to the Excel spreadsheet.",
@@ -33,7 +33,7 @@ class ReportingProcedure extends Procedure
     public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'type' => 'string|required|in:vulnerabilities,ports,assets',
+            'type' => 'string|required|min:5|max:15|in:vulnerabilities,ports,assets',
         ]);
         $data = [];
         $templatePath = '';
