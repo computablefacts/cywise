@@ -41,7 +41,6 @@ it('lists vulnerabilities for monitored assets', function () {
                 'high',
                 'medium',
                 'low',
-                'xlsx',
             ],
         ]);
 
@@ -154,7 +153,6 @@ it('lists vulnerabilities for one particular asset', function () {
                 'high',
                 'medium',
                 'low',
-                'xlsx',
             ],
         ]);
 
@@ -190,7 +188,6 @@ test('critical vulnerabilities are grouped with high vulnerabilities', function 
                 'high',
                 'medium',
                 'low',
-                'xlsx',
             ],
         ]);
 
@@ -259,7 +256,6 @@ it('hides vulnerabilities by type', function () {
                 'high',
                 'medium',
                 'low',
-                'xlsx',
             ],
         ]);
 
@@ -297,7 +293,6 @@ it('hides vulnerabilities by title', function () {
                 'high',
                 'medium',
                 'low',
-                'xlsx',
             ],
         ]);
 
