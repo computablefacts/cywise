@@ -218,7 +218,6 @@ it('hides vulnerabilities by uid', function () {
                 'high',
                 'medium',
                 'low',
-                'xlsx',
             ],
         ]);
 
