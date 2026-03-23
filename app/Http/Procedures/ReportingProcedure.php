@@ -18,36 +18,36 @@ class ReportingProcedure extends Procedure
     #[RpcMethod(
         description: "Create a report as an Excel spreadsheet.",
         params: [
-            "type" => "The type of report to create: vulnerabilities, open ports or assets. (string|min:5|max:15|in:vulnerabilities,ports,assets)",
+            "report" => "The type of report to create: vulnerabilities, open ports or assets. (string|min:5|max:15|in:vulnerabilities,ports,assets)",
         ],
         result: [
             "report" => "A link to the Excel spreadsheet.",
         ],
         ai_examples: [
-            "if the request is 'envoie moi un rapport de vulnérabilités au format Excel', the input should be '{\"type\":\"vulnerabilities\"}'",
-            "if the request is 'exporte mes actifs', the input should be '{\"type\":\"assets\"}'",
-            "if the request is 'exporte la liste des ports ouverts', the input should be '{\"type\":\"ports\"}'",
+            "if the request is 'envoie moi un rapport de vulnérabilités au format Excel', the input should be '{\"report\":\"vulnerabilities\"}'",
+            "if the request is 'exporte mes actifs', the input should be '{\"report\":\"assets\"}'",
+            "if the request is 'exporte la liste des ports ouverts', the input should be '{\"report\":\"ports\"}'",
         ],
         ai_result: "{{ \$result['report'] }}"
     )]
     public function create(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'type' => 'string|required|min:5|max:15|in:vulnerabilities,ports,assets',
+            'report' => 'string|required|min:5|max:15|in:vulnerabilities,ports,assets',
         ]);
         $data = [];
         $templatePath = '';
         $templateName = '';
 
-        if ($params['type'] === 'vulnerabilities') {
+        if ($params['report'] === 'vulnerabilities') {
             $data = $this->vulnerabilities($request);
             $templatePath = database_path('seeders/office/vulns-report.xlsx');
             $templateName = 'vulns-report.xlsx';
-        } elseif ($params['type'] === 'ports') {
+        } elseif ($params['report'] === 'ports') {
             $data = $this->openPorts($request);
             $templatePath = database_path('seeders/office/ports-report.xlsx');
             $templateName = 'ports-report.xlsx';
-        } elseif ($params['type'] === 'assets') {
+        } elseif ($params['report'] === 'assets') {
             $data = $this->assets($request);
             $templatePath = database_path('seeders/office/assets-report.xlsx');
             $templateName = 'assets-report.xlsx';
@@ -55,8 +55,10 @@ class ReportingProcedure extends Procedure
         if (!file_exists($templatePath)) {
             throw new \Exception("Template file {$templatePath} not found.");
         }
-        if (empty($data['data'])) {
-            unset($data['data']); // see https://github.com/AnourValar/office
+        if (empty($data['data'])) { // see https://github.com/AnourValar/office
+            return [
+                'report' => 'There is no data to export.',
+            ];
         }
 
         /** @var User $user */
@@ -151,7 +153,7 @@ class ReportingProcedure extends Procedure
                     'name' => $asset['asset'],
                     'domain' => $asset['tld'],
                     'is_monitored' => $asset['is_monitored'] ? 'Yes' : 'No',
-                    'tags' => $asset['tags']->map(fn(array $tag) => $tag['name'])->join('|'),
+                    'tags' => implode('|', array_map(fn(array $tag) => $tag['name'], $asset['tags'])),
                 ])
                 ->values()
                 ->toArray(),
