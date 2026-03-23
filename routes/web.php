@@ -113,7 +113,7 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
 
     $token = $request->input('api_token');
 
-    if (! $token) {
+    if (!$token) {
         return response('Missing token', 403)
             ->header('Content-Type', 'text/plain');
     }
@@ -121,7 +121,7 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
     /** @var \Laravel\Sanctum\PersonalAccessToken $token */
     $token = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
 
-    if (! $token) {
+    if (!$token) {
         return response('Invalid token', 403)
             ->header('Content-Type', 'text/plain');
     }
@@ -132,14 +132,14 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
 
     $ip = $request->input('server_ip');
 
-    if (! $ip) {
+    if (!$ip) {
         return response('Invalid IP address', 500)
             ->header('Content-Type', 'text/plain');
     }
 
     $name = $request->input('server_name');
 
-    if (! $name) {
+    if (!$name) {
         return response('Invalid server name', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -152,7 +152,7 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
         $platform = OsqueryPlatformEnum::LINUX;
     }
 
-    if (! $platform) {
+    if (!$platform) {
         return response('Invalid platform name', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -161,13 +161,13 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
         ->where('name', $name)
         ->first();
 
-    if (! $server) {
+    if (!$server) {
 
         $server = \App\Models\YnhServer::where('ip_address_v6', $ip)
             ->where('name', $name)
             ->first();
 
-        if (! $server) {
+        if (!$server) {
 
             $server = YnhServer::create([
                 'name' => $name,
@@ -187,16 +187,16 @@ Route::get('/setup/script', function (\Illuminate\Http\Request $request) {
         return response('The server is already configured', 500)
             ->header('Content-Type', 'text/plain');
     }
-    if (! $server->secret) {
+    if (!$server->secret) {
         $server->secret = Str::random(30);
     }
-    if (! $server->ssh_port) {
+    if (!$server->ssh_port) {
         $server->ssh_port = 22;
     }
-    if (! $server->ssh_username) {
+    if (!$server->ssh_username) {
         $server->ssh_username = 'twr_admin';
     }
-    if (! $server->ssh_public_key || ! $server->ssh_private_key) {
+    if (!$server->ssh_public_key || !$server->ssh_private_key) {
 
         $keys = new SshKeyPair();
         $keys->init();
@@ -229,7 +229,7 @@ Route::get('/update/{secret}', function (string $secret, \Illuminate\Http\Reques
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (! $server) {
+    if (!$server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -265,10 +265,10 @@ Route::post('/logalert/{secret}', function (string $secret, \Illuminate\Http\Req
 
         $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-        if (! $server) {
+        if (!$server) {
             $apiToken = \Wave\ApiKey::query()->where('key', '=', $secret)->first();
 
-            if (! $apiToken) {
+            if (!$apiToken) {
                 return new JsonResponse([
                     'status' => 'failure',
                     'message' => 'server not found',
@@ -284,7 +284,7 @@ Route::post('/logalert/{secret}', function (string $secret, \Illuminate\Http\Req
                 ->where('created_by', $user->id)
                 ->first();
 
-            if (! $server) {
+            if (!$server) {
                 return new JsonResponse([
                     'status' => 'failure',
                     'message' => 'server not found',
@@ -294,8 +294,8 @@ Route::post('/logalert/{secret}', function (string $secret, \Illuminate\Http\Req
         }
 
         $events = collect($request->input('lines'))
-            ->map(fn ($line) => $line ? json_decode($line, true) : [])
-            ->filter(fn ($event) => $event && count($event) > 0)
+            ->map(fn($line) => $line ? json_decode($line, true) : [])
+            ->filter(fn($event) => $event && count($event) > 0)
             ->all();
 
         \App\Events\ProcessLogalertPayload::dispatch($server, $events);
@@ -317,7 +317,7 @@ Route::get('/logalert/{secret}', function (string $secret, \Illuminate\Http\Requ
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (! $server) {
+    if (!$server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -332,7 +332,7 @@ Route::get('/osquery/{secret}', function (string $secret, \Illuminate\Http\Reque
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (! $server) {
+    if (!$server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -347,7 +347,7 @@ Route::get('/localmetrics/{secret}', function (string $secret, \Illuminate\Http\
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (! $server) {
+    if (!$server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -360,21 +360,21 @@ Route::get('/localmetrics/{secret}', function (string $secret, \Illuminate\Http\
 
 Route::post('/logparser/{secret}', function (string $secret, \Illuminate\Http\Request $request) {
 
-    if (! $request->hasFile('data')) {
+    if (!$request->hasFile('data')) {
         return response('Missing attachment', 500)
             ->header('Content-Type', 'text/plain');
     }
 
     $file = $request->file('data');
 
-    if (! $file->isValid()) {
+    if (!$file->isValid()) {
         return response('Invalid attachment', 500)
             ->header('Content-Type', 'text/plain');
     }
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (! $server) {
+    if (!$server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -384,7 +384,7 @@ Route::post('/logparser/{secret}', function (string $secret, \Illuminate\Http\Re
     if ($filename === 'osquery.jsonl.gz') {
 
         $logs = collect(gzfile($file->getRealPath()))
-            ->map(fn (string $line) => json_decode(trim($line), true));
+            ->map(fn(string $line) => json_decode(trim($line), true));
 
         if ($logs->isEmpty()) {
             return response('ok (empty file)', 200)
@@ -408,7 +408,7 @@ Route::get('/performa/{secret}', function (string $secret, \Illuminate\Http\Requ
 
     $server = \App\Models\YnhServer::where('secret', $secret)->first();
 
-    if (! $server) {
+    if (!$server) {
         return response('Unknown server', 500)
             ->header('Content-Type', 'text/plain');
     }
@@ -430,8 +430,8 @@ Route::get('/performa/user/login/{performa_domain}', function (string $performa_
 
     /** @var User $user */
     $user = Auth::user();
-    $usernames = collect(config('towerify.performa.whitelist.usernames'))->map(fn (string $username) => $username.'@')->toArray();
-    $domains = collect(config('towerify.performa.whitelist.domains'))->map(fn (string $domain) => '@'.$domain)->toArray();
+    $usernames = collect(config('towerify.performa.whitelist.usernames'))->map(fn(string $username) => $username . '@')->toArray();
+    $domains = collect(config('towerify.performa.whitelist.domains'))->map(fn(string $domain) => '@' . $domain)->toArray();
 
     if ($user
         && (
@@ -454,7 +454,7 @@ Route::get('/performa/user/login/{performa_domain}', function (string $performa_
 
     return response()->json([
         'code' => 0,
-        'location' => route('login').'?redirect_to=',
+        'location' => route('login') . '?redirect_to=',
     ]);
 
 })->middleware('throttle:6,1');
@@ -464,8 +464,8 @@ Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialI
 
     /** @var User $user */
     $user = Auth::user();
-    $usernames = collect(config('towerify.telescope.whitelist.usernames'))->map(fn (string $username) => $username.'@')->toArray();
-    $domains = collect(config('towerify.telescope.whitelist.domains'))->map(fn (string $domain) => '@'.$domain)->toArray();
+    $usernames = collect(config('towerify.telescope.whitelist.usernames'))->map(fn(string $username) => $username . '@')->toArray();
+    $domains = collect(config('towerify.telescope.whitelist.domains'))->map(fn(string $domain) => '@' . $domain)->toArray();
 
     if (Str::startsWith($user->email, $usernames) && Str::endsWith($user->email, $domains)) {
         try {
@@ -475,10 +475,6 @@ Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialI
                 RebuildPackagesList::sink();
             } elseif ($job === 'rebuild_latest_events_cache') {
                 RebuildLatestEventsCache::sink();
-            } elseif ($job === 'send_audit_report') {
-                $user = \App\Models\User::where('email', config('towerify.admin.email'))->firstOrFail();
-                $event = new \App\Events\SendAuditReport($user, false);
-                (new \App\Listeners\SendAuditReportListener())->handle($event);
             }
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
