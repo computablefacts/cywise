@@ -20,7 +20,6 @@ use App\Models\File;
 use App\Models\User;
 use App\Rules\IsValidCollectionName;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class QueryKnowledgeBase extends AbstractAction
@@ -122,8 +121,8 @@ class QueryKnowledgeBase extends AbstractAction
                 }, $anssi, array_keys($anssi));
                 $stop = microtime(true);
                 $nbResults = count($anssi);
-                Log::debug("[ANSSI] Searching ANSSI's dataset took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results for '{$json['question_fr']}'");
-                $chainOfThought[] = new ThoughtActionObservation("I need to search the ANSSI dataset.", "search[{$json['question_fr']}]", "I found {$nbResults} results.");
+                $elapsedTimeInSeconds = (int)ceil($stop - $start);
+                $chainOfThought[] = new ThoughtActionObservation("I need to search the ANSSI dataset.", "search[anssi,{$json['question_fr']}]", "I found {$nbResults} results in {$elapsedTimeInSeconds} seconds.");
             }
         }
 
@@ -154,8 +153,8 @@ class QueryKnowledgeBase extends AbstractAction
                 }, $rowden, array_keys($rowden));
                 $stop = microtime(true);
                 $nbResults = count($rowden);
-                Log::debug("[ROWDEN_QAA] Searching Rowden's Cybersecurity QAA took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results for '{$json['question_en']}'");
-                $chainOfThought[] = new ThoughtActionObservation("I need to search the ROWDEN dataset.", "search[{$json['question_en']}]", "I found {$nbResults} results.");
+                $elapsedTimeInSeconds = (int)ceil($stop - $start);
+                $chainOfThought[] = new ThoughtActionObservation("I need to search the ROWDEN dataset.", "search[rowden,{$json['question_en']}]", "I found {$nbResults} results in {$elapsedTimeInSeconds} seconds.");
             }
         }
 
@@ -166,16 +165,16 @@ class QueryKnowledgeBase extends AbstractAction
                 ->withUser($user)
                 ->provide() :
             '';
-        $chainOfThought[] = new ThoughtActionObservation("I need to load the memos.", "load_memos[]", "Memos loaded.");
-        $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
-        $chainOfThought[] = new ThoughtActionObservation("I need to load the chunks.", "load_chunks[]", "Chunks loaded.");
+        $chainOfThought[] = new ThoughtActionObservation("I need to load the user's memos.", "load[memos]", "The user's memos have been loaded.");
+        $result = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
+        $chainOfThought[] = new ThoughtActionObservation("I need to load the chunks.", "load[chunks]", "{$result['chunks_fr']['count']} FR chunks loaded in {$result['chunks_fr']['elapsed_time_in_seconds']} seconds. {$result['chunks_en']['count']} EN chunks loaded in {$result['chunks_en']['elapsed_time_in_seconds']} seconds. {$result['chunks_merged']['count']} chunks remaining after merge.");
         $question = $json['lang'] === 'english' ?
             $json['question_en'] :
             ($json['lang'] === 'french' ? $json['question_fr'] : $input);
         $answer = TextAssistant::use()
             ->withMessagesAndPrompt($messages, 'default_answer_question', [
                 'LANGUAGE' => $json['lang'],
-                'NOTES' => $chunks,
+                'NOTES' => $result['chunks'],
                 'MEMOS' => $memos . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
                 'QUESTION' => $question,
             ])
@@ -185,8 +184,9 @@ class QueryKnowledgeBase extends AbstractAction
         return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))), $chainOfThought, !empty($answer));
     }
 
-    private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): string
+    private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): array
     {
+        $result = [];
         $start = microtime(true);
 
         $chunksEn = ChunksProvider::use()
@@ -198,7 +198,10 @@ class QueryKnowledgeBase extends AbstractAction
             ->provide();
 
         $stop = microtime(true);
-        Log::debug("[LOAD_CHUNKS] Search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunksEn->count()} results");
+        $result['chunks_en'] = [
+            'count' => $chunksEn->count(),
+            'elapsed_time_in_seconds' => (int)ceil($stop - $start),
+        ];
         $start = microtime(true);
 
         $chunksFr = ChunksProvider::use()
@@ -210,7 +213,10 @@ class QueryKnowledgeBase extends AbstractAction
             ->provide();
 
         $stop = microtime(true);
-        Log::debug("[LOAD_CHUNKS] Search for '{$questionFr}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunksFr->count()} results");
+        $result['chunks_fr'] = [
+            'count' => $chunksFr->count(),
+            'elapsed_time_in_seconds' => (int)ceil($stop - $start),
+        ];
         $start = microtime(true);
 
         $chunks = $chunksEn
@@ -236,8 +242,13 @@ class QueryKnowledgeBase extends AbstractAction
             });
 
         $stop = microtime(true);
-        Log::debug("[LOAD_CHUNKS] Loading chunks for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
-        return $chunks->join("\n\n");
+        $result['chunks_merged'] = [
+            'count' => $chunks->count(),
+            'elapsed_time_in_seconds' => (int)ceil($stop - $start),
+        ];
+        $result['chunks'] = $chunks->join("\n\n");
+
+        return $result;
     }
 
     private function englishCollections(?string $collection = null): Collection
