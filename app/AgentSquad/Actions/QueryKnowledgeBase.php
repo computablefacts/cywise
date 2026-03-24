@@ -9,7 +9,6 @@ use App\AgentSquad\Assistants\ChunkAssistant;
 use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\ChunksProvider;
 use App\AgentSquad\Providers\MemosProvider;
-use App\AgentSquad\ThoughtActionObservation;
 use App\AgentSquad\Vectors\FileVectorStore;
 use App\AgentSquad\Vectors\Vector;
 use App\Enums\LanguageEnum;
@@ -54,8 +53,6 @@ class QueryKnowledgeBase extends AbstractAction
 
     public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
-        $chainOfThought = [];
-
         // Extract collection (if any)
         $collection = Str::before($input, ':');
 
@@ -79,23 +76,17 @@ class QueryKnowledgeBase extends AbstractAction
         $json = $result->parsed;
 
         if (!$json) {
-            $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", "The answer is not a valid JSON: {$answer}");
-            return new FailedAnswer(__("The answer is not a valid JSON: {$answer}"), $chainOfThought);
+            return new FailedAnswer(__("The answer is not a valid JSON: {$answer}"));
         }
         if (($json['lang'] ?? '') !== 'french' && ($json['lang'] ?? '') !== 'english') {
-            $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", "The language is unknown: {$answer}");
-            return new FailedAnswer(__("The language is unknown: {$answer}"), $chainOfThought);
+            return new FailedAnswer(__("The language is unknown: {$answer}"));
         }
         if (empty($json['question_en'] ?? '') && empty($json['question_fr'] ?? '')) {
-            $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", "The questions are missing: {$answer}");
-            return new FailedAnswer(__("The questions are missing: {$answer}"), $chainOfThought);
+            return new FailedAnswer(__("The questions are missing: {$answer}"));
         }
         if (empty($json['keywords_en'] ?? []) && empty($json['keywords_fr'] ?? [])) {
-            $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", "The keywords are missing: {$answer}");
-            return new FailedAnswer(__("The keywords are missing: {$answer}"), $chainOfThought);
+            return new FailedAnswer(__("The keywords are missing: {$answer}"));
         }
-
-        $chainOfThought[] = new ThoughtActionObservation("I need to reformulate the user's input as a question.", "reformulate[{$input}]", cywise_truncate_string(json_encode($json)));
 
         // Extract similar questions from ANSSI's dataset
         $anssi = [];
@@ -108,7 +99,6 @@ class QueryKnowledgeBase extends AbstractAction
                 ->embedding();
 
             if (!empty($embedding)) {
-                $start = microtime(true);
                 $dir = FileVectorStore::unpack("anssi.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
                 $anssi = array_values(array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
@@ -120,10 +110,6 @@ class QueryKnowledgeBase extends AbstractAction
                     $similarity = $vector['similarity'];
                     return "## Memo A{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** ANSSI\n**Score:** {$similarity}";
                 }, $anssi, array_keys($anssi));
-                $stop = microtime(true);
-                $nbResults = count($anssi);
-                $elapsedTimeInSeconds = (int)ceil($stop - $start);
-                $chainOfThought[] = new ThoughtActionObservation("I need to search the ANSSI dataset.", "search[anssi,{$json['question_fr']}]", "I found {$nbResults} results in {$elapsedTimeInSeconds} seconds.");
             }
         }
 
@@ -138,7 +124,6 @@ class QueryKnowledgeBase extends AbstractAction
                 ->embedding();
 
             if (!empty($embedding)) {
-                $start = microtime(true);
                 $dir = FileVectorStore::unpack("rowden_cybersecurityqaa.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
                 $rowden = array_values(array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
@@ -152,10 +137,6 @@ class QueryKnowledgeBase extends AbstractAction
                     $similarity = $vector['similarity'];
                     return "## Memo R{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** {$source}\n**Score:** {$similarity}";
                 }, $rowden, array_keys($rowden));
-                $stop = microtime(true);
-                $nbResults = count($rowden);
-                $elapsedTimeInSeconds = (int)ceil($stop - $start);
-                $chainOfThought[] = new ThoughtActionObservation("I need to search the ROWDEN dataset.", "search[rowden,{$json['question_en']}]", "I found {$nbResults} results in {$elapsedTimeInSeconds} seconds.");
             }
         }
 
@@ -166,9 +147,7 @@ class QueryKnowledgeBase extends AbstractAction
                 ->withUser($user)
                 ->provide() :
             '';
-        $chainOfThought[] = new ThoughtActionObservation("I need to load the user's memos.", "load[memos]", "The user's memos have been loaded.");
         $result = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
-        $chainOfThought[] = new ThoughtActionObservation("I need to load the chunks.", "load[chunks]", "{$result['chunks_fr']['count']} FR chunks loaded in {$result['chunks_fr']['elapsed_time_in_seconds']} seconds. {$result['chunks_en']['count']} EN chunks loaded in {$result['chunks_en']['elapsed_time_in_seconds']} seconds. {$result['chunks_merged']['count']} chunks remaining after merge.");
         $question = $json['lang'] === 'english' ?
             $json['question_en'] :
             ($json['lang'] === 'french' ? $json['question_fr'] : $input);
@@ -181,9 +160,8 @@ class QueryKnowledgeBase extends AbstractAction
                 'QUESTION' => $question,
             ])
             ->text();
-        $chainOfThought[] = new ThoughtActionObservation("I need to answer the question.", "answer[{$question}]", cywise_truncate_string($answer));
 
-        return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))), $chainOfThought, !empty($answer));
+        return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))));
     }
 
     private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): array

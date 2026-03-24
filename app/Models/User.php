@@ -275,6 +275,7 @@ class User extends WaveUser
             $this->setupPrompts('default_answer_question', 'seeders/prompts/default_answer_question.txt');
             $this->setupPrompts('default_hypothetical_questions', 'seeders/prompts/default_hypothetical_questions.txt');
             $this->setupPrompts('default_orchestrator', 'seeders/prompts/default_orchestrator.txt');
+            $this->setupPrompts('default_orchestrator_stuck', 'seeders/prompts/default_orchestrator_stuck.txt');
             $this->setupPrompts('default_reformulate_question', 'seeders/prompts/default_reformulate_question.txt');
             $this->setupPrompts('default_soc_operator', 'seeders/prompts/default_soc_operator.txt');
             $this->setupPrompts('default_summarize', 'seeders/prompts/default_summarize.txt');

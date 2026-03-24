@@ -71,33 +71,46 @@ class Orchestrator
 
     private function processInput(User $user, string $threadId, array $messages, string $input, array $chainOfThought = [], int $depth = 0): AbstractAnswer
     {
-        if (count($messages) > 5) { // Reduce the number of messages to avoid hitting the API limit on the number of tokens
-            $messages = array_slice($messages, -5);
+        // Reduce the number of messages to avoid hitting the API limit on the number of tokens
+        if (count($messages) > 10) {
+            $messages = array_slice($messages, -10);
         }
-        if ($depth >= 3) {
 
-            Log::warning("Too many iterations: $depth");
-            Log::warning("Messages: " . json_encode($messages));
-            Log::warning("Chain-of-thought: " . json_encode($chainOfThought));
+        // Format history
+        $history = '';
 
-            /** @var ThoughtActionObservation $tao */
-            $tao = array_pop($chainOfThought);
-            $markdown = Str::trim(Str::replace('I_DONT_KNOW', '', $tao->observation()));
+        foreach ($messages as $message) {
+            $prefix = ($message['role'] ?? '') === RoleEnum::USER->value ? 'user > ' : 'assistant > ';
+            $history .= $prefix . ($message['content'] ?? '') . "\n";
+        }
 
-            if (empty($markdown)) {
-                $markdown = __("I apologize, but I couldn't find any relevant references in my library.");
-            }
-            return new FailedAnswer($markdown, $chainOfThought);
+        // Format chain-of-thought
+        $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
+
+        // If depth >= 7, we are stuck!
+        if ($depth >= 7) {
+            $answer = TextAssistant::use()
+                ->withThreadId($threadId)
+                ->withDeepInfraModel($this->model)
+                ->withPrompt("default_orchestrator_stuck", [
+                    'COT' => $cot,
+                    'INPUT' => $input,
+                    'HISTORY' => $history,
+                    'DEPTH' => $depth,
+                ])
+                ->text();
+            return new FailedAnswer($answer, $chainOfThought);
         }
         if (!empty($messages)) {
 
             $lastMessage = $messages[count($messages) - 1];
             $nextAction = $lastMessage['next_action'] ?? null;
 
+            // Check if the next action to execute has been set by the last action executed
             if (isset($nextAction)) {
 
                 $answer = $this->agents[$nextAction]->execute($user, $threadId, $messages, $input);
-                $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
+                $chainOfThought[] = new ThoughtActionObservation('Executing the next pre-defined action in sequence.', "{$nextAction}[{$input}]", $answer);
                 $answer->setChainOfThought($chainOfThought);
 
                 if ($answer->failure()) {
@@ -115,15 +128,7 @@ class Orchestrator
             }
         }
 
-        $history = '';
-
-        foreach ($messages as $message) {
-            $prefix = ($message['role'] ?? '') === RoleEnum::USER->value ? 'user > ' : 'assistant > ';
-            $history .= $prefix . ($message['content'] ?? '') . "\n";
-        }
-
         $template = '{"thought":"describe here succinctly your thoughts about the question you have been asked", "action_name":"set here the name of the action to execute", "action_input":"set here the input for the action"}';
-        $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
         $actions = implode("\n", array_map(fn(AbstractAction $action) => "[ACTION][NAME]{$action->name()}[/NAME][DESCRIPTION]{$action->description()}[/DESCRIPTION][/ACTION]", array_filter($this->agents, fn(AbstractAction $action) => $action->isInvokable())));
         $result = TextAssistant::use()
             ->withThreadId($threadId)
@@ -144,9 +149,6 @@ class Orchestrator
         $answer = $result->raw;
         /** @var array $json */
         $json = $result->parsed;
-
-        // Log::debug("[ORCHESTRATOR] Prompt: {$prompt}");
-        // Log::debug("[ORCHESTRATOR] Answer: {$answer}");
 
         if (!isset($json)) {
 
@@ -192,7 +194,7 @@ class Orchestrator
         }
 
         $answer = $this->agents[$json['action_name']]->execute($user, $threadId, $messages, $json['action_input']);
-        $chainOfThought = array_merge($chainOfThought, $answer->chainOfThought());
+        $chainOfThought[] = new ThoughtActionObservation($json['thought'], "{$json['action_name']}[{$json['action_input']}]", $answer);
         $answer->setChainOfThought($chainOfThought);
 
         if ($answer->failure()) {

@@ -5,7 +5,6 @@ namespace App\AgentSquad\Actions;
 use App\AgentSquad\Answers\AbstractAnswer;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Answers\SuccessfulAnswer;
-use App\AgentSquad\ThoughtActionObservation;
 use App\Http\Procedures\TablesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Table;
@@ -53,7 +52,6 @@ class QueryTables extends AbstractAction
 
     public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
-        $chainOfThought = [];
         try {
 
             $procedure = new TablesProcedure();
@@ -62,7 +60,6 @@ class QueryTables extends AbstractAction
             $request->setUserResolver(fn() => $user);
             /** @var string $query */
             $query = $procedure->promptToQuery($request)['query'];
-            $chainOfThought[] = new ThoughtActionObservation("Transforming the user's input to SQL.", "prompt_to_query[{$input}]", "The output SQL is:\n{$query}");
 
             $request = new JsonRpcRequest([
                 'query' => $query,
@@ -71,14 +68,12 @@ class QueryTables extends AbstractAction
             $request->setUserResolver(fn() => $user);
             /** @var array $tsv */
             $tsv = $procedure->executeSqlQuery($request)['data'];
-            $nbRows = count($tsv);
-            $chainOfThought[] = new ThoughtActionObservation("Executing SQL statement.", "execute_sql_query[{$query}]", "The query returned {$nbRows} row(s).");
             $table = collect($tsv)->map(fn(array $columns) => implode("\t", $columns))->join("\n");
 
-            return new SuccessfulAnswer("The answer to '{$input}' in TSV format is (first row = header):\n{$table}", $chainOfThought);
+            return new SuccessfulAnswer("The answer to '{$input}' in TSV format is (first row = header):\n{$table}");
 
         } catch (\Exception $e) {
-            return new FailedAnswer("Computing the answer to '{$input}' ended in an error: {$e->getMessage()}", $chainOfThought);
+            return new FailedAnswer("Computing the answer to '{$input}' ended in an error: {$e->getMessage()}");
         }
     }
 }
