@@ -68,12 +68,44 @@ class ChunksProvider
 
         // TODO : take the collection priority into account
         return \Cache::remember($key, now()->addDays(7), function () {
-            return $this->fullTextSearch()
-                ->merge($this->vectorSearch())
-                ->groupBy(fn(Chunk $chunk) => $chunk->text)
-                ->map(fn(Collection $group) => $group->sortByDesc('_score')->first()) // the higher the better
-                ->values() // associative array => array
+
+            $fullTextChunks = $this->fullTextSearch();
+            $vectorChunks = $this->vectorSearch();
+
+            // Create a union of all unique chunks (keyed by text)
+            $uniqueChunks = [];
+
+            foreach ($fullTextChunks as $chunk) {
+                if (!isset($uniqueChunks[$chunk->text])) {
+                    $uniqueChunks[$chunk->text] = [
+                        'chunk' => $chunk,
+                        'fulltext_score' => $chunk->_score ?? 0.0,
+                        'vector_score' => 0.0,
+                    ];
+                } else {
+                    $uniqueChunks[$chunk->text]['fulltext_score'] = max($uniqueChunks[$chunk->text]['fulltext_score'], $chunk->_score ?? 0.0);
+                }
+            }
+            foreach ($vectorChunks as $chunk) {
+                if (!isset($uniqueChunks[$chunk->text])) {
+                    $uniqueChunks[$chunk->text] = [
+                        'chunk' => $chunk,
+                        'fulltext_score' => 0.0,
+                        'vector_score' => $chunk->_score ?? 0.0,
+                    ];
+                } else {
+                    $uniqueChunks[$chunk->text]['vector_score'] = max($uniqueChunks[$chunk->text]['vector_score'], $chunk->_score ?? 0.0);
+                }
+            }
+            return collect($uniqueChunks)
+                ->map(function (array $data) {
+                    /** @var Chunk $chunk */
+                    $chunk = $data['chunk'];
+                    $chunk->_score = (0.3 * $data['fulltext_score']) + (0.7 * $data['vector_score']);
+                    return $chunk;
+                })
                 ->sortByDesc('_score')
+                ->values()
                 ->take($this->limit);
         });
     }
@@ -93,11 +125,10 @@ class ChunksProvider
             $chunks = $chunks->merge(
                 Chunk::search("{$this->lang->value}:{$k}")
                     ->whereIn('collection_id', $this->collections->pluck('id'))
-                    ->take($this->limit)
                     ->get()
-            );
+            )->sortByDesc('_score')->take($this->limit);
         }
-        return $chunks;
+        return $this->minMaxScaler($chunks);
     }
 
     private function vectorSearch(): Collection
@@ -112,7 +143,7 @@ class ChunksProvider
 
             $embedding = json_encode($embedding);
 
-            return collect(DB::select("
+            return $this->minMaxScaler(collect(DB::select("
                 SELECT DISTINCT
                   chunk_id, 
                   (1 - VEC_DISTANCE_COSINE(VEC_FromText('{$embedding}'), embedding)) AS similarity
@@ -124,9 +155,9 @@ class ChunksProvider
             "))->map(function (object $vector) {
                 /** @var Chunk $chunk */
                 $chunk = Chunk::findOrFail($vector->chunk_id);
-                $chunk->_score = $vector->similarity;
+                $chunk->_score = (float)$vector->similarity;
                 return $chunk;
-            });
+            }));
         }
 
         $vectorStore = new MemoryVectorStore($this->limit);
@@ -141,13 +172,13 @@ class ChunksProvider
             ['chunk_id' => $vector->chunk_id]
         ))->toArray());
 
-        return collect($vectorStore->search($embedding))
+        return $this->minMaxScaler(collect($vectorStore->search($embedding))
             ->map(function (array $vector) {
                 /** @var Chunk $chunk */
                 $chunk = Chunk::findOrFail($vector['vector']->metadata('chunk_id'));
                 $chunk->_score = $vector['similarity'];
                 return $chunk;
-            });
+            }));
     }
 
     private function combine(array $arrays, int $sample = -1): array
@@ -177,5 +208,26 @@ class ChunksProvider
             $combinations = array_slice($combinations, 0, min(count($combinations), $sample));
         }
         return array_map(fn(array $combination) => implode(" ", $combination), $combinations);
+    }
+
+    private function minMaxScaler(Collection $chunks): Collection
+    {
+        if ($chunks->isEmpty()) {
+            return $chunks;
+        }
+
+        $min = $chunks->min('_score');
+        $max = $chunks->max('_score');
+
+        if ($max == $min) {
+            return $chunks->map(function (Chunk $chunk) {
+                $chunk->_score = 1.0;
+                return $chunk;
+            });
+        }
+        return $chunks->map(function (Chunk $chunk) use ($min, $max) {
+            $chunk->_score = ($chunk->_score - $min) / ($max - $min);
+            return $chunk;
+        });
     }
 }
