@@ -24,10 +24,14 @@ class TextAssistantTraceTest extends TestCaseWithDb
         ]);
 
         $assistant = new TextAssistant();
-        $result = $assistant->withRawPrompt('Hello prompt')->text();
+        $result = $assistant
+            ->withThreadId('abc123xyz0')
+            ->withRawPrompt('Hello prompt')
+            ->text();
 
         $this->assertEquals('Hello response', $result);
         $this->assertDatabaseHas('cb_traces', [
+            'thread_id' => 'abc123xyz0',
             'input' => json_encode([['role' => 'user', 'content' => 'Hello prompt']]),
             'output' => json_encode([
                 'choices' => [

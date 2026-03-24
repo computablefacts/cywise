@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int id
+ * @property ?string $thread_id
  * @property Carbon created_at
  * @property Carbon updated_at
  * @property string $input
@@ -23,6 +24,7 @@ class Trace extends Model
     protected $table = 'cb_traces';
 
     protected $fillable = [
+        'thread_id',
         'input',
         'output',
         'elapsed_time_in_seconds',

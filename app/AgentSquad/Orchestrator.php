@@ -126,6 +126,7 @@ class Orchestrator
         $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
         $actions = implode("\n", array_map(fn(AbstractAction $action) => "[ACTION][NAME]{$action->name()}[/NAME][DESCRIPTION]{$action->description()}[/DESCRIPTION][/ACTION]", array_filter($this->agents, fn(AbstractAction $action) => $action->isInvokable())));
         $result = TextAssistant::use()
+            ->withThreadId($threadId)
             ->withDeepInfraModel($this->model)
             ->withPrompt('default_orchestrator', [
                 'TEMPLATE' => $template,

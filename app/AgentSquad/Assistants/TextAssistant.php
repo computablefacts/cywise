@@ -15,6 +15,7 @@ class TextAssistant
     private string $model = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
     private int $timeoutInSeconds = 60;
     private string|array|null $messages = null;
+    private ?string $threadId = null;
 
     public static function use(): TextAssistant
     {
@@ -48,6 +49,12 @@ class TextAssistant
     public function withMessages(array $messages): TextAssistant
     {
         $this->messages = $messages;
+        return $this;
+    }
+
+    public function withThreadId(?string $threadId): TextAssistant
+    {
+        $this->threadId = $threadId;
         return $this;
     }
 
@@ -86,6 +93,7 @@ class TextAssistant
         $stop = microtime(true);
 
         Trace::create([
+            'thread_id' => $this->threadId,
             'input' => json_encode($messages),
             'output' => json_encode($response),
             'elapsed_time_in_seconds' => (int)ceil($stop - $start),

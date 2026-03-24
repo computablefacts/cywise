@@ -67,6 +67,7 @@ class QueryKnowledgeBase extends AbstractAction
 
         // Reformulate question in both english and french
         $result = TextAssistant::use()
+            ->withThreadId($threadId)
             ->withTimeout(30 * 60)
             ->withMessagesAndPrompt($messages, 'default_reformulate_question', [
                 'QUESTION' => htmlspecialchars($input, ENT_QUOTES, 'UTF-8'),
@@ -172,6 +173,7 @@ class QueryKnowledgeBase extends AbstractAction
             $json['question_en'] :
             ($json['lang'] === 'french' ? $json['question_fr'] : $input);
         $answer = TextAssistant::use()
+            ->withThreadId($threadId)
             ->withMessagesAndPrompt($messages, 'default_answer_question', [
                 'LANGUAGE' => $json['lang'],
                 'NOTES' => $result['chunks'],

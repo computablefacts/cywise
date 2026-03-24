@@ -115,6 +115,7 @@ class CyberBuddyProcedure extends Procedure
                 })
                 ->join("\n\n");
             $conversation->description = TextAssistant::use()
+                ->withThreadId($threadId)
                 ->withRawPrompt("Summarize the conversation in about 10 words :\n\n{$exchange}")
                 ->text();
             $conversation->save();
