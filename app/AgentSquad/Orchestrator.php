@@ -87,8 +87,8 @@ class Orchestrator
         // Format chain-of-thought
         $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
 
-        // If depth >= 7, we are stuck!
-        if ($depth >= 7) {
+        // If depth >= 15, we are stuck!
+        if ($depth >= 15) {
             $answer = TextAssistant::use()
                 ->withThreadId($threadId)
                 ->withDeepInfraModel($this->model)
