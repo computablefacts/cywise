@@ -78,9 +78,7 @@ class TextAssistant
             Log::error('TextAssistant messages must be either a string or an array');
             return '';
         }
-        Log::debug(json_encode($messages));
         $response = $this->callDeepInfra($messages);
-        Log::debug(json_encode($response));
         $answer = $response['choices'][0]['message']['content'] ?? '';
         $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
         return Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
