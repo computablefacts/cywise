@@ -4,6 +4,8 @@ namespace App\AgentSquad\Assistants;
 
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
+use App\Models\Trace;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -78,7 +80,18 @@ class TextAssistant
             Log::error('TextAssistant messages must be either a string or an array');
             return '';
         }
+
+        $start = microtime(true);
         $response = $this->callDeepInfra($messages);
+        $stop = microtime(true);
+
+        Trace::create([
+            'input' => json_encode($messages),
+            'output' => json_encode($response),
+            'elapsed_time_in_seconds' => (int)ceil($stop - $start),
+            'created_by' => Auth::id(),
+        ]);
+
         $answer = $response['choices'][0]['message']['content'] ?? '';
         $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
         return Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
