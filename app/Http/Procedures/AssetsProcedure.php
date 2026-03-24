@@ -319,8 +319,11 @@ A port scan will start soon for {{ \$result['asset'] }}.
             'trial_id' => 'integer|exists:ynh_trials,id',
         ]);
 
-        $asset = Str::betweenFirst($params['asset'], '://', '/');
-
+        if (Str::startsWith($params['asset'], ['http', 'https'])) { // deal with ranges
+            $asset = Str::betweenFirst($params['asset'], '://', '/');
+        } else {
+            $asset = $params['asset'];
+        }
         if (!IsValidAsset::test($asset)) {
             throw new \Exception("Invalid asset : {$asset}");
         }
