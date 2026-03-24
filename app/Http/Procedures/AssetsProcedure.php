@@ -319,11 +319,12 @@ A port scan will start soon for {{ \$result['asset'] }}.
             'trial_id' => 'integer|exists:ynh_trials,id',
         ]);
 
-        if (!IsValidAsset::test($params['asset'])) {
-            throw new \Exception("Invalid asset : {$params['asset']}");
+        $asset = Str::betweenFirst($params['asset'], '://', '/');
+
+        if (!IsValidAsset::test($asset)) {
+            throw new \Exception("Invalid asset : {$asset}");
         }
 
-        $asset = $params['asset'];
         $watch = is_bool($params['watch']) && $params['watch'];
         $trialId = $params['trial_id'] ?? 0;
         $obj = CreateAssetListener::execute($request->user(), $asset, $watch, [], $trialId);
