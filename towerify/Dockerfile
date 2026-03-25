@@ -155,8 +155,8 @@ COPY --chown=www-data:www-data --from=frontend /app/public/build/ /var/www/html/
 RUN chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Generate API docs
-RUN php artisan sajya:docs 'v2.public.rpc.endpoint' --path='/public/docs/' --name 'docs.public.html'
-RUN php artisan sajya:docs 'v2.private.rpc.endpoint' --path='/public/docs/' --name 'docs.private.html'
+RUN php artisan cywise:docs 'v2.public.rpc.endpoint' --path='/public/docs/' --name 'docs.public.html'
+RUN php artisan cywise:docs 'v2.private.rpc.endpoint' --path='/public/docs/' --name 'docs.private.html'
 
 COPY <<-EOT /etc/apache2/sites-available/laravel.conf
 <VirtualHost *:80>
