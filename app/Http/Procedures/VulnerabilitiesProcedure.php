@@ -99,6 +99,7 @@ if (empty(\$alert->cve_id)) {
             'port_tags.*' => 'string',
         ]);
 
+        $asset = $params['asset'] ?? null;
         $assetId = $params['asset_id'] ?? null;
         $tld = $params['tld'] ?? null;
         $tags = $params['tags'] ?? null;
@@ -106,6 +107,7 @@ if (empty(\$alert->cve_id)) {
         $alerts = Asset::query()
             ->where('is_monitored', true)
             ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
+            ->when($asset, fn($query, $assetId) => $query->where('asset', $assetId))
             ->when($tld, fn($query, $domain) => $query->where('tld', $tld))
             ->when($tags, fn($query, $domain) => $query
                 ->join('am_assets_tags', 'am_assets_tags.asset_id', '=', 'am_assets.id')
