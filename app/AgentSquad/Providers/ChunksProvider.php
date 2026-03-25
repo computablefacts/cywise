@@ -62,52 +62,46 @@ class ChunksProvider
             return collect();
         }
 
-        $collectionsPart = $this->collections->pluck('id')->implode('_');
-        $keywordsPart = implode('_', array_map(fn(array $keywords) => implode('|', $keywords), $this->keywords));
-        $key = 'chunks_provider_' . md5("{$collectionsPart}:{$this->lang->value}:{$keywordsPart}:{$this->text}");
-
         // TODO : take the collection priority into account
-        return \Cache::remember($key, now()->addDays(7), function () {
 
-            $fullTextChunks = $this->fullTextSearch();
-            $vectorChunks = $this->vectorSearch();
+        $fullTextChunks = $this->fullTextSearch();
+        $vectorChunks = $this->vectorSearch();
 
-            // Create a union of all unique chunks (keyed by text)
-            $uniqueChunks = [];
+        // Create a union of all unique chunks (keyed by text)
+        $uniqueChunks = [];
 
-            foreach ($fullTextChunks as $chunk) {
-                if (!isset($uniqueChunks[$chunk->text])) {
-                    $uniqueChunks[$chunk->text] = [
-                        'chunk' => $chunk,
-                        'fulltext_score' => $chunk->_score ?? 0.0,
-                        'vector_score' => 0.0,
-                    ];
-                } else {
-                    $uniqueChunks[$chunk->text]['fulltext_score'] = max($uniqueChunks[$chunk->text]['fulltext_score'], $chunk->_score ?? 0.0);
-                }
+        foreach ($fullTextChunks as $chunk) {
+            if (!isset($uniqueChunks[$chunk->text])) {
+                $uniqueChunks[$chunk->text] = [
+                    'chunk' => $chunk,
+                    'fulltext_score' => $chunk->_score ?? 0.0,
+                    'vector_score' => 0.0,
+                ];
+            } else {
+                $uniqueChunks[$chunk->text]['fulltext_score'] = max($uniqueChunks[$chunk->text]['fulltext_score'], $chunk->_score ?? 0.0);
             }
-            foreach ($vectorChunks as $chunk) {
-                if (!isset($uniqueChunks[$chunk->text])) {
-                    $uniqueChunks[$chunk->text] = [
-                        'chunk' => $chunk,
-                        'fulltext_score' => 0.0,
-                        'vector_score' => $chunk->_score ?? 0.0,
-                    ];
-                } else {
-                    $uniqueChunks[$chunk->text]['vector_score'] = max($uniqueChunks[$chunk->text]['vector_score'], $chunk->_score ?? 0.0);
-                }
+        }
+        foreach ($vectorChunks as $chunk) {
+            if (!isset($uniqueChunks[$chunk->text])) {
+                $uniqueChunks[$chunk->text] = [
+                    'chunk' => $chunk,
+                    'fulltext_score' => 0.0,
+                    'vector_score' => $chunk->_score ?? 0.0,
+                ];
+            } else {
+                $uniqueChunks[$chunk->text]['vector_score'] = max($uniqueChunks[$chunk->text]['vector_score'], $chunk->_score ?? 0.0);
             }
-            return collect($uniqueChunks)
-                ->map(function (array $data) {
-                    /** @var Chunk $chunk */
-                    $chunk = $data['chunk'];
-                    $chunk->_score = (0.3 * $data['fulltext_score']) + (0.7 * $data['vector_score']);
-                    return $chunk;
-                })
-                ->sortByDesc('_score')
-                ->values()
-                ->take($this->limit);
-        });
+        }
+        return collect($uniqueChunks)
+            ->map(function (array $data) {
+                /** @var Chunk $chunk */
+                $chunk = $data['chunk'];
+                $chunk->_score = (0.3 * $data['fulltext_score']) + (0.7 * $data['vector_score']);
+                return $chunk;
+            })
+            ->sortByDesc('_score')
+            ->values()
+            ->take($this->limit);
     }
 
     private function fullTextSearch(): Collection
@@ -116,17 +110,19 @@ class ChunksProvider
             return collect();
         }
 
+        $collectionsKeyPart = md5($this->collections->pluck('id')->sort()->implode(','));
         /** @var array<string> $keywords */
         $keywords = $this->combine($this->keywords, 5);
         /** @var Collection<Chunk> $chunks */
         $chunks = collect();
 
         foreach ($keywords as $k) {
-            $chunks = $chunks->merge(
-                Chunk::search("{$this->lang->value}:{$k}")
+            $chunkz = \Cache::remember("fulltext:{$this->lang->value}:{$k}:{$collectionsKeyPart}", now()->addDays(7), function () use ($k) {
+                return Chunk::search("{$this->lang->value}:{$k}")
                     ->whereIn('collection_id', $this->collections->pluck('id'))
-                    ->get()
-            )->sortByDesc('_score')->take($this->limit);
+                    ->get();
+            });
+            $chunks = $chunks->merge($chunkz)->sortByDesc('_score')->take($this->limit);
         }
         return $this->minMaxScaler($chunks);
     }
@@ -137,48 +133,57 @@ class ChunksProvider
             return collect();
         }
 
+        $collectionsKeyPart = md5($this->collections->pluck('id')->sort()->implode(','));
+        $textKeyPart = md5($this->text);
         $embedding = ChunkAssistant::use()->withChunk($this->text)->embedding();
 
         if (Vector::isSupportedByMariaDb()) {
+            $chunks = \Cache::remember("vectors:{$this->lang->value}:{$textKeyPart}:{$collectionsKeyPart}", now()->addDays(7), function () use ($embedding) {
 
-            $embedding = json_encode($embedding);
+                $embedding = json_encode($embedding);
 
-            return $this->minMaxScaler(collect(DB::select("
-                SELECT DISTINCT
-                  chunk_id, 
-                  (1 - VEC_DISTANCE_COSINE(VEC_FromText('{$embedding}'), embedding)) AS similarity
+                return collect(DB::select("
+                    SELECT DISTINCT
+                      chunk_id, 
+                      (1 - VEC_DISTANCE_COSINE(VEC_FromText('{$embedding}'), embedding)) AS similarity
+                    FROM cb_vectors
+                    WHERE locale = '{$this->lang->value}'
+                    AND collection_id IN ({$this->collections->pluck('id')->implode(',')})
+                    ORDER BY VEC_DISTANCE_COSINE(VEC_FromText('{$embedding}'), embedding)
+                    LIMIT {$this->limit}
+                "))->map(function (object $vector) {
+                    /** @var Chunk $chunk */
+                    $chunk = Chunk::findOrFail($vector->chunk_id);
+                    $chunk->_score = (float)$vector->similarity;
+                    return $chunk;
+                });
+            });
+            return $this->minMaxScaler($chunks);
+        }
+
+        $chunks = \Cache::remember("vectors:{$this->lang->value}:{$textKeyPart}:{$collectionsKeyPart}", now()->addDays(7), function () use ($embedding) {
+
+            $vectorStore = new MemoryVectorStore($this->limit);
+            $vectorStore->addVectors(collect(DB::select("
+                SELECT DISTINCT *
                 FROM cb_vectors
                 WHERE locale = '{$this->lang->value}'
                 AND collection_id IN ({$this->collections->pluck('id')->implode(',')})
-                ORDER BY VEC_DISTANCE_COSINE(VEC_FromText('{$embedding}'), embedding)
-                LIMIT {$this->limit}
-            "))->map(function (object $vector) {
-                /** @var Chunk $chunk */
-                $chunk = Chunk::findOrFail($vector->chunk_id);
-                $chunk->_score = (float)$vector->similarity;
-                return $chunk;
-            }));
-        }
+            "))->map(fn(object $vector) => new \App\AgentSquad\Vectors\Vector(
+                $vector->hypothetical_question,
+                json_decode($vector->embedding, true),
+                ['chunk_id' => $vector->chunk_id]
+            ))->toArray());
 
-        $vectorStore = new MemoryVectorStore($this->limit);
-        $vectorStore->addVectors(collect(DB::select("
-            SELECT DISTINCT *
-            FROM cb_vectors
-            WHERE locale = '{$this->lang->value}'
-            AND collection_id IN ({$this->collections->pluck('id')->implode(',')})
-        "))->map(fn(object $vector) => new \App\AgentSquad\Vectors\Vector(
-            $vector->hypothetical_question,
-            json_decode($vector->embedding, true),
-            ['chunk_id' => $vector->chunk_id]
-        ))->toArray());
-
-        return $this->minMaxScaler(collect($vectorStore->search($embedding))
-            ->map(function (array $vector) {
-                /** @var Chunk $chunk */
-                $chunk = Chunk::findOrFail($vector['vector']->metadata('chunk_id'));
-                $chunk->_score = $vector['similarity'];
-                return $chunk;
-            }));
+            return collect($vectorStore->search($embedding))
+                ->map(function (array $vector) {
+                    /** @var Chunk $chunk */
+                    $chunk = Chunk::findOrFail($vector['vector']->metadata('chunk_id'));
+                    $chunk->_score = $vector['similarity'];
+                    return $chunk;
+                });
+        });
+        return $this->minMaxScaler($chunks);
     }
 
     private function combine(array $arrays, int $sample = -1): array
