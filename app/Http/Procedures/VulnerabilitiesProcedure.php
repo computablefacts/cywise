@@ -128,7 +128,10 @@ if (empty(\$alert->cve_id)) {
                     $query->join('am_ports_tags', 'am_ports_tags.port_id', '=', 'alerts_dedup.port_id')
                         ->whereIn('am_ports_tags.tag', $portTags);
                 }
-                return $query->distinct()->get();
+                return $query->distinct()->get()->map(function (Alert $alert) use ($asset) {
+                    $alert->asset = $asset->asset;
+                    return $alert;
+                });
             })
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 
