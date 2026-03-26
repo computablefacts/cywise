@@ -541,7 +541,10 @@ class EndVulnsScanListener extends AbstractListener
         }
 
         $timeout = ($type === 'explanation') ? 120 : 60;
-        $response = LlmsProvider::provide(PromptsProvider::provide($template, $vars), null, $timeout);
+        $response = TextAssistant::use()
+            ->withTimeout($timeout)
+            ->withPrompt($template, $vars)
+            ->text();
 
         if ($type === 'explanation' && $this->isFalsePositiveExplanation($response)) {
             $detectedFalsePositive = true;
