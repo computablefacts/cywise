@@ -56,7 +56,9 @@ class VulnerabilitiesProcedure extends Procedure
         ],
         ai_result: "
 @foreach(\$result as \$key => \$value)
-@if(!empty(\$value))
+@if(empty(\$value))
+There are no vulnerabilities of {{ \$key }} severity.
+@else
 @php
 \$alerts = collect(\$value ?? [])->map(fn(array \$event) => (new \App\Models\Alert())->forceFill(\$event));
 @endphp
