@@ -304,7 +304,7 @@ if (!function_exists('cywise_levenshtein_distance')) {
             $row[0] = $i;
 
             for ($j = 1; $j <= $l1; $j++) {
-                $cost = ($s1[$j - 1] === $s2[$i - 1]) ? 0 : 1;
+                $cost = (mb_substr($s1, $j - 1, 1) === mb_substr($s2, $i - 1, 1)) ? 0 : 1;
                 $row[$j] = min(
                     $row[$j - 1] + 1, // Insertion
                     $rowPrev[$j] + 1, // Suppression
@@ -364,8 +364,10 @@ if (!function_exists('cywise_truncate_string')) {
         if (mb_strlen($str) <= $size) {
             return $str;
         }
-        $start = mb_substr($str, 0, 50);
-        $end = mb_substr($str, -50);
-        return $start . '[...]' . $end;
+        $ellipsis = '[...]';
+        $keep = max(0, intdiv($size - mb_strlen($ellipsis), 2));
+        $start = mb_substr($str, 0, $keep);
+        $end = mb_substr($str, -$keep);
+        return $start . $ellipsis . $end;
     }
 }

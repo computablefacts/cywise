@@ -94,8 +94,8 @@ class TextAssistant
 
         Trace::create([
             'thread_id' => $this->threadId,
-            'input' => json_encode($messages),
-            'output' => json_encode($response),
+            'input' => cywise_truncate_string(json_encode($messages), 16000),
+            'output' => cywise_truncate_string(json_encode($response), 16000),
             'elapsed_time_in_seconds' => (int)ceil($stop - $start),
             'created_by' => Auth::id(),
         ]);
