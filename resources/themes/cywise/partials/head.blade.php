@@ -38,8 +38,11 @@
     @endif
 @endif
 
-<meta name="robots" content="index,follow">
-<meta name="googlebot" content="index,follow">
+@php
+    $robots = (url('/') === 'https://www.cywise.io') ? 'index,follow' : 'noindex,nofollow';
+@endphp
+<meta name="robots" content="{{ $robots }}">
+<meta name="googlebot" content="{{ $robots }}">
 
 @if(isset($seo->description))
     <meta name="description" content="{{ $seo->description }}">
