@@ -73,6 +73,7 @@ Below is the list of your scheduled tasks:
             "if the request is 'send me in 3 days the list of assets with vulnerabilities', the input should be '{\"schedule\":\"+3 days\",\"task\":\"List assets with vulnerabilities.\",\"run_once\":true}'",
             "if the request is 'préviens-moi si www.example.com devient vulnérable', the input should be '{\"cron\":\"* * * * *\",\"trigger\":\"Le site www.example.com est-il vulnérable ?\",\"task\":\"Liste les vulnérabilités de www.example.com\"}'",
             "if the request is 'envoie-moi un email tous les matins à 9h si www.example.com est vulnérable', the input should be '{\"cron\":\"0 9 * * *\",\"trigger\":\"Le site www.example.com est-il vulnérable ?\",\"task\":\"Liste les vulnérabilités de www.example.com\"}'",
+            "if the request is 'envoie-moi dans 1h un export de mes vulnérabilités critiques', the input should be '{\"schedule\":\"+1 hour\",\"task\":\"Exporte mes vulnérabilités critiques.\",\"run_once\":true}'",
         ],
         ai_result: "{{ \$result['msg'] }}",
     )]
