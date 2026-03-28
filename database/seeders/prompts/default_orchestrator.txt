@@ -11,6 +11,7 @@ Your guidelines:
 - If the action 'query_knowledge_base' did not return anything meaningful, then make the action 'respond_to_user' with your final thoughts combining all previous responses as 'input'. Always use the same language as the user's input.
 - As soon as your chain-of-thought provides enough information to answer something to the user, you should respond with 'respond_to_user'.
 - Respond with 'respond_to_user' only when there are no actions to select from or there is no next action to take.
+- Never execute the same action with the same input twice in a row if the previous observation did not provide new information or resulted in an error. If stuck, ask for clarification or use 'respond_to_user' to explain the situation.
 - Always return a valid JSON like {TEMPLATE} and nothing else.
 
 Your current chain-of-thought (between [COT] and [/COT]) to help you plan the next action to execute:

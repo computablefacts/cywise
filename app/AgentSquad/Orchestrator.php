@@ -85,7 +85,7 @@ class Orchestrator
         }
 
         // Format chain-of-thought
-        $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Observation: {$tao->observation()}", $chainOfThought));
+        $cot = implode("\n", array_map(fn(ThoughtActionObservation $tao) => "> Thought: {$tao->thought()}\n> Action: {$tao->action()}\n> Observation: {$tao->observation()}", $chainOfThought));
 
         // If depth >= 15, we are stuck!
         if ($depth >= 15) {
@@ -191,6 +191,23 @@ class Orchestrator
         }
         if (is_array($json['action_input'])) { // edge case for remote actions : the input is a JSON string
             $json['action_input'] = json_encode($json['action_input']);
+        }
+
+        // Check for loop: if the same action with the same input was already executed in this chain
+        foreach ($chainOfThought as $tao) {
+            if ($tao->action() === "{$json['action_name']}[{$json['action_input']}]") {
+                $answer = TextAssistant::use()
+                    ->withThreadId($threadId)
+                    ->withDeepInfraModel($this->model)
+                    ->withPrompt("default_orchestrator_stuck", [
+                        'COT' => $cot,
+                        'INPUT' => $input,
+                        'HISTORY' => $history,
+                        'DEPTH' => $depth,
+                    ])
+                    ->text();
+                return new FailedAnswer($answer, $chainOfThought);
+            }
         }
 
         $answer = $this->agents[$json['action_name']]->execute($user, $threadId, $messages, $json['action_input']);
