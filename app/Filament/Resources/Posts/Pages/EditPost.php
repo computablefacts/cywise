@@ -10,6 +10,11 @@ class EditPost extends EditRecord
 {
     protected static string $resource = PostResource::class;
 
+    protected function afterSave(): void
+    {
+        PostResource::rebuildSitemap();
+    }
+
     protected function getHeaderActions(): array
     {
         return [
