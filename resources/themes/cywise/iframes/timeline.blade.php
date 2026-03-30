@@ -710,7 +710,7 @@
               <div class="mt-2 d-inline-flex align-items-center">
                 <div class="d-inline-flex align-items-center">
                   <input class="note-scope" type="checkbox" id="scopeCyberBuddy" value="CyberBuddy" checked>
-                  <label class="p-2" for="scopeCyberBuddy">CyberBuddy</label>
+                  <label class="p-2" for="scopeCyberBuddy">{{ tenant_custom_text('CyberBuddy') }}</label>
                 </div>
                 <div class="d-inline-flex align-items-center">
                   <input class="note-scope" type="checkbox" id="scopeSOC" value="SOC Operator">

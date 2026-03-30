@@ -23,6 +23,7 @@ class Tenant extends Model
     private const LOGO_DISK = 'images-s3';
     private const LOGO_DIRECTORY = 'tenants/logos';
     private const LOGO_EXTENSIONS = ['svg', 'png', 'webp', 'jpg', 'jpeg'];
+    private const DEFAULT_LOGO_PATH = 'cywise/img/cywise.png';
 
     protected $fillable = [
         'name',
@@ -50,19 +51,40 @@ class Tenant extends Model
         return sprintf('%s/%s.%s', self::LOGO_DIRECTORY, $this->logoFileBasename(), $extension);
     }
 
+    public function defaultLogoPath(): string
+    {
+        return self::DEFAULT_LOGO_PATH;
+    }
+
+    public function defaultLogoUrl(): string
+    {
+        return asset($this->defaultLogoPath());
+    }
+
+    public function hasCustomLogo(): bool
+    {
+        $path = $this->customLogoPath();
+
+        return $path !== null && $path !== $this->defaultLogoPath();
+    }
+
     public function customLogoPath(): ?string
     {
-        $disk = Storage::disk(self::LOGO_DISK);
+        try {
+            $disk = Storage::disk(self::LOGO_DISK);
 
-        foreach (self::LOGO_EXTENSIONS as $extension) {
-            $path = $this->logoPath($extension);
+            foreach (self::LOGO_EXTENSIONS as $extension) {
+                $path = $this->logoPath($extension);
 
-            if ($disk->exists($path)) {
-                return $path;
+                if ($disk->exists($path)) {
+                    return $path;
+                }
             }
-        }
 
-        return null;
+            return null;
+        } catch (\Throwable) {
+            return $this->defaultLogoPath();
+        }
     }
 
     public function customLogoUrl(): ?string
@@ -71,6 +93,10 @@ class Tenant extends Model
 
         if ($path === null) {
             return null;
+        }
+
+        if ($path === $this->defaultLogoPath()) {
+            return $this->defaultLogoUrl();
         }
 
         return Storage::disk(self::LOGO_DISK)->url($path);
@@ -84,6 +110,6 @@ class Tenant extends Model
             return $url;
         }
 
-        return asset('cywise/img/cywise.png');
+        return $this->defaultLogoUrl();
     }
 }

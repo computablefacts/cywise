@@ -1,5 +1,5 @@
 <h1>Analyse de votre domaine</h1>
-<p>Bonjour, je suis CyberBuddy, votre assistant en cybersécurité ! C'est moi qui vais vous accompagner tout au long de
+<p>Bonjour, je suis {{ tenant_custom_text('CyberBuddy') }}, votre assistant en cybersécurité ! C'est moi qui vais vous accompagner tout au long de
   votre analyse. Entrez simplement le nom de domaine que vous souhaitez auditer. Je vais m'occuper du reste pour
   détecter les failles potentielles.</p>
 <p><b>Pas besoin d'être un expert, je suis là pour vous guider !</b></p>

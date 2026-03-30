@@ -356,7 +356,7 @@ name('a-propos');
           <div class="mt-10 grid max-w-xl grid-cols-1 gap-8 text-base/7 text-gray-700 lg:max-w-none lg:grid-cols-2">
             <p>
               Cywise s’installe en quelques clics, détecte vos risques automatiquement, et vous accompagne dans toutes
-              vos démarches. Avec toujours cyberbuddy à vos côtés !
+              vos démarches. Avec toujours {{ tenant_custom_text('CyberBuddy') }} à vos côtés !
             </p>
             <ul class="marker:text-indigo-600 list-inside list-disc" role="list">
               <li>Lancer un audit express</li>

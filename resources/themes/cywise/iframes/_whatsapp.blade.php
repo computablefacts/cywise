@@ -62,7 +62,7 @@
 <p>
   Une fois le webhook validé par Meta, envoyez un message WhatsApp à votre numéro : Cywise vous répondra en
   utilisant <a
-      href="{{ route('iframes.cyberbuddy') }}">CyberBuddy</a>.
+      href="{{ route('iframes.cyberbuddy') }}">{{ tenant_custom_text('CyberBuddy') }}</a>.
 </p>
 
 @push('scripts')

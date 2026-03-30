@@ -85,6 +85,33 @@ test('tenant logo url falls back to the default logo when no S3 logo exists', fu
     expect($tenant->logoUrl())->toContain('/cywise/img/cywise.png');
 });
 
+test('tenant custom logo path falls back to the default image when the disk is not accessible', function () {
+    $tenant = new Tenant([
+        'name' => 'Unavailable Disk Tenant',
+    ]);
+
+    Storage::shouldReceive('disk')
+        ->twice()
+        ->with('images-s3')
+        ->andThrow(new RuntimeException('S3 unavailable'));
+
+    expect($tenant->customLogoPath())->toBe('cywise/img/cywise.png');
+    expect($tenant->hasCustomLogo())->toBeFalse();
+});
+
+test('tenant logo url falls back to the default logo when the disk is not accessible', function () {
+    $tenant = new Tenant([
+        'name' => 'Unavailable Disk Tenant',
+    ]);
+
+    Storage::shouldReceive('disk')
+        ->once()
+        ->with('images-s3')
+        ->andThrow(new RuntimeException('S3 unavailable'));
+
+    expect($tenant->logoUrl())->toContain('/cywise/img/cywise.png');
+});
+
 test('tenant logo url uses the custom tenant logo when one exists', function () {
     $tenant = new Tenant([
         'name' => 'Acme France',

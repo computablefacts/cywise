@@ -1,8 +1,8 @@
 @php
     $tenant = auth()->user()?->tenant();
-    $customLogoUrl = $tenant?->customLogoUrl();
-    $logoUrl = $customLogoUrl ?? asset('cywise/img/cywise.png');
-    $logoLabel = $customLogoUrl ? $tenant->name : 'Cywise';
+    $hasCustomLogo = $tenant?->hasCustomLogo() ?? false;
+    $logoUrl = $tenant?->logoUrl() ?? asset('cywise/img/cywise.png');
+    $logoLabel = $hasCustomLogo ? $tenant->name : 'Cywise';
 @endphp
 
 <img src="{{ $logoUrl }}"
