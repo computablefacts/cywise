@@ -96,4 +96,41 @@ class RemoteActionTest extends TestCaseWithDb
         // Vérification qu'aucun appel HTTP externe n'a été fait
         Http::assertNothingSent();
     }
+
+    /**
+     * Teste que les erreurs JSON-RPC retournent un SuccessfulAnswer avec le message d'erreur.
+     */
+    public function test_remote_action_returns_successful_answer_on_jsonrpc_error()
+    {
+        Http::fake([
+            'https://external-api.com/*' => Http::response([
+                'jsonrpc' => '2.0',
+                'id' => 1,
+                'error' => [
+                    'code' => -32601,
+                    'message' => 'Method not found'
+                ]
+            ], 200)
+        ]);
+
+        $model = new RemoteActionModel([
+            'name' => 'error_call',
+            'description' => 'Calls an external API that returns an error',
+            'url' => 'https://external-api.com/rpc',
+            'payload_template' => [
+                'jsonrpc' => '2.0',
+                'id' => 1,
+                'method' => 'unknown_method',
+                'params' => []
+            ],
+            'response_template' => 'Response: {{ $result["message"] }}',
+            'schema' => [],
+        ]);
+
+        $action = new RemoteAction($model);
+        $answer = $action->execute($this->user, 'thread-789', [], '{}');
+
+        $this->assertInstanceOf(SuccessfulAnswer::class, $answer);
+        $this->assertEquals('Method not found', $answer->markdown());
+    }
 }

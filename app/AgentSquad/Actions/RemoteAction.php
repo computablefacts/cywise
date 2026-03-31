@@ -144,7 +144,7 @@ class RemoteAction extends AbstractAction
 
         // Ensure the response is not a JSON-RPC error
         if (isset($data['error'])) {
-            return new FailedAnswer("Remote action call failed for action {$this->name()}");
+            return new SuccessfulAnswer($data['error']['message'] ?? "Remote action call failed for action {$this->name()}");
         }
 
         // Build the response

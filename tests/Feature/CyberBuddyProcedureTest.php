@@ -99,7 +99,7 @@ class CyberBuddyProcedureTest extends TestCaseWithDb
 
         // 3. Vérification de l'état de la base
         $asset = Asset::where('asset', 'existing.com')->first();
-        $this->assertTrue((bool)$asset->is_monitored, "L'actif existing.com devrait être monitoré");
+        $this->assertTrue((bool)$asset->is_monitored, "L'actif existing.com devrait être surveillé");
     }
 
     public function test_cyberbuddy_creates_and_monitors_non_existing_asset()
@@ -129,6 +129,6 @@ class CyberBuddyProcedureTest extends TestCaseWithDb
         // 3. Vérification de l'état de la base
         $asset = Asset::where('asset', 'new-asset.com')->first();
         $this->assertNotNull($asset, "L'actif new-asset.com devrait avoir été créé");
-        $this->assertTrue((bool)$asset->is_monitored, "L'actif new-asset.com devrait être monitoré");
+        $this->assertTrue((bool)$asset->is_monitored, "L'actif new-asset.com devrait être surveillé");
     }
 }
