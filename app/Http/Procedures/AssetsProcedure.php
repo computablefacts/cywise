@@ -306,8 +306,8 @@ A port scan will start soon for {{ \$result['asset'] }}.
             "asset" => "An asset object.",
         ],
         ai_examples: [
-            "if the request is 'add example.com', the input should be {\"asset\":\"example.com\",\"watch\":false}",
-            "if the request is 'add and monitor 192.168.1.1', the input should be {\"asset\":\"192.168.1.1\",\"watch\":true}",
+            "if the request is 'add example.com' and the asset 'example.com' does not exist, the input should be {\"asset\":\"example.com\",\"watch\":false}",
+            "if the request is 'add and monitor 192.168.1.1' and the asset '192.168.1.1' does not exist, the input should be {\"asset\":\"192.168.1.1\",\"watch\":true}",
         ],
         ai_result: "The asset {{ \$result['asset']['asset'] }} has been created.",
     )]
@@ -523,8 +523,8 @@ No {{ \$params['type'] === 'domain' ? 'domain' : 'IP address' }} found.
             "asset" => "The monitored asset.",
         ],
         ai_examples: [
-            "if the request is 'monitor example.com', the input should be {\"asset\":\"example.com\"}",
-            "if the request is 'watch 10.0.0.5', the input should be {\"asset\":\"10.0.0.5\"}",
+            "if the request is 'monitor example.com' and the asset 'example.com' exists, the input should be {\"asset\":\"example.com\"}",
+            "if the request is 'watch 10.0.0.5' and the asset '10.0.0.5' exists, the input should be {\"asset\":\"10.0.0.5\"}",
         ],
         ai_result: "The monitoring of {{ \$result['asset']['asset'] }} started.",
     )]
