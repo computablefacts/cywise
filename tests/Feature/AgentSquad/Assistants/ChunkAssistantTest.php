@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Assistants;
+namespace Tests\Feature\AgentSquad\Assistants;
 
 use App\AgentSquad\Assistants\ChunkAssistant;
 use App\Enums\LanguageEnum;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Assistants;
+namespace Tests\Feature\AgentSquad\Assistants;
 
 use App\AgentSquad\Assistants\AudioAssistant;
 use App\Enums\LanguageEnum;
