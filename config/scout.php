@@ -150,7 +150,7 @@ return [
 
     'sqlout' => [
         'table_name' => 'searchindex',
-        'default_mode' => 'in natural language mode',
+        'default_mode' => \Baril\Sqlout\Builder::NATURAL_LANGUAGE,
         'filters' => [
             'strip_tags',
             'html_entity_decode',
