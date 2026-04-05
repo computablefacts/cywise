@@ -24,8 +24,8 @@ class ApiUtils
 
         $response = Http::timeout(180)
             ->withBasicAuth(
-                config('towerify.cyberbuddy.api_username'),
-                config('towerify.cyberbuddy.api_password')
+                config('towerify.cyberbuddy.api_username', ''),
+                config('towerify.cyberbuddy.api_password', '')
             )->withHeaders([
                 'Accept' => 'application/json',
             ])->post($url, $json);
