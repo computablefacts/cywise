@@ -16,6 +16,7 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Vector;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -37,6 +38,10 @@ final class ChunksProviderTest extends TestCaseWithDb
             'tenant_id' => $this->tenant->id,
         ]);
         Auth::login($this->user);
+
+        Config::set('towerify.cyberbuddy.api', 'https://www.example.com');
+        Config::set('towerify.cyberbuddy.api_username', 'username_42');
+        Config::set('towerify.cyberbuddy.api_password', 'password_42');
 
         $this->collection = Collection::create([
             'name' => 'testlgfr',
