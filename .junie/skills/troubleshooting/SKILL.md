@@ -15,6 +15,10 @@ Use this skill when something fails unexpectedly during local development or tes
   Either skip DB tests or configure `DB_*` envs per `phpunit.xml`.
 - Tailwind classes not applied  
   Ensure `npm run dev` or `npm run build` has run and that Vite is serving the correct assets.
+- JSON-RPC Validation Errors  
+  Check `JsonRpcRequest` validation rules in the procedure method. Errors are returned in the `error` object of the JSON-RPC response.
+- Authentication Failures in RPC  
+  Ensure the RPC endpoint in `routes/api.php` has the `Authenticate` middleware and that you're sending a valid Bearer token.
 
 ## Related Guidance
 

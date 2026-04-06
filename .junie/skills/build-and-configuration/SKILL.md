@@ -65,6 +65,14 @@ Use this skill for environment setup, asset builds, project structure, page plac
 - Admin theme overrides live in `resources/css/filament/admin/theme.css`.
 - This file imports the base Filament theme, overrides several classes, and is built via Tailwind/Vite.
 
+## Adding a New JSON-RPC Procedure
+
+1. Create a class in `app/Http/Procedures` extending `Sajya\Server\Procedure`.
+2. Define methods with the `#[RpcMethod]` attribute.
+3. Use `App\Http\Requests\JsonRpcRequest` for parameter validation and user access.
+4. Register the procedure in `routes/api.php` under the appropriate RPC endpoint.
+5. Add a test case in `tests/Feature` (or `tests/Unit` if logic is isolated).
+
 ## Related Skills
 
 - See `testing` for test execution and database-backed test setup.
