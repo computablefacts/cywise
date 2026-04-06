@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\AgentSquad\Actions;
 
 use App\AgentSquad\Actions\RemoteAction;
 use App\AgentSquad\Answers\SuccessfulAnswer;
