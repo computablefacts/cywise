@@ -339,11 +339,11 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             return [
                 'server_name' => $server->name,
                 'server_ip_address' => $server->ip(),
-                'activity' => 'NORMAL',
-                'confidence' => 1,
-                'reasoning' => "Aucun événement notable n'a été trouvé.",
-                'suggested_action' => "Aucune action requise.",
-                'report' => "Il n'y a eu aucun événement notable sur le serveur {$server->name} d'adresse IP {$server->ip()} ces derniers jours.",
+                'activity' => 'UNKNOWN',
+                'confidence' => 0.35,
+                'reasoning' => "Aucun événement notable n'a été trouvé sur la fenêtre analysée.",
+                'suggested_action' => "Continuer la surveillance et vérifier qu'aucun capteur ni règle critique n'est indisponible.",
+                'report' => "Aucun événement notable n'a été trouvé sur le serveur **{$server->name}** d'adresse IP {$server->ip()} sur la période analysée.",
             ];
         }
 
@@ -359,12 +359,14 @@ Below is a list of security events sorted from the most recent to the oldest. Th
                     ->provide(),
             ])
             ->structured();
-        /** @var string $answer */
-        $answer = $result->raw;
         /** @var array $json */
         $json = $result->parsed;
+        /** @var string $answer */
+        $answer = json_encode($json);
 
         Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): {$answer}");
+
+        $activities = ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'];
 
         if (empty($json)) {
             Log::error('Failed to parse SOC operator answer (json): ' . $answer);
@@ -372,22 +374,22 @@ Below is a list of security events sorted from the most recent to the oldest. Th
                 'server_name' => $server->name,
                 'server_ip_address' => $server->ip(),
                 'activity' => 'UNKNOWN',
-                'confidence' => 1,
-                'reasoning' => "Unknown.",
-                'suggested_action' => "None.",
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (le JSON est invalide).",
+                'confidence' => 0.0,
+                'reasoning' => "Réponse JSON invalide.",
+                'suggested_action' => "Relancer l'analyse ou vérifier le format de sortie du modèle.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (JSON invalide).",
             ];
         }
-        if (!isset($json['activity']) || !in_array($json['activity'], ['NORMAL', 'SUSPICIOUS', 'ANORMAL'])) {
+        if (!isset($json['activity']) || !in_array($json['activity'], $activities, true)) {
             Log::error('Failed to parse SOC operator answer (activity): ' . $answer);
             return [
                 'server_name' => $server->name,
                 'server_ip_address' => $server->ip(),
                 'activity' => 'UNKNOWN',
-                'confidence' => 1,
-                'reasoning' => "Unknown.",
-                'suggested_action' => "None.",
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (l'attribut 'activity' est invalide).",
+                'confidence' => 0.0,
+                'reasoning' => "Attribut 'activity' invalide.",
+                'suggested_action' => "Relancer l'analyse.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `activity` invalide).",
             ];
         }
         if (!isset($json['confidence']) || !is_numeric($json['confidence']) || $json['confidence'] < 0 || $json['confidence'] > 1) {
@@ -396,10 +398,10 @@ Below is a list of security events sorted from the most recent to the oldest. Th
                 'server_name' => $server->name,
                 'server_ip_address' => $server->ip(),
                 'activity' => 'UNKNOWN',
-                'confidence' => 1,
-                'reasoning' => "Unknown.",
-                'suggested_action' => "None.",
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (l'attribut 'confidence' est invalide).",
+                'confidence' => 0.0,
+                'reasoning' => "Attribut 'confidence' invalide.",
+                'suggested_action' => "Relancer l'analyse.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `confidence` invalide).",
             ];
         }
         if (!isset($json['reasoning']) || !is_string($json['reasoning'])) {
@@ -408,10 +410,10 @@ Below is a list of security events sorted from the most recent to the oldest. Th
                 'server_name' => $server->name,
                 'server_ip_address' => $server->ip(),
                 'activity' => 'UNKNOWN',
-                'confidence' => 1,
-                'reasoning' => "Unknown.",
-                'suggested_action' => "None.",
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (l'attribut 'reasoning' est invalide).",
+                'confidence' => 0.0,
+                'reasoning' => "Attribut 'reasoning' invalide.",
+                'suggested_action' => "Relancer l'analyse.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `reasoning` invalide).",
             ];
         }
         if (!isset($json['suggested_action']) || !is_string($json['suggested_action'])) {
@@ -420,12 +422,15 @@ Below is a list of security events sorted from the most recent to the oldest. Th
                 'server_name' => $server->name,
                 'server_ip_address' => $server->ip(),
                 'activity' => 'UNKNOWN',
-                'confidence' => 1,
-                'reasoning' => "Unknown.",
-                'suggested_action' => "None.",
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (l'attribut 'suggested_action' est invalide).",
+                'confidence' => 0.0,
+                'reasoning' => "Attribut 'suggested_action' invalide.",
+                'suggested_action' => "Relancer l'analyse.",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `suggested_action` invalide).",
             ];
         }
+
+        $activity = $json['activity'];
+        $confidence = round((float)$json['confidence'], 2);
 
         $reasoning = ChunkAssistant::use()
             ->withLang(LanguageEnum::ENGLISH)
@@ -437,28 +442,45 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             ->withChunk($json['suggested_action'])
             ->translate();
 
-        if ($json['activity'] === "NORMAL") {
-            return [
-                'server_name' => $server->name,
-                'server_ip_address' => $server->ip(),
-                'activity' => $json['activity'],
-                'confidence' => $json['confidence'],
-                'reasoning' => $reasoning,
-                'suggested_action' => $suggestedAction,
-                'report' => "Il n'y a eu aucun événement notable sur le serveur **{$server->name}** d'adresse IP {$server->ip()} ces derniers jours.",
-            ];
+        $evidence = [];
+
+        if (isset($json['evidence']) && is_array($json['evidence'])) {
+            $evidence = collect($json['evidence'])
+                ->filter(fn($item) => is_string($item) && !empty(trim($item)))
+                ->map(fn(string $item) => ChunkAssistant::use()
+                    ->withLang(LanguageEnum::ENGLISH)
+                    ->withChunk($item)
+                    ->translate())
+                ->values()
+                ->all();
         }
 
-        $report = "L'activité sur le serveur **{$server->name}** d'adresse IP {$server->ip()} est **{$json['activity']}E**.\n\n";
-        $report .= "- **Indice de confiance (0=faible, 1=haute) :** {$json['confidence']}\n";
+        $activityLabel = match ($activity) {
+            'NORMAL' => 'normale (activité légitime ou attendue sans indicateurs clairs de compromission)',
+            'SUSPICIOUS' => 'suspecte (comportement suspect nécessitant une validation ou une surveillance accrue)',
+            'ANORMAL' => 'anormale (indicateurs forts de compromission ou comportement clairement malveillant)',
+            default => 'inconnue (preuves insuffisantes pour décider de manière fiable)',
+        };
+
+        $report = "### {$server->name} ({$server->ip()})\n\n";
+        $report .= "- **Activité :** {$activityLabel}\n";
+        $report .= "- **Indice de confiance (0=low, 1=high):** {$confidence}\n";
+
+        if (!empty($evidence)) {
+            $report .= "- **Indices observés :**\n";
+            foreach ($evidence as $item) {
+                $report .= "  - {$item}\n";
+            }
+        }
+
         $report .= "- **Raisonnement :** {$reasoning}\n";
         $report .= "- **Action suggérée :** {$suggestedAction}";
 
         return [
             'server_name' => $server->name,
             'server_ip_address' => $server->ip(),
-            'activity' => $json['activity'],
-            'confidence' => $json['confidence'],
+            'activity' => $activity,
+            'confidence' => $confidence,
             'reasoning' => $reasoning,
             'suggested_action' => $suggestedAction,
             'report' => $report,
