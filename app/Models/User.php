@@ -270,6 +270,7 @@ class User extends WaveUser
             $this->dropPrompt('default_chat');
             $this->dropPrompt('default_chat_history');
             $this->dropPrompt('default_debugger');
+            $this->dropPrompt('default_soc_operator');
 
             // Default prompts
             $this->setupPrompts('default_answer_question', 'seeders/prompts/default_answer_question.txt');
@@ -277,7 +278,8 @@ class User extends WaveUser
             $this->setupPrompts('default_orchestrator', 'seeders/prompts/default_orchestrator.txt');
             $this->setupPrompts('default_orchestrator_stuck', 'seeders/prompts/default_orchestrator_stuck.txt');
             $this->setupPrompts('default_reformulate_question', 'seeders/prompts/default_reformulate_question.txt');
-            $this->setupPrompts('default_soc_operator', 'seeders/prompts/default_soc_operator.txt');
+            $this->setupPrompts('default_soc_operator_daily', 'seeders/prompts/default_soc_operator_daily.txt');
+            $this->setupPrompts('default_soc_operator_weekly', 'seeders/prompts/default_soc_operator_weekly.txt');
             $this->setupPrompts('default_summarize', 'seeders/prompts/default_summarize.txt');
             $this->setupPrompts('default_translate', 'seeders/prompts/default_translate.txt');
             $this->setupPrompts('default_clickhouse_query_generation', 'seeders/prompts/default_clickhouse_query_generation.txt');

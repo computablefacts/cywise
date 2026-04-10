@@ -10,6 +10,7 @@ use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Sajya\Server\Procedure;
 
 class EventsProcedure extends Procedure
@@ -315,25 +316,62 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         }
 
         $user = $request->user();
-        $minDate = Carbon::now()->utc()->startOfDay()->subDays(5);
-        $maxDate = Carbon::now()->utc()->endOfDay();
+        $dailyReports = [];
+        $activities = ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'];
 
         Log::debug("Building SOC operator report for server {$server->name} ({$server->ip()})...");
 
-        $eventRequest = new JsonRpcRequest([
-            'min_score' => 0, // Load both security events and IoCs
-            'server_id' => $server->id,
-            'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')]
-        ]);
-        $eventRequest->setUserResolver(fn() => $user);
-        $events = $this->list($eventRequest)['events']
-            ->map(fn(YnhOsquery $event) => $event->logLine())
-            ->filter(fn(string $logLine) => !empty($logLine))
-            ->sort() // Reorder events from the oldest to the newest
-            ->values();
+        for ($i = 6; $i >= 0; $i--) { // 7 days
 
-        if ($events->isEmpty()) {
-            Log::debug("No notable events found for server {$server->name} ({$server->ip()})");
+            $day = Carbon::now()->utc()->subDays($i);
+            $minDate = $day->copy()->startOfDay();
+            $maxDate = $day->copy()->endOfDay();
+            $eventRequest = new JsonRpcRequest([
+                'min_score' => 0, // Load both security events and IoCs
+                'server_id' => $server->id,
+                'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')]
+            ]);
+            $eventRequest->setUserResolver(fn() => $user);
+            $events = $this->list($eventRequest)['events']
+                ->map(fn(YnhOsquery $event) => $event->logLine())
+                ->filter(fn(string $logLine) => !empty($logLine))
+                ->sort() // Reorder events from the oldest to the newest
+                ->values();
+
+            if ($events->isEmpty()) {
+                $dailyReports[] = "## Day {$minDate->format('Y-m-d')}\n\nVerdict: NORMAL\nReport: No notable events found for server {$server->name} ({$server->ip()}).";
+            } else {
+
+                $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
+                $result = TextAssistant::use()
+                    ->withPrompt('default_soc_operator_daily', [
+                        'SERVER_NAME' => $server->name,
+                        'SERVER_IP_ADDRESS' => $server->ip(),
+                        'LOGS' => $logs,
+                        'MEMOS' => MemosProvider::use()
+                            ->withScope(NotesProcedure::SCOPE_IS_SOC_OPERATOR)
+                            ->withUser($user)
+                            ->provide(),
+                    ])
+                    ->structured();
+
+                /** @var array $json */
+                $json = $result->parsed;
+
+                if (isset($json['activity'], $json['report']) && in_array($json['activity'], $activities, true)) {
+                    $dailyReports[] = "## Day {$minDate->format('Y-m-d')}\n\nVerdict: {$json['activity']}\nReport: {$json['report']}";
+                } else {
+                    $dailyReports[] = "## Day {$minDate->format('Y-m-d')}\n\nVerdict: UNKNOWN\nReport: The SOC operator failed to assess the server's activity.";
+                }
+            }
+        }
+
+        /** @var string $answer */
+        $answer = json_encode($dailyReports);
+        Log::debug("SOC operator daily reports for server {$server->name} ({$server->ip()}): {$answer}");
+
+        if (collect($dailyReports)->every(fn(string $report) => Str::contains($report, 'Verdict: NORMAL'))) {
+            Log::debug("No notable events found for server {$server->name} ({$server->ip()}) over the last 7 days");
             return [
                 'server_name' => $server->name,
                 'server_ip_address' => $server->ip(),
@@ -342,26 +380,23 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             ];
         }
 
-        $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
         $result = TextAssistant::use()
-            ->withPrompt('default_soc_operator', [
+            ->withPrompt('default_soc_operator_weekly', [
                 'SERVER_NAME' => $server->name,
                 'SERVER_IP_ADDRESS' => $server->ip(),
-                'LOGS' => $logs,
+                'DAILY_REPORTS' => implode("\n\n", $dailyReports),
                 'MEMOS' => MemosProvider::use()
                     ->withScope(NotesProcedure::SCOPE_IS_SOC_OPERATOR)
                     ->withUser($user)
                     ->provide(),
             ])
             ->structured();
+
         /** @var array $json */
         $json = $result->parsed;
-        /** @var string $answer */
         $answer = json_encode($json);
 
-        Log::debug("SOC operator answer for server {$server->name} ({$server->ip()}): {$answer}");
-
-        $activities = ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'];
+        Log::debug("SOC operator consensus for server {$server->name} ({$server->ip()}): {$answer}");
 
         if (empty($json)) {
             Log::error('Failed to parse SOC operator answer (json): ' . $answer);
