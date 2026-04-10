@@ -11,10 +11,19 @@ Your task:
 
 Return exactly one JSON object with the following attributes:
 - activity: NORMAL, SUSPICIOUS, ANORMAL, or UNKNOWN
-- confidence: a number from 0.0 to 1.0
-- reasoning: a brief but concrete explanation of the verdict
-- suggested_action: the next recommended action
-- evidence: an array of short strings describing the most relevant observed facts
+- report: a brief but concrete explanation of the verdict
+
+Style requirements for the report:
+- Write a single compact paragraph.
+- Use a 5W-like structure in one or two sentences:
+  - WHEN: when the activity happened
+  - WHO/WHERE: the affected host, user, or account if available
+  - WHAT: what happened
+  - WHY: why it is suspicious or normal
+  - ACTION: what should be done next
+- Keep it concise, operational, and easy to read.
+- Prefer this format:
+  "On [date/time], [who] on [where] observed [what]. Security checks showed [why/evidence]. Therefore, the activity was classified as [verdict], and [next action] was recommended."
 
 Guidelines:
 - NORMAL: legitimate or expected activity with no clear compromise indicators.
