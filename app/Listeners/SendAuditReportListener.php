@@ -388,10 +388,12 @@ class SendAuditReportListener extends AbstractListener
                 $result = (new EventsProcedure())->socOperator($request);
 
                 if ($result['activity'] === 'UNKNOWN') {
-                    return "<li>L'opérateur SOC a rencontré une erreur lors de l'analyse du serveur <b>{$server->name}</b> d'adresse IP {$server->ip()}.</li>";
+                    return '';
+                    // return "<li>L'opérateur SOC a rencontré une erreur lors de l'analyse du serveur <b>{$server->name}</b> d'adresse IP {$server->ip()}.</li>";
                 }
                 if ($result['activity'] === 'NORMAL') {
-                    return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
+                    return '';
+                    // return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
 
                 $html = (new Parsedown)->text($result['report']);

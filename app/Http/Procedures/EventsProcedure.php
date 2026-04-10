@@ -337,7 +337,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             return [
                 'server_name' => $server->name,
                 'server_ip_address' => $server->ip(),
-                'activity' => 'UNKNOWN',
+                'activity' => 'NORMAL',
                 'report' => "Aucun événement notable n'a été trouvé sur le serveur **{$server->name}** d'adresse IP {$server->ip()} sur la période analysée.",
             ];
         }
