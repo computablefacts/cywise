@@ -18,6 +18,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use Sajya\Server\Procedure;
 use Symfony\Component\Yaml\Yaml;
+use Wave\Page;
 use Wave\Plan;
 use Wave\Setting;
 use Wave\Theme;
@@ -168,6 +169,8 @@ class CywiseSeeder extends Seeder
             'active' => 1,
             'version' => 1.0
         ]);
+        Page::where('title', 'Example Page')->delete();
+        Page::where('title', 'About')->delete();
     }
 
     private function setupPermissionsRolesAndPlans(): void
