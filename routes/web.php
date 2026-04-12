@@ -45,6 +45,7 @@ use App\Http\Controllers\MultiLevelHealthCheckController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
+use App\Jobs\TriggerAssetsDiscovery;
 use App\Models\YnhServer;
 use App\Notifications\Notifiables\FreshdeskNotifiable;
 use App\Notifications\PerformaRequestedNotification;
@@ -463,7 +464,7 @@ Route::get('/performa/user/login/{performa_domain}', function (string $performa_
 })->middleware('throttle:6,1');
 
 /** @deprecated */
-Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialId = null) {
+Route::get('/dispatch/job/{job}', function (string $job) {
 
     /** @var User $user */
     $user = Auth::user();
@@ -478,11 +479,12 @@ Route::get('/dispatch/job/{job}/{trialId?}', function (string $job, ?int $trialI
                 RebuildPackagesList::sink();
             } elseif ($job === 'rebuild_latest_events_cache') {
                 RebuildLatestEventsCache::sink();
+            } elseif ($job === 'find_dns') {
+                TriggerAssetsDiscovery::dispatch();
             }
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
         }
-
         return response('ok', 200)->header('Content-Type', 'text/plain');
     }
 

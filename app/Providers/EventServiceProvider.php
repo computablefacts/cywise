@@ -19,6 +19,7 @@ use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Events\SendAuditReport;
 use App\Events\StartAssetsDiscover;
+use App\Events\AssetsDiscovery;
 use App\Listeners\AssetsSharedListener;
 use App\Listeners\BeginPortsScanListener;
 use App\Listeners\BeginVulnsScanListener;
@@ -40,6 +41,7 @@ use App\Listeners\RebuildPackagesListListener;
 use App\Listeners\SendAuditReportListener;
 use App\Listeners\StartAssetsDiscoverListener;
 use App\Listeners\StoreLoginTime;
+use App\Listeners\AssetsDiscoveryListener;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -90,6 +92,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         SendAuditReport::class => [
             SendAuditReportListener::class,
+        ],
+        AssetsDiscovery::class => [
+            AssetsDiscoveryListener::class,
         ],
 
         // CyberBuddy

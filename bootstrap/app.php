@@ -1,12 +1,13 @@
 <?php
 
+use App\Console\Commands\RunLevelHealthChecksCommand;
 use App\Jobs\Cleanup;
 use App\Jobs\DeleteEmbeddedChunks;
 use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Jobs\EmbedChunks;
 use App\Jobs\ProcessIncomingEmails;
 use App\Jobs\RunScheduledTasks;
-use App\Jobs\TriggerDiscoveryShallow;
+use App\Jobs\TriggerAssetsDiscovery;
 use App\Jobs\TriggerScan;
 use App\Jobs\TriggerSendAuditReport;
 use App\Jobs\UpdateTables;
@@ -16,7 +17,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
-use App\Console\Commands\RunLevelHealthChecksCommand;
 use Spatie\Health\Commands\DispatchQueueCheckJobsCommand;
 use Spatie\Health\Commands\ScheduleCheckHeartbeatCommand;
 
@@ -44,10 +44,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 '192.168.0.0/16',
             ],
             Request::HEADER_X_FORWARDED_FOR |
-                Request::HEADER_X_FORWARDED_HOST |
-                Request::HEADER_X_FORWARDED_PORT |
-                Request::HEADER_X_FORWARDED_PROTO |
-                Request::HEADER_X_FORWARDED_AWS_ELB
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT |
+            Request::HEADER_X_FORWARDED_PROTO |
+            Request::HEADER_X_FORWARDED_AWS_ELB
         );
         $middleware->preventRequestsDuringMaintenance([]);
         $middleware->trimStrings([
@@ -109,9 +109,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // AdversaryMeter
         $schedule->job(new TriggerScan())->everyMinute();
-        $schedule->job(new TriggerDiscoveryShallow())->daily();
+        $schedule->job(new TriggerAssetsDiscovery())->daily();
         $schedule->job(new TriggerSendAuditReport())->weeklyOn(1 /* monday */, '6:45');
-        // $schedule->job(new TriggerDiscoveryDeep())->weekly();
 
         // CyberBuddy
         $schedule->job(new EmbedChunks())->everyMinute();
@@ -126,7 +125,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Health check - please let this at the end
         $schedule->command(DispatchQueueCheckJobsCommand::class)->everyMinute();
         $schedule->command(ScheduleCheckHeartbeatCommand::class)->everyMinute();
-        
+
         $minutesToCron = function (int $minutes): string {
             return $minutes < 60
                 ? "*/{$minutes} * * * *"
