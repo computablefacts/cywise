@@ -2,16 +2,21 @@
 
 namespace App\Http\Procedures;
 
+use App\AgentSquad\Assistants\ChunkAssistant;
 use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Providers\MemosProvider;
+use App\Enums\LanguageEnum;
 use App\Http\Requests\JsonRpcRequest;
+use App\Models\User;
 use App\Models\YnhOsquery;
 use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Parsedown;
 use Sajya\Server\Procedure;
+use Wave\Page;
 
 class EventsProcedure extends Procedure
 {
@@ -317,69 +322,80 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
         $user = $request->user();
         $dailyReports = [];
-        $activities = ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'];
+        $dailyLinks = [];
+        $dailyEvents = [];
+        $dailyActivities = [];
 
-        Log::debug("Building SOC operator report for server {$server->name} ({$server->ip()})...");
+        Log::debug("Building SOC operator daily reports for server {$server->name} ({$server->ip()})...");
 
         for ($i = 6; $i >= 0; $i--) { // 7 days
 
             $day = Carbon::now()->utc()->subDays($i);
-            $minDate = $day->copy()->startOfDay();
-            $maxDate = $day->copy()->endOfDay();
-            $eventRequest = new JsonRpcRequest([
-                'min_score' => 0, // Load both security events and IoCs
-                'server_id' => $server->id,
-                'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')]
-            ]);
-            $eventRequest->setUserResolver(fn() => $user);
-            $events = $this->list($eventRequest)['events']
-                ->map(fn(YnhOsquery $event) => $event->logLine())
-                ->filter(fn(string $logLine) => !empty($logLine))
-                ->sort() // Reorder events from the oldest to the newest
-                ->values();
+            $page = $day->isCurrentDay() ?
+                null :
+                Page::where('author_id', $user->id)
+                    ->whereLike('slug', "daily-{$day->format('Y-m-d')}-{$server->id}%")
+                    ->first();
 
-            if ($events->isEmpty()) {
-                $dailyReports[] = "## Day {$minDate->format('Y-m-d')}\n\nVerdict: NORMAL\nReport: No notable events found for server {$server->name} ({$server->ip()}).";
+            if ($page) {
+                $report = $page->body;
             } else {
 
-                $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
-                $result = TextAssistant::use()
-                    ->withPrompt('default_soc_operator_daily', [
-                        'SERVER_NAME' => $server->name,
-                        'SERVER_IP_ADDRESS' => $server->ip(),
-                        'LOGS' => $logs,
-                        'MEMOS' => MemosProvider::use()
-                            ->withScope(NotesProcedure::SCOPE_IS_SOC_OPERATOR)
-                            ->withUser($user)
-                            ->provide(),
-                    ])
-                    ->structured();
+                // Create daily report
+                $report = $this->createDailyReport($user, $day, $server);
+                $activity = $report['activity'];
+                $report = $report['report'];
 
-                /** @var array $json */
-                $json = $result->parsed;
+                // Create webpage
+                $title = "Rapport journalier pour {$server->name} ({$server->ip()})";
+                $slug = "daily-{$day->format('Y-m-d')}-{$server->id}" . Str::random(64);
+                $page = $this->updateOrCreatePage($user, $slug, $title, $report);
+            }
 
-                if (isset($json['activity'], $json['report']) && in_array($json['activity'], $activities, true)) {
-                    $dailyReports[] = "## Day {$minDate->format('Y-m-d')}\n\nVerdict: {$json['activity']}\nReport: {$json['report']}";
-                } else {
-                    $dailyReports[] = "## Day {$minDate->format('Y-m-d')}\n\nVerdict: UNKNOWN\nReport: The SOC operator failed to assess the server's activity.";
-                }
+            // Save markdown and page link for later use
+            $dailyReports[] = "## {$day->format('Y-m-d')}\n\n{$report}";
+            $dailyLinks[] = "<a href=\"{$page->link()}\">{$day->format('Y-m-d')}</a>";
+
+            if (preg_match('/\*\*Evènements\s*\((\d+)\)\s*:\*\*/u', $report, $matches)) {
+                $dailyEvents[] = (int)$matches[1];
+            } else {
+                $dailyEvents[] = 0;
+            }
+            if (preg_match('/\*\*Activité\s*:\*\*\s*(\S+)/u', $report, $matches)) {
+                $dailyActivities[] = $matches[1];
+            } else {
+                $dailyActivities[] = 'inconnue';
             }
         }
 
-        /** @var string $answer */
-        $answer = json_encode($dailyReports);
-        Log::debug("SOC operator daily reports for server {$server->name} ({$server->ip()}): {$answer}");
+        Log::debug("Daily reports for server {$server->name} ({$server->ip()}) built.");
+        Log::debug("Building SOC operator weekly report for server {$server->name} ({$server->ip()})...");
 
-        if (collect($dailyReports)->every(fn(string $report) => Str::contains($report, 'Verdict: NORMAL'))) {
-            Log::debug("No notable events found for server {$server->name} ({$server->ip()}) over the last 7 days");
-            return [
-                'server_name' => $server->name,
-                'server_ip_address' => $server->ip(),
-                'activity' => 'NORMAL',
-                'report' => "Aucun événement notable n'a été trouvé sur le serveur **{$server->name}** d'adresse IP {$server->ip()} sur la période analysée.",
-            ];
-        }
+        // Create weekly report
+        $report = $this->createWeeklyReport($user, $server, $dailyReports);
+        $activity = $report['activity'];
+        $report = $report['report'];
 
+        // Create webpage
+        $title = "Rapport hebdomadaire pour {$server->name} ({$server->ip()})";
+        $slug = 'weekly-' . Carbon::now()->format('Y-m-d') . '-' . $server->id . Str::random(64);
+        $page = $this->updateOrCreatePage($user, $slug, $title, "{$report}\n\n# Rapports journaliers\n\n- " . implode("\n- ", array_map(fn(string $link, string $activity, int $events) => "{$link} (activité {$activity}, {$events} évènements)", $dailyLinks, $dailyActivities, $dailyEvents)));
+
+        Log::debug("Weekly report for server {$server->name} ({$server->ip()}) built.");
+
+        // Short report
+        $report = "{$report}\n\n**<a href=\"{$page->link()}\">Cliquez ici</a>** pour accéder au rapport détaillé.";
+
+        return [
+            'server_name' => $server->name,
+            'server_ip_address' => $server->ip(),
+            'activity' => $activity,
+            'report' => $report,
+        ];
+    }
+
+    private function createWeeklyReport(User $user, YnhServer $server, array $dailyReports): array
+    {
         $result = TextAssistant::use()
             ->withPrompt('default_soc_operator_weekly', [
                 'SERVER_NAME' => $server->name,
@@ -394,54 +410,121 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
         /** @var array $json */
         $json = $result->parsed;
-        $answer = json_encode($json);
-
-        Log::debug("SOC operator consensus for server {$server->name} ({$server->ip()}): {$answer}");
 
         if (empty($json)) {
-            Log::error('Failed to parse SOC operator answer (json): ' . $answer);
+            Log::error('Failed to parse SOC operator answer (json): ' . json_encode($json));
             return [
-                'server_name' => $server->name,
-                'server_ip_address' => $server->ip(),
                 'activity' => 'UNKNOWN',
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (JSON invalide).",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (JSON invalide)."
             ];
         }
-        if (!isset($json['activity']) || !in_array($json['activity'], $activities, true)) {
-            Log::error('Failed to parse SOC operator answer (activity): ' . $answer);
+        if (!isset($json['activity']) || !in_array($json['activity'], ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'], true)) {
+            Log::error('Failed to parse SOC operator answer (activity): ' . json_encode($json));
             return [
-                'server_name' => $server->name,
-                'server_ip_address' => $server->ip(),
                 'activity' => 'UNKNOWN',
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `activity` invalide).",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `activity` invalide)."
             ];
         }
         if (!isset($json['report']) || !is_string($json['report'])) {
-            Log::error('Failed to parse SOC operator answer (report): ' . $answer);
+            Log::error('Failed to parse SOC operator answer (report): ' . json_encode($json));
             return [
-                'server_name' => $server->name,
-                'server_ip_address' => $server->ip(),
                 'activity' => 'UNKNOWN',
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `report` invalide).",
+                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `report` invalide)."
+            ];
+        }
+        return [
+            'activity' => $json['activity'],
+            'report' => "**Activité :** {$this->activityEnToFr($json['activity'])}\n\n**Analyse :** {$this->translateEnToFr($json['report'])}"
+        ];
+    }
+
+    private function createDailyReport(User $user, Carbon $day, YnhServer $server): array
+    {
+        $activities = ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'];
+        $minDate = $day->copy()->startOfDay();
+        $maxDate = $day->copy()->endOfDay();
+        $eventRequest = new JsonRpcRequest([
+            'min_score' => 0, // Load both security events and IoCs
+            'server_id' => $server->id,
+            'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')]
+        ]);
+        $eventRequest->setUserResolver(fn() => $user);
+        $events = $this->list($eventRequest)['events']
+            ->map(fn(YnhOsquery $event) => $event->logLine())
+            ->filter(fn(string $logLine) => !empty($logLine))
+            ->sort() // Reorder events from the oldest to the newest
+            ->values();
+
+        if ($events->isEmpty()) {
+            return [
+                'activity' => 'NORMAL',
+                'report' => "**Activité :** {$this->activityEnToFr('NORMAL')}\n\n**Analyse :** Aucun évènement significatif n'a été signalé concernant le serveur {$server->name} d'adresse IP {$server->ip()}.\n\n**Evènements ({$events->count()}) :**\n```\nAucun\n```"
             ];
         }
 
-        $activityLabel = match ($json['activity']) {
+        $compressed = cywise_compress_log_buffer($events->toArray(), 0.8);
+        $logs = implode("\n", $compressed);
+        $result = TextAssistant::use()
+            ->withPrompt('default_soc_operator_daily', [
+                'SERVER_NAME' => $server->name,
+                'SERVER_IP_ADDRESS' => $server->ip(),
+                'LOGS' => $logs,
+                'MEMOS' => MemosProvider::use()
+                    ->withScope(NotesProcedure::SCOPE_IS_SOC_OPERATOR)
+                    ->withUser($user)
+                    ->provide(),
+            ])
+            ->structured();
+
+        /** @var array $json */
+        $json = $result->parsed;
+        $nbEvents = count($events->toArray());
+        $maxEvents = 100;
+
+        if ($nbEvents > $maxEvents) {
+            $oldest = implode("\n", array_slice($events->toArray(), 0, $maxEvents)) . "\n...";
+        } else {
+            $oldest = implode("\n", $events->toArray());
+        }
+        if (isset($json['activity'], $json['report']) && in_array($json['activity'], $activities, true)) {
+            return [
+                'activity' => $json['activity'],
+                'report' => "**Activité :** {$this->activityEnToFr($json['activity'])}\n\n**Analyse :** {$this->translateEnToFr($json['report'])}\n\n**Evènements ({$events->count()}) :**\n```\n{$oldest}\n```"
+            ];
+        }
+        return [
+            'activity' => 'UNKNOWN',
+            'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** L'opérateur du SOC n'a pas pu évaluer l'activité du serveur.\n\n**Evènements ({$events->count()}) :**\n```\n{$oldest}\n```"
+        ];
+    }
+
+    private function activityEnToFr(string $activity): string
+    {
+        return match ($activity) {
             'NORMAL' => 'normale (activité légitime ou attendue sans indicateurs clairs de compromission)',
             'SUSPICIOUS' => 'suspecte (comportement suspect nécessitant une validation ou une surveillance accrue)',
             'ANORMAL' => 'anormale (indicateurs forts de compromission ou comportement clairement malveillant)',
             default => 'inconnue (preuves insuffisantes pour décider de manière fiable)',
         };
+    }
 
-        $report = "### {$server->name} ({$server->ip()})\n\n";
-        $report .= "- **Activité :** {$activityLabel}\n";
-        $report .= "- **Rapport :** {$json['report']}\n";
+    private function translateEnToFr(string $textEn): string
+    {
+        return ChunkAssistant::use()
+            ->withLang(LanguageEnum::ENGLISH)
+            ->withChunk($textEn)
+            ->translate(LanguageEnum::FRENCH);
+    }
 
-        return [
-            'server_name' => $server->name,
-            'server_ip_address' => $server->ip(),
-            'activity' => $json['activity'],
-            'report' => $report,
-        ];
+    private function updateOrCreatePage(User $user, string $slug, string $title, string $markdown): Page
+    {
+        return Page::updateOrCreate([
+            'author_id' => $user->id,
+            'slug' => $slug,
+        ], [
+            'title' => $title,
+            'body' => (new Parsedown)->text($markdown),
+            'status' => 'ACTIVE',
+        ]);
     }
 }
