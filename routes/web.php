@@ -59,6 +59,9 @@ use Wave\Facades\Wave;
 // Wave routes
 Wave::routes();
 
+// See Wave's dynamic pages : https://devdojo.com/wave/docs/features/pages
+Route::get('p/{slug}', '\Wave\Http\Controllers\PageController@page')->name('wave.page');
+
 // See https://devdojo.com/question/customizing-the-two-factor-authentication
 Route::view('/auth/login', 'vendor/auth/pages/auth/login');
 Route::view('/auth/register', 'vendor/auth/pages/auth/register');
