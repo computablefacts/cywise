@@ -140,7 +140,7 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
                     ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']));
 
                 Log::debug("{$leaksPrev->count()} leaks found.");
-                Log::debug("Computing diff...]");
+                Log::debug("Computing diff...");
 
                 $leaks = $leaks->filter(function (array $leak) use ($leaksPrev) {
                     return !$leaksPrev->contains(function (object $leakPrev) use ($leak) {
