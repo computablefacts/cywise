@@ -58,7 +58,7 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
     (new FreshdeskNotifiable)->notify(Notification::viaEmail(
         "<b>Fullname:</b> {$params['fullName']}<br><b>Email:</b> {$params['email']}<br><b>Phone:</b> {$params['phone']}<br><b>Message:</b> {$params['message']}",
         "{$params['email']} vous a contacté !",
-        $params['email']
+        config('towerify.freshdesk.from_email')
     ));
 
     return response()->json([
