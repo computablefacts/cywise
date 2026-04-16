@@ -34,7 +34,7 @@ class AssetsDiscoveryListener extends AbstractListener
             $request->setUserResolver(fn() => $user);
             $response = (new AssetsProcedure())->discover($request);
 
-            if (($response['fallback'] ?? false) === true && !empty($response['subdomains'])) {
+            if (!empty($response['subdomains'])) {
 
                 $assets = collect($response['subdomains'])->filter(fn(?string $domain) => !empty($domain));
                 $assets->each(fn(string $domain) => CreateAsset::dispatch($user, $domain, true));
