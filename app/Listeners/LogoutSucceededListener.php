@@ -15,17 +15,19 @@ class LogoutSucceededListener extends AbstractListener
         }
         if ($event->guard === 'web') {
             
-            /** @var User $user */
+            /** @var ?User $user */
             $user = $event->user;
 
-            /** @var AppTrace $trace */
-            $trace = AppTrace::create([
-                'user_id' => $user?->id,
-                'verb' => 'GET',
-                'endpoint' => "/auth/logout?email={$user->email}",
-                'duration_in_ms' => 10,
-                'failed' => false,
-            ]);
+            if ($user) {
+                /** @var AppTrace $trace */
+                $trace = AppTrace::create([
+                    'user_id' => $user->id,
+                    'verb' => 'GET',
+                    'endpoint' => "/auth/logout?email={$user->email}",
+                    'duration_in_ms' => 10,
+                    'failed' => false,
+                ]);
+            }
         }
     }
 }
