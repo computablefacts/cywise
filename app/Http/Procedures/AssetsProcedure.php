@@ -3,6 +3,7 @@
 namespace App\Http\Procedures;
 
 use App\Enums\AssetTypesEnum;
+use App\Events\AssetsDiscovery;
 use App\Events\AssetsShared;
 use App\Events\BeginPortsScan;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
@@ -335,6 +336,9 @@ A port scan will start soon for {{ \$result['asset'] }}.
         if (!$obj) {
             throw new \Exception("The asset could not be created : {$params['asset']}");
         }
+
+        AssetsDiscovery::dispatch($request->user(), $asset);
+
         return [
             'asset' => $this->convertAsset($obj->refresh()),
         ];
