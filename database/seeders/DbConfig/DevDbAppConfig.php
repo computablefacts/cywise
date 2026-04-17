@@ -79,9 +79,9 @@ class DevDbAppConfig implements DbAppConfigInterface
             'encrypted:towerify.clickhouse.password' => 'ItPMAV4hUTob4663_ldQ+/6HwskcA4HFOSZuDcBaxFSlsqMAOcknfxM/WfKI=',
             'towerify.clickhouse.database' => 'cywise_ngdev',
 
-            'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
-            'towerify.josianne.username' => 'cywise',
-            'encrypted:towerify.josianne.password' => 'BZMMOKdbxEtn?mpc_xZS2m+XhLGIkAQC7rhtpVKG3diisqZkgxGmSrCPkx7o=',
+            'towerify.josianne.host' => 'clickhouse.apps.josiane2.computablefacts.io',
+            'towerify.josianne.username' => 'engineering',
+            'encrypted:towerify.josianne.password' => 'UoLR1#5eIpk2YgNs_vPgqsFbneIzaE+4ElAZwcRv4uvz1xz96kylHyeU0RSg=',
             'towerify.josianne.database' => '',
 
             'mail.mailers.mailcoach.domain' => 'cywiseapp.mailcoach.app',

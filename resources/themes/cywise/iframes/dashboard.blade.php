@@ -356,7 +356,7 @@
               <td style="color:var(--bs-body-color);">{{ empty($l->password) ? '-' : $l->password }}</td>
               <td>
                 <span class="lozenge new" style="font-size: 0.8rem;">
-                  {{ empty($l->website) ? __('leak') : __('infostealer log') }}
+                  {{ $l->leak_type ?? (empty($l->website) ? __('leak') : __('infostealer log')) }}
                 </span>
               </td>
             </tr>

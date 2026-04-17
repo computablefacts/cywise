@@ -8,6 +8,7 @@ use App\Models\Chunk;
 use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\File;
+use App\Models\Leak;
 use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\TimelineFact;
@@ -214,8 +215,11 @@ class CleanupTenantDataTest extends TestCaseWithDb
             'embedding' => array_fill(0, 1024, 0.1),
             'created_by' => $user->id,
         ]);
-        $leak = TimelineItem::createItem($user->id, 'leak', now(), 0, [
-            'credentials' => json_encode([['email' => 'leak@example.com', 'password' => '****', 'leak_date' => '2021-01-01']]),
+        $leak = Leak::create([
+            'created_by' => $user->id,
+            'email' => 'leak@example.com',
+            'password' => '****',
+            'leak_date' => '2021-01-01',
         ]);
         $fact = TimelineFact::create([
             'owned_by' => $user->id,

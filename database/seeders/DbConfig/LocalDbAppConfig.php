@@ -74,8 +74,8 @@ class LocalDbAppConfig implements DbAppConfigInterface
             'towerify.stripe.plans.premium.onetime_price' => null,
             'towerify.stripe.plans.premium.onetime_price_id' => null,
 
-            'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
-            'towerify.josianne.username' => 'cywise',
+            'towerify.josianne.host' => 'clickhouse.apps.josiane2.computablefacts.io',
+            'towerify.josianne.username' => 'engineering',
             // 'encrypted:towerify.josianne.password' => '',
             'towerify.josianne.database' => '',
 
