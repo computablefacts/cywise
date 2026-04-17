@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('am_leaks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('created_by')->index();
+            $table->unsignedBigInteger('user_id')->index();
             $table->date('leak_date')->nullable();
             $table->string('email')->index();
             $table->string('website')->nullable();
             $table->string('password')->nullable();
             $table->timestamps();
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
