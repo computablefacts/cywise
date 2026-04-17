@@ -336,9 +336,9 @@ A port scan will start soon for {{ \$result['asset'] }}.
         if (!$obj) {
             throw new \Exception("The asset could not be created : {$params['asset']}");
         }
-
-        AssetsDiscovery::dispatch($request->user(), $asset);
-
+        if ($obj->isDns()) {
+            AssetsDiscovery::dispatch($request->user(), $obj->tld());
+        }
         return [
             'asset' => $this->convertAsset($obj->refresh()),
         ];
