@@ -207,7 +207,7 @@ class EndVulnsScanListener extends AbstractListener
                     $a->translated('vulnerability');
                     $a->translated('remediation');
 
-                    if ($a->isHigh()) {
+                    if ($a->isHigh() || $a->isMedium()) {
                         foreach ($users as $u) {
                             if ($asset->asset === $port->ip) {
                                 $u->notify(new Notification("{$port->ip}:{$port->port} - {$a->translated('title')} - {$a->translated('vulnerability')}"));
