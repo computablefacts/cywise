@@ -282,7 +282,8 @@ class CyberBuddyController extends Controller
 
         if (Str::startsWith($secret, 'vulns-report-') ||
             Str::startsWith($secret, 'assets-report-') ||
-            Str::startsWith($secret, 'ports-report-')) {
+            Str::startsWith($secret, 'ports-report-') ||
+            Str::startsWith($secret, 'remediation-report-')) {
             return Storage::disk('files-s3')->download("/reports/{$secret}", null, [
                 'pragma' => 'private',
                 'Cache-Control' => 'private, max-age=3600',
