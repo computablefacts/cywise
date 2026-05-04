@@ -23,10 +23,10 @@ class FusionLiveProcedure extends Procedure
             "if the request is 'list FusionLive workspaces', the input should be {}",
         ],
         ai_result: "
-            J'ai trouvé {{ count(\$result['workspaces']) }} espaces de travail :
-            @foreach(\$result['workspaces'] as \$w)
-            - L'espace de travail '{{ \$w['name'] }}' a été créé le {{ \$w['creation_date'] }} par {{ \$w['created_by'] }} et a pour identifiant {{ \$w['id'] }}. Il est associé à la société {{ \$w['company'] }} et a pour statut '{{ \$w['status'] }}'.
-            @endforeach
+J'ai trouvé {{ count(\$result['workspaces']) }} espaces de travail :
+@foreach(\$result['workspaces'] as \$w)
+- L'espace de travail '{{ \$w['name'] }}' a été créé le {{ \$w['creation_date'] }} par {{ \$w['created_by'] }} et a pour identifiant {{ \$w['id'] }}. Il est associé à la société {{ \$w['company'] }} et a pour statut '{{ \$w['status'] }}'.
+@endforeach
         ",
     )]
     public function workspaces(JsonRpcRequest $request): array
@@ -88,7 +88,31 @@ class FusionLiveProcedure extends Procedure
             "if the request is 'list files in 1458', the input should be {\"workspace_id\":1458}",
             "if the request is 'list files whose status is 'MAJ - Pour mise à jour' in 1458', the input should be {\"workspace_id\":1458,\"status\":\"MAJ - Pour mise à jour\"}",
         ],
-        ai_result: "{{ json_encode(\$result) }}",
+        ai_result: "
+I found {{ count(\$result['documents']) }} folders and {{ array_sum(array_column(\$result['documents'], 'count')) }} documents.
+
+@foreach(\$result['documents'] as \$folder)
+
+# Folder: {{ \$folder['location'] }} ({{ \$folder['count'] }} documents)
+
+@foreach(\$folder['documents'] as \$doc)
+
+## File: {{ \$doc['file']['name'] ?? \$doc['title'] }}
+
+- **Id.** {{ \$doc['id'] }}
+- **Company Name.** {{ \$doc['company'] }}
+- **Uploaded At.** {{ \$doc['upload_date'] }}
+- **Title.** {{ \$doc['title'] }}
+- **Size.** {{ \$doc['size'] }} bytes
+- **Reference.** {{ \$doc['reference'] }}
+- **Status.** {{ \$doc['status'] }}
+- **Revision.** {{ \$doc['revision'] }}
+- **Locked.** {{ \$doc['is_locked'] ? 'true' : 'false' }}
+- **Attachments.** {{ count(\$doc['attachments']) > 0 ? 'yes (' . count(\$doc['attachments']) . ')' : 'no' }}
+
+@endforeach
+@endforeach
+        ",
     )]
     public function documents(JsonRpcRequest $request): array
     {
@@ -120,6 +144,165 @@ class FusionLiveProcedure extends Procedure
 
         return [
             'documents' => $documents,
+        ];
+    }
+
+    #[RpcMethod(
+        description: "List all users for a given FusionLive workspace.",
+        params: [
+            'workspace_id' => 'The workspace ID. (integer|required|min:0)',
+            'group_id' => 'An optional group ID. (integer|nullable|min:0)',
+        ],
+        result: [
+            'users' => 'A list of users.',
+        ],
+        ai_examples: [
+            "if the request is 'list users in workspace 1458', the input should be {\"workspace_id\":1458}",
+            "if the request is 'list users in workspace 1458 and group 123', the input should be {\"workspace_id\":1458,\"group_id\":123}",
+        ],
+        ai_result: "
+I found {{ count(\$result['users']) }} users in the workspace.
+
+@foreach(\$result['users'] as \$user)
+
+# {{ \$user['firstname'] }} {{ \$user['lastname'] }}
+
+- **Id.** {{ \$user['id'] }}
+- **Company.** {{ \$user['company'] }}
+- **Profession.** {{ \$user['profession'] }}
+- **Email.**{{ \$user['email'] }}
+- **Phone.** {{ \$user['phone'] }}
+
+@endforeach
+        ",
+    )]
+    public function users(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'workspace_id' => 'integer|required|min:0',
+            'group_id' => 'integer|nullable|min:0',
+        ]);
+        $workspaceId = $params['workspace_id'];
+        $groupId = $params['group_id'] ?? null;
+        $user = $request->user();
+        $username = $user?->fusionlive_username ?? '';
+        $password = $user?->fusionlive_password ?? '';
+
+        if (empty($username) || empty($password)) {
+            throw new \Exception('Missing FusionLive credentials.');
+        }
+
+        $token = $this->token($username, $password);
+        $payload = isset($groupId) ?
+            "<listusers mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/><group id=\"{$groupId}\"/></listusers>" :
+            "<listusers mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/></listusers>";
+        $result = $this->post('/pws/workspaces', $payload);
+
+        if ($result['code'] != 0) {
+            return [
+                'users' => [],
+            ];
+        }
+
+        $el = new FusionLiveXmlElement($result['data'], [
+            'users' => [
+                'xpath' => '/status/users/user',
+                'many' => true
+            ],
+        ]);
+
+        return [
+            'users' => array_map(function (\SimpleXMLElement $u) {
+                return [
+                    'id' => (int)FusionLiveXmlElement::attr($u, 'id'),
+                    'firstname' => (string)FusionLiveXmlElement::attr($u, 'firstname'),
+                    'lastname' => (string)FusionLiveXmlElement::attr($u, 'lastname'),
+                    'email' => (string)FusionLiveXmlElement::attr($u, 'email'),
+                    'company' => (string)FusionLiveXmlElement::attr($u, 'company'),
+                    'profession' => (string)FusionLiveXmlElement::attr($u, 'profession'),
+                    'phone' => (string)FusionLiveXmlElement::attr($u, 'phone'),
+                    'mobile' => (string)FusionLiveXmlElement::attr($u, 'mobile'),
+                ];
+            }, $el->users),
+        ];
+    }
+
+    #[RpcMethod(
+        description: "List all groups for a given FusionLive workspace.",
+        params: [
+            'workspace_id' => 'The workspace ID. (integer|required|min:0)',
+        ],
+        result: [
+            'groups' => 'A list of groups.',
+        ],
+        ai_examples: [
+            "if the request is 'list groups in workspace 1458', the input should be {\"workspace_id\":1458}",
+        ],
+        ai_result: "
+I found {{ count(\$result['groups']) }} groups in the workspace.
+
+@foreach(\$result['groups'] as \$group)
+
+# {{ \$group['name'] }}
+
+- **Id.** {{ \$group['id'] }}
+- **Description.** {{ \$group['description'] }}
+- **Created At.** {{ \$group['created_at'] }}
+- **Updated At.** {{ \$group['updated_at'] }}
+- **Created By.** {{ \$group['created_by'] }}
+- **Updated By.** {{ \$group['updated_by'] }}
+- **Company.** {{ \$group['company'] }}
+
+@endforeach
+        ",
+    )]
+    public function groups(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'workspace_id' => 'integer|required|min:0',
+        ]);
+        $workspaceId = $params['workspace_id'];
+        $user = $request->user();
+        $username = $user?->fusionlive_username ?? '';
+        $password = $user?->fusionlive_password ?? '';
+
+        if (empty($username) || empty($password)) {
+            throw new \Exception('Missing FusionLive credentials.');
+        }
+
+        $token = $this->token($username, $password);
+        $result = $this->post('/pws/workspaces', "<listgroups mode=\"detail\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/></listgroups>");
+
+        if ($result['code'] != 0) {
+            return [
+                'groups' => [],
+            ];
+        }
+
+        $el = new FusionLiveXmlElement($result['data'], [
+            'groups' => [
+                'xpath' => '/status/groups/group',
+                'many' => true
+            ],
+        ]);
+
+        return [
+            'groups' => array_map(function (\SimpleXMLElement $g) {
+                return [
+                    'id' => (int)FusionLiveXmlElement::attr($g, 'id'),
+                    'name' => (string)FusionLiveXmlElement::attr($g, 'name'),
+                    'description' => (string)FusionLiveXmlElement::attr($g, 'description'),
+                    'is_folder_group' => (FusionLiveXmlElement::attr($g, 'is_folder_group') === 'true'),
+                    'is_message_group' => (FusionLiveXmlElement::attr($g, 'is_message_group') === 'true'),
+                    'is_deleted' => (FusionLiveXmlElement::attr($g, 'isdeleted') === 'true'),
+                    'company' => (string)FusionLiveXmlElement::attr($g, 'company_name'),
+                    'created_by' => (string)FusionLiveXmlElement::attr($g, 'creator'),
+                    'created_at' => (string)FusionLiveXmlElement::attr($g, 'datecreated'),
+                    'updated_by' => (string)FusionLiveXmlElement::attr($g, 'updater'),
+                    'updated_at' => (string)FusionLiveXmlElement::attr($g, 'dateupdated'),
+                    'uri' => (string)FusionLiveXmlElement::attr($g, 'uri'),
+                ];
+            }, $el->groups),
         ];
     }
 
@@ -186,9 +369,17 @@ class FusionLiveProcedure extends Procedure
             'id' => $folderId,
             'location' => $location,
             'count' => $count,
-            'documents' => array_map(function (\SimpleXMLElement $d) {
+            'documents' => array_map(function (\SimpleXMLElement $d) use ($token, $workspaceId) {
+
+                $attachments = [];
+                $docId = (int)FusionLiveXmlElement::attr($d, 'id');
+                $hasAttachments = (FusionLiveXmlElement::attr($d, 'hasattachment') === 'true');
+
+                if ($hasAttachments) {
+                    $attachments = $this->loadAttachments($token, $workspaceId, $docId);
+                }
                 return [
-                    'id' => (int)FusionLiveXmlElement::attr($d, 'id'),
+                    'id' => $docId,
                     'upload_date' => (string)FusionLiveXmlElement::attr($d, 'uploaded'),
                     'first_version_id' => (int)FusionLiveXmlElement::attr($d, 'firstVersionId'),
                     'reference' => (string)FusionLiveXmlElement::attr($d, 'reference'),
@@ -201,13 +392,67 @@ class FusionLiveProcedure extends Procedure
                     'has_link' => (FusionLiveXmlElement::attr($d, 'haslink') === 'true'),
                     'is_link' => (FusionLiveXmlElement::attr($d, 'islink') === 'true'),
                     'is_locked' => (FusionLiveXmlElement::attr($d, 'islocked') === 'true'),
-                    'has_attachment' => (FusionLiveXmlElement::attr($d, 'hasattachment') === 'true'),
                     'has_markup' => (FusionLiveXmlElement::attr($d, 'hasmarkup') === 'true'),
                     'size' => (int)FusionLiveXmlElement::attr($d, 'size'),
-                    'company_name' => (string)FusionLiveXmlElement::attr($d, 'companyname'),
+                    'company' => (string)FusionLiveXmlElement::attr($d, 'companyname'),
+                    'uri' => (string)FusionLiveXmlElement::attr($d, 'uri'),
+                    'file' => $d->file ? [
+                        'name' => (string)FusionLiveXmlElement::attr($d->file, 'name'),
+                        'type' => (string)FusionLiveXmlElement::attr($d->file, 'type'),
+                        'mime_type' => (string)FusionLiveXmlElement::attr($d->file, 'mimetype'),
+                        'code_format' => (string)FusionLiveXmlElement::attr($d->file, 'contentformatcode'),
+                    ] : null,
+                    'attachments' => $attachments,
                 ];
             }, $el->documents),
         ];
+    }
+
+    private function loadAttachments(string $token, int $workspaceId, int $documentId): array
+    {
+        $payload = "<listattachments mode=\"list\"><authentication token=\"{$token}\"/><workspace id=\"{$workspaceId}\"/><document id=\"{$documentId}\"/></listattachments>";
+        $result = $this->post('/pws/folders', $payload);
+
+        if ($result['code'] != 0) {
+            return [];
+        }
+
+        $el = new FusionLiveXmlElement($result['data'], [
+            'documents' => [
+                'xpath' => '/status/documents/document',
+                'many' => true
+            ],
+        ]);
+
+        return array_map(function (\SimpleXMLElement $d) use ($token, $workspaceId) {
+
+            $attachments = [];
+            $docId = (int)FusionLiveXmlElement::attr($d, 'id');
+            $hasAttachments = (FusionLiveXmlElement::attr($d, 'hasattachment') === 'true');
+
+            if ($hasAttachments) {
+                $attachments = $this->loadAttachments($token, $workspaceId, $docId);
+            }
+            return [
+                'id' => $docId,
+                'first_version_id' => (int)FusionLiveXmlElement::attr($d, 'firstVersionId'),
+                'reference' => (string)FusionLiveXmlElement::attr($d, 'reference'),
+                'title' => (string)FusionLiveXmlElement::attr($d, 'title'),
+                'revision' => (string)FusionLiveXmlElement::attr($d, 'revision'),
+                'status' => (string)FusionLiveXmlElement::attr($d, 'status'),
+                'version' => (string)FusionLiveXmlElement::attr($d, 'version'),
+                'is_latest' => (FusionLiveXmlElement::attr($d, 'islatest') === 'true'),
+                'has_content' => (FusionLiveXmlElement::attr($d, 'hascontent') === 'true'),
+                'has_link' => (FusionLiveXmlElement::attr($d, 'haslink') === 'true'),
+                'is_link' => (FusionLiveXmlElement::attr($d, 'islink') === 'true'),
+                'is_locked' => (FusionLiveXmlElement::attr($d, 'islocked') === 'true'),
+                'has_markup' => (FusionLiveXmlElement::attr($d, 'hasmarkup') === 'true'),
+                'size' => (int)FusionLiveXmlElement::attr($d, 'size'),
+                'company_name' => (string)FusionLiveXmlElement::attr($d, 'companyname'),
+                'uri' => (string)FusionLiveXmlElement::attr($d, 'uri'),
+                'attachments' => $attachments,
+            ];
+        }, $el->documents);
     }
 
     private function token(string $username, string $password): string
@@ -238,6 +483,7 @@ class FusionLiveProcedure extends Procedure
 
     private function post(string $endpoint, string $payload): array
     {
+        // Log::debug($payload);
         try {
             $response = Http::withBody($payload, 'text/plain;charset=UTF-8')->post("https://uk.fusion.live{$endpoint}");
         } catch (ConnectionException $e) {

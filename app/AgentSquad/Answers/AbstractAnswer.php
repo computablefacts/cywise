@@ -25,7 +25,7 @@ abstract class AbstractAnswer
 
     public function __toString()
     {
-        return ($this->success ? '[SUCCESS] ' : '[FAILURE] ') . $this->answer;
+        return $this->answer;
     }
 
     public function nextAction(): ?string

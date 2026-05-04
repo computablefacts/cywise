@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\AppConfig;
+use App\Models\Tenant;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 if (!function_exists('format_bytes')) {
@@ -304,7 +307,7 @@ if (!function_exists('cywise_levenshtein_distance')) {
             $row[0] = $i;
 
             for ($j = 1; $j <= $l1; $j++) {
-                $cost = ($s1[$j - 1] === $s2[$i - 1]) ? 0 : 1;
+                $cost = (mb_substr($s1, $j - 1, 1) === mb_substr($s2, $i - 1, 1)) ? 0 : 1;
                 $row[$j] = min(
                     $row[$j - 1] + 1, // Insertion
                     $rowPrev[$j] + 1, // Suppression
@@ -340,6 +343,11 @@ if (!function_exists('app_config_override')) {
             foreach ($settings as $keyValuePair) {
                 $key = $keyValuePair['key'];
                 $value = $keyValuePair['value'];
+
+                if (Str::startsWith($key, 'tenant_display_text.')) {
+                    continue;
+                }
+
                 if (Str::startsWith($key, 'array:')) {
                     $key = Str::chopStart($key, 'array:');
                     $value = explode(',', $value);
@@ -364,8 +372,34 @@ if (!function_exists('cywise_truncate_string')) {
         if (mb_strlen($str) <= $size) {
             return $str;
         }
-        $start = mb_substr($str, 0, 50);
-        $end = mb_substr($str, -50);
-        return $start . '[...]' . $end;
+        $ellipsis = '[...]';
+        $keep = max(0, intdiv($size - mb_strlen($ellipsis), 2));
+        $start = mb_substr($str, 0, $keep);
+        $end = mb_substr($str, -$keep);
+        return $start . $ellipsis . $end;
+    }
+}
+if (!function_exists('tenant_custom_text_key')) {
+    function tenant_custom_text_key(string $defaultText, int $tenantId): string
+    {
+        $slug = Str::of($defaultText)
+            ->slug('-')
+            ->value();
+
+        return sprintf('tenant_display_text.%d.%s', $tenantId, $slug !== '' ? $slug : 'text');
+    }
+}
+if (!function_exists('tenant_custom_text')) {
+    function tenant_custom_text(string $defaultText, ?Tenant $tenant = null): string
+    {
+        $tenant ??= Auth::user()?->tenant();
+
+        if (!$tenant?->id) {
+            return __($defaultText);
+        }
+
+        return AppConfig::query()
+            ->where('key', tenant_custom_text_key($defaultText, $tenant->id))
+            ->first()?->value ?? __($defaultText);
     }
 }

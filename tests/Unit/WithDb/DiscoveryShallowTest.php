@@ -4,7 +4,7 @@ namespace Tests\Unit\WithDb;
 
 use App\Events\CreateAsset;
 use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
-use App\Jobs\TriggerDiscoveryShallow;
+use App\Jobs\TriggerDiscovery;
 use App\Models\Asset;
 use App\Models\Tenant;
 use App\Models\User;
@@ -45,7 +45,7 @@ class DiscoveryShallowTest extends TestCaseWithDbAndSeeders
         CreateAsset::dispatch($user, 'example.com', false);
         CreateAsset::dispatch($user, 'example.com', false);
 
-        $job = (new TriggerDiscoveryShallow())->withFakeQueueInteractions();
+        $job = (new TriggerDiscovery())->withFakeQueueInteractions();
         $job->handle();
 
         $assetsOriginal = Asset::where('asset', 'example.com')->get();

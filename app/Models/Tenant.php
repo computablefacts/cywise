@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * @property int id
@@ -18,6 +20,11 @@ class Tenant extends Model
 {
     use HasFactory;
 
+    private const LOGO_DISK = 'images-s3';
+    private const LOGO_DIRECTORY = 'tenants/logos';
+    private const LOGO_EXTENSIONS = ['svg', 'png', 'webp', 'jpg', 'jpeg'];
+    private const DEFAULT_LOGO_PATH = 'cywise/img/cywise.png';
+
     protected $fillable = [
         'name',
         'deletion_scheduled_at',
@@ -30,4 +37,79 @@ class Tenant extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function logoFileBasename(): string
+    {
+        return Str::of($this->name)
+            ->ascii()
+            ->slug('-')
+            ->value();
+    }
+
+    public function logoPath(string $extension): string
+    {
+        return sprintf('%s/%s.%s', self::LOGO_DIRECTORY, $this->logoFileBasename(), $extension);
+    }
+
+    public function defaultLogoPath(): string
+    {
+        return self::DEFAULT_LOGO_PATH;
+    }
+
+    public function defaultLogoUrl(): string
+    {
+        return asset($this->defaultLogoPath());
+    }
+
+    public function hasCustomLogo(): bool
+    {
+        $path = $this->customLogoPath();
+
+        return $path !== null && $path !== $this->defaultLogoPath();
+    }
+
+    public function customLogoPath(): ?string
+    {
+        try {
+            $disk = Storage::disk(self::LOGO_DISK);
+
+            foreach (self::LOGO_EXTENSIONS as $extension) {
+                $path = $this->logoPath($extension);
+
+                if ($disk->exists($path)) {
+                    return $path;
+                }
+            }
+
+            return null;
+        } catch (\Throwable) {
+            return $this->defaultLogoPath();
+        }
+    }
+
+    public function customLogoUrl(): ?string
+    {
+        $path = $this->customLogoPath();
+
+        if ($path === null) {
+            return null;
+        }
+
+        if ($path === $this->defaultLogoPath()) {
+            return $this->defaultLogoUrl();
+        }
+
+        return Storage::disk(self::LOGO_DISK)->url($path);
+    }
+
+    public function logoUrl(): string
+    {
+        $url = $this->customLogoUrl();
+
+        if ($url !== null) {
+            return $url;
+        }
+
+        return $this->defaultLogoUrl();
+    }
 }

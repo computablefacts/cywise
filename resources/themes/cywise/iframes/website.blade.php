@@ -332,9 +332,9 @@
       <div class="ud-about-content-wrapper">
         <div class="ud-about-content">
           <span class="tag">Accompagnement IA</span>
-          <h2>CyberBuddy & CyberScribe</h2>
+          <h2>{{ tenant_custom_text('CyberBuddy') }} & CyberScribe</h2>
           <p>
-            Votre expert en cybersécurité, disponible 24/7. CyberBuddy vous guide en temps réel en s'appuyant sur des
+            Votre expert en cybersécurité, disponible 24/7. {{ tenant_custom_text('CyberBuddy') }} vous guide en temps réel en s'appuyant sur des
             bases de connaissances vérifiées (NIST, ANSSI, etc.)
           </p>
           <p>
@@ -642,7 +642,7 @@ $premiumFeatures = explode(',', $premium->features);
             <div id="collapseOne" class="accordion-collapse collapse">
               <div class="ud-faq-body">
                 Oui, Cywise vous permet d'intégrer vos propres documents (Charte Informatique, Charte IA, PSSI, etc.) à
-                CyberBuddy. Vos équipes peuvent alors poser des questions en langage naturel et obtenir des réponses
+                {{ tenant_custom_text("CyberBuddy") }}. Vos équipes peuvent alors poser des questions en langage naturel et obtenir des réponses
                 extraites directement de vos ressources internes.
               </div>
             </div>

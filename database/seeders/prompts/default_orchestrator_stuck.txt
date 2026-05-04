@@ -1,0 +1,18 @@
+After {DEPTH} attempts, the process has been paused to reassess the approach and ensure alignment with your goal.
+Use the chain-of-thought provided (between [COT] and [/COT]), the conversation history (between [HISTORY] and [/HISTORY]) and the user's input (between [INPUT] and [/INPUT]) to explain your current state to the user and ask for guidance to refine the process and achieve the goal.
+Always use the same language as the user's input.
+
+Your current chain-of-thought (between [COT] and [/COT]) to help you plan the next action to execute:
+[COT]
+{COT}
+[/COT]
+
+The conversation history (between [HISTORY] and [/HISTORY]) is:
+[HISTORY]
+{HISTORY}
+[/HISTORY]
+
+The user's input (between [INPUT] and [/INPUT]) is:
+[INPUT]
+{INPUT}
+[/INPUT]

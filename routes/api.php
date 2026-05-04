@@ -58,7 +58,7 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
     (new FreshdeskNotifiable)->notify(Notification::viaEmail(
         "<b>Fullname:</b> {$params['fullName']}<br><b>Email:</b> {$params['email']}<br><b>Phone:</b> {$params['phone']}<br><b>Message:</b> {$params['message']}",
         "{$params['email']} vous a contacté !",
-        $params['email']
+        config('towerify.freshdesk.from_email')
     ));
 
     return response()->json([
@@ -234,6 +234,7 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             \App\Http\Procedures\PromptsProcedure::class,
             \App\Http\Procedures\RapidApiProcedure::class,
             \App\Http\Procedures\RemoteActionsProcedure::class,
+            \App\Http\Procedures\ReportingProcedure::class,
             \App\Http\Procedures\OsqueryRulesProcedure::class,
             \App\Http\Procedures\OssecRulesProcedure::class,
             \App\Http\Procedures\RolesProcedure::class,

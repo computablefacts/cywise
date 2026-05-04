@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\SimpleEmail;
 use App\Models\User;
+use App\Notifications\Notifiables\AbstractNotifiable;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -11,8 +12,13 @@ use Illuminate\Support\Str;
 
 class MessagingService
 {
-    public function sendMailCoach(User $user, string $subject, string $title, string $content, ?string $template = null, array $data = [], ?string $from = null): bool
+    public function sendMailCoach(User|AbstractNotifiable $user, string $subject, string $title, string $content, ?string $template = null, array $data = [], ?string $from = null): bool
     {
+        if ($user instanceof User) {
+            $email = $user->email;
+        } else {
+            $email = $user->routeNotificationForMail();
+        }
         try {
             if ($template === 'honeypot-requested') {
                 $mailable = new \App\Mail\HoneypotRequested(
@@ -20,16 +26,16 @@ class MessagingService
                     \App\Enums\HoneypotCloudSensorsEnum::from($data['cloud_sensor']),
                     \App\Enums\HoneypotCloudProvidersEnum::from($data['cloud_provider']),
                     $data['dns'],
-                    $user->email
+                    $email
                 );
             } elseif ($template === 'performa-requested') {
-                $mailable = new \App\Mail\PerformaRequested($data['id'], $user->email);
+                $mailable = new \App\Mail\PerformaRequested($data['id'], $email);
             } else {
                 $mailable = new SimpleEmail($subject, $title, $content, $from);
             }
 
             Mail::mailer()
-                ->to($user->email)
+                ->to($email)
                 ->send($mailable);
 
             return true;

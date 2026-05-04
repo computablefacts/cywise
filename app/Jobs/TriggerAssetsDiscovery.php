@@ -3,8 +3,7 @@
 namespace App\Jobs;
 
 use App\Enums\AssetTypesEnum;
-use App\Events\CreateAsset;
-use App\Helpers\VulnerabilityScannerApiUtilsFacade as ApiUtils;
+use App\Events\AssetsDiscovery;
 use App\Models\Asset;
 use App\Models\Tenant;
 use App\Models\User;
@@ -13,9 +12,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Str;
 
-class TriggerDiscoveryShallow implements ShouldQueue
+class TriggerAssetsDiscovery implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -43,22 +41,7 @@ class TriggerDiscoveryShallow implements ShouldQueue
                     ->map(fn(Asset $asset) => $asset->tld())
                     ->filter(fn(?string $tld) => !empty($tld))
                     ->unique()
-                    ->each(function (string $tld) use ($user) {
-
-                        $discovered = $this->discover($tld);
-
-                        if (($response['fallback'] ?? false) === true && !empty($discovered['subdomains'])) {
-                            collect($discovered['subdomains'])
-                                ->filter(fn(?string $domain) => !empty($domain))
-                                ->filter(fn(string $domain) => $user->email === config('towerify.admin.email') || !Str::endsWith($domain, ['computablefacts.com', 'computablefacts.io', 'towerify.io', 'cywise.io']))
-                                ->each(fn(string $domain) => CreateAsset::dispatch($user, $domain, true));
-                        }
-                    });
+                    ->each(fn(string $tld) => AssetsDiscovery::dispatch($user, $tld));
             });
-    }
-
-    private function discover(string $tld): array
-    {
-        return ApiUtils::discover_public($tld);
     }
 }

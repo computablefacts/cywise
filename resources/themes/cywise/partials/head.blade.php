@@ -38,8 +38,13 @@
     @endif
 @endif
 
-<meta name="robots" content="index,follow">
-<meta name="googlebot" content="index,follow">
+@php
+    $robots = (url('/') === 'https://www.cywise.io') ? 'index,follow' : 'noindex,nofollow';
+    $canonical = preg_replace('/^http[s]?:\/\/(?:.*?)\.?cywise\.io/i', 'https://www.cywise.io', Request::fullUrl());
+@endphp
+<meta name="robots" content="{{ $robots }}">
+<meta name="googlebot" content="{{ $robots }}">
+<link rel="canonical" href="{{ $canonical }}">
 
 @if(isset($seo->description))
     <meta name="description" content="{{ $seo->description }}">

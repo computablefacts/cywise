@@ -55,6 +55,8 @@ class Scan extends Model
         // - The scan is no more attached to an asset
         // - The ports scan has not completed after x days
         // - The vulns scan has not completed after x days
+        // - The ports scan completed but the vulns scan never started
+        // - The scan completed but cur_scan_id has not been updated with next_scan_id
         DB::update("
             DELETE
             FROM am_scans
@@ -72,13 +74,27 @@ class Scan extends Model
               AND vulns_scan_ends_at IS NULL  
               AND vulns_scan_begins_at IS NOT NULL
               AND vulns_scan_begins_at < '{$minDate->format('Y-m-d')}'
+            ) OR (
+              ports_scan_id IN (SELECT next_scan_id FROM am_assets WHERE next_scan_id IS NOT NULL)
+              AND ports_scan_begins_at IS NOT NULL
+              AND ports_scan_ends_at IS NOT NULL
+              AND vulns_scan_begins_at IS NULL
+              AND vulns_scan_ends_at IS NULL
+              AND ports_scan_ends_at < '{$minDate->format('Y-m-d')}'
+            ) OR (
+              ports_scan_id IN (SELECT next_scan_id FROM am_assets WHERE next_scan_id IS NOT NULL)
+              AND ports_scan_begins_at IS NOT NULL
+              AND ports_scan_ends_at IS NOT NULL
+              AND vulns_scan_begins_at IS NOT NULL
+              AND vulns_scan_ends_at IS NOT NULL
+              AND vulns_scan_ends_at < '{$minDate->format('Y-m-d')}'
             )
         ");
     }
 
     public function asset(): BelongsTo
     {
-        return $this->belongsTo(Asset::class);
+        return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
 
     public function port(): HasOne

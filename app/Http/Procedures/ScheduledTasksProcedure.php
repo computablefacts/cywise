@@ -24,25 +24,25 @@ class ScheduledTasksProcedure extends Procedure
             "if the request is 'list my scheduled tasks', the input should be {}",
         ],
         ai_result: "
-            @php
-                \$tasks = collect(\$result['tasks'] ?? [])->map(fn(array \$task) => (new \App\Models\ScheduledTask())->forceFill(\$task));
-            @endphp
-            @if(\$tasks->isEmpty())
-                No scheduled tasks found.
-            @else
-                Below is the list of your scheduled tasks:
-                @foreach(\$tasks as \$task)
-                @if(empty(\$task->trigger))
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}). @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
-                @else
-                @if(\$task->cron === '* * * * *')
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}. @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
-                @else
-                - {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }} ({{ \$task->readableCron() }}). @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
-                @endif
-                @endif
-                @endforeach
-            @endif
+@php
+\$tasks = collect(\$result['tasks'] ?? [])->map(fn(array \$task) => (new \App\Models\ScheduledTask())->forceFill(\$task));
+@endphp
+@if(\$tasks->isEmpty())
+No scheduled tasks found.
+@else
+Below is the list of your scheduled tasks:
+@foreach(\$tasks as \$task)
+@if(empty(\$task->trigger))
+- {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} ({{ \$task->readableCron() }}). @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
+@else
+@if(\$task->cron === '* * * * *')
+- {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }}. @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
+@else
+- {{ \$task->id }}. {{ \$task->name }}: {{ \$task->task }} when {{ \$task->trigger }} ({{ \$task->readableCron() }}). @if(!empty(\$task->last_email_sent_at))The last notification has been sent at {{ \$task->last_email_sent_at }}.@endif
+@endif
+@endif
+@endforeach
+@endif
         ",
     )]
     public function list(JsonRpcRequest $request): array
@@ -73,6 +73,7 @@ class ScheduledTasksProcedure extends Procedure
             "if the request is 'send me in 3 days the list of assets with vulnerabilities', the input should be '{\"schedule\":\"+3 days\",\"task\":\"List assets with vulnerabilities.\",\"run_once\":true}'",
             "if the request is 'préviens-moi si www.example.com devient vulnérable', the input should be '{\"cron\":\"* * * * *\",\"trigger\":\"Le site www.example.com est-il vulnérable ?\",\"task\":\"Liste les vulnérabilités de www.example.com\"}'",
             "if the request is 'envoie-moi un email tous les matins à 9h si www.example.com est vulnérable', the input should be '{\"cron\":\"0 9 * * *\",\"trigger\":\"Le site www.example.com est-il vulnérable ?\",\"task\":\"Liste les vulnérabilités de www.example.com\"}'",
+            "if the request is 'envoie-moi dans 1h un export de mes vulnérabilités critiques', the input should be '{\"schedule\":\"+1 hour\",\"task\":\"Exporte mes vulnérabilités critiques.\",\"run_once\":true}'",
         ],
         ai_result: "{{ \$result['msg'] }}",
     )]

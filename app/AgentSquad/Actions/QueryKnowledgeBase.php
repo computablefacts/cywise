@@ -19,7 +19,6 @@ use App\Models\File;
 use App\Models\User;
 use App\Rules\IsValidCollectionName;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class QueryKnowledgeBase extends AbstractAction
@@ -65,6 +64,7 @@ class QueryKnowledgeBase extends AbstractAction
 
         // Reformulate question in both english and french
         $result = TextAssistant::use()
+            ->withThreadId($threadId)
             ->withTimeout(30 * 60)
             ->withMessagesAndPrompt($messages, 'default_reformulate_question', [
                 'QUESTION' => htmlspecialchars($input, ENT_QUOTES, 'UTF-8'),
@@ -99,9 +99,9 @@ class QueryKnowledgeBase extends AbstractAction
                 ->embedding();
 
             if (!empty($embedding)) {
-                $start = microtime(true);
                 $dir = FileVectorStore::unpack("anssi.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
+                $anssi = array_values(array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
                 $anssi = array_map(function (array $vector, int $index) {
                     /** @var Vector $vec */
                     $vec = $vector['vector'];
@@ -109,10 +109,7 @@ class QueryKnowledgeBase extends AbstractAction
                     $answer = preg_replace('/#+/', '', $vec->metadata('answer'));
                     $similarity = $vector['similarity'];
                     return "## Memo A{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** ANSSI\n**Score:** {$similarity}";
-                }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
-                $stop = microtime(true);
-                $nbResults = count($anssi);
-                Log::debug("[ANSSI] Searching ANSSI's dataset took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+                }, $anssi, array_keys($anssi));
             }
         }
 
@@ -127,9 +124,9 @@ class QueryKnowledgeBase extends AbstractAction
                 ->embedding();
 
             if (!empty($embedding)) {
-                $start = microtime(true);
                 $dir = FileVectorStore::unpack("rowden_cybersecurityqaa.zip");
                 $vectorStore = new FileVectorStore($dir, 5);
+                $rowden = array_values(array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
                 $rowden = array_map(function (array $vector, int $index) {
                     /** @var Vector $vec */
                     $vec = $vector['vector'];
@@ -139,10 +136,7 @@ class QueryKnowledgeBase extends AbstractAction
                     $source = empty($source) ? 'n/a' : $source;
                     $similarity = $vector['similarity'];
                     return "## Memo R{$index}\n\n**Question:** {$question}\n**Answer:** {$answer}\n**Source:** {$source}\n**Score:** {$similarity}";
-                }, array_filter($vectorStore->search($embedding), fn(array $vector) => $vector['similarity'] > 0.6));
-                $stop = microtime(true);
-                $nbResults = count($rowden);
-                Log::debug("[ROWDEN_QAA] Searching Rowden's Cybersecurity QAA took " . ((int)ceil($stop - $start)) . " seconds and returned {$nbResults} results");
+                }, $rowden, array_keys($rowden));
             }
         }
 
@@ -153,23 +147,26 @@ class QueryKnowledgeBase extends AbstractAction
                 ->withUser($user)
                 ->provide() :
             '';
-        $chunks = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
+        $result = $this->loadChunks($user, $json['question_en'] ?? '', $json['question_fr'] ?? '', $json['keywords_en'] ?? [], $json['keywords_fr'] ?? [], $collection);
+        $question = $json['lang'] === 'english' ?
+            $json['question_en'] :
+            ($json['lang'] === 'french' ? $json['question_fr'] : $input);
         $answer = TextAssistant::use()
+            ->withThreadId($threadId)
             ->withMessagesAndPrompt($messages, 'default_answer_question', [
                 'LANGUAGE' => $json['lang'],
-                'NOTES' => $chunks,
+                'NOTES' => $result['chunks'],
                 'MEMOS' => $memos . "\n\n" . implode("\n\n", $anssi) . "\n\n" . implode("\n\n", $rowden),
-                'QUESTION' => $json['lang'] === 'english' ?
-                    $json['question_en'] :
-                    ($json['lang'] === 'french' ? $json['question_fr'] : $input),
+                'QUESTION' => $question,
             ])
             ->text();
 
-        return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))), [], !empty($answer));
+        return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))));
     }
 
-    private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): string
+    private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): array
     {
+        $result = [];
         $start = microtime(true);
 
         $chunksEn = ChunksProvider::use()
@@ -181,7 +178,10 @@ class QueryKnowledgeBase extends AbstractAction
             ->provide();
 
         $stop = microtime(true);
-        Log::debug("[LOAD_CHUNKS] Search for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunksEn->count()} results");
+        $result['chunks_en'] = [
+            'count' => $chunksEn->count(),
+            'elapsed_time_in_seconds' => (int)ceil($stop - $start),
+        ];
         $start = microtime(true);
 
         $chunksFr = ChunksProvider::use()
@@ -193,7 +193,10 @@ class QueryKnowledgeBase extends AbstractAction
             ->provide();
 
         $stop = microtime(true);
-        Log::debug("[LOAD_CHUNKS] Search for '{$questionFr}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunksFr->count()} results");
+        $result['chunks_fr'] = [
+            'count' => $chunksFr->count(),
+            'elapsed_time_in_seconds' => (int)ceil($stop - $start),
+        ];
         $start = microtime(true);
 
         $chunks = $chunksEn
@@ -219,8 +222,13 @@ class QueryKnowledgeBase extends AbstractAction
             });
 
         $stop = microtime(true);
-        Log::debug("[LOAD_CHUNKS] Loading chunks for '{$questionEn}' took " . ((int)ceil($stop - $start)) . " seconds and returned {$chunks->count()} results");
-        return $chunks->join("\n\n");
+        $result['chunks_merged'] = [
+            'count' => $chunks->count(),
+            'elapsed_time_in_seconds' => (int)ceil($stop - $start),
+        ];
+        $result['chunks'] = $chunks->join("\n\n");
+
+        return $result;
     }
 
     private function englishCollections(?string $collection = null): Collection
@@ -254,6 +262,10 @@ class QueryKnowledgeBase extends AbstractAction
     private function enhanceWithSources(string $answer): string
     {
         $matches = [];
+        // Remove [[Memo ...]]
+        $answer = preg_replace('/\[\[Memo\s+.*?]]/i', '', $answer);
+        // Replace [[Note 1234]] by [[1234]]
+        $answer = preg_replace('/\[\[Note\s+/i', '[[', $answer);
         // Extract: [12] from [[12]] or [[12] and [13]] from [[12],[13]]
         $isOk = preg_match_all("/\[\[\d+]]|\[\[\d+]|\[\d+]]/", $answer, $matches);
         if (!$isOk) {

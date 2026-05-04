@@ -77,12 +77,22 @@ class Chunk extends Model
                 $text .= ($line . "\n");
             }
         }
-        return [
-            'section' => $lang . ":" . $section,
-            'subsection' => $lang . ":" . $subsection,
-            'subsubsection' => $lang . ":" . $subsubsection,
-            'text' => $lang . ":" . $text,
-        ];
+
+        $data = [];
+
+        if (!empty($section)) {
+            $data['section'] = $lang . ":" . $section;
+        }
+        if (!empty($subsection)) {
+            $data['subsection'] = $lang . ":" . $subsection;
+        }
+        if (!empty($subsubsection)) {
+            $data['subsubsection'] = $lang . ":" . $subsubsection;
+        }
+        if (!empty($text)) {
+            $data['text'] = $lang . ":" . $text;
+        }
+        return $data;
     }
 
     public function shouldBeSearchable(): bool

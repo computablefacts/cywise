@@ -55,35 +55,37 @@ class VulnerabilitiesProcedure extends Procedure
             "if the request is 'quelles sont les vulnérabilités de criticité moyenne du serveur 192.168.1.1 ?', the input should be '{\"asset\":\"192.168.1.1\",\"level\":\"medium\"}'",
         ],
         ai_result: "
-            @foreach(\$result as \$key => \$value)
-            @if(!empty(\$value))
-            @php
-            \$alerts = collect(\$value ?? [])->map(fn(array \$event) => (new \App\Models\Alert())->forceFill(\$event));
-            @endphp
-            # Vulnerabilities of {{ \$key }} severity
-            @foreach(\$alerts as \$alert)
-            @php
-            if (empty(\$alert->cve_id)) {
-               \$cve = '';
-            } else {
-               \$cve = '**Note.** Cette vulnérabilité a pour identifiant [' . \$alert->cve_id . '](https://nvd.nist.gov/vuln/detail/' . \$alert->cve_id . ').';
-            }
-            \$vulnerability = \$alert->translated('vulnerability');
-            \$remediation = \$alert->translated('remediation');
-            @endphp
-            ## {{ \$alert->title }}
-            
-            **Actif concerné.** L'actif concerné est {{ \$alert->asset()?->asset }} pointant vers le serveur {{ \$alert->port?->ip }}. Le port {{ \$alert->port?->port }} de ce serveur est ouvert et expose un service {{ \$alert->port?->service }} ({{ \$alert->port?->product }}).
-            
-            **Description détaillée.** {{ \$vulnerability }}
-            
-            **Remédiation.** {{ \$remediation }}
-            
-            {{ \$cve }}
-            
-            @endforeach
-            @endif
-            @endforeach
+@foreach(\$result as \$key => \$value)
+@if(empty(\$value))
+There are no vulnerabilities of {{ \$key }} severity.
+@else
+@php
+\$alerts = collect(\$value ?? [])->map(fn(array \$event) => (new \App\Models\Alert())->forceFill(\$event));
+@endphp
+# Vulnerabilities of {{ \$key }} severity
+@foreach(\$alerts as \$alert)
+@php
+if (empty(\$alert->cve_id)) {
+   \$cve = '';
+} else {
+   \$cve = '**Note.** Cette vulnérabilité a pour identifiant [' . \$alert->cve_id . '](https://nvd.nist.gov/vuln/detail/' . \$alert->cve_id . ').';
+}
+\$vulnerability = \$alert->translated('vulnerability');
+\$remediation = \$alert->translated('remediation');
+@endphp
+## {{ \$alert->title }}
+
+**Actif concerné.** L'actif concerné est {{ \$alert->asset()?->asset }} pointant vers le serveur {{ \$alert->port?->ip }}. Le port {{ \$alert->port?->port }} de ce serveur est ouvert et expose un service {{ \$alert->port?->service }} ({{ \$alert->port?->product }}).
+
+**Description détaillée.** {{ \$vulnerability }}
+
+**Remédiation.** {{ \$remediation }}
+
+{{ \$cve }}
+
+@endforeach
+@endif
+@endforeach
         ",
     )]
     public function list(JsonRpcRequest $request): array
@@ -99,6 +101,7 @@ class VulnerabilitiesProcedure extends Procedure
             'port_tags.*' => 'string',
         ]);
 
+        $asset = $params['asset'] ?? null;
         $assetId = $params['asset_id'] ?? null;
         $tld = $params['tld'] ?? null;
         $tags = $params['tags'] ?? null;
@@ -106,6 +109,7 @@ class VulnerabilitiesProcedure extends Procedure
         $alerts = Asset::query()
             ->where('is_monitored', true)
             ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
+            ->when($asset, fn($query, $assetId) => $query->where('asset', $assetId))
             ->when($tld, fn($query, $domain) => $query->where('tld', $tld))
             ->when($tags, fn($query, $domain) => $query
                 ->join('am_assets_tags', 'am_assets_tags.asset_id', '=', 'am_assets.id')
@@ -126,7 +130,10 @@ class VulnerabilitiesProcedure extends Procedure
                     $query->join('am_ports_tags', 'am_ports_tags.port_id', '=', 'alerts_dedup.port_id')
                         ->whereIn('am_ports_tags.tag', $portTags);
                 }
-                return $query->distinct()->get();
+                return $query->distinct()->get()->map(function (Alert $alert) use ($asset) {
+                    $alert->asset = $asset->asset;
+                    return $alert;
+                });
             })
             ->filter(fn(Alert $alert) => $alert->is_hidden === 0);
 

@@ -1,5 +1,5 @@
 <!-- Section 1 -->
-<footer class="pt-10 hidden md:block">
+<footer class="hidden md:block border-t border-solid border-gray-200/60">
   <x-container>
     <!--
     @if(!Request::is('/'))
@@ -104,7 +104,7 @@
     </div>
     @endif
     -->
-    <div class="flex flex-col items-center justify-between py-10 border-t border-solid lg:flex-row border-gray">
+    <div class="flex flex-col items-center justify-between py-10 lg:flex-row">
       <ul class="flex flex-wrap space-x-5 text-xs">
         <li class="mb-6 text-center flex-full lg:flex-none lg:mb-0">&copy; {{ date('Y') }} {{ setting('site.title') }}
         </li>

@@ -180,30 +180,36 @@ test('truncate string equal to limit', function () {
 
 test('truncate string longer than limit', function () {
 
-    $start = str_repeat('a', 50);
-    $middle = str_repeat('b', 10);
-    $end = str_repeat('c', 50);
+    $start = str_repeat('a', 47);
+    $middle = str_repeat('b', 16);
+    $end = str_repeat('c', 47);
     $str = $start . $middle . $end;
 
     // Total length is 110, limit is 100
+    // (100 - 5) / 2 = 47.5 -> 47
     $expected = $start . '[...]' . $end;
     expect(cywise_truncate_string($str, 100))->toEqual($expected);
 });
 
 test('truncate string with default limit (500)', function () {
     $str = str_repeat('a', 501);
-    $expected = str_repeat('a', 50) . '[...]' . str_repeat('a', 50);
+    // (500 - 5) / 2 = 247.5 -> 247
+    $expected = str_repeat('a', 247) . '[...]' . str_repeat('a', 247);
     expect(cywise_truncate_string($str))->toEqual($expected);
 });
 
 test('truncate string with multibyte characters', function () {
 
-    $start = str_repeat('é', 50);
-    $middle = '🚀';
-    $end = str_repeat('à', 50);
+    $start = str_repeat('é', 47);
+    $middle = '🚀🚀🚀🚀';
+    $end = str_repeat('à', 47);
     $str = $start . $middle . $end;
 
+    // Total mb_length is 47+4+47 = 98. Oh wait, test was 101.
+    $str = $start . '🚀🚀🚀🚀🚀🚀🚀' . $end; // 47+7+47 = 101
+
     // Total mb_length is 101, limit is 100
+    // (100 - 5) / 2 = 47
     $expected = $start . '[...]' . $end;
     expect(cywise_truncate_string($str, 100))->toEqual($expected);
 });
@@ -213,9 +219,9 @@ test('truncate string with very short string but limit smaller than 100', functi
     $str = "This is a string that is longer than ten characters."; // 52 chars
     $limit = 10;
 
-    // Since length (52) > limit (10), it will take first 50 and last 50.
-    $start = mb_substr($str, 0, 50);
-    $end = mb_substr($str, -50);
+    // (10 - 5) / 2 = 2
+    $start = mb_substr($str, 0, 2);
+    $end = mb_substr($str, -2);
     $expected = $start . '[...]' . $end;
 
     expect(cywise_truncate_string($str, $limit))->toEqual($expected);

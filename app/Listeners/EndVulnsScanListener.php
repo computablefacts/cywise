@@ -14,6 +14,7 @@ use App\Models\Trial;
 use App\Models\User;
 use App\Notifications\Notification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -130,7 +131,7 @@ class EndVulnsScanListener extends AbstractListener
         $ssl = $task['ssl'] ?? null;
 
         /** @var Port $port */
-        $port = $scan->port()->first();
+        $port = $scan->port;
         $port->service = $service;
         $port->product = $product;
         $port->ssl = $ssl ? 1 : 0;
@@ -141,6 +142,8 @@ class EndVulnsScanListener extends AbstractListener
             $port->tags()->create(['tag' => Str::lower($label)]);
         });
 
+        Auth::logout();
+
         $this->setAlerts($port, $task);
         $this->setScreenshot($port, $task);
         $this->markScanAsCompleted($scan);
@@ -148,15 +151,18 @@ class EndVulnsScanListener extends AbstractListener
 
     private function setAlerts(Port $port, array $task): void
     {
+        /** @var Asset $asset */
+        $asset = $port->scan->asset;
         /** @var User $user */
-        $user = $port->scan->asset->createdBy;
+        $user = $asset->createdBy;
+        $users = User::where('tenant_id', $user->tenant_id)->get();
         $user->actAs(); // Because we need to access the user's prompts through PromptsProcedure
 
         collect($task['data'] ?? [])
             ->filter(fn(array $data) => isset($data['alerts']) && count($data['alerts']))
             ->flatMap(fn(array $data) => $data['alerts'])
             ->filter(fn(array|string $alert) => is_array($alert))
-            ->each(function (array $alert) use ($port) {
+            ->each(function (array $alert) use ($port, $asset, $users) {
                 try {
                     $type = trim($alert['type']);
 
@@ -173,8 +179,7 @@ class EndVulnsScanListener extends AbstractListener
                     $cve_vendor = empty($alert['cve_vendor']) ? null : $alert['cve_vendor'];
                     $cve_product = empty($alert['cve_product']) ? null : $alert['cve_product'];
                     $title = trim($alert['title'] ?? '');
-                    $aiRemediationResult = $this->generateAiRemediation($port, $alert);
-                    $aiRemediation = $aiRemediationResult['content'];
+                    $aiRemediation = $this->generateAiRemediation($port, $alert);
 
                     /** @var Alert $a */
                     $a = Alert::updateOrCreate([
@@ -185,8 +190,8 @@ class EndVulnsScanListener extends AbstractListener
                         'type' => $type,
                         'vulnerability' => $vulnerability,
                         'remediation' => $remediation,
-                        'ai_remediation' => $aiRemediation,
-                        'false_positive' => $aiRemediationResult['is_false_positive'],
+                        'ai_remediation' => $aiRemediation['content'],
+                        'false_positive' => $aiRemediation['is_false_positive'],
                         'level' => $level,
                         'uid' => $uid,
                         'cve_id' => $cve_id,
@@ -203,18 +208,16 @@ class EndVulnsScanListener extends AbstractListener
                     $a->translated('remediation');
 
                     if ($a->isHigh()) {
-
-                        /** @var Asset $asset */
-                        $asset = $port->scan->asset;
-                        $users = User::where('tenant_id', $asset->createdBy->tenant_id)->get();
-
                         foreach ($users as $u) {
-                            $u->notify(new Notification("{$asset->asset} ({$port->ip}) - {$a->translated('title')}"));
+                            if ($asset->asset === $port->ip) {
+                                $u->notify(new Notification("{$port->ip}:{$port->port} - {$a->translated('title')} - {$a->translated('vulnerability')}"));
+                            } else {
+                                $u->notify(new Notification("{$asset->asset} ({$port->ip}:{$port->port}) - {$a->translated('title')} - {$a->translated('vulnerability')}"));
+                            }
                         }
                     }
                 } catch (\Exception $exception) {
                     Log::error($exception);
-                    Log::error($alert);
                 }
             });
     }
@@ -541,7 +544,10 @@ class EndVulnsScanListener extends AbstractListener
         }
 
         $timeout = ($type === 'explanation') ? 120 : 60;
-        $response = LlmsProvider::provide(PromptsProvider::provide($template, $vars), null, $timeout);
+        $response = TextAssistant::use()
+            ->withTimeout($timeout)
+            ->withPrompt($template, $vars)
+            ->text();
 
         if ($type === 'explanation' && $this->isFalsePositiveExplanation($response)) {
             $detectedFalsePositive = true;

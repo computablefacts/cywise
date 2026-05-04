@@ -5,6 +5,7 @@ namespace App\Http\Procedures;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Collection;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -25,15 +26,14 @@ class CollectionsProcedure extends Procedure
     public function update(JsonRpcRequest $request): array
     {
         $params = $request->validate([
-            'collection_id' => 'required|integer|exists:cb_prompts,id',
+            'collection_id' => 'required|integer|exists:cb_collections,id',
             'priority' => 'required|integer|min:0',
         ]);
 
         /** @var User $user */
         $user = $request->user();
         /** @var Collection $collection */
-        $collection = Collection::query()
-            ->where('created_by', $user->id)
+        $collection = $this->accessibleCollectionsQuery($user)
             ->where('id', '=', $params['collection_id'])
             ->first();
 
@@ -67,8 +67,7 @@ class CollectionsProcedure extends Procedure
         /** @var User $user */
         $user = $request->user();
         /** @var Collection $collection */
-        $collection = Collection::query()
-            ->where('created_by', $user->id)
+        $collection = $this->accessibleCollectionsQuery($user)
             ->where('id', '=', $params['collection_id'])
             ->first();
 
@@ -85,7 +84,7 @@ class CollectionsProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "List all collections that belong to the current user.",
+        description: "List all collections visible to the current tenant user.",
         params: [
             'page' => 'The page number (optional, default 1).',
             'page_size' => 'The page size (optional, default 25).',
@@ -108,14 +107,9 @@ class CollectionsProcedure extends Procedure
 
         /** @var User $user */
         $user = $request->user();
-        $nbPages = ceil(Collection::query()->where('created_by', $user->id)->count() / $pageSize);
-        $collections = \App\Models\Collection::query()
-            ->where('created_by', $user->id)
-            ->where('is_deleted', false)
-            ->where(function ($query) use ($user) {
-                $query->where('name', "privcol{$user->id}")
-                    ->orWhere('name', 'not like', "privcol%");
-            })
+        $query = $this->accessibleCollectionsQuery($user);
+        $nbPages = (int) ceil((clone $query)->count() / $pageSize);
+        $collections = $query
             ->orderBy('priority')
             ->orderBy('name')
             ->forPage($page <= 0 ? 1 : $page, $pageSize <= 0 ? 25 : $pageSize)
@@ -127,5 +121,15 @@ class CollectionsProcedure extends Procedure
             "nb_pages" => $nbPages,
             "collections" => $collections,
         ];
+    }
+
+    private function accessibleCollectionsQuery(User $user): Builder
+    {
+        return Collection::query()
+            ->where('is_deleted', false)
+            ->where(function (Builder $query) use ($user) {
+                $query->where('name', "privcol{$user->id}")
+                    ->orWhere('name', 'not like', "privcol%");
+            });
     }
 }

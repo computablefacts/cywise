@@ -5,6 +5,7 @@ namespace App\Http\Procedures;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Chunk;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Sajya\Server\Attributes\RpcMethod;
 use Sajya\Server\Procedure;
 
@@ -30,9 +31,8 @@ class ChunksProcedure extends Procedure
         /** @var User $user */
         $user = $request->user();
         /** @var Chunk $chunk */
-        $chunk = Chunk::query()
-            ->where('created_by', $user->id)
-            ->where('id', '=', $params['chunk_id'])
+        $chunk = $this->accessibleChunksQuery($user)
+            ->where('cb_chunks.id', '=', $params['chunk_id'])
             ->first();
 
         if (!isset($chunk)) {
@@ -67,9 +67,8 @@ class ChunksProcedure extends Procedure
         /** @var User $user */
         $user = $request->user();
         /** @var Chunk $chunk */
-        $chunk = Chunk::query()
-            ->where('created_by', $user->id)
-            ->where('id', '=', $params['chunk_id'])
+        $chunk = $this->accessibleChunksQuery($user)
+            ->where('cb_chunks.id', '=', $params['chunk_id'])
             ->first();
 
         if (!isset($chunk)) {
@@ -92,7 +91,7 @@ class ChunksProcedure extends Procedure
     }
 
     #[RpcMethod(
-        description: "List all chunks that belong to the current user.",
+        description: "List all chunks visible to the current tenant user.",
         params: [
             'page' => 'The page number (optional, default 1).',
             'page_size' => 'The page size (optional, default 25).',
@@ -123,21 +122,7 @@ class ChunksProcedure extends Procedure
 
         /** @var User $user */
         $user = $request->user();
-        $query = \App\Models\Chunk::select('cb_chunks.*')
-            ->join('cb_collections', 'cb_collections.id', 'cb_chunks.collection_id')
-            ->join('cb_files', 'cb_files.id', 'cb_chunks.file_id')
-            ->where('cb_chunks.created_by', $user->id)
-            ->where('cb_chunks.is_deleted', false)
-            ->where('cb_collections.is_deleted', false)
-            ->where(function ($query) use ($user) {
-                $query->where('cb_collections.name', "privcol{$user->id}")
-                    ->orWhere('cb_collections.name', 'not like', "privcol%");
-            })
-            ->orderBy('cb_collections.name')
-            ->orderBy('cb_files.name')
-            ->orderBy('cb_chunks.page')
-            ->orderBy('cb_chunks.id')
-            ->forPage($page <= 0 ? 1 : $page, $pageSize <= 0 ? 25 : $pageSize);
+        $query = $this->accessibleChunksQuery($user);
 
         if (!empty($collection)) {
             $query->where('cb_collections.name', $collection);
@@ -146,8 +131,14 @@ class ChunksProcedure extends Procedure
             $query->where('cb_files.name_normalized', $file);
         }
 
-        $nbPages = ceil($query->count() / $pageSize);
-        $chunks = $query->get();
+        $nbPages = (int) ceil((clone $query)->count() / $pageSize);
+        $chunks = $query
+            ->orderBy('cb_collections.name')
+            ->orderBy('cb_files.name')
+            ->orderBy('cb_chunks.page')
+            ->orderBy('cb_chunks.id')
+            ->forPage($page <= 0 ? 1 : $page, $pageSize <= 0 ? 25 : $pageSize)
+            ->get();
 
         return [
             "page" => $page,
@@ -157,5 +148,19 @@ class ChunksProcedure extends Procedure
             "file" => $file,
             "chunks" => $chunks,
         ];
+    }
+
+    private function accessibleChunksQuery(User $user): Builder
+    {
+        return Chunk::query()
+            ->select('cb_chunks.*')
+            ->join('cb_collections', 'cb_collections.id', 'cb_chunks.collection_id')
+            ->join('cb_files', 'cb_files.id', 'cb_chunks.file_id')
+            ->where('cb_chunks.is_deleted', false)
+            ->where('cb_collections.is_deleted', false)
+            ->where(function (Builder $query) use ($user) {
+                $query->where('cb_collections.name', "privcol{$user->id}")
+                    ->orWhere('cb_collections.name', 'not like', "privcol%");
+            });
     }
 }

@@ -25,28 +25,30 @@
       </span>
     </div>
     <div class="d-flex align-items-center flex-wrap" style="gap:10px;">
-      @if(!$asset->is_monitored)
-      <button class="show-replies" title="{{ __('Start Monitoring') }}"
+      <button id="start-monitoring-{{ $asset->id }}" class="show-replies {{ $asset->is_monitored ? 'd-none' : '' }}"
+              title="{{ __('Start Monitoring') }}"
               onclick="startMonitoringAsset('{{ $asset->id }}')">
         <span class="bp4-icon bp4-icon-play"></span>
       </button>
-      <button class="show-replies" title="{{ __('Delete') }}" onclick="deleteAsset('{{ $asset->id }}')">
-        <span class="bp4-icon bp4-icon-trash"></span>
-      </button>
-      @else
-      <button class="show-replies" title="{{ __('Stop Monitoring') }}"
+      <button id="stop-monitoring-{{ $asset->id }}" class="show-replies {{ $asset->is_monitored ? '' : 'd-none' }}"
+              title="{{ __('Stop Monitoring') }}"
               onclick="stopMonitoringAsset('{{ $asset->id }}')">
         <span class="bp4-icon bp4-icon-symbol-square"></span>
       </button>
-      <button class="show-replies" title="{{ __('Restart Scan') }}"
+      <button id="restart-scan-{{ $asset->id }}" class="show-replies {{ $asset->is_monitored ? '' : 'd-none' }}"
+              title="{{ __('Restart Scan') }}"
               onclick="restartScan('{{ $asset->id }}')">
         <span class="bp4-icon bp4-icon-repeat"></span>
       </button>
-      <button class="show-replies" title="{{ __('Partager') }}"
+      <button id="delete-asset-{{ $asset->id }}" class="show-replies {{ $asset->is_monitored ? 'd-none' : '' }}"
+              title="{{ __('Delete') }}"
+              onclick="deleteAsset('{{ $asset->id }}')">
+        <span class="bp4-icon bp4-icon-trash"></span>
+      </button>
+      <button id="share-asset-{{ $asset->id }}" class="show-replies" title="{{ __('Partager') }}"
               onclick="openShareModal('asset','{{ $asset->id }}')">
         <span class="bp4-icon bp4-icon-follower"></span>
       </button>
-      @endif
       <div class="d-flex align-items-center" style="gap:6px;margin-top:16px;">
         @php( $tags = $asset->tags()->orderBy('tag')->get() )
         <div id="tags-{{ $asset->id }}">

@@ -1,6 +1,14 @@
 User-agent: *
 Disallow: /cyber-check
 Disallow: /cyber-advisor
+Disallow: /the-cyber-brief
+Disallow: /check-health
+Disallow: /example-page
 Disallow: /auth/register
 Disallow: /auth/login
 Disallow: /admin
+Disallow: /pricing
+Disallow: /billing
+Disallow: /login
+Disallow: /register
+Sitemap: https://www.cywise.io/sitemap.xml

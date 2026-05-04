@@ -3,6 +3,7 @@
 namespace App\Notifications\Channels;
 
 use App\Models\User;
+use App\Notifications\Notifiables\AbstractNotifiable;
 use App\Services\MessagingService;
 use Illuminate\Notifications\Notification;
 
@@ -12,7 +13,7 @@ class MailCoachChannel
     {
     }
 
-    public function send(User $notifiable, Notification $notification): void
+    public function send(User|AbstractNotifiable $notifiable, Notification $notification): void
     {
         if (method_exists($notification, 'toMailCoach')) {
             $data = $notification->toMailCoach($notifiable);

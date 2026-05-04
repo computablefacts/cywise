@@ -31,7 +31,7 @@
             <x-app.user-menu position="top" />
         </header>
         {{-- End Mobile Header --}}
-        <main class="flex flex-col flex-1 xl:px-0 lg:pt-0 lg:h-screen border-l-0 lg:border-l">
+        <main class="flex flex-col flex-1 xl:px-0 lg:pt-0 lg:h-screen lg:border-l border-solid border-gray-200/60">
             {{ $slot }}
         </main>
     </div>

@@ -31,23 +31,23 @@ class LeaksProcedure extends Procedure
             "if the request is 'have credentials leaked for example.com?', the input should be {\"asset\":\"example.com\"}",
         ],
         ai_result: "
-            @php
-                \$leaks = collect(\$result['leaks'] ?? []);
-            @endphp
-            @if(\$leaks->isEmpty())
-                No leaks found.
-            @else
-                @foreach(\$leaks as \$leak)
-                    @if(empty(\$leak['password']))
-                        The email {{ \$leak['email'] }} was leaked on {{ \$leak['leak_date'] }}.
-                    @else
-                        The email {{ \$leak['email'] }} associated to the password '{{ \$leak['password'] }}' was leaked on {{ \$leak['leak_date'] }}.
-                    @endif
-                    @if(!empty(\$leak['website']))
-                        These credentials enable the user to log in to the website {{ \$leak['website'] }}.   
-                    @endif
-                @endforeach
-            @endif
+@php
+\$leaks = collect(\$result['leaks'] ?? []);
+@endphp
+@if(\$leaks->isEmpty())
+No leaks found.
+@else
+@foreach(\$leaks as \$leak)
+@if(empty(\$leak['password']))
+The email {{ \$leak['email'] }} was leaked on {{ \$leak['leak_date'] }}.
+@else
+The email {{ \$leak['email'] }} associated to the password '{{ \$leak['password'] }}' was leaked on {{ \$leak['leak_date'] }}.
+@endif
+@if(!empty(\$leak['website']))
+These credentials enable the user to log in to the website {{ \$leak['website'] }}.   
+@endif
+@endforeach
+@endif
         ",
     )]
     public function list(JsonRpcRequest $request): array
@@ -140,7 +140,7 @@ class LeaksProcedure extends Procedure
                     ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']));
 
                 Log::debug("{$leaksPrev->count()} leaks found.");
-                Log::debug("Computing diff...]");
+                Log::debug("Computing diff...");
 
                 $leaks = $leaks->filter(function (array $leak) use ($leaksPrev) {
                     return !$leaksPrev->contains(function (object $leakPrev) use ($leak) {

@@ -138,7 +138,7 @@ $user = \Auth::user();
           <x-app.sidebar-link href="{{ route('cyberbuddy') }}"
                               icon="phosphor-robot"
                               :active="Request::is('cyberbuddy')">
-            {{ __('CyberBuddy') }}
+            {{ tenant_custom_text('CyberBuddy') }}
           </x-app.sidebar-link>
           @endif
           @if($user->canView('iframes.cyberscribe'))

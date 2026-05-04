@@ -3,12 +3,15 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCaseWithDb;
 
 class FusionLiveProcedureValidationTest extends TestCaseWithDb
 {
     public function test_workspaces_throws_exception_when_credentials_missing()
     {
+        Config::set('towerify.hasher.nonce', 'azertyuiop1234567890');
+
         $user = User::factory()->create([
             'fusionlive_username' => null,
             'fusionlive_password' => null,
@@ -31,6 +34,8 @@ class FusionLiveProcedureValidationTest extends TestCaseWithDb
 
     public function test_list_documents_throws_exception_when_credentials_missing()
     {
+        Config::set('towerify.hasher.nonce', 'azertyuiop1234567890');
+
         $user = User::factory()->create([
             'fusionlive_username' => 'someuser',
             'fusionlive_password' => '', // empty string
@@ -50,5 +55,82 @@ class FusionLiveProcedureValidationTest extends TestCaseWithDb
 
         $response->assertStatus(200);
         $response->assertJsonPath('error.message', 'Missing FusionLive credentials.');
+    }
+
+    public function test_list_users_throws_exception_when_credentials_missing()
+    {
+        Config::set('towerify.hasher.nonce', 'azertyuiop1234567890');
+
+        $user = User::factory()->create([
+            'fusionlive_username' => 'someuser',
+            'fusionlive_password' => '', // empty string
+        ]);
+        $this->actingAs($user);
+
+        $payload = [
+            'jsonrpc' => '2.0',
+            'method' => 'fusionlive@users',
+            'params' => [
+                'workspace_id' => 123,
+            ],
+            'id' => 1,
+        ];
+
+        $response = $this->postJson('/api/v2/private/endpoint', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('error.message', 'Missing FusionLive credentials.');
+    }
+
+    public function test_list_groups_throws_exception_when_credentials_missing()
+    {
+        Config::set('towerify.hasher.nonce', 'azertyuiop1234567890');
+
+        $user = User::factory()->create([
+            'fusionlive_username' => 'someuser',
+            'fusionlive_password' => '', // empty string
+        ]);
+        $this->actingAs($user);
+
+        $payload = [
+            'jsonrpc' => '2.0',
+            'method' => 'fusionlive@groups',
+            'params' => [
+                'workspace_id' => 123,
+            ],
+            'id' => 1,
+        ];
+
+        $response = $this->postJson('/api/v2/private/endpoint', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('error.message', 'Missing FusionLive credentials.');
+    }
+
+    public function test_list_users_with_group_id_validation_error()
+    {
+        Config::set('towerify.hasher.nonce', 'azertyuiop1234567890');
+
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $payload = [
+            'jsonrpc' => '2.0',
+            'method' => 'fusionlive@users',
+            'params' => [
+                'workspace_id' => 123,
+                'group_id' => 'invalid', // should be integer
+            ],
+            'id' => 1,
+        ];
+
+        $response = $this->postJson('/api/v2/private/endpoint', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('error.code', -32602); // Invalid params
+        // Log error if it failed to see what's in the response
+        if ($response->json('error.code') !== -32602) {
+            fwrite(STDERR, print_r($response->json(), true));
+        }
     }
 }

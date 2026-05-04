@@ -18,6 +18,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use Sajya\Server\Procedure;
 use Symfony\Component\Yaml\Yaml;
+use Wave\Page;
 use Wave\Plan;
 use Wave\Setting;
 use Wave\Theme;
@@ -38,6 +39,7 @@ class CywiseSeeder extends Seeder
         $this->setupOssecRules();
         $this->setupCustomOssecRules();
         $this->setupOsqueryRules();
+        $this->cleanupDisabledOsqueryRules();
         $this->setupCyberFrameworks();
         $this->setupCyberBuddy();
         $this->updateAccountsData();
@@ -168,6 +170,8 @@ class CywiseSeeder extends Seeder
             'active' => 1,
             'version' => 1.0
         ]);
+        Page::where('title', 'Example Page')->delete();
+        Page::where('title', 'About')->delete();
     }
 
     private function setupPermissionsRolesAndPlans(): void
@@ -647,6 +651,14 @@ class CywiseSeeder extends Seeder
             $rule['created_by'] = null; // this rule is available to all users
             \App\Models\YnhOsqueryRule::updateOrCreate(['name' => $rule['name']], $rule);
         }
+
+        \App\Models\YnhOsquery::query()
+            ->whereIn('ynh_osquery_rule_id', \App\Models\YnhOsqueryRule::where('enabled', false)->pluck('id'))
+            ->delete();
+
+        \App\Models\YnhOsqueryRule::query()
+            ->where('enabled', false)
+            ->delete();
     }
 
     private function updateAccountsData(): void
@@ -679,9 +691,12 @@ class CywiseSeeder extends Seeder
             'events@list',
             'events@socOperator',
             'fusionlive@documents',
+            'fusionlive@groups',
+            'fusionlive@users',
             'fusionlive@workspaces',
             'leaks@list',
             'notes@create',
+            'reporting@create',
             'scheduled-tasks@create',
             'scheduled-tasks@list',
             'scheduled-tasks@toggle',
@@ -731,8 +746,8 @@ class CywiseSeeder extends Seeder
                 Log::debug("Action {$name} schema loaded : ", $schema);
 
                 // if (empty($schema)) {
-                    // Log::warning("Action {$name} schema has no properties. Skipped.");
-                    // continue;
+                // Log::warning("Action {$name} schema has no properties. Skipped.");
+                // continue;
                 // }
 
                 Log::debug("Updating or creating action {$name}...");
@@ -1021,6 +1036,17 @@ class CywiseSeeder extends Seeder
     {
         $yaml = file_get_contents('https://raw.githubusercontent.com/wazuh/wazuh-agent/refs/heads/main/etc/ruleset/sca/applications/web_vulnerabilities.yml');
         return Yaml::parse($yaml);
+    }
+
+    private function cleanupDisabledOsqueryRules(): void
+    {
+        \App\Models\YnhOsquery::query()
+            ->whereHas('rule', function ($query) {
+                $query->where('enabled', false);
+            })
+            ->delete();
+
+        Log::debug('Deleted ynh_osquery records with disabled rules.');
     }
 
     private function setupEnvironment(): void

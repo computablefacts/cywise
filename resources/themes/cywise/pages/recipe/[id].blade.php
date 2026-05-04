@@ -33,7 +33,7 @@ new class extends Component {
     <x-app.container>
         <x-card class="lg:p-10">
             <x-app.heading
-                    title="{{ __('AI-generated remediation recipe') }}"
+                    title="{!! __('AI-generated remediation recipe') !!}"
                     description=""
             />
             <div class="max-w-full mt-8 prose-sm prose dark:prose-invert">

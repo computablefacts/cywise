@@ -29,7 +29,7 @@ class ProdDbAppConfig implements DbAppConfigInterface
             'encrypted:towerify.cyberbuddy.api_password' => 'J8l!aJd8EI7iwkgz_txIvvdR02JEPqOaOxK9N7A==',
 
             'towerify.deepinfra.api' => 'https://api.deepinfra.com/v1/openai',
-            'encrypted:towerify.deepinfra.api_key' => '2sb?kbsVy4yE3gFw_xNKSEzcwSsF2E8gHmym8okt84QGYCy9T9Sp0e7u3PvkTO/C9z1qEebGyHaJ8Sj3V',
+            'encrypted:towerify.deepinfra.api_key' => 'D!13o6upXJWBQwBj_qmO/EarXBKPbxsmCHyMMO8EWYX8ItTfr2v0o2i/QQELdGTgytgmhQzTHyyyincUD',
 
             'array:towerify.telescope.whitelist.usernames' => 'csavelief,engineering,pbrisacier,pduteil,pduteil+dev',
             'array:towerify.telescope.whitelist.domains' => 'computablefacts.com,hdwsec.fr,mncc.fr',

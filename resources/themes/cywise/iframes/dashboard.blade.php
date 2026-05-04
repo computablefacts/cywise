@@ -520,7 +520,7 @@
           {{ __('Do you have a question related to Cyber?') }}
         </h6>
         <div class="card-text mb-3">
-          {{ __('Click here to launch CyberBuddy:') }}
+          {{ tenant_custom_text('Click here to launch CyberBuddy:') }}
         </div>
         <form>
           <div class="row">
