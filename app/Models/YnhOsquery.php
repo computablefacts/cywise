@@ -268,13 +268,30 @@ class YnhOsquery extends Model
         return $this->action === 'removed';
     }
 
+    public function indicatorOfCompromise(): string
+    {
+        $score = $this->score ?? 0;
+        if ($score >= 75 && $score <= 100) {
+            return 'high';
+        }
+        if ($score >= 50 && $score <= 74) {
+            return 'medium';
+        }
+        if ($score >= 25 && $score <= 49) {
+            return 'low';
+        }
+        if ($score >= 1 && $score <= 24) {
+            return 'suspect';
+        }
+        return 'none';
+    }
+
     public function logLine(): string
     {
         // Attributes server_name, server_ip_address, comments and score are loaded by EventsProcedure::list
-        $criticality = $this->score ?? 0;
         $time = $this->calendar_time->utc()->format('Y-m-d H:i:s');
         $message = $this->message();
-        return empty($message) ? '' : "{$time} - {$this->server_name} (ip address: {$this->server_ip_address}) - {$message} (criticality: {$criticality})";
+        return empty($message) ? '' : "{$time} - {$this->server_name} (ip address: {$this->server_ip_address}) - {$message}";
     }
 
     public function message(): string
@@ -487,7 +504,8 @@ class YnhOsquery extends Model
                 ));
         }
         if ($this->score > 0) {
-            $msg .= " ({$this->comments})";
+            // $msg .= " ({$this->comments})";
+            $msg .= " (threat Level: {$this->indicatorOfCompromise()})";
         }
         return $msg;
     }
