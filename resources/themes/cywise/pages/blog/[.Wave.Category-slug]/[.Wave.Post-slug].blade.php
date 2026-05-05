@@ -26,13 +26,13 @@
                 </span>
             </h1>
         </div>
-
+<!--
         @if(!empty($post->image()))
         <div class="relative">
             <img class="w-full h-auto rounded-lg" src="{{ $post->image() }}" alt="{{ $post->title }}" srcset="{{ $post->image() }}">
         </div>
         @endif
-
+-->
         <div class="max-w-4xl mx-auto">
             {!! $post->body !!}
         </div>
