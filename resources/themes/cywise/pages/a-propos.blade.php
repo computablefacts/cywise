@@ -5,7 +5,13 @@ use function Laravel\Folio\{name};
 name('a-propos');
 ?>
 
-<x-layouts.marketing :title="__('About')">
+<x-layouts.marketing
+    :seo="[
+        'title' => __('About'),
+        'description' => 'L\'équipe',
+        'type' => 'website',
+    ]"
+>
   <x-container class="py-0">
     <!-- HERO : BEGIN -->
     <div class="bg-white px-6 py-12 sm:py-16 lg:px-8">

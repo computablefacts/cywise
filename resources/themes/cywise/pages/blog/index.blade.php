@@ -10,6 +10,7 @@
     :seo="[
         'title' => 'Blog',
         'description' => __('Check out some of our latest blog posts below.'),
+        'type' => 'website',
     ]"
 >
     <x-container>

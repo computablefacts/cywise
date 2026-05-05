@@ -10,16 +10,18 @@
 
 <x-dynamic-component 
 	:component="$layout"
+  :seo="[
+        'title' => __('Changelog'),
+        'description' => __('Latest updates and enhancements'),
+        'type' => 'website',
+    ]"
 >
-
-    
     <x-app.container>
         <x-card class="lg:p-10">
             <x-app.heading
                 title="{{ __('Changelog') }}"
                 description="{{ __('Latest updates and enhancements') }}"
             />
-
         <div class="max-w-full mt-8 prose-sm prose dark:prose-invert">
                 @foreach($logs as $changelog)
                     <div class="flex flex-col items-start space-y-3 lg:flex-row lg:space-y-0 lg:space-x-5">
@@ -36,11 +38,8 @@
                             @endif
                         </div>
                     </div>
-                    
                 @endforeach
             </div>
         </x-card>
-
     </x-app.container>
-
 </x-dynamic-component>
