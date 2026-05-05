@@ -3,7 +3,12 @@
     name('blog.post');
 ?>
 
-<x-layouts.marketing>
+<x-layouts.marketing
+    :seo="[
+        'title' => $post->title . ' | Cywise',
+        'description' => $post->excerpt ?? '',
+    ]"
+>
     <article id="post-{{ $post->id }}" class="max-w-4xl px-5 pb-20 mx-auto prose prose-md dark:prose-invert lg:prose-lg lg:px-0">
 
         <x-elements.back-button
