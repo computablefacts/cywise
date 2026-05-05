@@ -25,7 +25,7 @@
         <div class="max-w-full mt-8 prose-sm prose dark:prose-invert">
                 @foreach($logs as $changelog)
                     <div class="flex flex-col items-start space-y-3 lg:flex-row lg:space-y-0 lg:space-x-5">
-                        <div class="flex-shrink-0 px-2 py-1 text-xs translate-y-1 rounded-full bg-zinc-100 dark:bg-zinc-600">
+                        <div class="flex-shrink-0 px-2 py-1 text-xs translate-y-1 rounded-full text-blue-900 bg-blue-100 border-blue-200">
                             <time datetime="{{ Carbon\Carbon::parse($changelog->created_at)->toIso8601String() }}" class="ml-1">{{ Carbon\Carbon::parse($changelog->created_at)->toFormattedDateString() }}</time>
                         </div>
                         <div class="relative">
