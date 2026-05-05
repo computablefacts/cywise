@@ -13,7 +13,7 @@
         />
 
         <meta property="name" content="{{ $post->title }}">
-        <meta property="author" typeof="Person" content="admin">
+        <meta property="author" typeof="Person" content="{{ $post->user->name }}">
         <meta property="dateModified" content="{{ Carbon\Carbon::parse($post->updated_at)->toIso8601String() }}">
         <meta class="uk-margin-remove-adjacent" property="datePublished" content="{{ Carbon\Carbon::parse($post->created_at)->toIso8601String() }}">
 
@@ -21,8 +21,8 @@
             <h1 class="flex flex-col leading-none">
                 <span>{{ $post->title }}</span>
                 <span class="mt-0 mt-10 text-base font-normal">
-                  Écrit le <time datetime="{{ Carbon\Carbon::parse($post->created_at)->toIso8601String() }}">{{ Carbon\Carbon::parse($post->created_at)->toFormattedDateString() }}</time>.
-                  Posté dans <a href="{{ $post->linkCategory() }}" rel="category">{{ $post->category->name }}</a>.
+                  Mis à jour le <time datetime="{{ Carbon\Carbon::parse($post->created_at)->toIso8601String() }}">{{ Carbon\Carbon::parse($post->created_at)->toFormattedDateString() }}</time>.
+                  Posté dans la catégorie <a href="{{ $post->linkCategory() }}" rel="category">{{ $post->category->name }}</a>.
                 </span>
             </h1>
         </div>
