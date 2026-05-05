@@ -5,7 +5,7 @@
 
 <x-layouts.marketing
     :seo="[
-        'title' => $post->title . ' | Cywise',
+        'title' => $post->title,
         'description' => $post->excerpt ?? '',
     ]"
 >
