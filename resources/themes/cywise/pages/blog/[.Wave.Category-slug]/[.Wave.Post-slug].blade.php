@@ -21,8 +21,7 @@
             <h1 class="flex flex-col leading-none">
                 <span>{{ $post->title }}</span>
                 <span class="mt-0 mt-10 text-base font-normal">
-                  Mis à jour le <time datetime="{{ Carbon\Carbon::parse($post->created_at)->toIso8601String() }}">{{ Carbon\Carbon::parse($post->created_at)->toFormattedDateString() }}</time>.
-                  Posté dans la catégorie <a href="{{ $post->linkCategory() }}" rel="category">{{ $post->category->name }}</a>.
+                  Posté dans la catégorie <a href="{{ $post->linkCategory() }}" class="relative z-10 px-3 py-1.5 font-medium text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100" style="text-decoration:none;" rel="category">{{ $post->category->name }}</a> le <time datetime="{{ Carbon\Carbon::parse($post->created_at)->toIso8601String() }}">{{ Carbon\Carbon::parse($post->created_at)->toFormattedDateString() }}</time> par {{ $post->user->name }}.
                 </span>
             </h1>
         </div>
