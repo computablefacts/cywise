@@ -13,7 +13,9 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Parsedown;
 use Sajya\Server\Procedure;
+use Soundasleep\Html2Text;
 
 class ReportingProcedure extends Procedure
 {
@@ -35,7 +37,7 @@ class ReportingProcedure extends Procedure
             "if the request is 'exporte mes actifs', the input should be '{\"report\":\"assets\"}'",
             "if the request is 'exporte la liste des ports ouverts', the input should be '{\"report\":\"ports\"}'",
             "if the request is 'comment corriger l'alerte 123', the input should be '{\"report\":\"remediation\", \"alert_id\": 123}'",
-            "if the request is 'comment corriger la vuln X du serveur Y', the input should be '{\"report\":\"remediation\", \"vulnerability_name\":\"X\", \"asset_name\":\"Y\"}'"
+            "if the request is 'comment corriger la vuln X du serveur Y', the input should be '{\"report\":\"remediation\", \"vulnerability_name\": \"X\", \"asset_name\": \"Y\"}'"
         ],
         ai_result: "{{ \$result['report'] }}"
     )]
@@ -63,7 +65,7 @@ class ReportingProcedure extends Procedure
             $data = $this->assets($request);
             $templatePath = database_path('seeders/office/assets-report.xlsx');
             $templateName = 'assets-report.xlsx';
-        } elseif ($params['report'] === 'remediation') {
+        } else {
             $alert = $this->remediationAlert(
                 $params['alert_id'] ?? null,
                 $params['vulnerability_name'] ?? null,
@@ -270,28 +272,17 @@ class ReportingProcedure extends Procedure
 
     private function plainText(mixed $value): string
     {
-        $text = trim((string)$value);
+        $markdown = Str::trim((string)$value);
 
-        if ($text === '') {
+        if ($markdown === '') {
             return 'N/A';
         }
 
-        $text = str_replace(["\r\n", "\r"], "\n", $text);
-        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = preg_replace('/<!--.*?-->/s', '', $text);
-        $text = preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $text);
-        $text = preg_replace('/<\s*li\b[^>]*>/i', "\n- ", $text);
-        $text = preg_replace('/<\s*\/\s*(p|div|li|h[1-6])\s*>/i', "\n", $text);
-        $text = strip_tags($text);
-        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = preg_replace('/^[ \t]*```[a-zA-Z0-9_-]*[ \t]*$/m', '', $text);
-        $text = preg_replace('/`([^`\n]+)`/', '$1', $text);
-        $text = preg_replace('/\[([^\]]+)]\([^)]+\)/', '$1', $text);
-        $text = preg_replace('/^[ \t]{0,3}#{1,6}[ \t]+/m', '', $text);
-        $text = preg_replace('/(\*\*|__)(.*?)\1/s', '$2', $text);
-        $text = preg_replace('/[ \t]+\n/', "\n", $text);
+        $text = Html2Text::convert((new Parsedown())->text($markdown), [
+            'ignore_errors' => true,
+            'drop_links' => true,
+        ]);
         $text = preg_replace('/\n{3,}/', "\n\n", $text);
-        $text = preg_replace('/[ \t]{2,}/', ' ', $text);
 
         return trim($text) ?: 'N/A';
     }
