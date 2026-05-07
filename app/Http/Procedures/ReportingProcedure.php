@@ -13,7 +13,9 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Parsedown;
 use Sajya\Server\Procedure;
+use Soundasleep\Html2Text;
 
 class ReportingProcedure extends Procedure
 {
@@ -270,28 +272,17 @@ class ReportingProcedure extends Procedure
 
     private function plainText(mixed $value): string
     {
-        $text = trim((string) $value);
+        $markdown = trim((string) $value);
 
-        if ($text === '') {
+        if ($markdown === '') {
             return 'N/A';
         }
 
-        $text = str_replace(["\r\n", "\r"], "\n", $text);
-        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = preg_replace('/<!--.*?-->/s', '', $text);
-        $text = preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $text);
-        $text = preg_replace('/<\s*li\b[^>]*>/i', "\n- ", $text);
-        $text = preg_replace('/<\s*\/\s*(p|div|li|h[1-6])\s*>/i', "\n", $text);
-        $text = strip_tags($text);
-        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = preg_replace('/^[ \t]*```[a-zA-Z0-9_-]*[ \t]*$/m', '', $text);
-        $text = preg_replace('/`([^`\n]+)`/', '$1', $text);
-        $text = preg_replace('/\[([^\]]+)]\([^)]+\)/', '$1', $text);
-        $text = preg_replace('/^[ \t]{0,3}#{1,6}[ \t]+/m', '', $text);
-        $text = preg_replace('/(\*\*|__)(.*?)\1/s', '$2', $text);
-        $text = preg_replace('/[ \t]+\n/', "\n", $text);
+        $text = Html2Text::convert((new Parsedown())->text($markdown), [
+            'ignore_errors' => true,
+            'drop_links' => true,
+        ]);
         $text = preg_replace('/\n{3,}/', "\n\n", $text);
-        $text = preg_replace('/[ \t]{2,}/', ' ', $text);
 
         return trim($text) ?: 'N/A';
     }
