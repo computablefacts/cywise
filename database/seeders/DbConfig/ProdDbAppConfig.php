@@ -83,9 +83,9 @@ class ProdDbAppConfig implements DbAppConfigInterface
             'encrypted:towerify.clickhouse.password' => '&k?DDrraEUP3ZyVD_6QdlNz7/95zYaFWNTHXchWk6DXkTIB5g0F7Lrov4/sI=',
             'towerify.clickhouse.database' => 'cywise_ngprod',
 
-            'towerify.josianne.host' => 'clickhouse.apps.josiane.computablefacts.io',
-            'towerify.josianne.username' => 'cywise',
-            'encrypted:towerify.josianne.password' => 'GDr6#awPcu0NKbuR_G06I3zEp0mVx3PDo0lTH1xxpx+MNVimAVAQDfONbRT0=',
+            'towerify.josianne.host' => 'clickhouse.apps.josiane2.computablefacts.io',
+            'towerify.josianne.username' => 'engineering',
+            'encrypted:towerify.josianne.password' => 'nbIXvVEsU52Y87c5_//Fx7Bfc6erEqRRlX4ZBu1zjwcmph/1cWFuKrLaNpSU=',
             'towerify.josianne.database' => '',
 
             'mail.mailers.mailcoach.domain' => 'cywiseapp.mailcoach.app',

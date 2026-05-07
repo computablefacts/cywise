@@ -23,7 +23,12 @@ class Post extends Model
 
     public function link()
     {
-        return url('/blog/'.$this->category->slug.'/'.$this->slug);
+        return url('/blog/' . $this->category->slug . '/' . $this->slug);
+    }
+
+    public function linkCategory()
+    {
+        return url('/blog/' . $this->category->slug . '/');
     }
 
     public function user(): BelongsTo

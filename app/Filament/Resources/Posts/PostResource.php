@@ -24,10 +24,8 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Wave\Category;
-use Wave\Changelog;
 use Wave\Post;
 
 class PostResource extends Resource
@@ -44,7 +42,7 @@ class PostResource extends Resource
             ->components([
                 TextInput::make('title')
                     ->live(onBlur: true)
-                    ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state)))
+                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state)))
                     ->required()
                     ->maxLength(191),
                 TextInput::make('slug')
@@ -69,10 +67,10 @@ class PostResource extends Resource
                     ->label('Author')
                     ->options(
                         User::all()
-                            ->mapWithKeys(fn($user) => [
+                            ->mapWithKeys(fn ($user) => [
                                 $user->id => $user->name
                                     ?? $user->username
-                                        ?? $user->email,
+                                    ?? $user->email,
                             ])
                             ->toArray()
                     )
@@ -129,13 +127,11 @@ class PostResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make()
-                    ->after(fn() => self::rebuildSitemap()),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->after(fn() => self::rebuildSitemap()),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -154,93 +150,5 @@ class PostResource extends Resource
             'create' => CreatePost::route('/create'),
             'edit' => EditPost::route('/{record}/edit'),
         ];
-    }
-
-    public static function rebuildSitemap(): void
-    {
-        $sitemap = public_path('sitemap.xml');
-
-        if (\Illuminate\Support\Facades\File::exists($sitemap)) {
-            \Illuminate\Support\Facades\File::delete($sitemap);
-        }
-
-        // Initial URL map with default lastmod
-        $urlToLastModified = collect();
-
-        // Laravel Folio Pages
-        $folio = resource_path('themes/cywise/pages');
-        collect(\Illuminate\Support\Facades\File::allFiles($folio))
-            ->filter(fn(\SplFileInfo $file) => $file->getExtension() === 'php')
-            ->map(function (\SplFileInfo $file) use ($folio) {
-                $uri = $file->getRelativePathname();
-                if (Str::endsWith($uri, 'index.blade.php')) {
-                    $uri = Str::beforeLast($uri, 'index.blade.php');
-                } else {
-                    $uri = Str::beforeLast($uri, '.blade.php');
-                }
-                return [
-                    'path' => Str::trim($uri, '/'),
-                    'lastmod' => date('Y-m-d'),
-                ];
-            })
-            ->filter(fn(array $item) => !Str::contains($item['path'], ['[', ']'])) // Exclure les fichiers dynamiques Folio [...]
-            ->filter(fn(array $item) => !Str::startsWith($item['path'], ['layout', 'profile', 'recipe', 'settings', 'subscription', 'pricing'])) // Exclure les répertoires privés
-            ->filter(function (array $item) use ($folio) { // Exclure les fichiers utilisant le middleware('auth')
-                $uri = $item['path'];
-                $file = $folio . '/' . ($uri === '' ? 'index' : $uri) . '.blade.php';
-                if (!\Illuminate\Support\Facades\File::exists($file)) {
-                    $file = $folio . '/' . $uri . '/index.blade.php';
-                }
-                if (\Illuminate\Support\Facades\File::exists($file)) {
-                    $content = \Illuminate\Support\Facades\File::get($file);
-                    if (Str::contains($content, "middleware('auth')") || Str::contains($content, 'middleware("auth")')) {
-                        return false;
-                    }
-                }
-                return true;
-            })
-            ->each(fn(array $item) => $urlToLastModified->put($item['path'], $item['lastmod']));
-
-        // Blog URLs
-        $urlToLastModified->put('blog', date('Y-m-d'));
-        try {
-            Category::all()->each(fn(Category $c) => $urlToLastModified->put("blog/{$c->slug}", $c->updated_at?->format('Y-m-d') ?? date('Y-m-d')));
-            Post::all()->each(fn(Post $p) => $urlToLastModified->put("blog/" . ($p->category->slug ?? 'all') . "/{$p->slug}", $p->updated_at?->format('Y-m-d') ?? date('Y-m-d')));
-        } catch (\Exception $e) {
-            Log::warning("Erreur blog: " . $e->getMessage());
-        }
-
-        // Changelog URLs
-        $urlToLastModified->put('changelog', date('Y-m-d'));
-        try {
-            Changelog::all()->each(fn(Changelog $c) => $urlToLastModified->put("changelog/{$c->id}", $c->updated_at?->format('Y-m-d') ?? date('Y-m-d')));
-        } catch (\Exception $e) {
-            Log::warning("Erreur changelog: " . $e->getMessage());
-        }
-
-        // Build sitemap
-        $baseUrl = Str::rtrim(config('app.url'), '/');
-        $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
-
-        $urlToLastModified->filter(fn($lastmod, $path) => !Str::contains($path, ['{', '}']))
-            ->sortKeys()
-            ->each(function (string $lastmod, string $path) use ($xml, $baseUrl) {
-                $path = Str::ltrim($path, '/');
-                $url = $xml->addChild('url');
-                $url->addChild('loc', htmlspecialchars($baseUrl . ($path === '' ? '' : "/$path")));
-                $url->addChild('lastmod', $lastmod);
-                $url->addChild('changefreq', 'weekly');
-                $url->addChild('priority', ($path === '' ? '1.0' : '0.8'));
-            });
-
-        $dom = new \DOMDocument('1.0');
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML($xml->asXML());
-
-        // Update sitemap
-        \Illuminate\Support\Facades\File::put($sitemap, $dom->saveXML());
-
-        Log::debug("Sitemap généré ({$urlToLastModified->count()} URLs).");
     }
 }

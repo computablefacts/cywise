@@ -75,6 +75,8 @@ Route::redirect('/the-cyber-brief', '/blog');
 Route::redirect('/home', '/dashboard');
 
 // Public facing tools
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+
 Route::get('/cyber-check', function (\Illuminate\Http\Request $request) {
     return redirect()->route('tools.cybercheck', [
         'hash' => Str::random(128),

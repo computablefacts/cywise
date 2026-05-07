@@ -2,6 +2,7 @@
 ./towerify/*/*.tar.gz
 ./data
 ./node_modules
+./public/sitemap.xml
 ./public/hot
 ./public/storage
 ./public/wave/docs

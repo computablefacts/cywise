@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\Collection;
 use App\Models\Conversation;
 use App\Models\File;
+use App\Models\Leak;
 use App\Models\ScheduledTask;
 use App\Models\Tenant;
 use App\Models\TimelineFact;
@@ -322,6 +323,7 @@ class Cleanup implements ShouldQueue
             || Collection::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             // || Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || Vector::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
+            || Leak::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
             || TimelineItem::whereIn('owned_by', $userIds)->exists()
             || TimelineFact::whereIn('owned_by', $userIds)->exists();
     }
@@ -377,6 +379,7 @@ class Cleanup implements ShouldQueue
         // Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
 
         // 4. Leaks & co
+        Leak::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
         TimelineItem::whereIn('owned_by', $userIds)->delete();
         TimelineFact::whereIn('owned_by', $userIds)->delete();
     }

@@ -5,7 +5,7 @@ namespace App\Http\Procedures;
 use App\Helpers\JosianeClient;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Asset;
-use App\Models\TimelineItem;
+use App\Models\Leak;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -58,7 +58,7 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
         ]);
 
         /** @var Carbon $createdAtOrAfter */
-        $createdAtOrAfter = isset($params['created_at_or_after']) ? Carbon::parse($params['created_at_or_after']) : null;
+        $createdAtOrAfter = isset($params['created_at_or_after']) ? Carbon::parse($params['created_at_or_after'])->startOfDay() : null;
         $asset = isset($params['asset']) ?? null;
 
         Log::debug("Fetching leaks of the last 15 days...");
@@ -66,106 +66,120 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
         /** @var User $user */
         $user = $request->user();
         $now = Carbon::now()->utc()->subDays(15);
-        $leaks = TimelineItem::fetchItems($user->id, 'leak', $now, null, 0);
+        $leaks = Leak::where('created_at', '>=', $now)->orderByDesc('created_at')->get();
+        $tlds = Asset::select('am_assets.*')
+            ->join('users', 'users.id', '=', 'am_assets.created_by')
+            ->when($user->tenant_id, fn($query, $tenantId) => $query->where('users.tenant_id', $tenantId))
+            ->when($user->customer_id, fn($query, $customerId) => $query->where('users.customer_id', $customerId))
+            ->when($asset, fn($query, $asset) => $query->whereLike('am_assets.asset', "%{$asset}"))
+            ->get()
+            ->map(fn(Asset $asset) => $asset->tld())
+            ->filter(fn(?string $tld) => !empty($tld))
+            ->unique();
+
+        Log::debug("Searching leaked credentials for {$tlds->count()} TLDs...");
+
+        if ($leaks->isEmpty()) {
+            $leaks = $this->fetchLeaks($tlds);
+        } else {
+            $leaks = $this->fetchLeaks($tlds, $leaks->first()->created_at);
+        }
 
         Log::debug("{$leaks->count()} leaks found.");
 
-        if ($leaks->isEmpty()) {
-
-            $tlds = "'" . Asset::select('am_assets.*')
-                    ->join('users', 'users.id', '=', 'am_assets.created_by')
-                    ->when($user->tenant_id, fn($query, $tenantId) => $query->where('users.tenant_id', $tenantId))
-                    ->when($user->customer_id, fn($query, $customerId) => $query->where('users.customer_id', $customerId))
-                    ->when($asset, fn($query, $asset) => $query->whereLike('am_assets.asset', "%{$asset}"))
-                    ->get()
-                    ->map(fn(Asset $asset) => $asset->tld())
-                    ->filter(fn(?string $tld) => !empty($tld))
-                    ->unique()
-                    ->join("','") . "'";
-
-            if ($tlds === "''") {
-                $leaks = collect();
-            } else {
-
-                $query = "
-                  SELECT DISTINCT 
-                    min(db_date) AS leak_date, 
-                    lower(concat(login, '@', login_email_domain)) AS email, 
-                    concat(url_scheme, '://', url_subdomain, '.', url_domain) AS website, 
-                    password
-                  FROM dumps_login_email_domain 
-                  WHERE login_email_domain IN ({$tlds})
-                  GROUP BY email, website, password
-                  ORDER BY leak_date DESC, email ASC, website ASC
-                  LIMIT 1000
-                ";
-
-                Log::debug("Searching leaked credentials...");
-
-                $output = JosianeClient::executeQuery($query);
-                $leaks = collect(explode("\n", $output))
-                    ->filter(fn(string $line) => !empty($line) && $line !== 'ok')
-                    ->map(function (string $line) {
-                        $obj = explode("\t", $line);
-                        return [
-                            'leak_date' => Str::before(Str::trim($obj[0]), ' '),
-                            'email' => Str::trim($obj[1] ?? ''),
-                            'website' => Str::trim($obj[2] ?? ''),
-                            'password' => $this->maskPassword(Str::trim($obj[3] ?? '')),
-                        ];
-                    })
-                    ->map(function (array $credentials) {
-                        // if (preg_match("/(?i)\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|(([^\s()<>]+|(([^\s()<>]+)))*))+(?:(([^\s()<>]+|(([^\s()<>]+)))*)|[^\s`!()[]{};:'\".,<>?«»“”‘’]))/", $credentials['website'])) {
-                        if (filter_var($credentials['website'], FILTER_VALIDATE_URL)) {
-                            return $credentials;
-                        }
-                        return [
-                            'leak_date' => $credentials['leak_date'],
-                            'email' => $credentials['email'],
-                            'website' => '',
-                            'password' => $credentials['password'],
-                        ];
-                    })
-                    ->unique(fn(array $credentials) => $credentials['email'] . $credentials['website'] . $credentials['password']);
-            }
-
-            Log::debug("{$leaks->count()} leaked credentials found.");
-
-            if (count($leaks) > 0) {
-
-                Log::debug("Fetching all leaks...");
-
-                // Get previous leaks
-                $leaksPrev = TimelineItem::fetchItems($user->id, 'leak', null, $now, 0)
-                    ->flatMap(fn(TimelineItem $item) => json_decode($item->attributes()['credentials']));
-
-                Log::debug("{$leaksPrev->count()} leaks found.");
-                Log::debug("Computing diff...");
-
-                $leaks = $leaks->filter(function (array $leak) use ($leaksPrev) {
-                    return !$leaksPrev->contains(function (object $leakPrev) use ($leak) {
-                        return $leakPrev->email === $leak['email'] &&
-                            $leakPrev->website === $leak['website'] &&
-                            $leakPrev->password === $leak['password'];
-                    });
-                });
-
-                Log::debug("{$leaks->count()} new leaks found.");
-
-                // Only add the new leaks
-                if (count($leaks) > 0) {
-                    $leaks->chunk(10)->each(fn(Collection $leaksChunk) => TimelineItem::createItem($user->id, 'leak', Carbon::now(), 0, [
-                        'credentials' => json_encode($leaksChunk->values()->toArray()),
-                    ]));
-                }
-            }
-        }
+        $leaks->each(function (array $leak) {
+            $leak['created_by'] = request()->user()->id;
+            Leak::updateOrCreate([
+                'website' => $leak['website'],
+                'email' => $leak['email'],
+                'password' => $leak['password'],
+            ], $leak);
+        });
         return [
-            'leaks' => TimelineItem::fetchItems($user->id, 'leak', $createdAtOrAfter, null, 0)
-                ->flatMap(fn(TimelineItem $item) => collect(json_decode($item->attributes()['credentials'], true))
-                    ->map(fn(array $credentials) => (object)array_merge(['timestamp' => $item->timestamp], $credentials)))
+            'leaks' => Leak::query()
+                ->when($createdAtOrAfter, fn($query, $date) => $query->where('created_at', '>=', $date))
+                ->get()
+                ->map(fn(Leak $leak) => (object)[
+                    'timestamp' => $leak->created_at,
+                    'leak_date' => $leak->leak_date?->format('Y-m-d'),
+                    'leak_type' => $leak->leak_type,
+                    'email' => $leak->email,
+                    'website' => $leak->website,
+                    'password' => $leak->password,
+                ])
                 ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE),
         ];
+    }
+
+    private function fetchLeaks(Collection $tlds, ?Carbon $createdAtOrAfter = null): Collection
+    {
+        return collect($tlds)
+            ->flatMap(function (string $tld) use ($createdAtOrAfter) {
+                $range = $createdAtOrAfter ? "AND inserted_at >= '{$createdAtOrAfter->format('Y-m-d')}'" : '';
+                $query = "
+                    SELECT 
+                        db_date AS leak_date,
+                        db_type AS leak_type,
+                        lower(concat(login, '@', login_email_domain)) AS email,
+                        url_full AS website,
+                        password,
+                        inserted_at_sort
+                    FROM josiane_v2
+                    WHERE login_email_domain IN ('{$tld}')
+                    {$range}
+                    ORDER BY inserted_at_sort DESC, website ASC, email ASC
+                    LIMIT 1000
+                    SETTINGS use_query_cache = 1
+                ";
+                $output = JosianeClient::executeQuery($query);
+                return collect(explode("\n", $output));
+            })
+            ->concat(
+                $tlds
+                    ->map(function (string $tld) {
+                        $parts = array_reverse(explode('.', $tld));
+                        return implode('.', $parts);
+                    })
+                    ->flatMap(function (string $tld) use ($createdAtOrAfter) {
+                        $range = $createdAtOrAfter ? "AND inserted_at >= '{$createdAtOrAfter->format('Y-m-d')}'" : '';
+                        $query = "
+                            SELECT 
+                                db_date AS leak_date,
+                                db_type AS leak_type,
+                                lower(concat(login, '@', login_email_domain)) AS email,
+                                url_full AS website,
+                                password,
+                                inserted_at_sort
+                            FROM josiane_v2
+                            WHERE rev_url_domain LIKE '{$tld}.%'
+                            {$range}
+                            ORDER BY inserted_at_sort DESC, website ASC, email ASC
+                            LIMIT 1000
+                            SETTINGS use_query_cache = 1
+                        ";
+                        $output = JosianeClient::executeQuery($query);
+                        return collect(explode("\n", $output));
+                    })
+            )
+            ->filter(fn(string $line) => !empty($line) && $line !== 'ok')
+            ->map(function (string $line) {
+                $obj = explode("\t", $line);
+                $website = Str::trim($obj[3] ?? '');
+                if (filter_var($website, FILTER_VALIDATE_URL)) {
+                    $website = parse_url($website, PHP_URL_SCHEME) . '://' . parse_url($website, PHP_URL_HOST);
+                } else {
+                    $website = '';
+                }
+                return [
+                    'leak_date' => Str::before(Str::trim($obj[0]), ' '),
+                    'leak_type' => Str::trim($obj[1] ?? ''),
+                    'email' => Str::trim($obj[2] ?? ''),
+                    'website' => $website,
+                    'password' => $this->maskPassword(Str::trim($obj[4] ?? '')),
+                ];
+            })
+            ->unique(fn(array $credentials) => $credentials['website'] . $credentials['email'] . $credentials['password'])
+            ->sortByDesc('leak_date');
     }
 
     private function maskPassword(string $password, int $size = 3): string
