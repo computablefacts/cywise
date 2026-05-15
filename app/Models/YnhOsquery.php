@@ -286,6 +286,11 @@ class YnhOsquery extends Model
         return 'none';
     }
 
+    public function category(): string
+    {
+        return $this->rule_category ?? $this->rule->category;
+    }
+
     public function logLine(): string
     {
         // Attributes server_name, server_ip_address, comments and score are loaded by EventsProcedure::list
@@ -505,7 +510,7 @@ class YnhOsquery extends Model
         }
         if ($this->score > 0) {
             // $msg .= " ({$this->comments})";
-            $msg .= " (category: {$this->rule->category}, threat Level: {$this->indicatorOfCompromise()})";
+            $msg .= " (category: {$this->category()}, threat Level: {$this->indicatorOfCompromise()})";
         }
         return $msg;
     }
