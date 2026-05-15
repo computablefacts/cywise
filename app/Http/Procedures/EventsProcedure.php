@@ -79,7 +79,8 @@ class EventsProcedure extends Procedure
             "server_id" => "An optional server id to filter events by.",
             "server_name" => "An optional server name to filter events by. (string|nullable|min:0|max:191|exists:ynh_servers,name)",
             "ip_address" => "An optional server IP address to filter events by. (string|nullable|min:4|max:15|exists:ynh_servers,ip_address)",
-            "window" => "An optional window of time [min_date, max_date] to filter events by."
+            "window" => "An optional window of time [min_date, max_date] to filter events by.",
+            "categories" => "An optional list of categories to filter events by."
         ],
         result: [
             "events" => "The list of events over the last 3 days.",
@@ -202,15 +203,18 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             'ip_address' => 'string|nullable|prohibits:server_id,server_name|min:4|max:15|exists:ynh_servers,ip_address',
             'window' => 'array|nullable|min:2|max:2',
             'window.*' => 'date|required',
+            'categories' => 'array|nullable',
+            'categories.*' => 'string|required',
         ]);
 
         $minScore = $params['min_score'] ?? 0;
         $maxScore = $params['max_score'] ?? 100;
         $ruleName = $params['rule_name'] ?? null;
+        $categories = $params['categories'] ?? null;
 
         if (isset($params['window'])) {
-            $minDate = Carbon::createFromFormat('Y-m-d', $params['window'][0])->startOfDay();
-            $maxDate = Carbon::createFromFormat('Y-m-d', $params['window'][1])->endOfDay();
+            $minDate = Carbon::parse($params['window'][0])->startOfDay();
+            $maxDate = Carbon::parse($params['window'][1])->endOfDay();
         } else {
             $minDate = Carbon::now()->subDays(2)->startOfDay();
             $maxDate = Carbon::now()->endOfDay();
@@ -240,6 +244,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             DB::raw('ynh_servers.ip_address AS server_ip_address'),
             'ynh_osquery_rules.score',
             'ynh_osquery_rules.comments',
+            'ynh_osquery_rules.category AS rule_category',
             'ynh_osquery.*'
         ])
             ->join('ynh_osquery_rules', 'ynh_osquery_rules.id', '=', 'ynh_osquery.ynh_osquery_rule_id')
@@ -253,6 +258,9 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
         if (isset($ruleName)) {
             $events = $events->where('ynh_osquery_rules.name', $ruleName);
+        }
+        if (isset($categories)) {
+            $events = $events->whereIn('ynh_osquery_rules.category', $categories);
         }
         if ($dismissed->filter(fn(object $item) => !is_null($item->ynh_server_id) && !is_null($item->ynh_osquery_rule_id))->isNotEmpty()) {
             $tuples = $dismissed->map(fn(object $item) => "({$item->ynh_server_id}, {$item->ynh_osquery_rule_id})")->implode(',');
