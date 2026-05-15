@@ -313,10 +313,13 @@ class AttackGraph
         return trim($output);
     }
 
-    private function renderTree(YnhOsquery $event, string $prefix, bool $isLast): string
+    private function renderTree(YnhOsquery $event, string $prefix, bool $isLast, ?YnhOsquery $parent = null): string
     {
         $branch = $isLast ? "└── " : "├── ";
-        $output = $prefix . $branch . $event->calendar_time->format('Y-m-d H:i:s') . " [{$event->category()}] " . $event->message() . "\n";
+        $latestDescendantTime = $this->leafTimestamp($event);
+        $score = $this->calculateScore($parent, $event, $latestDescendantTime);
+        $scoreStr = number_format($score, 2) . " ─ ";
+        $output = $prefix . $branch . $scoreStr . $event->calendar_time->format('Y-m-d H:i:s') . " [{$event->category()}] " . $event->message() . "\n";
         $node = $this->nodes->get($event->category());
         $children = collect();
 
@@ -337,7 +340,7 @@ class AttackGraph
 
         foreach ($children as $child) {
             $isLastChild = (++$childIndex === $childCount);
-            $output .= $this->renderTree($child, $newPrefix, $isLastChild);
+            $output .= $this->renderTree($child, $newPrefix, $isLastChild, $event);
         }
         return $output;
     }
@@ -375,5 +378,47 @@ class AttackGraph
         $maxTimeB = $toNode->events->max('calendar_time');
 
         return $minTimeA <= $maxTimeB;
+    }
+
+    public function calculateScore(?YnhOsquery $a, $b, ?int $referenceTimestamp = null): float
+    {
+        $lambda = 0.00001; // Constante de décroissance temporelle (environ 0.86 de decay après 4 heures)
+        $scoreA = 50.0;
+
+        if ($a) {
+            $scoreA = data_get($a, 'rule.score') ?? 50.0;
+        }
+
+        $scoreB = data_get($b, 'rule.score') ?? 50.0;
+
+        $criticityA = min(1.0, floatval($scoreA) / 100.0);
+        $criticityB = min(1.0, floatval($scoreB) / 100.0);
+        $criticityScore = 0.3 * $criticityA + 0.7 * $criticityB;
+        $dt = 0;
+
+        if ($referenceTimestamp !== null) {
+            $dt = abs($referenceTimestamp - $b->calendar_time->timestamp);
+        } elseif ($a) {
+            $dt = abs($b->calendar_time->timestamp - $a->calendar_time->timestamp);
+        }
+
+        $temporalDecay = exp(-$lambda * $dt);
+
+        return $criticityScore * $temporalDecay;
+    }
+
+    private function leafTimestamp(YnhOsquery $event): int
+    {
+        $maxTimestamp = $event->calendar_time->timestamp;
+        $node = $this->nodes->get($event->category());
+        if ($node) {
+            foreach ($node->edges as $edge) {
+                $nextEvents = $edge->to->events->filter(fn(YnhOsquery $e) => $e->calendar_time->gte($event->calendar_time));
+                foreach ($nextEvents as $nextEvent) {
+                    $maxTimestamp = max($maxTimestamp, $this->leafTimestamp($nextEvent));
+                }
+            }
+        }
+        return $maxTimestamp;
     }
 }
