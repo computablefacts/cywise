@@ -200,7 +200,6 @@ class TimelineController extends Controller
 
         return YnhServer::forUser($user)
             ->filter(fn(YnhServer $server) => !$serverId || $serverId === $server->id)
-            ->filter(fn(YnhServer $server) => !$server->isYunoHost())
             ->map(function (YnhServer $server) {
 
                 $timestamp = $server->created_at->utc()->format('Y-m-d H:i:s');
