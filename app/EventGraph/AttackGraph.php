@@ -307,7 +307,21 @@ class AttackGraph
         $index = 0;
 
         foreach ($roots as $root) {
+
             $isLast = (++$index === $count);
+
+            // On cherche le scénario maximal (chemin) qui commence par cette racine pour afficher son score global
+            $maximalScenarios = $this->findAllPaths();
+            $bestScenarioForRoot = collect($maximalScenarios)
+                ->filter(fn(array $scenario) => $scenario[0]->id === $root->id)
+                ->sortByDesc(fn(array $scenario) => count($scenario))
+                ->first();
+
+            if ($bestScenarioForRoot) {
+                $pathScore = $this->calculatePathScore($bestScenarioForRoot);
+                $output .= "[Path Score: " . number_format($pathScore, 2) . "]\n";
+            }
+
             $output .= $this->renderTree($root, "", $isLast);
         }
         return trim($output);
@@ -405,6 +419,24 @@ class AttackGraph
         $temporalDecay = exp(-$lambda * $dt);
 
         return $criticityScore * $temporalDecay;
+    }
+
+    public function calculatePathScore(array $scenario): float
+    {
+        if (empty($scenario)) {
+            return 0.0;
+        }
+
+        $totalScore = 0;
+        $prevEvent = null;
+        $lastEvent = end($scenario);
+        $referenceTimestamp = $lastEvent->calendar_time->timestamp;
+
+        foreach ($scenario as $event) {
+            $totalScore += $this->calculateScore($prevEvent, $event, $referenceTimestamp);
+            $prevEvent = $event;
+        }
+        return $totalScore / count($scenario);
     }
 
     private function leafTimestamp(YnhOsquery $event): int
