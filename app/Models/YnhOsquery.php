@@ -291,7 +291,7 @@ class YnhOsquery extends Model
         // Attributes server_name, server_ip_address, comments and score are loaded by EventsProcedure::list
         $time = $this->calendar_time->utc()->format('Y-m-d H:i:s');
         $message = $this->message();
-        return empty($message) ? '' : "{$time} - {$this->server_name} (ip address: {$this->server_ip_address}) - {$message}";
+        return empty($message) ? '' : "{$time} - {$this->server_name} ({$this->server_ip_address}) - {$message}";
     }
 
     public function message(): string
@@ -494,7 +494,7 @@ class YnhOsquery extends Model
                 $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} ({$type}) a été désinstallé.";
             }
         } else {
-            $msg = isset($this->columns['text']) ? $this->columns['text'] : "Un événement de type {$this->name} est arrivé.";
+            // $msg = isset($this->columns['text']) ? $this->columns['text'] : "Un événement de type {$this->name} est arrivé.";
             $msg = isset($this->columns['text'])
                 ? $this->columns['text']
                 : "Un événement de type {$this->name} est arrivé. Champs disponibles : " . implode(', ', array_map(
@@ -505,7 +505,7 @@ class YnhOsquery extends Model
         }
         if ($this->score > 0) {
             // $msg .= " ({$this->comments})";
-            $msg .= " (threat Level: {$this->indicatorOfCompromise()})";
+            $msg .= " (category: {$this->rule->category}, threat Level: {$this->indicatorOfCompromise()})";
         }
         return $msg;
     }
