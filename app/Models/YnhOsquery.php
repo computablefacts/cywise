@@ -500,17 +500,19 @@ class YnhOsquery extends Model
             }
         } else {
             // $msg = isset($this->columns['text']) ? $this->columns['text'] : "Un événement de type {$this->name} est arrivé.";
+            $attributes = implode(', ', array_map(
+                fn($k, $v) => "$k=$v",
+                array_keys(is_array($this->columns) ? $this->columns : []),
+                is_array($this->columns) ? $this->columns : []
+            ));
+            $attributes = empty($attributes) ? 'empty' : $attributes;
             $msg = isset($this->columns['text'])
                 ? $this->columns['text']
-                : "Un événement de type {$this->name} est arrivé. Champs disponibles : " . implode(', ', array_map(
-                    fn($k, $v) => "$k=$v",
-                    array_keys($this->columns),
-                    $this->columns
-                ));
+                : "Un événement de type {$this->name} est arrivé. Champs disponibles : {$attributes}";
         }
         if ($this->score > 0) {
             // $msg .= " ({$this->comments})";
-            $msg .= " (category: {$this->category()}, threat Level: {$this->indicatorOfCompromise()})";
+            // $msg .= " (category: {$this->category()}, threat Level: {$this->indicatorOfCompromise()})";
         }
         return $msg;
     }
