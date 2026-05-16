@@ -316,7 +316,7 @@ class AttackGraph
     private function renderTree(YnhOsquery $event, string $prefix, bool $isLast): string
     {
         $branch = $isLast ? "└── " : "├── ";
-        $output = $prefix . $branch . $event->calendar_time->format('Y-m-d H:i:s') . " [{$event->category()}] " . $event->message() . "\n";
+        $output = $prefix . $branch . $event->calendar_time->format('Y-m-d H:i:s') . " [{$event->category()}][{$event->indicatorOfCompromise()}] " . $event->message() . "\n";
         $node = $this->nodes->get($event->category());
         $children = collect();
 
