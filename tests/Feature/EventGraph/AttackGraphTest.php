@@ -197,14 +197,10 @@ class AttackGraphTest extends TestCaseWithDb
         
         // Vérifier la hiérarchie visuelle minimale (indentation)
         $lines = explode("\n", $formatted);
-        $rootIndex = 0;
-        if (str_contains($lines[0], '[Path Score:')) {
-            $rootIndex = 1;
-        }
-        $this->assertStringContainsString('initial_access', $lines[$rootIndex]);
-        $this->assertStringContainsString('    ', $lines[$rootIndex + 1]); // Indentation pour le premier fils
-        $this->assertStringContainsString('execution', $lines[$rootIndex + 1]);
-        $this->assertStringContainsString('    ', $lines[$rootIndex + 2]); // Indentation cumulée
-        $this->assertStringContainsString('credential_access', $lines[$rootIndex + 2]);
+        $this->assertStringContainsString('initial_access', $lines[0]);
+        $this->assertStringContainsString('    ', $lines[1]); // Indentation pour le premier fils
+        $this->assertStringContainsString('execution', $lines[1]);
+        $this->assertStringContainsString('    ', $lines[2]); // Indentation cumulée
+        $this->assertStringContainsString('credential_access', $lines[2]);
     }
 }
