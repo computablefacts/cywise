@@ -304,9 +304,6 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         ],
         result: [
             "activity" => "The activity status: UNKNOWN, NORMAL, SUSPICIOUS, or ANORMAL.",
-            "confidence" => "The confidence score between 0 (low) to 1 (high).",
-            "reasoning" => "The reasoning behind the analysis.",
-            "suggested_action" => "The suggested action to take.",
             "report" => "A full text report in Markdown format.",
         ],
         ai_examples: [
@@ -329,65 +326,23 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         }
 
         $user = $request->user();
-        $dailyReports = [];
-        $dailyLinks = [];
-        $dailyEvents = [];
-        $dailyActivities = [];
+        $day = Carbon::now()->utc();
 
-        Log::debug("Building SOC operator daily reports for server {$server->name} ({$server->ip()})...");
-
-        for ($i = 6; $i >= 0; $i--) { // 7 days
-
-            $day = Carbon::now()->utc()->subDays($i);
-            $page = $day->isCurrentDay() ?
-                null :
-                Page::where('author_id', $user->id)
-                    ->whereLike('slug', "daily-{$day->format('Y-m-d')}-{$server->id}%")
-                    ->first();
-
-            if ($page) {
-                $report = $page->body;
-            } else {
-
-                // Create daily report
-                $report = $this->createDailyReport($user, $day, $server);
-                $activity = $report['activity'];
-                $report = $report['report'];
-
-                // Create webpage
-                $title = "Rapport journalier pour {$server->name} ({$server->ip()})";
-                $slug = "daily-{$day->format('Y-m-d')}-{$server->id}" . Str::random(64);
-                $page = $this->updateOrCreatePage($user, $slug, $title, $report);
-            }
-
-            // Save markdown and page link for later use
-            $dailyReports[] = "## {$day->format('Y-m-d')}\n\n{$report}";
-            $dailyLinks[] = "<a href=\"{$page->link()}\">{$day->format('Y-m-d')}</a>";
-
-            if (preg_match('/\*\*Evènements\s*\((\d+)\)\s*:\*\*/u', $report, $matches)) {
-                $dailyEvents[] = (int)$matches[1];
-            } else {
-                $dailyEvents[] = 0;
-            }
-            if (preg_match('/\*\*Activité\s*:\*\*\s*(\S+)/u', $report, $matches)) {
-                $dailyActivities[] = $matches[1];
-            } else {
-                $dailyActivities[] = 'inconnue';
-            }
-        }
-
-        Log::debug("Daily reports for server {$server->name} ({$server->ip()}) built.");
         Log::debug("Building SOC operator weekly report for server {$server->name} ({$server->ip()})...");
 
+        Page::where('author_id', $user->id)
+            ->whereLike('slug', "weekly-{$day->format('Y-m-d')}-{$server->id}%")
+            ->delete();
+
         // Create weekly report
-        $report = $this->createWeeklyReport($user, $server, $dailyReports);
+        $report = $this->analyzeEvents($user, $day, $server);
         $activity = $report['activity'];
         $report = $report['report'];
 
         // Create webpage
-        $title = "Rapport hebdomadaire pour {$server->name} ({$server->ip()})";
-        $slug = 'weekly-' . Carbon::now()->format('Y-m-d') . '-' . $server->id . Str::random(64);
-        $page = $this->updateOrCreatePage($user, $slug, $title, "{$report}\n\n# Rapports journaliers\n\n- " . implode("\n- ", array_map(fn(string $link, string $activity, int $events) => "{$link} (activité {$activity}, {$events} évènements)", $dailyLinks, $dailyActivities, $dailyEvents)));
+        $title = "Rapport glissant sur 10 jours - {$server->name} ({$server->ip()})";
+        $slug = "weekly-{$day->format('Y-m-d')}-{$server->id}" . Str::random(64);
+        $page = $this->updateOrCreatePage($user, $slug, $title, $report);
 
         Log::debug("Weekly report for server {$server->name} ({$server->ip()}) built.");
 
@@ -402,54 +357,10 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         ];
     }
 
-    private function createWeeklyReport(User $user, YnhServer $server, array $dailyReports): array
-    {
-        $result = TextAssistant::use()
-            ->withPrompt('default_soc_operator_weekly', [
-                'SERVER_NAME' => $server->name,
-                'SERVER_IP_ADDRESS' => $server->ip(),
-                'DAILY_REPORTS' => implode("\n\n", $dailyReports),
-                'MEMOS' => MemosProvider::use()
-                    ->withScope(NotesProcedure::SCOPE_IS_SOC_OPERATOR)
-                    ->withUser($user)
-                    ->provide(),
-            ])
-            ->structured();
-
-        /** @var array $json */
-        $json = $result->parsed;
-
-        if (empty($json)) {
-            Log::error('Failed to parse SOC operator answer (json): ' . json_encode($json));
-            return [
-                'activity' => 'UNKNOWN',
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (JSON invalide)."
-            ];
-        }
-        if (!isset($json['activity']) || !in_array($json['activity'], ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'], true)) {
-            Log::error('Failed to parse SOC operator answer (activity): ' . json_encode($json));
-            return [
-                'activity' => 'UNKNOWN',
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `activity` invalide)."
-            ];
-        }
-        if (!isset($json['report']) || !is_string($json['report'])) {
-            Log::error('Failed to parse SOC operator answer (report): ' . json_encode($json));
-            return [
-                'activity' => 'UNKNOWN',
-                'report' => "L'opérateur SOC n'a pas fourni de réponse significative concernant le serveur **{$server->name}** d'adresse IP {$server->ip()} (attribut `report` invalide)."
-            ];
-        }
-        return [
-            'activity' => $json['activity'],
-            'report' => "**Activité :** {$this->activityEnToFr($json['activity'])}\n\n**Analyse :** {$this->translateEnToFr($json['report'])}"
-        ];
-    }
-
-    private function createDailyReport(User $user, Carbon $day, YnhServer $server): array
+    private function analyzeEvents(User $user, Carbon $day, YnhServer $server): array
     {
         $activities = ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'];
-        $minDate = $day->copy()->startOfDay();
+        $minDate = $day->copy()->startOfDay()->subDays(10);
         $maxDate = $day->copy()->endOfDay();
         $eventRequest = new JsonRpcRequest([
             'min_score' => 0, // Load both security events and IoCs
@@ -473,7 +384,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         $compressed = cywise_compress_log_buffer($events->toArray(), 0.8);
         $logs = implode("\n", $compressed);
         $result = TextAssistant::use()
-            ->withPrompt('default_soc_operator_daily', [
+            ->withPrompt('default_soc_operator', [
                 'SERVER_NAME' => $server->name,
                 'SERVER_IP_ADDRESS' => $server->ip(),
                 'LOGS' => $logs,
@@ -490,9 +401,9 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         $maxEvents = 100;
 
         if ($nbEvents > $maxEvents) {
-            $oldest = implode("\n", array_slice($events->toArray(), 0, $maxEvents)) . "\n...";
+            $oldest = implode("\n", array_slice($events->reverse()->toArray(), 0, $maxEvents)) . "\n...";
         } else {
-            $oldest = implode("\n", $events->toArray());
+            $oldest = implode("\n", $events->reverse()->toArray());
         }
         if (isset($json['activity'], $json['report']) && in_array($json['activity'], $activities, true)) {
             return [
