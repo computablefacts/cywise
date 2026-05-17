@@ -498,17 +498,18 @@ class YnhOsquery extends Model
             if ($this->isRemoved()) {
                 $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} ({$type}) a été désinstallé.";
             }
+        } else if (!empty($this->columns['text'])) {
+            $msg = $this->columns['text'];
+        } else if (!empty($this->columns['cmdline'])) {
+            $msg = "Un événement de type {$this->name} est arrivé : {$this->columns['cmdline']}";
         } else {
-            // $msg = isset($this->columns['text']) ? $this->columns['text'] : "Un événement de type {$this->name} est arrivé.";
             $attributes = implode(', ', array_map(
                 fn($k, $v) => "$k=$v",
                 array_keys(is_array($this->columns) ? $this->columns : []),
                 is_array($this->columns) ? $this->columns : []
             ));
             $attributes = empty($attributes) ? 'empty' : $attributes;
-            $msg = isset($this->columns['text'])
-                ? $this->columns['text']
-                : "Un événement de type {$this->name} est arrivé. Champs disponibles : {$attributes}";
+            $msg = "Un événement de type {$this->name} est arrivé. Attributs : {$attributes}";
         }
         if ($this->score > 0) {
             // $msg .= " ({$this->comments})";

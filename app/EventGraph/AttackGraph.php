@@ -54,16 +54,16 @@ class AttackGraph
                     'min_score' => 0,
                     'server_id' => $serverId,
                     'window' => [
-                        $date->copy()->subYear()->format('Y-m-d'),
+                        $date->copy()->subDays(10)->format('Y-m-d'),
                         $date->format('Y-m-d'),
                     ],
                     'categories' => [$category],
                 ]);
                 $request->setUserResolver(fn() => $user);
                 $events = $procedure->list($request)['events'];
-                $event = $events->filter(fn(YnhOsquery $e) => $e->calendar_time->lt($startOfDay))->first();
+                $eventz = $events->filter(fn(YnhOsquery $e) => $e->calendar_time->lt($startOfDay));
 
-                if ($event) {
+                foreach ($eventz as $event) {
                     $node->addEvent($event);
                 }
 
@@ -74,15 +74,15 @@ class AttackGraph
                     'server_id' => $serverId,
                     'window' => [
                         $date->format('Y-m-d'),
-                        $date->copy()->addYear()->format('Y-m-d'),
+                        $date->copy()->addDays(10)->format('Y-m-d'),
                     ],
                     'categories' => [$category],
                 ]);
                 $request->setUserResolver(fn() => $user);
                 $events = $procedure->list($request)['events'];
-                $event = $events->filter(fn(YnhOsquery $e) => $e->calendar_time->gt($endOfDay))->reverse()->first();
+                $eventz = $events->filter(fn(YnhOsquery $e) => $e->calendar_time->gt($endOfDay))->reverse();
 
-                if ($event) {
+                foreach ($eventz as $event) {
                     $node->addEvent($event);
                 }
             }
@@ -166,6 +166,11 @@ class AttackGraph
                 'name' => 'Élévation de Privilèges',
                 'description' => 'Obtention de droits administrateur.',
                 'attck_phases' => ['TA0004'], // ATT&CK Phase: Privilege Escalation
+            ],
+            'other' => [
+                'name' => 'Autres types d\'évènements',
+                'description' => 'Autres types d\'évènements.',
+                'attck_phases' => [], // ATT&CK Phase: Privilege Escalation
             ],
         ];
     }

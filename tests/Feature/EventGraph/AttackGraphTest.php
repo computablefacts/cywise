@@ -203,4 +203,63 @@ class AttackGraphTest extends TestCaseWithDb
         $this->assertStringContainsString('    ', $lines[2]); // Indentation cumulée
         $this->assertStringContainsString('credential_access', $lines[2]);
     }
+
+    public function test_render_tree_includes_intermediate_events()
+    {
+        $server = \App\Models\YnhServer::factory()->create();
+        $date = Carbon::parse('2026-05-15');
+
+        $ruleInitial = YnhOsqueryRule::factory()->create(['category' => 'initial_access']);
+        $ruleExecution = YnhOsqueryRule::factory()->create(['category' => 'execution']);
+        $ruleDiscovery = YnhOsqueryRule::factory()->create(['category' => 'discovery']);
+
+        // Scenario: 
+        // 1. initial_access (10:00)
+        // 2. discovery (10:15) - intermediate event (not directly linked in category graph between initial and execution?)
+        // 3. execution (10:30)
+
+        $eventInitial = YnhOsquery::factory()->create([
+            'ynh_server_id' => $server->id,
+            'ynh_osquery_rule_id' => $ruleInitial->id,
+            'calendar_time' => $date->copy()->setTime(10, 0),
+            'name' => 'initial_access_event'
+        ]);
+        $eventDiscovery = YnhOsquery::factory()->create([
+            'ynh_server_id' => $server->id,
+            'ynh_osquery_rule_id' => $ruleDiscovery->id,
+            'calendar_time' => $date->copy()->setTime(10, 15),
+            'name' => 'discovery_event'
+        ]);
+        $eventExecution = YnhOsquery::factory()->create([
+            'ynh_server_id' => $server->id,
+            'ynh_osquery_rule_id' => $ruleExecution->id,
+            'calendar_time' => $date->copy()->setTime(10, 30),
+            'name' => 'execution_event'
+        ]);
+
+        $graph = AttackGraph::fromEvents(collect([$eventInitial, $eventDiscovery, $eventExecution]));
+        
+        // Ensure there is an edge from initial_access to execution in the category graph
+        // (This depends on AttackGraph::relationshipsBetweenCategories)
+        
+        $paths = $graph->findAllPaths();
+        $formatted = $graph->tree($paths);
+
+        // Current behavior: discovery_event might be a separate root if it's not linked, 
+        // or just a child of something else.
+        // If initial_access -> execution is an edge, we want discovery_event (10:15) 
+        // to appear between them because 10:00 < 10:15 < 10:30.
+
+        $this->assertStringContainsString('10:00:00 [initial_access]', $formatted);
+        $this->assertStringContainsString('10:15:00 [discovery]', $formatted);
+        $this->assertStringContainsString('10:30:00 [execution]', $formatted);
+        
+        // Check order
+        $posInitial = strpos($formatted, '10:00:00');
+        $posDiscovery = strpos($formatted, '10:15:00');
+        $posExecution = strpos($formatted, '10:30:00');
+        
+        $this->assertTrue($posInitial < $posDiscovery, 'Initial should be before Discovery');
+        $this->assertTrue($posDiscovery < $posExecution, 'Discovery should be before Execution');
+    }
 }
