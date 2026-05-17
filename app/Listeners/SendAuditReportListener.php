@@ -392,10 +392,10 @@ class SendAuditReportListener extends AbstractListener
                     return '';
                     // return "<li>L'opérateur SOC a rencontré une erreur lors de l'analyse du serveur <b>{$server->name}</b> d'adresse IP {$server->ip()}.</li>";
                 }
-                // if ($result['activity'] === 'NORMAL') {
-                // return '';
-                // return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
-                // }
+                if ($result['activity'] === 'NORMAL') {
+                    return '';
+                    // return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
+                }
 
                 $report = Str::replace("\n\n**", "\n- **", $result['report']);
                 $html = (new Parsedown)->text("## {$server->name} ({$server->ip()})\n- {$report}");
