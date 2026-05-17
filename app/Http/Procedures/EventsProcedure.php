@@ -383,11 +383,13 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
         $compressed = cywise_compress_log_buffer($events->toArray(), 0.8);
         $logs = implode("\n", $compressed);
+        $os = YnhOsquery::operatingSystem($server->id);
         $result = TextAssistant::use()
             ->withPrompt('default_soc_operator', [
                 'SERVER_NAME' => $server->name,
                 'SERVER_IP_ADDRESS' => $server->ip(),
                 'LOGS' => $logs,
+                'OS' => isset($os) ? "OS is {$os->os}/{$os->codename}.\nMajor version is {$os->major_version}.\nMinor version is {$os->minor_version}.\nPatch version is {$os->patch_version}." : "OS is unknown.",
                 'MEMOS' => MemosProvider::use()
                     ->withScope(NotesProcedure::SCOPE_IS_SOC_OPERATOR)
                     ->withUser($user)

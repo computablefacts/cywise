@@ -23,6 +23,10 @@ Guidelines:
 - ANORMAL: strong indicators of compromise or clearly malicious behavior.
 - UNKNOWN: not enough evidence to decide reliably.
 
+# Operating System
+
+{OS}
+
 # Compressed Security Events
 
 {LOGS}
