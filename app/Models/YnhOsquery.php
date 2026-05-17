@@ -498,10 +498,20 @@ class YnhOsquery extends Model
             if ($this->isRemoved()) {
                 $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} ({$type}) a été désinstallé.";
             }
+        } else if ($this->name === 'tcpdump_installed' ||
+            $this->name === 'wireshark_installed' ||
+            $this->name === 'busybox_installed' ||
+            $this->name === 'dsniff_installed' ||
+            $this->name === 'hping3_installed' ||
+            $this->name === 'nbtscan_installed' ||
+            $this->name === 'netcat_installed' ||
+            $this->name === 'scapy_installed' ||
+            $this->name === 'nmap_installed') {
+            $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} a été installé ou mis à jour.";
+        } else if (!empty($this->columns['cmdline'])) {
+            $msg = "La ligne de commande {$this->columns['cmdline']} a été exécutée.";
         } else if (!empty($this->columns['text'])) {
             $msg = $this->columns['text'];
-        } else if (!empty($this->columns['cmdline'])) {
-            $msg = "Un événement de type {$this->name} est arrivé : {$this->columns['cmdline']}";
         } else {
             $attributes = implode(', ', array_map(
                 fn($k, $v) => "$k=$v",
@@ -509,12 +519,9 @@ class YnhOsquery extends Model
                 is_array($this->columns) ? $this->columns : []
             ));
             $attributes = empty($attributes) ? 'empty' : $attributes;
-            $msg = "Un événement de type {$this->name} est arrivé. Attributs : {$attributes}";
+            $msg = "Un événement a été généré : {$attributes}";
         }
-        if ($this->score > 0) {
-            // $msg .= " ({$this->comments})";
-            // $msg .= " (category: {$this->category()}, threat Level: {$this->indicatorOfCompromise()})";
-        }
+        // $msg .= " (event_category={$this->category()}, event_threat_level={$this->indicatorOfCompromise()})";
         return $msg;
     }
 }
