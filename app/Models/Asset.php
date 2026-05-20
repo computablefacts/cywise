@@ -206,8 +206,13 @@ class Asset extends Model
 
     public function isIpAddressMissing(bool $invalidateCache = false): bool
     {
+        if (!$this->isDns()) {
+            return false;
+        }
+
         $key = "ip_address_missing:{$this->id}";
         $dateKey = "ip_address_missing_date:{$this->id}";
+
         if ($invalidateCache) {
             $cachedAt = \Cache::get($dateKey);
             if (!$cachedAt || now()->subDays(3)->timestamp >= $cachedAt) {
