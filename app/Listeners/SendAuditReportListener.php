@@ -384,7 +384,10 @@ class SendAuditReportListener extends AbstractListener
             ->get()
             ->map(function (YnhServer $server) use ($user) {
 
-                $request = new JsonRpcRequest(['server_id' => $server->id]);
+                $request = new JsonRpcRequest([
+                    'server_id' => $server->id,
+                    'include_events' => false,
+                ]);
                 $request->setUserResolver(fn() => $user);
                 $result = (new EventsProcedure())->socOperator($request);
 
