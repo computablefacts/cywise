@@ -339,9 +339,9 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
         // Create weekly report
         $report = $this->analyzeEvents($user, $day, $server);
+        $events = $report['events'];
         $activity = $report['activity'];
         $report = $report['report'];
-        $events = $report['events'];
 
         // Create webpage
         $title = "Rapport glissant sur 10 jours - {$server->name} ({$server->ip()})";
@@ -357,7 +357,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             'server_name' => $server->name,
             'server_ip_address' => $server->ip(),
             'activity' => $activity,
-            'report' => $includeEvents ? "{$report}\n{$events}" : $report,
+            'report' => $includeEvents ? "{$report}\n\n{$events}" : $report,
         ];
     }
 
@@ -377,7 +377,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             ->filter(fn(string $logLine) => !empty($logLine))
             ->sort() // Reorder events from the oldest to the newest
             ->values();
-        $eventsMarkdown = "\n**Evènements ({$events->count()}) :**\n```\nAucun\n```";
+        $eventsMarkdown = "**Evènements ({$events->count()}) :**\n```\nAucun\n```";
 
         if ($events->isEmpty()) {
             return [
@@ -414,7 +414,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             $oldest = implode("\n", $events->reverse()->toArray());
         }
 
-        $eventsMarkdown = "\n**Evènements ({$events->count()}) :**\n```\n{$oldest}\n```";
+        $eventsMarkdown = "**Evènements ({$events->count()}) :**\n```\n{$oldest}\n```";
 
         if (isset($json['activity'], $json['report']) && in_array($json['activity'], $activities, true)) {
             return [
