@@ -242,24 +242,26 @@ class SendAuditReportListener extends AbstractListener
 
         Log::debug("{$nbAlerts} alerts found for user {$user->email}");
 
-        $noIpAssets = $assets->filter(fn(Asset $asset) => $asset->isIpAddressMissing())->unique()->sort();
-        $cloudflareAssets = $assets->filter(fn(Asset $asset) => $asset->isProtectedByCloudflare())->unique()->sort();
+        $noIpAssets = $assets->filter(fn(Asset $asset) => $asset->isIpAddressMissing())
+            ->map(fn(Asset $asset) => $asset->asset)
+            ->unique()
+            ->sort();
+        $cloudflareAssets = $assets->filter(fn(Asset $asset) => $asset->isProtectedByCloudflare())
+            ->map(fn(Asset $asset) => $asset->asset)
+            ->unique()
+            ->sort();
         $noIpSection = '';
         $cloudflareSection = '';
 
         if ($noIpAssets->isNotEmpty()) {
             $noIpSection = "<li>J'ai découvert <b>{$noIpAssets->count()}</b> domaines sans adresse IP :<ul>";
-            foreach ($noIpAssets as $asset) {
-                $noIpSection .= "<li>{$asset->asset}</li>";
-            }
+            $noIpSection .= $noIpAssets->map(fn(string $asset) => "<li>{$asset}</li>")->join('');
             $noIpSection .= '</ul></li>';
         }
         if ($cloudflareAssets->isNotEmpty()) {
             $url = app_url();
             $cloudflareSection = "<li>J'ai découvert <b>{$cloudflareAssets->count()}</b> actifs protégés par Cloudflare (n'oubliez pas d'autoriser <a href=\"{$url}/ips-v4.txt\">nos adresses IP</a> !) :<ul>";
-            foreach ($cloudflareAssets as $asset) {
-                $cloudflareSection .= "<li>{$asset->asset}</li>";
-            }
+            $cloudflareSection .= $cloudflareAssets->map(fn(string $asset) => "<li>{$asset}</li>")->join('');
             $cloudflareSection .= '</ul></li>';
         }
 
