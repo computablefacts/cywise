@@ -363,8 +363,11 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
     private function analyzeEvents(User $user, Carbon $day, YnhServer $server): array
     {
+        $window = 10;
         $activities = ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'];
-        $minDate = $day->copy()->startOfDay()->subDays(10);
+
+        // Load current activity
+        $minDate = $day->copy()->startOfDay()->subDays($window);
         $maxDate = $day->copy()->endOfDay();
         $eventRequest = new JsonRpcRequest([
             'min_score' => 0, // Load both security events and IoCs
@@ -387,13 +390,40 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             ];
         }
 
-        $compressed = cywise_compress_log_buffer($events->toArray(), 0.8);
-        $logs = implode("\n", $compressed);
+        $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
+
+        // Load baseline activity
+        $eventRequest = new JsonRpcRequest([
+            'min_score' => 0, // Load both security events and IoCs
+            'server_id' => $server->id,
+            'window' => [$minDate->copy()->subDays($window)->format('Y-m-d'), $maxDate->copy()->subDays($window)->format('Y-m-d')]
+        ]);
+        $eventRequest->setUserResolver(fn() => $user);
+        $eventz = $this->list($eventRequest)['events']
+            ->map(fn(YnhOsquery $event) => $event->logLine())
+            ->filter(fn(string $logLine) => !empty($logLine))
+            ->sort() // Reorder events from the oldest to the newest
+            ->values();
+
+        if ($eventz->isEmpty()) {
+            return [
+                'activity' => 'UNKNOWN',
+                'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** Nous finalisons la baseline pour le serveur {$server->name} d'adresse IP {$server->ip()}. Elle sera prête d'ici quelques jours.",
+                'events' => $eventsMarkdown,
+            ];
+        }
+
+        $baseline = implode("\n", cywise_compress_log_buffer($eventz->toArray(), 0.8));
+
+        // Load OS information
         $os = YnhOsquery::operatingSystem($server->id);
+
+        // Analyze current activity
         $result = TextAssistant::use()
             ->withPrompt('default_soc_operator', [
                 'SERVER_NAME' => $server->name,
                 'SERVER_IP_ADDRESS' => $server->ip(),
+                'BASELINE' => $baseline,
                 'LOGS' => $logs,
                 'OS' => isset($os) ? "OS is {$os->os}/{$os->codename}.\nMajor version is {$os->major_version}.\nMinor version is {$os->minor_version}.\nPatch version is {$os->patch_version}." : "OS is unknown.",
                 'MEMOS' => MemosProvider::use()
