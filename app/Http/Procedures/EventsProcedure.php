@@ -348,7 +348,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         $slug = "weekly-{$day->format('Y-m-d')}-{$server->id}" . Str::random(64);
         $page = $this->updateOrCreatePage($user, $slug, $title, "{$report}\n{$events}");
 
-        Log::debug("Weekly report for server {$server->name} ({$server->ip()}) built.");
+        Log::debug("Weekly report for server {$server->name} ({$server->ip()}) built : {$page->link()}");
 
         // Short report
         $report = "{$report}\n\n**<a href=\"{$page->link()}\">Cliquez ici</a>** pour accéder au rapport détaillé.";
