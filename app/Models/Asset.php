@@ -204,8 +204,14 @@ class Asset extends Model
             ->exists();
     }
 
-    public function isIpAddressMissing(): bool
+    public function isIpAddressMissing(bool $invalidateCache = false): bool
     {
-        return $this->isDns() && empty(@dns_get_record($this->asset, DNS_A + DNS_AAAA));
+        $key = "ip_address_missing:{$this->id}";
+        if ($invalidateCache) {
+            \Cache::forget($key);
+        }
+        return \Cache::remember($key, now()->addDays(7), function () {
+            return $this->isDns() && empty(@dns_get_record($this->asset, DNS_A + DNS_AAAA));
+        });
     }
 }

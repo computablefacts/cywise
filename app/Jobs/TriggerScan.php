@@ -63,7 +63,7 @@ class TriggerScan implements ShouldQueue
                 return $scans->isEmpty() || $scans->sortBy('vulns_scan_ends_at')->last()?->vulns_scan_ends_at <= $minDate;
             })
             ->each(function (Asset $asset) {
-                if ($asset->isIpAddressMissing()) {
+                if ($asset->isIpAddressMissing(true)) {
                     Log::debug("Asset {$asset->asset} ({$asset->id}) has no IP associated, skipping scan.");
                 } else {
                     Log::debug("Starting scan of asset {$asset->asset} ({$asset->id})...");
