@@ -24,6 +24,13 @@
         @endif
       </span>
     </div>
+    @if($asset->isProtectedByCloudflare())
+    <div class="mt-1">
+      <small class="text-muted">
+        {!! __('This asset seems protected by Cloudflare. Do not forget to whitelist <a href="/ips-v4.txt" target="_blank">our IP addresses</a>.') !!}
+      </small>
+    </div>
+    @endif
     <div class="d-flex align-items-center flex-wrap" style="gap:10px;">
       <button id="start-monitoring-{{ $asset->id }}" class="show-replies {{ $asset->is_monitored ? 'd-none' : '' }}"
               title="{{ __('Start Monitoring') }}"

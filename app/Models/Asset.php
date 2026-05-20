@@ -193,4 +193,14 @@ class Asset extends Model
             ->where('ports_scan_id', $this->next_scan_id)
             ->get();
     }
+
+    public function isProtectedByCloudflare(): bool
+    {
+        return !DB::table('am_ports')
+            ->join('am_ports_tags', 'am_ports.id', '=', 'am_ports_tags.port_id')
+            ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
+            ->where('am_scans.asset_id', $this->id)
+            ->where('am_ports_tags.tag', 'like', '%cloudflare%')
+            ->exists();
+    }
 }
