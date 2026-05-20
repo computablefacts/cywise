@@ -31,6 +31,13 @@
       </small>
     </div>
     @endif
+    @if($asset->has_no_ip)
+    <div class="mt-1">
+      <small class="text-muted">
+        {{ __('This asset is not associated with any IP address.') }}
+      </small>
+    </div>
+    @endif
     <div class="d-flex align-items-center flex-wrap" style="gap:10px;">
       <button id="start-monitoring-{{ $asset->id }}" class="show-replies {{ $asset->is_monitored ? 'd-none' : '' }}"
               title="{{ __('Start Monitoring') }}"
