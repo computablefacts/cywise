@@ -338,14 +338,15 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             ->delete();
 
         // Create weekly report
-        $report = $this->analyzeEvents($user, $day, $server, $includeEvents);
+        $report = $this->analyzeEvents($user, $day, $server);
         $activity = $report['activity'];
         $report = $report['report'];
+        $events = $report['events'];
 
         // Create webpage
         $title = "Rapport glissant sur 10 jours - {$server->name} ({$server->ip()})";
         $slug = "weekly-{$day->format('Y-m-d')}-{$server->id}" . Str::random(64);
-        $page = $this->updateOrCreatePage($user, $slug, $title, $report);
+        $page = $this->updateOrCreatePage($user, $slug, $title, "{$report}\n{$events}");
 
         Log::debug("Weekly report for server {$server->name} ({$server->ip()}) built.");
 
@@ -356,11 +357,11 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             'server_name' => $server->name,
             'server_ip_address' => $server->ip(),
             'activity' => $activity,
-            'report' => $report,
+            'report' => $includeEvents ? "{$report}\n{$events}" : $report,
         ];
     }
 
-    private function analyzeEvents(User $user, Carbon $day, YnhServer $server, bool $includeEvents = true): array
+    private function analyzeEvents(User $user, Carbon $day, YnhServer $server): array
     {
         $activities = ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'];
         $minDate = $day->copy()->startOfDay()->subDays(10);
@@ -376,12 +377,13 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             ->filter(fn(string $logLine) => !empty($logLine))
             ->sort() // Reorder events from the oldest to the newest
             ->values();
-        $eventsMarkdown = $includeEvents ? "\n**Evènements ({$events->count()}) :**\n```\nAucun\n```" : "";
+        $eventsMarkdown = "\n**Evènements ({$events->count()}) :**\n```\nAucun\n```";
 
         if ($events->isEmpty()) {
             return [
                 'activity' => 'NORMAL',
-                'report' => "**Activité :** {$this->activityEnToFr('NORMAL')}\n\n**Analyse :** Aucun évènement significatif n'a été signalé concernant le serveur {$server->name} d'adresse IP {$server->ip()}.\n{$eventsMarkdown}"
+                'report' => "**Activité :** {$this->activityEnToFr('NORMAL')}\n\n**Analyse :** Aucun évènement significatif n'a été signalé concernant le serveur {$server->name} d'adresse IP {$server->ip()}.",
+                'events' => $eventsMarkdown,
             ];
         }
 
@@ -412,17 +414,19 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             $oldest = implode("\n", $events->reverse()->toArray());
         }
 
-        $eventsMarkdown = $includeEvents ? "\n**Evènements ({$events->count()}) :**\n```\n{$oldest}\n```" : "";
+        $eventsMarkdown = "\n**Evènements ({$events->count()}) :**\n```\n{$oldest}\n```";
 
         if (isset($json['activity'], $json['report']) && in_array($json['activity'], $activities, true)) {
             return [
                 'activity' => $json['activity'],
-                'report' => "**Activité :** {$this->activityEnToFr($json['activity'])}\n\n**Analyse :** {$this->translateEnToFr($json['report'])}\n{$eventsMarkdown}"
+                'report' => "**Activité :** {$this->activityEnToFr($json['activity'])}\n\n**Analyse :** {$this->translateEnToFr($json['report'])}",
+                'events' => $eventsMarkdown,
             ];
         }
         return [
             'activity' => 'UNKNOWN',
-            'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** L'opérateur du SOC n'a pas pu évaluer l'activité du serveur.\n{$eventsMarkdown}"
+            'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** L'opérateur du SOC n'a pas pu évaluer l'activité du serveur.",
+            'events' => $eventsMarkdown,
         ];
     }
 
