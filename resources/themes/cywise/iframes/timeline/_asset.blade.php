@@ -31,7 +31,7 @@
       </small>
     </div>
     @endif
-    @if($asset->has_no_ip)
+    @if($asset->isIpAddressMissing())
     <div class="mt-1">
       <small class="text-muted">
         {{ __('This asset is not associated with any IP address.') }}

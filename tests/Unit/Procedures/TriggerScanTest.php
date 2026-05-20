@@ -64,23 +64,19 @@ it('should NOT trigger a scan for a domain with no IP and mark it', function () 
 
     asTenant1User();
     $asset = createAsset('no-ip.example.com', true);
+    expect($asset->isIpAddressMissing())->toBeTrue();
 
     app()->call([new TriggerScan, 'handle']);
 
     // Vérifier qu'aucun scan n'a été créé
     $this->assertDatabaseCount('am_scans', 0);
-
-    // Vérifier que l'asset est marqué comme n'ayant pas d'IP
-    $asset->refresh();
-    expect($asset->has_no_ip)->toBeTrue();
 });
 
 it('should trigger a scan for a domain that previously had no IP but now has one', function () {
 
     asTenant1User();
     $asset = createAsset('www.google.com', true);
-    $asset->has_no_ip = true;
-    $asset->save();
+    expect($asset->isIpAddressMissing())->toBeFalse();
 
     $taskId = '6409ae68ed42e11e31e5f19d';
     expect()->startPortsScanToBeCalled('www.google.com', $taskId);
@@ -89,8 +85,4 @@ it('should trigger a scan for a domain that previously had no IP but now has one
 
     // Vérifier qu'un scan a été créé
     $this->assertDatabaseCount('am_scans', 1);
-
-    // Vérifier que l'asset n'est plus marqué comme n'ayant pas d'IP
-    $asset->refresh();
-    expect($asset->has_no_ip)->toBeFalse();
 });
