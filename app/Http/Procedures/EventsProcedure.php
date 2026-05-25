@@ -392,11 +392,34 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
         $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
 
-        // Load baseline activity
+        // Load baseline activity e.g. the mid-point between the oldest and newest events
+        $firstEventDate = YnhOsquery::where('ynh_server_id', $server->id)->min('calendar_time');
+
+        if (!isset($firstEventDate)) {
+            return [
+                'activity' => 'UNKNOWN',
+                'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** Nous finalisons la baseline pour le serveur {$server->name} d'adresse IP {$server->ip()}.",
+                'events' => $eventsMarkdown,
+            ];
+        }
+
+        $baselineStartDate = Carbon::parse($firstEventDate)->startOfDay();
+        $midPoint = $baselineStartDate->copy()->addSeconds((int)($baselineStartDate->diffInSeconds($day) / 2));
+        $baselineMinDate = $midPoint->copy()->subDays($window / 2)->startOfDay();
+        $baselineMaxDate = $midPoint->copy()->addDays($window / 2)->endOfDay();
+
+        if ($minDate->lessThanOrEqualTo($baselineMaxDate)) {
+            return [
+                'activity' => 'UNKNOWN',
+                'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** Nous finalisons la baseline pour le serveur {$server->name} d'adresse IP {$server->ip()}.",
+                'events' => $eventsMarkdown,
+            ];
+        }
+
         $eventRequest = new JsonRpcRequest([
             'min_score' => 0, // Load both security events and IoCs
             'server_id' => $server->id,
-            'window' => [$minDate->copy()->subDays($window)->format('Y-m-d'), $maxDate->copy()->subDays($window)->format('Y-m-d')]
+            'window' => [$baselineMinDate->format('Y-m-d'), $baselineMaxDate->format('Y-m-d')]
         ]);
         $eventRequest->setUserResolver(fn() => $user);
         $eventz = $this->list($eventRequest)['events']
@@ -408,7 +431,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         if ($eventz->isEmpty()) {
             return [
                 'activity' => 'UNKNOWN',
-                'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** Nous finalisons la baseline pour le serveur {$server->name} d'adresse IP {$server->ip()}. Elle sera prête d'ici quelques jours.",
+                'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** Nous finalisons la baseline pour le serveur {$server->name} d'adresse IP {$server->ip()}.",
                 'events' => $eventsMarkdown,
             ];
         }
