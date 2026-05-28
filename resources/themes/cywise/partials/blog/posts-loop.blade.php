@@ -22,7 +22,7 @@
                     {{ $post->title }}
                 </a>
             </h2>
-            <p class="mt-5 text-sm leading-6 text-zinc-600 line-clamp-3">{{ substr(strip_tags($post->body), 0, 110) }}@if(strlen(strip_tags($post->body)) > 200){{ '...' }}@endif</p>
+            <p class="mt-5 text-sm leading-6 text-zinc-600 line-clamp-3">{!! substr(strip_tags($post->body), 0, 110) !!}@if(strlen(strip_tags($post->body)) > 200){{ '...' }}@endif</p>
         </div>
     </article>
 @endforeach
