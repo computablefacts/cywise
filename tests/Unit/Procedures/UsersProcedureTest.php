@@ -15,7 +15,6 @@ class UsersProcedureTest extends TestCaseWithDb
     {
         parent::setUp();
         Permission::findOrCreate('call.users.togglegetsauditreport', 'web');
-        Permission::findOrCreate('call.users.toggleautomonitornewassets', 'web');
         Permission::findOrCreate('call.users.sendauditreport', 'web');
     }
 
@@ -55,36 +54,6 @@ class UsersProcedureTest extends TestCaseWithDb
             ->assertJsonPath('result.msg', "The user {$user->name} will get no audit report.");
 
         $this->assertFalse((bool)$user->fresh()->gets_audit_report);
-    }
-
-    public function test_toggle_auto_monitor_new_assets_self(): void
-    {
-        $user = User::factory()->create(['auto_monitor_new_assets' => true]);
-        $this->actingAs($user);
-        $user->givePermissionTo('call.users.toggleautomonitornewassets');
-        $response = $this->postJson('/api/v2/private/endpoint', [
-            'jsonrpc' => '2.0',
-            'id' => 1,
-            'method' => 'users@toggleAutoMonitorNewAssets',
-            'params' => []
-        ]);
-
-        $response->assertStatus(200)
-            ->assertJsonPath('result.msg', "New assets discovered for user {$user->name} will not be automatically monitored.");
-
-        $this->assertFalse((bool)$user->fresh()->auto_monitor_new_assets);
-
-        $response = $this->postJson('/api/v2/private/endpoint', [
-            'jsonrpc' => '2.0',
-            'id' => 1,
-            'method' => 'users@toggleAutoMonitorNewAssets',
-            'params' => ['auto_monitor_new_assets' => true]
-        ]);
-
-        $response->assertStatus(200)
-            ->assertJsonPath('result.msg', "New assets discovered for user {$user->name} will be automatically monitored.");
-
-        $this->assertTrue((bool)$user->fresh()->auto_monitor_new_assets);
     }
 
     public function test_toggle_gets_audit_report_by_id(): void

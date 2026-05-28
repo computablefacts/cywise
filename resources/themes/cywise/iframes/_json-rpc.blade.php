@@ -314,8 +314,8 @@
     executeJsonRpcApiCall('users@toggleGetsAuditReport', {user_id: userId}, onSuccess);
   }
 
-  function toggleAutoMonitorNewAssetsApiCall(userId, onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('users@toggleAutoMonitorNewAssets', {user_id: userId}, onSuccess);
+  function toggleAutoMonitorNewSubdomainsApiCall(assetId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('assets@toggleAutoMonitorNewSubdomains', {asset_id: assetId}, onSuccess);
   }
 
   function sendAuditReportApiCall(userId, onSuccess = onSuccessDefault) {

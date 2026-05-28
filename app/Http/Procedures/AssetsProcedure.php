@@ -597,6 +597,48 @@ No {{ \$params['type'] === 'domain' ? 'domain' : 'IP address' }} found.
     }
 
     #[RpcMethod(
+        description: "Toggle whether new subdomains discovered for a given asset should be automatically monitored.",
+        params: [
+            "asset" => "The asset as an IP address or DNS. (string|required|min:1|max:191)",
+            "asset_id" => "The asset id. (integer|required|exists:am_assets,id)",
+            "auto_monitor" => "true if the user wants new subdomains to be automatically monitored, false otherwise. When null, the current value is toggled. (boolean|nullable)"
+        ],
+        result: [
+            "msg" => "A success message.",
+        ],
+        ai_examples: [
+            "if the request is 'enable automatic subdomains monitoring for example.com', the input should be {\"asset\":\"example.com\",\"auto_monitor\":\"true\"}",
+            "if the request is 'disable automatic subdomains monitoring for example.com', the input should be {\"asset\":\"example.com\",\"auto_monitor\":\"false\"}",
+        ],
+        ai_result: "{{ \$result['msg'] }}",
+    )]
+    public function toggleAutoMonitorNewSubdomains(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'asset_id' => 'integer|required_without:asset|prohibits:asset|exists:am_assets,id',
+            'asset' => 'string|required_without:asset_id|prohibits:asset_id|min:1|max:191|exists:am_assets,asset',
+            'auto_monitor' => 'boolean|nullable',
+        ]);
+
+        if (isset($params['asset_id'])) {
+            /** @var Asset $asset */
+            $asset = Asset::findOrFail($params['asset_id']);
+        } else {
+            /** @var Asset $asset */
+            $asset = Asset::where('asset', $params['asset'])->firstOrFail();
+        }
+
+        $asset->auto_monitor_new_subdomains = $params['auto_monitor'] ?? !$asset->auto_monitor_new_subdomains;
+        $asset->save();
+
+        $status = $asset->auto_monitor_new_subdomains ? 'be automatically monitored' : 'not be automatically monitored';
+
+        return [
+            "msg" => "New subdomains discovered for asset {$asset->asset} will {$status}.",
+        ];
+    }
+
+    #[RpcMethod(
         description: "Tag an asset.",
         params: [
             "asset_id" => "The asset id.",

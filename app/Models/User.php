@@ -31,7 +31,6 @@ use Wave\User as WaveUser;
  * @property string performa_secret
  * @property boolean terms_accepted
  * @property boolean gets_audit_report
- * @property boolean auto_monitor_new_assets
  * @property ?string telegram_bot_token
  * @property ?string telegram_webhook_secret
  * @property ?string telegram_chat_id
@@ -70,7 +69,6 @@ class User extends WaveUser
         'am_api_token',
         'superset_id',
         'gets_audit_report',
-        'auto_monitor_new_assets',
         'telegram_bot_token',
         'telegram_webhook_secret',
         'telegram_chat_id',

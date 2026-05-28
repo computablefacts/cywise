@@ -901,6 +901,8 @@
     () => toaster.toastSuccess("{{ __('The asset will be deleted soon.') }}"));
   const restartScan = (assetId) => restartAssetScanApiCall(assetId,
     () => toaster.toastSuccess("{{ __('The scan has been restarted.') }}"));
+  const toggleAutoMonitorNewSubdomains = (assetId) => toggleAutoMonitorNewSubdomainsApiCall(assetId,
+    (response) => toaster.toastSuccess(response.msg));
 
   /* ASSETS TAGGING */
 

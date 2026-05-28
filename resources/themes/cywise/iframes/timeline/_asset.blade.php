@@ -38,6 +38,17 @@
       </small>
     </div>
     @endif
+    @if($asset->isDns())
+    <div class="mt-1">
+      <input type="checkbox"
+             id="auto-monitor-{{ $asset->id }}"
+             {{ $asset->auto_monitor_new_subdomains ? 'checked' : '' }}
+      onclick="toggleAutoMonitorNewSubdomains('{{ $asset->id }}')">
+      <label class="p-2 mb-0 cursor-pointer" for="auto-monitor-{{ $asset->id }}">
+        {{ __('Auto Monitor New Subdomains') }}
+      </label>
+    </div>
+    @endif
     <div class="d-flex align-items-center flex-wrap" style="gap:10px;">
       <button id="start-monitoring-{{ $asset->id }}" class="show-replies {{ $asset->is_monitored ? 'd-none' : '' }}"
               title="{{ __('Start Monitoring') }}"

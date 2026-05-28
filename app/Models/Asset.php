@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\DB;
  * @property ?string next_scan_id
  * @property ?string discovery_id
  * @property bool is_monitored
+ * @property bool auto_monitor_new_subdomains
  * @property int created_by
  * @property int ynh_trial_id
  */
@@ -43,6 +44,7 @@ class Asset extends Model
         'next_scan_id',
         'discovery_id',
         'is_monitored',
+        'auto_monitor_new_subdomains',
         'created_by',
         'ynh_trial_id',
     ];
@@ -50,6 +52,7 @@ class Asset extends Model
     protected $casts = [
         'type' => AssetTypesEnum::class,
         'is_monitored' => 'boolean',
+        'auto_monitor_new_subdomains' => 'boolean',
         'ynh_trial_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
