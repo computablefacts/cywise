@@ -40,14 +40,23 @@ class AssetsDiscoveryListener extends AbstractListener
                 $assets = collect($response['subdomains'])->filter(fn(?string $domain) => !empty($domain));
                 $assets->each(function (string $domain) use ($user, $tld) {
 
+                    // On cherche le parent le plus proche (le plus long) qui correspond au domaine ou un de ses parents.
+                    // Exemple pour www2.example.com : parents possibles ["www2.example.com", "example.com"]
+                    $parts = explode('.', $domain);
+                    $candidates = [];
+
+                    for ($i = 0; $i < count($parts); $i++) {
+                        $candidates[] = implode('.', array_slice($parts, $i));
+                    }
+
                     /** @var Asset $parent */
                     $parent = Asset::query()
-                        ->whereLike('asset', "%{$domain}")
+                        ->whereIn('asset', $candidates)
                         ->where('tld', $tld)
-                        ->where('created_by', $user->id)
+                        ->orderByRaw('LENGTH(asset) DESC')
                         ->first();
 
-                    CreateAsset::dispatch($user, $domain, $parent ? $parent->auto_monitor_new_subdomains : true);
+                    CreateAsset::dispatch($user, $domain, $parent->auto_monitor_new_subdomains ?? true);
                 });
 
                 Log::debug("Assets discovery ended for {$tld} ({$assets->count()})");

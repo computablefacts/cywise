@@ -7,8 +7,8 @@ use App\Events\CreateAsset;
 use App\Models\Asset;
 use App\Models\AssetTag;
 use App\Models\Honeypot;
-use App\Models\User;
 use App\Models\Trial;
+use App\Models\User;
 use App\Rules\IsValidAsset;
 use App\Rules\IsValidDomain;
 use App\Rules\IsValidIpAddress;
@@ -55,6 +55,7 @@ class CreateAssetListener extends AbstractListener
                 'asset' => $asset,
                 'type' => $assetType,
                 'is_monitored' => $monitor,
+                'auto_monitor_new_subdomains' => $monitor,
                 'created_by' => $user->id,
                 'ynh_trial_id' => $trialId > 0 ? $trialId : null,
             ]);
