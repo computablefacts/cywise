@@ -68,6 +68,61 @@ class UsersProcedure extends Procedure
     }
 
     #[RpcMethod(
+        description: "Toggle whether new assets discovered for a given user should be automatically monitored.",
+        params: [
+            "user_id" => "An optional user id. If both the user_id and the email are null, the email of the current user is used.",
+            "email" => "An optional user email. If both the user_id and the email are null, the email of the current user is used. (string|nullable|email|max:191|exists:users,email)",
+            "auto_monitor_new_assets" => "true if the user wants new assets to be automatically monitored, false otherwise. When null, the current value is toggled. (boolean|nullable)"
+        ],
+        result: [
+            "msg" => "A success message.",
+        ],
+        ai_examples: [
+            "if the request is 'arrête de surveiller automatiquement les nouveaux actifs pour bob@example.com', the input should be '{\"email\":\"bob@example.com\",\"auto_monitor_new_assets\":false}'",
+            "if the request is 'arrête de surveiller automatiquement les nouveaux actifs', the input should be '{\"email\":null,\"auto_monitor_new_assets\":false}'",
+            "if the request is 'réactive la surveillance automatique des nouveaux actifs pour alice@example.com', the input should be '{\"email\":\"alice@example.com\",\"auto_monitor_new_assets\":true}'",
+            "if the request is 'désactive la surveillance automatique des nouveaux actifs', the input should be '{\"email\":null,\"auto_monitor_new_assets\":false}'",
+        ],
+        ai_result: "{{ \$result['msg'] }}",
+    )]
+    public function toggleAutoMonitorNewAssets(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'user_id' => 'integer|nullable|prohibits:email|exists:users,id',
+            'email' => 'string|nullable|prohibits:user_id|email|max:191|exists:users,email',
+            'auto_monitor_new_assets' => 'boolean|nullable',
+        ]);
+
+        /** @var User $loggedInUser */
+        $loggedInUser = $request->user();
+
+        if (isset($params['user_id']) && !isset($params['email'])) {
+            $user = User::query()
+                ->where('id', $params['user_id'])
+                ->when($loggedInUser->tenant_id, fn($query) => $query->where('tenant_id', $loggedInUser->tenant_id))
+                ->when($loggedInUser->customer_id, fn($query) => $query->where('customer_id', $loggedInUser->customer_id))
+                ->firstOrFail();
+        } else if (!isset($params['user_id']) && isset($params['email'])) {
+            $user = User::query()
+                ->where('email', $params['email'])
+                ->when($loggedInUser->tenant_id, fn($query) => $query->where('tenant_id', $loggedInUser->tenant_id))
+                ->when($loggedInUser->customer_id, fn($query) => $query->where('customer_id', $loggedInUser->customer_id))
+                ->firstOrFail();
+        } else {
+            $user = $loggedInUser;
+        }
+
+        $user->auto_monitor_new_assets = $params['auto_monitor_new_assets'] ?? !$user->auto_monitor_new_assets;
+        $user->save();
+
+        $status = $user->auto_monitor_new_assets ? 'be automatically monitored' : 'not be automatically monitored';
+
+        return [
+            "msg" => "New assets discovered for user {$user->name} will {$status}."
+        ];
+    }
+
+    #[RpcMethod(
         description: "Immediately send the weekly email report to a given user.",
         params: [
             "user_id" => "An optional user id. If both the user_id and the email are null, the email of the current user is used.",

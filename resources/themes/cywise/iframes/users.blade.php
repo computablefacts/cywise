@@ -24,6 +24,7 @@
         <th>{{ __('Username') }}</th>
         <th>{{ __('Email') }}</th>
         <th>{{ __('Audit Report') }}</th>
+        <th>{{ __('Auto Monitor New Assets') }}</th>
         <th>{{ __('Send audit report') }}</th>
       </tr>
       </thead>
@@ -44,7 +45,12 @@
           </a>
         </td>
         <td>
-          <input type="checkbox" data-user-id="{{ $user->id }}" {{ $user->gets_audit_report ? 'checked' : '' }}>
+          <input type="checkbox" class="toggle-gets-audit-report" data-user-id="{{ $user->id }}" {{ $user->gets_audit_report
+          ? 'checked' : '' }}>
+        </td>
+        <td>
+          <input type="checkbox" class="toggle-auto-monitor-new-assets" data-user-id="{{ $user->id }}" {{ $user->auto_monitor_new_assets
+          ? 'checked' : '' }}>
         </td>
         <td>
           <button class="btn btn-sm btn-primary send-audit-report" data-user-id="{{ $user->id }}">
@@ -53,7 +59,7 @@
         </td>
       </tr>
       <tr>
-        <td colspan="5" class="pt-0">
+        <td colspan="6" class="pt-0">
           @foreach(collect($user->roles->all())->sortBy('name') as $role)
           <span class="lozenge information">{{ $role->name }}</span>
           @endforeach
@@ -70,9 +76,15 @@
 @push('scripts')
 <script>
 
-  document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+  document.querySelectorAll('.toggle-gets-audit-report').forEach((checkbox) => {
     checkbox.addEventListener('change',
       (event) => toggleGetsAuditReportApiCall(event.target.getAttribute('data-user-id'),
+        response => toaster.toastSuccess(response.msg)));
+  });
+
+  document.querySelectorAll('.toggle-auto-monitor-new-assets').forEach((checkbox) => {
+    checkbox.addEventListener('change',
+      (event) => toggleAutoMonitorNewAssetsApiCall(event.target.getAttribute('data-user-id'),
         response => toaster.toastSuccess(response.msg)));
   });
 

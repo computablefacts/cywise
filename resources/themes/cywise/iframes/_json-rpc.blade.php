@@ -314,6 +314,10 @@
     executeJsonRpcApiCall('users@toggleGetsAuditReport', {user_id: userId}, onSuccess);
   }
 
+  function toggleAutoMonitorNewAssetsApiCall(userId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('users@toggleAutoMonitorNewAssets', {user_id: userId}, onSuccess);
+  }
+
   function sendAuditReportApiCall(userId, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('users@sendAuditReport', {user_id: userId}, onSuccess);
   }

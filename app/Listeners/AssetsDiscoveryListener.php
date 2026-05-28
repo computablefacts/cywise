@@ -37,7 +37,7 @@ class AssetsDiscoveryListener extends AbstractListener
             if (!empty($response['subdomains'])) {
 
                 $assets = collect($response['subdomains'])->filter(fn(?string $domain) => !empty($domain));
-                $assets->each(fn(string $domain) => CreateAsset::dispatch($user, $domain, true));
+                $assets->each(fn(string $domain) => CreateAsset::dispatch($user, $domain, $user->auto_monitor_new_assets));
 
                 Log::debug("Assets discovery ended for {$tld} ({$assets->count()})");
             } else {

@@ -337,5 +337,6 @@
   "User tag": "Étiquette utilisateur",
   "System tag": "Étiquette système",
   "This asset seems protected by Cloudflare. Do not forget to whitelist <a href=\"/ips-v4.txt\" target=\"_blank\">our IP addresses</a>.": "Cet actif semble protégé par Cloudflare. N'oubliez pas d'autoriser <a href=\"/ips-v4.txt\" target=\"_blank\">nos adresses IP</a>.",
-  "This asset is not associated with any IP address.": "Cet actif n'est pas associé à une adresse IP."
+  "This asset is not associated with any IP address.": "Cet actif n'est pas associé à une adresse IP.",
+  "Auto Monitor New Assets": "Surveillance des actifs découverts"
 }
