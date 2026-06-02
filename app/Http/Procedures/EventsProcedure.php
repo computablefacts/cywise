@@ -344,7 +344,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         $report = $report['report'];
 
         // Create webpage
-        $title = "Rapport glissant sur 10 jours - {$server->name} ({$server->ip()})";
+        $title = "Rapport sur 7 jours glissants - {$server->name} ({$server->ip()})";
         $slug = "weekly-{$day->format('Y-m-d')}-{$server->id}" . Str::random(64);
         $page = $this->updateOrCreatePage($user, $slug, $title, "{$report}\n\n{$events}");
 
@@ -363,17 +363,20 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
     private function analyzeEvents(User $user, Carbon $day, YnhServer $server): array
     {
-        $window = 10;
+        $window = 7; // Most systems have activity patterns that repeat weekly
         $activities = ['NORMAL', 'SUSPICIOUS', 'ANORMAL', 'UNKNOWN'];
 
         // Load current activity
-        $minDate = $day->copy()->startOfDay()->subDays($window);
+        $minDate = $day->copy()->subDays($window)->startOfDay();
         $maxDate = $day->copy()->endOfDay();
         $eventRequest = new JsonRpcRequest([
             'min_score' => 0, // Load both security events and IoCs
             'server_id' => $server->id,
             'window' => [$minDate->format('Y-m-d'), $maxDate->format('Y-m-d')]
         ]);
+
+        Log::debug("SOC_OPERATOR - CURRENT_ACTIVITY - Fetching events for server {$server->name} between {$minDate->format('Y-m-d')} and {$maxDate->format('Y-m-d')}");
+
         $eventRequest->setUserResolver(fn() => $user);
         $events = $this->list($eventRequest)['events']
             ->map(fn(YnhOsquery $event) => $event->logLine())
@@ -382,39 +385,13 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             ->values();
         $eventsMarkdown = "**Evènements ({$events->count()}) :**\n```\nAucun\n```";
 
-        if ($events->isEmpty()) {
-            return [
-                'activity' => 'NORMAL',
-                'report' => "**Activité :** {$this->activityEnToFr('NORMAL')}\n\n**Analyse :** Aucun évènement significatif n'a été signalé concernant le serveur {$server->name} d'adresse IP {$server->ip()}.",
-                'events' => $eventsMarkdown,
-            ];
-        }
+        Log::debug("SOC_OPERATOR - CURRENT_ACTIVITY - {$events->count()} events fetched");
 
-        $logs = implode("\n", cywise_compress_log_buffer($events->toArray(), 0.8));
+        // Load baseline activity (using the same 7-day period two weeks earlier gives you a baseline that is both recent and separated from the current activity)
+        $baselineMinDate = $minDate->copy()->subDays(2 * $window);
+        $baselineMaxDate = $maxDate->copy()->subDays(2 * $window);
 
-        // Load baseline activity e.g. the mid-point between the oldest and newest events
-        $firstEventDate = YnhOsquery::where('ynh_server_id', $server->id)->min('calendar_time');
-
-        if (!isset($firstEventDate)) {
-            return [
-                'activity' => 'UNKNOWN',
-                'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** Nous finalisons la baseline pour le serveur {$server->name} d'adresse IP {$server->ip()}.",
-                'events' => $eventsMarkdown,
-            ];
-        }
-
-        $baselineStartDate = Carbon::parse($firstEventDate)->startOfDay();
-        $midPoint = $baselineStartDate->copy()->addSeconds((int)($baselineStartDate->diffInSeconds($day) / 2));
-        $baselineMinDate = $midPoint->copy()->subDays($window / 2)->startOfDay();
-        $baselineMaxDate = $midPoint->copy()->addDays($window / 2)->endOfDay();
-
-        if ($minDate->lessThanOrEqualTo($baselineMaxDate)) {
-            return [
-                'activity' => 'UNKNOWN',
-                'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** Nous finalisons la baseline pour le serveur {$server->name} d'adresse IP {$server->ip()}.",
-                'events' => $eventsMarkdown,
-            ];
-        }
+        Log::debug("SOC_OPERATOR - BASELINE_ACTIVITY - Fetching events for server {$server->name} between {$baselineMinDate->format('Y-m-d')} and {$baselineMaxDate->format('Y-m-d')}");
 
         $eventRequest = new JsonRpcRequest([
             'min_score' => 0, // Load both security events and IoCs
@@ -428,7 +405,9 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             ->sort() // Reorder events from the oldest to the newest
             ->values();
 
-        if ($eventz->isEmpty()) {
+        Log::debug("SOC_OPERATOR - BASELINE_ACTIVITY - {$eventz->count()} events fetched");
+
+        if ($events->isEmpty() && $eventz->isEmpty()) {
             return [
                 'activity' => 'UNKNOWN',
                 'report' => "**Activité :** {$this->activityEnToFr('UNKNOWN')}\n\n**Analyse :** Nous finalisons la baseline pour le serveur {$server->name} d'adresse IP {$server->ip()}.",
@@ -436,7 +415,18 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             ];
         }
 
-        $baseline = implode("\n", cywise_compress_log_buffer($eventz->toArray(), 0.8));
+        // Compress logs lines
+        $compressed = cywise_compress_log_buffer($events->toArray(), 0.85);
+        $nbCompressed = count($compressed);
+        $logs = implode("\n", $compressed);
+
+        Log::debug("SOC_OPERATOR - CURRENT_ACTIVITY - {$events->count()} -> {$nbCompressed} lines after compression");
+
+        $compressed = cywise_compress_log_buffer($eventz->toArray(), 0.85);
+        $nbCompressed = count($compressed);
+        $baseline = implode("\n", $compressed);
+
+        Log::debug("SOC_OPERATOR - BASELINE_ACTIVITY - {$eventz->count()} -> {$nbCompressed} lines after compression");
 
         // Load OS information
         $os = YnhOsquery::operatingSystem($server->id);
