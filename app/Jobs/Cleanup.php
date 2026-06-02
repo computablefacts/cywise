@@ -29,6 +29,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Wave\Page;
 
 class Cleanup implements ShouldQueue
 {
@@ -47,6 +48,7 @@ class Cleanup implements ShouldQueue
 
     public function handle()
     {
+        $this->removeOldPages();
         $this->deleteTenantsWithoutUsers();
         $this->removeTrialsWithoutDomains();
         $this->deleteAssetsOfTenantsWithoutSubscription();
@@ -382,5 +384,13 @@ class Cleanup implements ShouldQueue
         Leak::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
         TimelineItem::whereIn('owned_by', $userIds)->delete();
         TimelineFact::whereIn('owned_by', $userIds)->delete();
+
+        // 5. Pages
+        Page::whereIn('author_id', $userIds)->delete();
+    }
+
+    private function removeOldPages(): void
+    {
+        Page::where('updated_at', '<=', Carbon::now()->subDays(10)->startOfDay())->delete();
     }
 }
