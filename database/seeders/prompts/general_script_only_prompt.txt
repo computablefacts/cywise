@@ -6,6 +6,7 @@ TITRE : {title}
 CVE : {cve_id}
 SERVEUR : {ip}:{port}
 TECHNOLOGIE : {technology}
+OS : {operating_system}
 
 MÉTHODOLOGIE À AUTOMATISER :
 {analysis_context}
@@ -16,7 +17,7 @@ RÈGLES DU SCRIPT BASH :
 3. Ne propose PAS de solutions de contournement (ex: règles Nginx pour bloquer une URL) si la méthodologie recommande une mise à jour logicielle, SAUF si l'automatisation de la mise à jour est techniquement impossible par script.
 4. Pour CHAQUE commande critique ou potentiellement destructrice (suppression de fichier, mise à jour, redémarrage de service, modification de configuration), tu DOIS demander une confirmation à l'utilisateur.
    Exemple : `read -p "Voulez-vous vraiment appliquer cette action ? [y/N] " response; if [[ ! $response =~ ^[Yy]$ ]]; then exit 1; fi`
-5. Le script doit être robuste : vérifier l'existence des fichiers avant modification et la présence des outils (apt, yum, systemctl, etc.) avant utilisation.
+5. Le script doit être robuste : vérifier l'existence des fichiers avant modification et la présence des outils adaptés à l'OS détecté ({operating_system}) avant utilisation.
 6. Variables à utiliser : IP={ip}, PORT={port}, TECH={technology}.
 
 RÈGLES DE RÉPONSE :

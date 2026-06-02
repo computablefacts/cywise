@@ -9,6 +9,7 @@ Tu dois analyser une vulnérabilité et fournir des explications détaillées su
 <port>{port}</port>
 <protocol>{protocol}</protocol>
 <type>{type}</type>
+<operating_system>{operating_system}</operating_system>
 <tags>{tags}</tags>
 <title>{title}</title>
 <cve_id>{cve_id}</cve_id>
@@ -45,7 +46,7 @@ Explique concrètement :
 **PRÉREQUIS :**
 - Accès : [SSH, console, etc.]
 - Droits : [sudo, root, etc.]
-- Outils requis : [Liste]
+- Outils requis : [Liste adaptée à l'OS détecté : {operating_system}]
 
 **BACKUP OBLIGATOIRE :**
 [Commandes pour sauvegarder avant modification]

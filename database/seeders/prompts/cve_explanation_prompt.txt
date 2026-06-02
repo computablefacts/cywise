@@ -10,6 +10,7 @@ Tu dois analyser une vulnérabilité CVE et fournir des explications détaillée
 <ip>{ip}</ip>
 <port>{port}</port>
 <protocol>{protocol}</protocol>
+<operating_system>{operating_system}</operating_system>
 <tags>{tags}</tags>
 <type>{type}</type>
 <title>{title}</title>
@@ -52,7 +53,7 @@ Basé sur le score CVSS et la description NIST, explique concrètement :
 **PRÉREQUIS :**
 - Accès : [SSH, console, etc.]
 - Droits : [sudo, root, etc.]
-- Outils : [apt, yum, etc.]
+- Outils : [apt, yum, etc. adaptés à l'OS détecté : {operating_system}]
 
 **BACKUP OBLIGATOIRE :**
 [Commandes pour sauvegarder avant modification]

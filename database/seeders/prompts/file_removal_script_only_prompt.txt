@@ -8,6 +8,7 @@ Un fichier exposé a été détecté sur un serveur {technology}. Tu dois adapte
 <server_type>{technology}</server_type>
 <target>{domain}</target>
 <filename>{filename}</filename>
+<operating_system>{operating_system}</operating_system>
 </detected_information>
 
 <script_template>

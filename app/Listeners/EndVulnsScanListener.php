@@ -12,6 +12,8 @@ use App\Models\Port;
 use App\Models\Scan;
 use App\Models\Trial;
 use App\Models\User;
+use App\Models\YnhOsquery;
+use App\Models\YnhServer;
 use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -392,6 +394,14 @@ class EndVulnsScanListener extends AbstractListener
             'cve_id' => $alert['cve_id'] ?? null,
             'tags' => implode(', ', $tags),
         ];
+
+        $server = YnhServer::where('ip_address', $port->ip)
+            ->orWhere('ip_address_v6', $port->ip)
+            ->first();
+        $os = $server ? YnhOsquery::operatingSystem($server->id) : null;
+        $context['operating_system'] = $os
+            ? "{$os->os} {$os->codename} {$os->major_version}.{$os->minor_version}.{$os->patch_version}"
+            : 'unknown';
 
         if ($category === 'file_exposed') {
             $url = $this->extractExposedUrl($alert, $port);

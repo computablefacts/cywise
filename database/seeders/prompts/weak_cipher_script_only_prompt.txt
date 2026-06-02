@@ -13,6 +13,7 @@ Tu dois UNIQUEMENT modifier les variables TARGET_DOMAIN et TARGET_PORT.
 <port>{port}</port>
 <type>{type}</type>
 <title>{title}</title>
+<operating_system>{operating_system}</operating_system>
 <description>{vulnerability}</description>
 </vulnerability>
 
