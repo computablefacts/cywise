@@ -485,10 +485,23 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
     private function translateEnToFr(string $textEn): string
     {
-        return ChunkAssistant::use()
-            ->withLang(LanguageEnum::ENGLISH)
-            ->withChunk($textEn)
-            ->translate(LanguageEnum::FRENCH);
+        $paragraphsEn = explode('--8<---', $textEn);
+        $paragraphsFr = [];
+
+        foreach ($paragraphsEn as $paragraph) {
+
+            $paragraph = Str::trim($paragraph);
+
+            if (empty($paragraph)) {
+                continue;
+            }
+
+            $paragraphsFr[] = ChunkAssistant::use()
+                ->withLang(LanguageEnum::ENGLISH)
+                ->withChunk($paragraph)
+                ->translate(LanguageEnum::FRENCH);
+        }
+        return implode("\n\n", $paragraphsFr);
     }
 
     private function updateOrCreatePage(User $user, string $slug, string $title, string $markdown): Page

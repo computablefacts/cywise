@@ -157,3 +157,4 @@ Return exactly this JSON structure:
 }
 
 The report must be concise but sufficiently explicit. It should help a human analyst understand why the activity was classified this way.
+Separate each paragraph in the report with a --8<--- line.

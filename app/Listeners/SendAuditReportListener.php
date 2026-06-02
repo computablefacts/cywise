@@ -15,7 +15,6 @@ use Carbon\Carbon;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Parsedown;
 
 class SendAuditReportListener extends AbstractListener
@@ -425,8 +424,7 @@ class SendAuditReportListener extends AbstractListener
                     // return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
 
-                $report = Str::replace("\n\n**", "\n- **", $result['report']);
-                $html = (new Parsedown)->text("## {$server->name} ({$server->ip()})\n- {$report}");
+                $html = (new Parsedown)->text("**{$server->name} ({$server->ip()})**\n\n{$result['report']}");
                 return "<li>{$html}</li>";
             })
             ->filter(fn(string $event) => !empty($event))
