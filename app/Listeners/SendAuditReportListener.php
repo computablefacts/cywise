@@ -423,9 +423,7 @@ class SendAuditReportListener extends AbstractListener
                     return '';
                     // return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
-
-                $html = (new Parsedown)->text("**{$server->name} ({$server->ip()})**\n\n{$result['report']}");
-                return "<li>{$html}</li>";
+                return (new Parsedown)->text("**{$server->name} ({$server->ip()})**\n\n{$result['report']}");
             })
             ->filter(fn(string $event) => !empty($event))
             ->sort()
@@ -433,10 +431,7 @@ class SendAuditReportListener extends AbstractListener
 
         Log::debug("SOC operator report: " . json_encode(['activity' => $activity]));
 
-        return $activity->isEmpty() ? '' : "
-            <h3>Analyse de l'activité des serveurs</h3>
-            <ul>{$activity->implode('')}</ul>
-        ";
+        return $activity->isEmpty() ? '' : "<h3>Analyse de l'activité des serveurs</h3>{$activity->implode('')}";
     }
 
     private function fetchLeaks(User $user, ?Carbon $createdAtOrAfter = null): Collection
