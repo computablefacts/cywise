@@ -215,7 +215,7 @@ if (!function_exists('cywise_compress_log_buffer')) {
             $line = $buffer[$i];
             $lineCount = 1;
 
-            // Check if next line is similar (single line compression)
+            // Check if next line is similar
             while ($i + 1 < $size) {
 
                 $nextLine = $buffer[$i + 1];
@@ -229,9 +229,7 @@ if (!function_exists('cywise_compress_log_buffer')) {
                 }
             }
             if ($lineCount > 1) { // If single line compression worked, output it
-                $compressed[] = "[BEGIN {$lineCount}x REPEATED LINE]";
-                $compressed[] = $line;
-                $compressed[] = "[END {$lineCount}x REPEATED LINE]";
+                $compressed[] = "[{$lineCount}x REPEATED LINE] $line";
                 $i++;
                 continue;
             }
