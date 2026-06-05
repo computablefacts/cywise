@@ -68,6 +68,7 @@ class CreateAssetListener extends AbstractListener
                         $obj = $azzet->tags()->create(['tag' => $tag]);
                     }
                 });
+            $azzet->refresh(); // #9189 : add missing fields
         }
         return $azzet;
     }
