@@ -53,7 +53,7 @@ render(function (Request $request) {
         </ul>
       </div>
       <div class="col-6 text-end">
-        <a href="{{ route('iframes.actions-editor') }}">
+        <a href="{{ route('actions.editor') }}">
           {{ __('+ new') }}
         </a>
       </div>
@@ -76,7 +76,7 @@ render(function (Request $request) {
                        value="{{ $actionName }}"
                        @checked($checked)>
                 @if($instance->isRemote())
-                <a href="{{ route('iframes.actions-editor', ['action_id' => $instance->id()]) }}"
+                <a href="{{ route('actions.editor', ['action_id' => $instance->id()]) }}"
                    class="btn btn-sm btn-link py-0">
                   <b>{{ $instance->name() }}</b>
                 </a>
@@ -130,7 +130,7 @@ render(function (Request $request) {
                        @checked($checked=== null ? ($tenantSettings[$actionName]->enabled ?? true) : $checked)>
                 <b>{{ $instance->name() }}</b>
                 @if($instance->isRemote())
-                <a href="{{ route('iframes.actions-editor', ['action_id' => $instance->id()]) }}"
+                <a href="{{ route('actions.editor', ['action_id' => $instance->id()]) }}"
                    class="btn btn-sm btn-link py-0">
                   <b>{{ $instance->name() }}</b>
                 </a>
