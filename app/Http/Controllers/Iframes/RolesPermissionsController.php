@@ -11,7 +11,7 @@ class RolesPermissionsController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        return view('theme::iframes.roles-and-permissions', [
+        return view('theme::pages.roles-and-permissions', [
             'permissions' => Permission::query()->orderBy('name')->pluck('name')->toArray(),
         ]);
     }
