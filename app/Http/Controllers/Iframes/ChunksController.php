@@ -13,7 +13,7 @@ class ChunksController extends Controller
     public function __invoke(Request $request): View
     {
         $chunks = (new ChunksProcedure())->list(JsonRpcRequest::createFrom($request));
-        return view('theme::iframes.chunks', [
+        return view('theme::pages.chunks', [
             'chunks' => $chunks['chunks'],
             'collection' => $chunks['collection'],
             'file' => $chunks['file'],
