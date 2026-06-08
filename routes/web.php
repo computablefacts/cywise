@@ -15,7 +15,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\CyberBuddyController;
 use App\Http\Controllers\Iframes\CyberScribeController;
 use App\Http\Controllers\Iframes\DocumentationController;
 use App\Http\Controllers\Iframes\DocumentsController;
@@ -504,7 +503,6 @@ Route::get('/website', [WebsiteController::class, '__invoke'])->name('iframes.we
 Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class])->prefix('iframes')->name('iframes.')->group(function () {
     Route::get('/assets', [TimelineController::class, '__invoke'])->name('assets');
     Route::get('/conversations', [TimelineController::class, '__invoke'])->name('conversations');
-    Route::get('/cyberbuddy', [CyberBuddyController::class, '__invoke'])->name('cyberbuddy');
     Route::get('/cyberscribe', [CyberScribeController::class, '__invoke'])->name('cyberscribe');
     Route::get('/documentation', [DocumentationController::class, '__invoke'])->name('documentation');
     Route::get('/documents', [DocumentsController::class, '__invoke'])->name('documents');
