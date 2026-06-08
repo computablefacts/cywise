@@ -15,7 +15,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\PromptsController;
 use App\Http\Controllers\Iframes\RolesPermissionsController;
 use App\Http\Controllers\Iframes\RulesController;
 use App\Http\Controllers\Iframes\RulesEditorController;
@@ -503,7 +502,6 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/ioc', [TimelineController::class, '__invoke'])->name('ioc');
     Route::get('/leaks', [TimelineController::class, '__invoke'])->name('leaks');
     Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
-    Route::get('/prompts', [PromptsController::class, '__invoke'])->name('prompts');
     Route::get('/roles-and-permissions', [RolesPermissionsController::class, '__invoke'])->name('roles-and-permissions');
     Route::get('/scheduled-tasks', [ScheduledTasksController::class, '__invoke'])->name('scheduled-tasks');
     Route::get('/rules', [RulesController::class, '__invoke'])->name('rules');
