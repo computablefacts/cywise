@@ -30,7 +30,7 @@ render(function (Request $request) {
   <div class="container-fluid">
     @include('theme::iframes._agent')
     <div class="px-3 pt-3" style="text-align: right;">
-      <a href="{{ route('iframes.rules-editor') }}">
+      <a href="{{ route('rules-editor') }}">
         {{ __('+ new') }}
       </a>
     </div>
@@ -52,7 +52,7 @@ render(function (Request $request) {
           <div class="col">
             <h6>
               @if(isset($rule->created_by) || \Auth::user()?->isCywiseAdmin())
-              <a href="{{ route('iframes.rules-editor', ['rule_id' => $rule->id]) }}">
+              <a href="{{ route('rules-editor', ['rule_id' => $rule->id]) }}">
                 {{ $rule->displayName() }}
               </a>
               @else

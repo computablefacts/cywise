@@ -15,7 +15,7 @@ class RulesEditorController extends Controller
             'rule_id' => 'nullable|integer|exists:ynh_osquery_rules,id',
         ]);
         $rule = isset($params['rule_id']) ? YnhOsqueryRule::findOrFail($params['rule_id']) : new YnhOsqueryRule();
-        return view('theme::iframes.rules-editor', [
+        return view('theme::pages.rules-editor', [
             'rule' => $rule,
         ]);
     }
