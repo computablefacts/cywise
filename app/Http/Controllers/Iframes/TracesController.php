@@ -13,6 +13,6 @@ class TracesController extends Controller
     public function __invoke(Request $request): View
     {
         $traces = (new TracesProcedure())->list(JsonRpcRequest::createFrom($request));
-        return view('theme::iframes.traces', $traces);
+        return view('theme::pages.traces', $traces);
     }
 }
