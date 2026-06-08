@@ -367,7 +367,7 @@ render(function (Request $request) {
           </div>
           <div class="row mt-2">
             <div class="col text-center">
-              <a class="btn btn-primary" href="{{ route('iframes.tables') }}">{{ __('Back to tables list') }}</a>
+              <a class="btn btn-primary" href="{{ route('tables') }}">{{ __('Back to tables list') }}</a>
             </div>
           </div>
         </div>

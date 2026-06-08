@@ -15,7 +15,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\TablesController;
 use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Controllers\Iframes\TracesController;
 use App\Http\Controllers\Iframes\UsersController;
@@ -494,7 +493,6 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/ioc', [TimelineController::class, '__invoke'])->name('ioc');
     Route::get('/leaks', [TimelineController::class, '__invoke'])->name('leaks');
     Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
-    Route::get('/tables', [TablesController::class, '__invoke'])->name('tables');
     Route::get('/traces', [TracesController::class, '__invoke'])->name('traces');
     Route::get('/users', [UsersController::class, '__invoke'])->name('users');
     Route::get('/users/invitation', [UsersInvitationController::class, '__invoke'])->name('user-invitation');
