@@ -32,7 +32,7 @@ class FrameworksController extends Controller
                 })
                 ->filter(fn(object $item) => count($item->highlights) > 0);
         }
-        return view('theme::iframes.frameworks', [
+        return view('theme::pages.frameworks', [
             'search' => $search,
             'frameworks' => $frameworks,
             'highlights' => $highlights,
