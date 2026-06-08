@@ -128,7 +128,7 @@ class TimelineController extends Controller
                     'url' => Str::startsWith($uid, 'TA') ? "https://attack.mitre.org/tactics/$uid/" : "https://attack.mitre.org/techniques/$uid/"
                 ])->values() : [],
                 'can_edit' => isset($rule->created_by) || \Auth::user()?->isCywiseAdmin(),
-                'editor_url' => route('iframes.rules-editor', ['rule_id' => $rule->id]),
+                'editor_url' => route('rules-editor', ['rule_id' => $rule->id]),
             ]];
         })->toArray();
 

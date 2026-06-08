@@ -538,7 +538,7 @@
           <div class="col">
             <h6 id="rule-title">
               @if(isset($selectedRule->created_by) || \Auth::user()?->isCywiseAdmin())
-              <a href="{{ route('iframes.rules-editor', ['rule_id' => $selectedRule->id]) }}">
+              <a href="{{ route('rules-editor', ['rule_id' => $selectedRule->id]) }}">
                 {{ $selectedRule->displayName() }}
               </a>
               @else
