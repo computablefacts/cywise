@@ -16,7 +16,6 @@ use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
 use App\Http\Controllers\Iframes\TimelineController;
-use App\Http\Controllers\Iframes\UsersInvitationController;
 use App\Http\Controllers\Iframes\WebsiteController;
 use App\Http\Controllers\MultiLevelHealthCheckController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
@@ -491,6 +490,5 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/ioc', [TimelineController::class, '__invoke'])->name('ioc');
     Route::get('/leaks', [TimelineController::class, '__invoke'])->name('leaks');
     Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
-    Route::get('/users/invitation', [UsersInvitationController::class, '__invoke'])->name('user-invitation');
     Route::get('/vulnerabilities', [TimelineController::class, '__invoke'])->name('vulnerabilities');
 });

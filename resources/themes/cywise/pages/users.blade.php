@@ -16,7 +16,7 @@ render(function (Request $request) {
 <x-layouts.app>
   <div class="container-fluid">
     <div class="px-3 pt-3" style="text-align: right;">
-      <a href="{{ route('iframes.user-invitation') }}">
+      <a href="{{ route('user-invitation') }}">
         {{ __('+ new') }}
       </a>
     </div>

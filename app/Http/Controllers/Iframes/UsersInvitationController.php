@@ -10,6 +10,6 @@ class UsersInvitationController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        return view('theme::iframes.user-invitation');
+        return view('theme::pages.user-invitation');
     }
 }
