@@ -44,7 +44,7 @@ render(function (Request $request) {
   <div class="container-fluid">
     @include('theme::iframes._agent')
     <div class="px-3 pt-3" style="text-align: right;">
-      <a href="{{ route('iframes.sca-editor') }}">
+      <a href="{{ route('sca-editor') }}">
         {{ __('+ new') }}
       </a>
     </div>

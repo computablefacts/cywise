@@ -15,7 +15,7 @@ class ScaEditorController extends Controller
             'check_id' => 'nullable|integer|exists:ynh_ossec_checks,id',
         ]);
         $check = isset($params['check_id']) ? YnhOssecCheck::findOrFail($params['check_id']) : new YnhOssecCheck();
-        return view('theme::iframes.sca-editor', [
+        return view('theme::pages.sca-editor', [
             'check' => $check,
         ]);
     }

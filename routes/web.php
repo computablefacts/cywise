@@ -15,7 +15,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\ScaEditorController;
 use App\Http\Controllers\Iframes\SharesController;
 use App\Http\Controllers\Iframes\TableController;
 use App\Http\Controllers\Iframes\TablesController;
@@ -497,7 +496,6 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/ioc', [TimelineController::class, '__invoke'])->name('ioc');
     Route::get('/leaks', [TimelineController::class, '__invoke'])->name('leaks');
     Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
-    Route::get('/sca/edit', [ScaEditorController::class, '__invoke'])->name('sca-editor');
     Route::get('/shares', [SharesController::class, '__invoke'])->name('shares');
     Route::get('/table', [TableController::class, '__invoke'])->name('table');
     Route::get('/tables', [TablesController::class, '__invoke'])->name('tables');
