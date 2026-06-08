@@ -15,7 +15,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\DocumentsController;
 use App\Http\Controllers\Iframes\FrameworksController;
 use App\Http\Controllers\Iframes\PromptsController;
 use App\Http\Controllers\Iframes\RolesPermissionsController;
@@ -501,7 +500,6 @@ Route::get('/website', [WebsiteController::class, '__invoke'])->name('iframes.we
 Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class])->prefix('iframes')->name('iframes.')->group(function () {
     Route::get('/assets', [TimelineController::class, '__invoke'])->name('assets');
     Route::get('/conversations', [TimelineController::class, '__invoke'])->name('conversations');
-    Route::get('/documents', [DocumentsController::class, '__invoke'])->name('documents');
     Route::get('/events', [TimelineController::class, '__invoke'])->name('events');
     Route::get('/frameworks', [FrameworksController::class, '__invoke'])->name('frameworks');
     Route::get('/ioc', [TimelineController::class, '__invoke'])->name('ioc');
