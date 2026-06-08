@@ -15,7 +15,7 @@ class ScheduledTasksController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        return view('theme::iframes.scheduled-tasks', [
+        return view('theme::pages.scheduled-tasks', [
             'tasks' => $tasks,
         ]);
     }
