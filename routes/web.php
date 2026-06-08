@@ -15,7 +15,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\RulesController;
 use App\Http\Controllers\Iframes\RulesEditorController;
 use App\Http\Controllers\Iframes\ScaController;
 use App\Http\Controllers\Iframes\ScaEditorController;
@@ -500,7 +499,6 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/ioc', [TimelineController::class, '__invoke'])->name('ioc');
     Route::get('/leaks', [TimelineController::class, '__invoke'])->name('leaks');
     Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
-    Route::get('/rules', [RulesController::class, '__invoke'])->name('rules');
     Route::get('/rules/edit', [RulesEditorController::class, '__invoke'])->name('rules-editor');
     Route::get('/sca', [ScaController::class, '__invoke'])->name('sca');
     Route::get('/sca/edit', [ScaEditorController::class, '__invoke'])->name('sca-editor');

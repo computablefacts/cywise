@@ -12,6 +12,6 @@ class RulesController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        return view('theme::iframes.rules', (new OsqueryRulesProcedure())->list(JsonRpcRequest::createFrom($request)));
+        return view('theme::pages.rules', (new OsqueryRulesProcedure())->list(JsonRpcRequest::createFrom($request)));
     }
 }
