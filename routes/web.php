@@ -15,7 +15,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\ActionsController;
 use App\Http\Controllers\Iframes\ActionsEditorController;
 use App\Http\Controllers\Iframes\AnalyzeController;
 use App\Http\Controllers\Iframes\ChunksController;
@@ -532,7 +531,6 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/table', [TableController::class, '__invoke'])->name('table');
     Route::get('/tables', [TablesController::class, '__invoke'])->name('tables');
     Route::get('/traces', [TracesController::class, '__invoke'])->name('traces');
-    Route::get('/actions', [ActionsController::class, '__invoke'])->name('actions');
     Route::get('/actions/edit', [ActionsEditorController::class, '__invoke'])->name('actions-editor');
     Route::get('/users', [UsersController::class, '__invoke'])->name('users');
     Route::get('/users/invitation', [UsersInvitationController::class, '__invoke'])->name('user-invitation');
