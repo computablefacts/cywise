@@ -1,16 +1,11 @@
 <?php
 
-use App\Http\Controllers\Iframes\TablesController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
-use Illuminate\Http\Request;
-use function Laravel\Folio\{middleware, name, render};
+use function Laravel\Folio\{middleware, name};
 
 middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class]);
 name('tables');
-render(function (Request $request) {
-  return app(TablesController::class)($request);
-});
 ?>
 
 <x-layouts.app>

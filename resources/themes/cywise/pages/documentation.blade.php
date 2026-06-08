@@ -1,16 +1,11 @@
 <?php
 
-use App\Http\Controllers\Iframes\DocumentationController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
-use Illuminate\Http\Request;
-use function Laravel\Folio\{middleware, name, render};
+use function Laravel\Folio\{middleware, name};
 
 middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class]);
 name('documentation');
-render(function (Request $request) {
-  return app(DocumentationController::class)($request);
-});
 ?>
 
 <x-layouts.app>
