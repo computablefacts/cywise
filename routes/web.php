@@ -22,7 +22,6 @@ use App\Http\Controllers\Iframes\ChunksController;
 use App\Http\Controllers\Iframes\CollectionsController;
 use App\Http\Controllers\Iframes\CyberBuddyController;
 use App\Http\Controllers\Iframes\CyberScribeController;
-use App\Http\Controllers\Iframes\DashboardController;
 use App\Http\Controllers\Iframes\DocumentationController;
 use App\Http\Controllers\Iframes\DocumentsController;
 use App\Http\Controllers\Iframes\FrameworksController;
@@ -515,7 +514,6 @@ Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::
     Route::get('/conversations', [TimelineController::class, '__invoke'])->name('conversations');
     Route::get('/cyberbuddy', [CyberBuddyController::class, '__invoke'])->name('cyberbuddy');
     Route::get('/cyberscribe', [CyberScribeController::class, '__invoke'])->name('cyberscribe');
-    Route::get('/dashboard', [DashboardController::class, '__invoke'])->name('dashboard');
     Route::get('/documentation', [DocumentationController::class, '__invoke'])->name('documentation');
     Route::get('/documents', [DocumentsController::class, '__invoke'])->name('documents');
     Route::get('/events', [TimelineController::class, '__invoke'])->name('events');

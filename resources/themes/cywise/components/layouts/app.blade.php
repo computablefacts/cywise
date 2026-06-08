@@ -17,8 +17,27 @@
             }
         });
     </script>
+
+    <!-- FastBootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/fastbootstrap@2.2.0/dist/css/fastbootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha256-V6lu+OdYNKTKTsVFBuQsyIlDiRWiOmtC8VQ8Lzdm2i4="
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+
+    <!-- app-specific styles -->
+    <link href="{{ asset('cywise/css/app.css') }}" rel="stylesheet">
+
+    <!-- page-specific styles -->
+    @stack('styles')
 </head>
 <body x-data class="flex flex-col lg:min-h-screen bg-zinc-50 dark:bg-zinc-900 @if(config('wave.dev_bar')){{ 'pb-10' }}@endif">
+
+    @include('theme::iframes._blueprintjs')
+    @include('theme::iframes._toaster')
+    @include('theme::iframes._json-rpc')
 
     <x-app.sidebar />
 
@@ -40,9 +59,14 @@
     @if(!auth()->guest() && auth()->user()->hasChangelogNotifications())
         @include('theme::partials.changelogs')
     @endif
+
+    <!-- app-specific scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
     @include('theme::partials.footer-scripts')
     {{ $javascript ?? '' }}
-    
+
+    <!-- page-specific scripts -->
+    @stack('scripts')
 
 </body>
 </html>

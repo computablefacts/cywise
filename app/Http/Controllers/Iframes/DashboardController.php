@@ -119,7 +119,7 @@ class DashboardController extends Controller
             ->take(3)
             ->toArray();
 
-        return view('theme::iframes.dashboard', [
+        return view('theme::pages.dashboard', [
             'nb_monitored' => $nbMonitored,
             'nb_monitorable' => $nbMonitorable,
             'nb_vulns_high' => $nbVulnsHigh,

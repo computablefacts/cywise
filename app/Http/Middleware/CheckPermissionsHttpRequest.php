@@ -6,6 +6,7 @@ use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CheckPermissionsHttpRequest
 {
@@ -32,6 +33,9 @@ class CheckPermissionsHttpRequest
                         'required_permission' => 'Missing route name.',
                     ],
                 ], 403);
+            }
+            if (!Str::startsWith('iframes.', $route)) {
+                $route = "iframes.{$route}";
             }
             if ($user->cannotView($route)) {
                 return response()->json([
