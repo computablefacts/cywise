@@ -8,6 +8,6 @@ class AnalyzeController extends Controller
 {
     public function __invoke()
     {
-        return view('theme::iframes.analyze');
+        return view('theme::pages.analyze');
     }
 }

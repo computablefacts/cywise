@@ -15,7 +15,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\AnalyzeController;
 use App\Http\Controllers\Iframes\ChunksController;
 use App\Http\Controllers\Iframes\CollectionsController;
 use App\Http\Controllers\Iframes\CyberBuddyController;
@@ -505,7 +504,6 @@ Route::post('/files/many', '\App\Http\Controllers\CyberBuddyController@uploadMan
 Route::get('/website', [WebsiteController::class, '__invoke'])->name('iframes.website');
 
 Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class])->prefix('iframes')->name('iframes.')->group(function () {
-    Route::get('/analyze', [AnalyzeController::class, '__invoke'])->name('analyze');
     Route::get('/assets', [TimelineController::class, '__invoke'])->name('assets');
     Route::get('/chunks', [ChunksController::class, '__invoke'])->name('chunks');
     Route::get('/collections', [CollectionsController::class, '__invoke'])->name('collections');
