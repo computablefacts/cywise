@@ -95,30 +95,30 @@ render(function (Request $request) {
           <div class="col">
             <ul class="pagination justify-content-center mt-3 mb-3">
               <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ route('iframes.prompts', ['page' => 1]) }}">
+                <a class="page-link" href="{{ route('prompts', ['page' => 1]) }}">
                   <span>&laquo;&nbsp;{{ __('First') }}</span>
                 </a>
               </li>
               <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
                 <a class="page-link"
-                   href="{{ route('iframes.prompts', ['page' => $currentPage <= 1 ? 1 : $currentPage - 1]) }}">
+                   href="{{ route('prompts', ['page' => $currentPage <= 1 ? 1 : $currentPage - 1]) }}">
                   <span>&lt;&nbsp;{{ __('Previous') }}</span>
                 </a>
               </li>
               <li class="page-item">
                 <a class="page-link active"
-                   href="{{ route('iframes.prompts', ['page' => $currentPage]) }}">
+                   href="{{ route('prompts', ['page' => $currentPage]) }}">
                   {{ $currentPage }}
                 </a>
               </li>
               <li class="page-item {{ $currentPage >= $nbPages ? 'disabled' : '' }}">
                 <a class="page-link"
-                   href="{{ route('iframes.prompts', ['page' => $currentPage >= $nbPages ? $nbPages : $currentPage + 1])}}">
+                   href="{{ route('prompts', ['page' => $currentPage >= $nbPages ? $nbPages : $currentPage + 1])}}">
                   <span>{{ __('Next') }}&nbsp;&gt;</span>
                 </a>
               </li>
               <li class="page-item {{ $currentPage >= $nbPages ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ route('iframes.prompts', ['page' => $nbPages]) }}">
+                <a class="page-link" href="{{ route('prompts', ['page' => $nbPages]) }}">
                   <span>{{ __('Last') }}&nbsp;&raquo;</span>
                 </a>
               </li>
