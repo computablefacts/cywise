@@ -25,8 +25,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
-class TimelineController extends Controller
+abstract class AbstractTimelineController extends Controller
 {
+    protected abstract function objects(): string;
+
+    protected abstract function viewname(): string;
+
     public static function noteAndMemo(User $user, TimelineItem $item): array
     {
         $timestamp = $item->timestamp->utc()->format('Y-m-d H:i:s');
@@ -60,7 +64,7 @@ class TimelineController extends Controller
         ]);
 
         $rulesList = YnhOsqueryRule::where('enabled', true)->orderBy('name')->get();
-        $objects = last(explode('/', trim($request->path(), '/')));
+        $objects = $this->objects();
 
         if ($objects === 'events') {
             $rulesList = $rulesList->filter(fn(YnhOsqueryRule $rule) => $rule->score <= 0);
@@ -132,7 +136,7 @@ class TimelineController extends Controller
             ]];
         })->toArray();
 
-        return view('theme::iframes.timeline', [
+        return view($this->viewname(), [
             'today_separator' => $this->separator(Carbon::now()),
             'items' => (
             $objects === 'assets' ?

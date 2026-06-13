@@ -15,7 +15,7 @@
               <b>{{ $nb_high }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.ioc', [ 'level' => 'high' ]) }}" class="link">
+              <a href="{{ route('ioc', [ 'level' => 'high' ]) }}" class="link">
                 {{ __('High') }}
               </a>
             </div>
@@ -40,7 +40,7 @@
               <b>{{ $nb_medium }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.ioc', [ 'level' => 'medium' ]) }}" class="link">
+              <a href="{{ route('ioc', [ 'level' => 'medium' ]) }}" class="link">
                 {{ __('Medium') }}
               </a>
             </div>
@@ -65,7 +65,7 @@
               <b>{{ $nb_low }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.ioc', [ 'level' => 'low' ]) }}" class="link">
+              <a href="{{ route('ioc', [ 'level' => 'low' ]) }}" class="link">
                 {{ __('Low') }}
               </a>
             </div>
@@ -90,7 +90,7 @@
               <b>{{ $nb_suspect }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.ioc', [ 'level' => 'suspect' ]) }}" class="link">
+              <a href="{{ route('ioc', [ 'level' => 'suspect' ]) }}" class="link">
                 {{ __('Suspect') }}
               </a>
             </div>

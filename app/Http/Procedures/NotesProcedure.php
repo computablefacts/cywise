@@ -2,7 +2,7 @@
 
 namespace App\Http\Procedures;
 
-use App\Http\Controllers\Iframes\TimelineController;
+use App\Http\Controllers\Iframes\AbstractTimelineController;
 use App\Http\Procedures\RpcMethod as RpcMethod;
 use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
@@ -61,7 +61,7 @@ class NotesProcedure extends Procedure
 
         return [
             "msg" => "Your note has been saved!",
-            "html" => TimelineController::noteAndMemo($user, $item)['html'] ?? '',
+            "html" => AbstractTimelineController::noteAndMemo($user, $item)['html'] ?? '',
         ];
     }
 

@@ -10,7 +10,7 @@
       <span>
         {!! __('<b>:user</b> started a <a href=":href" class="link">conversation</a>', [
           'user' => $conversation->createdBy->name,
-          'href' => route('iframes.cyberbuddy', [ 'conversation_id' => $conversation->id ]) ])
+          'href' => route('cyberbuddy', [ 'conversation_id' => $conversation->id ]) ])
         !!}
       </span>
   </div>
@@ -21,7 +21,7 @@
         @if($conversation->format === \App\Models\Conversation::FORMAT_V1)
         {!! __('<b>:user</b> started a <a href=":href" class="link">conversation</a>', [
           'user' => $conversation->createdBy->name,
-          'href' => route('iframes.cyberbuddy', [ 'conversation_id' => $conversation->id ]) ])
+          'href' => route('cyberbuddy', [ 'conversation_id' => $conversation->id ]) ])
         !!}
         @else
         {!! __('<b>:user</b> started a <b>conversation</b>', [ 'user' => $conversation->createdBy->name ]) !!}

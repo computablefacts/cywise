@@ -15,11 +15,8 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\TimelineController;
 use App\Http\Controllers\Iframes\WebsiteController;
 use App\Http\Controllers\MultiLevelHealthCheckController;
-use App\Http\Middleware\CheckPermissionsHttpRequest;
-use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Jobs\TriggerAssetsDiscovery;
 use App\Models\YnhServer;
@@ -482,13 +479,3 @@ Route::post('/files/one', '\App\Http\Controllers\CyberBuddyController@uploadOneF
 Route::post('/files/many', '\App\Http\Controllers\CyberBuddyController@uploadManyFiles')->middleware('auth:sanctum');
 
 Route::get('/website', [WebsiteController::class, '__invoke'])->name('iframes.website');
-
-Route::middleware([LogHttpRequests::class, 'auth', CheckPermissionsHttpRequest::class])->prefix('iframes')->name('iframes.')->group(function () {
-    Route::get('/assets', [TimelineController::class, '__invoke'])->name('assets');
-    Route::get('/conversations', [TimelineController::class, '__invoke'])->name('conversations');
-    Route::get('/events', [TimelineController::class, '__invoke'])->name('events');
-    Route::get('/ioc', [TimelineController::class, '__invoke'])->name('ioc');
-    Route::get('/leaks', [TimelineController::class, '__invoke'])->name('leaks');
-    Route::get('/notes-and-memos', [TimelineController::class, '__invoke'])->name('notes-and-memos');
-    Route::get('/vulnerabilities', [TimelineController::class, '__invoke'])->name('vulnerabilities');
-});
