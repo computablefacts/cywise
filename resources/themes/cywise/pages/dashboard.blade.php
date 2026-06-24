@@ -601,7 +601,7 @@ render(function (Request $request) {
 
     function createAsset() {
       const asset = document.querySelector('#asset').value;
-      createAssetApiCall(asset, true, () => toaster.toastSuccess("{{ __('The monitoring started.') }}"));
+      createAssetApiCall(asset, true, () => window.toaster.toastSuccess("{{ __('The monitoring started.') }}"));
     }
 
   </script>

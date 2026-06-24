@@ -86,7 +86,7 @@ name('cyberscribe');
       reader.onload = e => {
         saveTemplateApiCall(null, true, file.name, JSON.parse(e.target.result), response => {
           elTemplates.items = [response.template].concat(elTemplates.items); // TODO : sort by name?
-          toaster.toastSuccess("{{ __('Your model has been successfully uploaded!') }}");
+          window.toaster.toastSuccess("{{ __('Your model has been successfully uploaded!') }}");
         }, () => {
           elSubmit.loading = false;
           elSubmit.disabled = false;
@@ -115,7 +115,7 @@ name('cyberscribe');
       const ctx = window.BlockNote ? window.BlockNote.ctx : null;
 
       if (!template || !ctx) {
-        toaster.toastError("{{ __('The document is not loaded!') }}");
+        window.toaster.toastError("{{ __('The document is not loaded!') }}");
         return;
       }
       saveTemplateApiCall(template.id, false, template.name, ctx.blocks, response => {
@@ -125,7 +125,7 @@ name('cyberscribe');
         template.id = response.template.id;
         elTemplates.items = [response.template].concat(elTemplates.items.filter(item => item.id !== template.id)); // TODO : sort by name?
         elTemplates.selectedItem = response.template;
-        toaster.toastSuccess("{{ __('The document has been saved!') }}");
+        window.toaster.toastSuccess("{{ __('The document has been saved!') }}");
       });
     };
 
@@ -134,7 +134,7 @@ name('cyberscribe');
       const ctx = window.BlockNote ? window.BlockNote.ctx : null;
 
       if (!ctx) {
-        toaster.toastError("{{ __('The document is not loaded!') }}");
+        window.toaster.toastError("{{ __('The document is not loaded!') }}");
         return;
       }
 
@@ -215,7 +215,7 @@ name('cyberscribe');
         deleteTemplateApiCall(elTemplates.selectedItem.id, () => {
           elTemplates.items = elTemplates.items.filter(item => item.id !== elTemplates.selectedItem.id);
           clearDocument();
-          toaster.toastSuccess("{{ __('The document has been deleted!') }}");
+          window.toaster.toastSuccess("{{ __('The document has been deleted!') }}");
         });
       }
     };

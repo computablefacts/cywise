@@ -113,7 +113,7 @@ render(function (Request $request) {
         examples: JSON.parse(editorExamples.getValue() || '[]')
       };
 
-      createRemoteActionApiCall(params, () => toaster.toastSuccess("{{ __('The action has been saved.') }}"));
+      createRemoteActionApiCall(params, () => window.toaster.toastSuccess("{{ __('The action has been saved.') }}"));
     });
 
   </script>

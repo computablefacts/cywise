@@ -574,7 +574,7 @@ render(function (Request $request) {
 
     const uploadTables = () => {
       if (uploadSelectedFiles.length === 0) {
-        toaster.toastError("{{ __('Please select at least one TSV file.') }}");
+        window.toaster.toastError("{{ __('Please select at least one TSV file.') }}");
         return false;
       }
 
@@ -588,11 +588,11 @@ render(function (Request $request) {
         }
       })
         .then(response => {
-          toaster.toastSuccess("{{ __('Files uploaded successfully!') }}");
+          window.toaster.toastSuccess("{{ __('Files uploaded successfully!') }}");
           uploadSelectedFiles = [];
           refreshUploadList();
         })
-        .catch(error => toaster.toastAxiosError(error))
+        .catch(error => window.toaster.toastAxiosError(error))
         .finally(() => {
           isUpdatingTheListOfTables = false;
           listTables();
@@ -653,7 +653,7 @@ render(function (Request $request) {
       const tables = checkboxes.map(checkbox => checkbox.getAttribute('data-file'));
 
       if (tables.length !== 1) {
-        toaster.toastError("{{ __('Please select the table to import.') }}");
+        window.toaster.toastError("{{ __('Please select the table to import.') }}");
         return false;
       }
 
@@ -704,18 +704,18 @@ render(function (Request $request) {
         checkbox => JSON.parse(com.computablefacts.helpers.fromBase64(checkbox.getAttribute('data-file'))));
 
       if (tables.length === 0) {
-        toaster.toastError("{{ __('Please select the table to import.') }}");
+        window.toaster.toastError("{{ __('Please select the table to import.') }}");
         return false;
       }
       if (description.trim() === '') {
-        toaster.toastError("{{ __('Please enter a table description.') }}");
+        window.toaster.toastError("{{ __('Please enter a table description.') }}");
         return false;
       }
 
       const updatable = document.getElementById('toggle-updatable').checked === true;
       const copy = document.getElementById('toggle-copy').checked === true;
       const deduplicate = document.getElementById('toggle-deduplicate').checked === true;
-      const onSuccess = response => toaster.toastSuccess(response.message);
+      const onSuccess = response => window.toaster.toastSuccess(response.message);
 
       if (elStorageType.el.selectedItem === AWS_STORAGE.value) {
         importAwsFileApiCall(elAwsRegion.el.value, elAwsAccessKeyId.el.value, elAwsSecretAccessKey.el.value,
@@ -740,19 +740,19 @@ render(function (Request $request) {
       const materialize = document.getElementById('toggle-materialize').checked === true;
 
       if (name.trim() === '') {
-        toaster.toastError("{{ __('Please enter a table name.') }}");
+        window.toaster.toastError("{{ __('Please enter a table name.') }}");
         return false;
       }
       if (description.trim() === '') {
-        toaster.toastError("{{ __('Please enter a table description.') }}");
+        window.toaster.toastError("{{ __('Please enter a table description.') }}");
         return false;
       }
       if (sql.trim() === '') {
-        toaster.toastError("{{ __('Please enter a SQL query.') }}");
+        window.toaster.toastError("{{ __('Please enter a SQL query.') }}");
         return false;
       }
 
-      createVirtualTableApiCall(sql, materialize, name, description, response => toaster.toastSuccess(response.message));
+      createVirtualTableApiCall(sql, materialize, name, description, response => window.toaster.toastSuccess(response.message));
       return true;
     };
 

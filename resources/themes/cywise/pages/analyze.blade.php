@@ -150,14 +150,14 @@ name('analyze');
           });
 
           if (!data || !data.length) {
-            toaster.toastError('Empty TSV file.');
+            window.toaster.toastError('Empty TSV file.');
             return;
           }
 
           buildCharts();
 
         } catch (err) {
-          toaster.toastError(err.message || 'Failed to parse TSV');
+          window.toaster.toastError(err.message || 'Failed to parse TSV');
         }
       };
       reader.readAsText(file);
@@ -210,7 +210,7 @@ name('analyze');
 
       const cf = window.crossfilter || window.crossfilter2;
       if (!cf) {
-        toaster.toastError('Crossfilter library failed to load. Please check your network connection and try again.');
+        window.toaster.toastError('Crossfilter library failed to load. Please check your network connection and try again.');
         return;
       }
 
@@ -218,14 +218,14 @@ name('analyze');
       const columns = Object.keys(data[0] || {});
 
       if (!columns.includes('output')) {
-        toaster.toastError('The CSV file must contain an "output" column.');
+        window.toaster.toastError('The CSV file must contain an "output" column.');
         return;
       }
 
       const outputValues = Array.from(new Set(data.map(d => d['output']))).filter(v => v !== '');
 
       if (outputValues.length > 5) {
-        toaster.toastError('The "output" column must have 5 or fewer categories. Found: ' + outputValues.length);
+        window.toaster.toastError('The "output" column must have 5 or fewer categories. Found: ' + outputValues.length);
         return;
       }
       if (elOptimizeBtn) {

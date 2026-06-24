@@ -21,7 +21,7 @@
     };
 
     return fetch(fullUrl, options).catch(error => {
-      toaster.toastError(error);
+      window.toaster.toastError(error);
       console.error(error);
     });
   }
@@ -66,7 +66,7 @@
         const scopes = Array.from(document.querySelectorAll('.note-scope:checked')).map(cb => cb.value);
 
         if (scopes.length === 0) {
-          toaster.toastError("{{ __('Please select at least one scope.') }}");
+          window.toaster.toastError("{{ __('Please select at least one scope.') }}");
           return;
         }
 
@@ -120,13 +120,13 @@
   const deleteConversation = (conversationId) => {
     const response = confirm("{{ __('Are you sure you want to delete this conversation?') }}");
     if (response) {
-      deleteConversationApiCall(conversationId, (response) => toaster.toastSuccess(response.msg));
+      deleteConversationApiCall(conversationId, (response) => window.toaster.toastSuccess(response.msg));
     }
   }
 
   /* EVENTS */
 
-  const dismissEvent = (eventId) => dismissEventApiCall(eventId, () => toaster.toastSuccess("{{ __('Hide events like this for this server in the timeline.') }}"));
+  const dismissEvent = (eventId) => dismissEventApiCall(eventId, () => window.toaster.toastSuccess("{{ __('Hide events like this for this server in the timeline.') }}"));
 
   /* VULNERABILITIES */
 
@@ -139,7 +139,7 @@
       document.querySelectorAll(`#stop-monitoring-${assetId}`).forEach(el => el.classList.remove('d-none'));
       document.querySelectorAll(`#restart-scan-${assetId}`).forEach(el => el.classList.remove('d-none'));
       document.querySelectorAll(`#delete-asset-${assetId}`).forEach(el => el.classList.add('d-none'));
-      toaster.toastSuccess("{{ __('The monitoring started.') }}");
+      window.toaster.toastSuccess("{{ __('The monitoring started.') }}");
     });
   const stopMonitoringAsset = (assetId) => unmonitorAssetApiCall(assetId,
     () => {
@@ -147,14 +147,14 @@
       document.querySelectorAll(`#stop-monitoring-${assetId}`).forEach(el => el.classList.add('d-none'));
       document.querySelectorAll(`#restart-scan-${assetId}`).forEach(el => el.classList.add('d-none'));
       document.querySelectorAll(`#delete-asset-${assetId}`).forEach(el => el.classList.remove('d-none'));
-      toaster.toastSuccess("{{ __('The monitoring stopped.') }}");
+      window.toaster.toastSuccess("{{ __('The monitoring stopped.') }}");
     });
   const deleteAsset = (assetId) => deleteAssetApiCall(assetId,
-    () => toaster.toastSuccess("{{ __('The asset will be deleted soon.') }}"));
+    () => window.toaster.toastSuccess("{{ __('The asset will be deleted soon.') }}"));
   const restartScan = (assetId) => restartAssetScanApiCall(assetId,
-    () => toaster.toastSuccess("{{ __('The scan has been restarted.') }}"));
+    () => window.toaster.toastSuccess("{{ __('The scan has been restarted.') }}"));
   const toggleAutoMonitorNewSubdomains = (assetId) => toggleAutoMonitorNewSubdomainsApiCall(assetId,
-    (response) => toaster.toastSuccess(response.msg));
+    (response) => window.toaster.toastSuccess(response.msg));
 
   /* ASSETS TAGGING */
 
@@ -182,7 +182,7 @@
 
       // If already present, do nothing
       if (document.getElementById(`tag-${tag.id}`)) {
-        toaster.toastSuccess("{{ __('Tag already present.') }}");
+        window.toaster.toastSuccess("{{ __('Tag already present.') }}");
         return;
       }
 
@@ -215,9 +215,8 @@
       wrapper.appendChild(btn);
       list.appendChild(wrapper);
 
-      if (toaster) {
-        toaster.toastSuccess("{{ __('Tag added.') }}");
-      }
+      window.toaster.toastSuccess("{{ __('Tag added.') }}");
+
       toggleTagInput(assetId);
     });
   }
@@ -228,10 +227,8 @@
       if (elTag) {
         elTag.remove();
       }
-      if (toaster) {
-        const msg = response && response.msg ? response.msg : "{{ __('Tag removed.') }}";
-        toaster.toastSuccess(msg);
-      }
+      const msg = response && response.msg ? response.msg : "{{ __('Tag removed.') }}";
+      window.toaster.toastSuccess(msg);
       toggleTagInput(assetId);
     });
   }

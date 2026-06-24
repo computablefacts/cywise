@@ -57,9 +57,7 @@
       const el = document.getElementById(id);
       el.select();
       document.execCommand('copy');
-      if (typeof toaster !== 'undefined') {
-        toaster.toastSuccess("{{ __('Copied to clipboard') }}");
-      }
+      window.toaster.toastSuccess("{{ __('Copied to clipboard') }}");
     }
   }
 </script>

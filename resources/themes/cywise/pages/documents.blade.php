@@ -190,8 +190,10 @@ render(function (Request $request) {
           'Content-Type': 'multipart/form-data',
         }
       }).then(response => {
-        toaster.toastSuccess("{{ __('Your file has been successfully uploaded. It will be available shortly.') }}");
-      }).catch(error => toaster.toastAxiosError(error)).finally(() => {
+        window.toaster.toastSuccess("{{ __('Your file has been successfully uploaded. It will be available shortly.') }}");
+      }).catch(error => {
+        window.toaster.toastAxiosError(error);
+      }).finally(() => {
         elSubmit.loading = false;
         elSubmit.disabled = false;
       });

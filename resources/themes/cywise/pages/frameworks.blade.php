@@ -157,13 +157,13 @@ render(function (Request $request) {
     const load = (id, event) => {
       event.preventDefault();
       event.stopPropagation();
-      loadFrameworkApiCall(id, response => toaster.toastSuccess(response.msg));
+      loadFrameworkApiCall(id, response => window.toaster.toastSuccess(response.msg));
     };
 
     const unload = (id, event) => {
       event.preventDefault();
       event.stopPropagation();
-      unloadFrameworkApiCall(id, response => toaster.toastSuccess(response.msg));
+      unloadFrameworkApiCall(id, response => window.toaster.toastSuccess(response.msg));
     };
 
     let searchText = null;

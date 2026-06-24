@@ -88,14 +88,14 @@ render(function (Request $request) {
     document.querySelectorAll('.toggle-gets-audit-report').forEach((checkbox) => {
       checkbox.addEventListener('change',
         (event) => toggleGetsAuditReportApiCall(event.target.getAttribute('data-user-id'),
-          response => toaster.toastSuccess(response.msg)));
+          response => window.toaster.toastSuccess(response.msg)));
     });
 
     document.querySelectorAll('.send-audit-report').forEach((button) => {
       button.addEventListener('click',
         (event) => {
           const userId = event.currentTarget.getAttribute('data-user-id');
-          sendAuditReportApiCall(userId, response => toaster.toastSuccess(response.msg));
+          sendAuditReportApiCall(userId, response => window.toaster.toastSuccess(response.msg));
         });
     });
 

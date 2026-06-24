@@ -69,9 +69,7 @@
     const el = document.getElementById(id);
     el.select();
     document.execCommand('copy');
-    if (toaster) {
-      toaster.toastSuccess("Copié dans le presse-papier");
-    }
+    window.toaster.toastSuccess("Copié dans le presse-papier");
   }
 
   (function () {
@@ -96,17 +94,13 @@
         const token = (elToken.value || '').trim();
 
         if (!phoneId || !token) {
-          if (toaster) {
-            toaster.toastError("Veuillez saisir l'ID de numéro de téléphone et le token d'accès.");
-          }
+          window.toaster.toastError("Veuillez saisir l'ID de numéro de téléphone et le token d'accès.");
           return;
         }
 
         elBtn.setAttribute('disabled', 'disabled');
         setWhatsAppConfigurationApiCall(token, phoneId, (result) => {
-          if (toaster) {
-            toaster.toastSuccess("Configuration enregistrée. Configurez maintenant le webhook côté Meta.");
-          }
+          window.toaster.toastSuccess("Configuration enregistrée. Configurez maintenant le webhook côté Meta.");
           updateWebhookOutputs(result.webhook, result.verify_token);
         }, () => elBtn.removeAttribute('disabled'));
       });

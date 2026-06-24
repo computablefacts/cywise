@@ -48,7 +48,7 @@ name('user-invitation');
 
     btnCreate.addEventListener('click', () => {
       createUserInvitationApiCall(elEmail.value,
-        () => toaster.toastSuccess("{{ __('The invitation has been sent.') }}"));
+        () => window.toaster.toastSuccess("{{ __('The invitation has been sent.') }}"));
     });
 
   </script>

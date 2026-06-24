@@ -60,7 +60,7 @@
             view.querySelector('.desc-text').textContent = result.data.description || '';
             edit.classList.add('d-none');
             view.classList.remove('d-none');
-            toaster.toastSuccess(result.message);
+            window.toaster.toastSuccess(result.message);
         });
         setTimeout(() => btn.disabled = false, 500);
         return false;

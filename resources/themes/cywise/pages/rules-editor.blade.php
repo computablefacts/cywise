@@ -142,7 +142,7 @@ render(function (Request $request) {
     btnCreate.addEventListener('click', () => {
       createOsqueryRuleApiCall(elName.value, elDescription.value, elCategory.value, elPlatform.value, elInterval.value,
         elIoC.checked, elScore.value, editor.getValue(),
-        () => toaster.toastSuccess("{{ __('The rule has been saved.') }}"));
+        () => window.toaster.toastSuccess("{{ __('The rule has been saved.') }}"));
     });
 
   </script>

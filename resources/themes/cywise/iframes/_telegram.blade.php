@@ -67,9 +67,7 @@
     const el = document.getElementById(id);
     el.select();
     document.execCommand('copy');
-    if (toaster) {
-      toaster.toastSuccess("Copié dans le presse-papier");
-    }
+    window.toaster.toastSuccess("Copié dans le presse-papier");
   }
 
   (function () {
@@ -92,16 +90,12 @@
       elBtn.addEventListener('click', function () {
         const token = (elInput.value || '').trim();
         if (!token) {
-          if (toaster) {
-            toaster.toastError("Veuillez saisir un token de bot Telegram.");
-          }
+          window.toaster.toastError("Veuillez saisir un token de bot Telegram.");
           return;
         }
         elBtn.setAttribute('disabled', 'disabled');
         setTelegramConfigurationApiCall(token, (result) => {
-          if (toaster) {
-            toaster.toastSuccess("Token enregistré. Configurez maintenant le webhook côté Telegram.");
-          }
+          window.toaster.toastSuccess("Token enregistré. Configurez maintenant le webhook côté Telegram.");
           updateWebhookOutputs(result.webhook, token);
         }, () => elBtn.removeAttribute('disabled'));
       });

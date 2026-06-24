@@ -122,7 +122,7 @@ render(function (Request $request) {
     });
     btnCreate.addEventListener('click', () => {
       createOssecRuleApiCall(elName.value, elDescription.value, elRationale.value, elRemediation.value, elPlatform.value,
-        editor.getValue(), () => toaster.toastSuccess("{{ __('The rule has been saved.') }}"));
+        editor.getValue(), () => window.toaster.toastSuccess("{{ __('The rule has been saved.') }}"));
     });
 
   </script>
