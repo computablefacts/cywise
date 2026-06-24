@@ -81,8 +81,6 @@ render(function (Request $request) {
       @endif
     </div>
   </div>
-
-  @push('scripts')
   <script>
 
     document.querySelectorAll('.toggle-gets-audit-report').forEach((checkbox) => {
@@ -100,7 +98,5 @@ render(function (Request $request) {
     });
 
   </script>
-  @endpush
-
 </x-layouts.app>
 

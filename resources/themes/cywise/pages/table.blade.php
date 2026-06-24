@@ -374,9 +374,6 @@ render(function (Request $request) {
       </div>
     </div>
   </div>
-
-  @push('scripts')
-
   <script>
 
     const steps = document.querySelectorAll('.step');
@@ -757,7 +754,5 @@ render(function (Request $request) {
     };
 
   </script>
-  @endpush
-
 </x-layouts.app>
 

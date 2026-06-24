@@ -150,8 +150,6 @@ render(function (Request $request) {
     </div>
     @endif
   </div>
-
-  @push('scripts')
   <script>
 
     const load = (id, event) => {
@@ -184,7 +182,5 @@ render(function (Request $request) {
     });
 
   </script>
-  @endpush
-  
 </x-layouts.app>
 

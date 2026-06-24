@@ -54,8 +54,6 @@ name('cyberscribe');
       </div>
     </div>
   </div>
-
-  @push('scripts')
   @viteReactRefresh
   @vite('resources/js/app.js')
   <script>
@@ -221,7 +219,5 @@ name('cyberscribe');
     };
 
   </script>
-  @endpush
-
 </x-layouts.app>
 

@@ -129,8 +129,6 @@ render(function (Request $request) {
       @endif
     </div>
   </div>
-
-  @push('scripts')
   <script>
 
     function deletePrompt(promptId) {
@@ -174,7 +172,5 @@ render(function (Request $request) {
     }
 
   </script>
-  @endpush
-
 </x-layouts.app>
 

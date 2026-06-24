@@ -38,8 +38,6 @@ name('user-invitation');
       </div>
     </div>
   </div>
-
-  @push('scripts')
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.6.0/ace.js"></script>
   <script>
 
@@ -52,7 +50,5 @@ name('user-invitation');
     });
 
   </script>
-  @endpush
-
 </x-layouts.app>
 

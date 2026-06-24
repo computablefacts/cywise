@@ -65,8 +65,6 @@ render(function (Request $request) {
       </div>
     </div>
   </div>
-
-  @push('scripts')
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.6.0/ace.js"></script>
   <script>
 
@@ -117,6 +115,4 @@ render(function (Request $request) {
     });
 
   </script>
-  @endpush
-
 </x-layouts.app>

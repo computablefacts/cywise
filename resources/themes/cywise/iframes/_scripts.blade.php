@@ -1,4 +1,3 @@
-@push('scripts')
 <script>
 
   /* HELPERS */
@@ -341,4 +340,3 @@
   });
 
 </script>
-@endpush

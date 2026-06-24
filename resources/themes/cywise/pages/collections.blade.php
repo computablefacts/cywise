@@ -118,8 +118,6 @@ render(function (Request $request) {
       @endif
     </div>
   </div>
-
-  @push('scripts')
   <script>
 
     function deleteCollection(collectionId) {
@@ -162,7 +160,5 @@ render(function (Request $request) {
     }
 
   </script>
-  @endpush
-  
 </x-layouts.app>
 

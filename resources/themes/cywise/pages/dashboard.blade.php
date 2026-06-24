@@ -595,8 +595,6 @@ render(function (Request $request) {
     </div>
     <!-- MESSAGING TABS : END -->
   </div>
-
-  @push('scripts')
   <script>
 
     function createAsset() {
@@ -605,7 +603,5 @@ render(function (Request $request) {
     }
 
   </script>
-  @endpush
-
 </x-layouts.app>
 

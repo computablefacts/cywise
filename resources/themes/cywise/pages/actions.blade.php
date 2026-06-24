@@ -159,8 +159,6 @@ render(function (Request $request) {
       </div>
     </div>
   </div>
-
-  @push('scripts')
   <script>
 
     function handleSubmit(form) {
@@ -189,6 +187,4 @@ render(function (Request $request) {
     }
 
   </script>
-  @endpush
-
 </x-layouts.app>

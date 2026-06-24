@@ -787,8 +787,6 @@ render(function (Request $request) {
       </div>
     </div>
   </div>
-
-  @push('scripts')
   <script>
 
     let run = 0;
@@ -1136,7 +1134,5 @@ render(function (Request $request) {
     };
 
   </script>
-  @endpush
-
 </x-layouts.app>
 

@@ -49,8 +49,6 @@
     </div>
   </div>
 </div>
-
-@push('scripts')
 <script>
   if (typeof copyToClipboard !== 'function') {
     function copyToClipboard(id) {
@@ -61,4 +59,3 @@
     }
   }
 </script>
-@endpush

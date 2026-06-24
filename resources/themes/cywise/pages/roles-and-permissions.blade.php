@@ -33,8 +33,6 @@ render(function (Request $request) {
       </div>
     </div>
   </div>
-
-  @push('scripts')
   <script>
 
     const ALL_PERMISSIONS = @json($permissions ?? []);
@@ -106,6 +104,4 @@ render(function (Request $request) {
       });
     });
   </script>
-  @endpush
-
 </x-layouts.app>

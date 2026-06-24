@@ -34,13 +34,14 @@
     @stack('styles')
 
 </head>
-<body>
+<body x-data class="flex flex-col lg:min-h-screen bg-zinc-50 dark:bg-zinc-900 @if(config('wave.dev_bar')){{ 'pb-10' }}@endif">
 
+@persist('blueprintjs')
 @include('theme::iframes._blueprintjs')
 @include('theme::iframes._toaster')
+<script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
 @include('theme::iframes._json-rpc')
-
-<div x-data class="flex flex-col lg:min-h-screen bg-zinc-50 dark:bg-zinc-900 @if(config('wave.dev_bar')){{ 'pb-10' }}@endif">
+@endpersist
 
     <x-app.sidebar />
 
@@ -64,13 +65,12 @@
     @endif
 
     <!-- app-specific scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
     @include('theme::partials.footer-scripts')
     {{ $javascript ?? '' }}
 
     <!-- page-specific scripts -->
     @stack('scripts')
-</div>
+
 </body>
 </html>
 

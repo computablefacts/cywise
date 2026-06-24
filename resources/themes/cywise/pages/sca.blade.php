@@ -336,8 +336,6 @@ render(function (Request $request) {
     </div>
     @endforeach
   </div>
-
-  @push('scripts')
   <script>
 
     let selectedPolicy = null;
@@ -390,7 +388,5 @@ render(function (Request $request) {
     });
 
   </script>
-  @endpush
-
 </x-layouts.app>
 

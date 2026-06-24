@@ -60,8 +60,6 @@
   Une fois le webhook actif, envoyez un message à votre bot Telegram : il répondra via <a
       href="{{ route('cyberbuddy') }}">{{ tenant_custom_text('CyberBuddy') }}</a>, dans le contexte de votre compte Cywise.
 </p>
-
-@push('scripts')
 <script>
   function copyToClipboard(id) {
     const el = document.getElementById(id);
@@ -110,4 +108,3 @@
     }
   })();
 </script>
-@endpush
