@@ -13,7 +13,7 @@
         {!! __('<b>:user</b> has added the asset <b>:asset</b> (<a href=":href" class="link">:count vulnerabilities</a>)', [
         'asset' => $asset->asset,
         'count' => $alerts->count(),
-        'href' => route('iframes.vulnerabilities', [ 'asset_id' => $asset->id ]),
+        'href' => route('vulnerabilities', [ 'asset_id' => $asset->id ]),
         'user' => $asset->createdBy->name
         ]) !!}
         @else

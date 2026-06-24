@@ -384,7 +384,7 @@ class SendAuditReportListener extends AbstractListener
                 $title = $alert->translated('title');
                 $vulnerability = $alert->translated('vulnerability');
                 $remediation = $alert->translated('remediation');
-                $link = route('iframes.assets') . "#aid-{$alert->asset()->id}";
+                $link = route('assets') . "#aid-{$alert->asset()->id}";
 
                 return "
                     <h3>{$title} {$level}</h3>

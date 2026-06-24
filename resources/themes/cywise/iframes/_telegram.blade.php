@@ -60,7 +60,7 @@
 </p>
 <p>
   Une fois le webhook actif, envoyez un message à votre bot Telegram : il répondra via <a
-      href="{{ route('iframes.cyberbuddy') }}">{{ tenant_custom_text('CyberBuddy') }}</a>, dans le contexte de votre compte Cywise.
+      href="{{ route('cyberbuddy') }}">{{ tenant_custom_text('CyberBuddy') }}</a>, dans le contexte de votre compte Cywise.
 </p>
 
 @push('scripts')

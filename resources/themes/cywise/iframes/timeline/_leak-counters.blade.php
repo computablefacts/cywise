@@ -15,7 +15,7 @@
               <b>{{ $nb_leaks }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.leaks') }}" class="link">
+              <a href="{{ route('leaks') }}" class="link">
                 {{ __('Leaks') }}
               </a>
             </div>

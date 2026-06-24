@@ -33,7 +33,7 @@ render(function (Request $request) {
                   <b>{{ $nb_monitored + $nb_monitorable }}</b> {{ __('assets') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('iframes.assets') }}" class="link">
+                  <a href="{{ route('assets') }}" class="link">
                     {{ __('Saved') }}
                   </a>
                 </div>
@@ -58,7 +58,7 @@ render(function (Request $request) {
                   <b>{{ $nb_monitored }}</b> {{ __('assets') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('iframes.assets', [ 'status' => 'monitored' ]) }}" class="link">
+                  <a href="{{ route('assets', [ 'status' => 'monitored' ]) }}" class="link">
                     {{ __('Monitored') }}
                   </a>
                 </div>
@@ -83,7 +83,7 @@ render(function (Request $request) {
                   <b>{{ $nb_monitorable }}</b> {{ __('assets') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('iframes.assets', [ 'status' => 'monitorable' ]) }}" class="link">
+                  <a href="{{ route('assets', [ 'status' => 'monitorable' ]) }}" class="link">
                     {{ __('Monitorable') }}
                   </a>
                 </div>
@@ -112,7 +112,7 @@ render(function (Request $request) {
                   <b>{{ $nb_vulns_high }}</b> {{ __('vulnerabilities') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'high' ]) }}" class="link">
+                  <a href="{{ route('vulnerabilities', [ 'level' => 'high' ]) }}" class="link">
                     {{ __('High') }}
                   </a>
                 </div>
@@ -137,7 +137,7 @@ render(function (Request $request) {
                   <b>{{ $nb_vulns_medium }}</b> {{ __('vulnerabilities') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'medium' ]) }}" class="link">
+                  <a href="{{ route('vulnerabilities', [ 'level' => 'medium' ]) }}" class="link">
                     {{ __('Medium') }}
                   </a>
                 </div>
@@ -162,7 +162,7 @@ render(function (Request $request) {
                   <b>{{ $nb_vulns_low }}</b> {{ __('vulnerabilities') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('iframes.vulnerabilities', [ 'level' => 'low' ]) }}" class="link">
+                  <a href="{{ route('vulnerabilities', [ 'level' => 'low' ]) }}" class="link">
                     {{ __('Low') }}
                   </a>
                 </div>
@@ -191,7 +191,7 @@ render(function (Request $request) {
                   <b>{{ $nb_iocs_high }}</b> {{ __('IoCs') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('iframes.ioc', [ 'level' => 'high' ]) }}" class="link">
+                  <a href="{{ route('ioc', [ 'level' => 'high' ]) }}" class="link">
                     {{ __('High') }}
                   </a>
                 </div>
@@ -216,7 +216,7 @@ render(function (Request $request) {
                   <b>{{ $nb_iocs_medium }}</b> {{ __('IoCs') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('iframes.ioc', [ 'level' => 'medium' ]) }}" class="link">
+                  <a href="{{ route('ioc', [ 'level' => 'medium' ]) }}" class="link">
                     {{ __('Medium') }}
                   </a>
                 </div>
@@ -241,7 +241,7 @@ render(function (Request $request) {
                   <b>{{ $nb_iocs_low }}</b> {{ __('IoCs') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('iframes.ioc', [ 'level' => 'low' ]) }}" class="link">
+                  <a href="{{ route('ioc', [ 'level' => 'low' ]) }}" class="link">
                     {{ __('Low') }}
                   </a>
                 </div>
@@ -277,7 +277,7 @@ render(function (Request $request) {
                 @else
                 <span class="dot-blue"></span>
                 @endif
-                &nbsp;<a href="{{ route('iframes.vulnerabilities') }}#vid-{{ $item->id }}" class="link text-truncate">
+                &nbsp;<a href="{{ route('vulnerabilities') }}#vid-{{ $item->id }}" class="link text-truncate">
                   {{ $item->asset()->asset }}
                 </a>
               </div>
@@ -319,7 +319,7 @@ render(function (Request $request) {
                 @else
                 <span class="dot-blue"></span>
                 @endif
-                &nbsp;<a href="{{ route('iframes.ioc') }}#eid-{{ $item->id }}" class="link text-truncate">
+                &nbsp;<a href="{{ route('ioc') }}#eid-{{ $item->id }}" class="link text-truncate">
                   {{ $item->server_name }}
                 </a>
               </div>
@@ -540,7 +540,7 @@ render(function (Request $request) {
             <form>
               <div class="row">
                 <div class="col align-content-center">
-                  <a href="{{ route('iframes.cyberbuddy') }}" class="btn btn-primary" style="width: 100%;">
+                  <a href="{{ route('cyberbuddy') }}" class="btn btn-primary" style="width: 100%;">
                     {{ __('Start Conversation >') }}
                   </a>
                 </div>

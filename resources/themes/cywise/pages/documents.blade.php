@@ -91,7 +91,7 @@ render(function (Request $request) {
             </td>
             <td style="text-align:right">
               <a
-                  href="{{ route('iframes.chunks', ['page' => 1, 'collection' => $file['collection'], 'file' => $file['name_normalized']]) }}">
+                  href="{{ route('chunks', ['page' => 1, 'collection' => $file['collection'], 'file' => $file['name_normalized']]) }}">
                 {{ Illuminate\Support\Number::format($file['nb_chunks'], locale:'sv') }}
               </a>
             </td>
@@ -129,30 +129,30 @@ render(function (Request $request) {
             <ul class="pagination justify-content-center mt-3 mb-3">
               <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
                 <a class="page-link"
-                   href="{{ route('iframes.documents', ['page' => 1, 'collection' => $collection]) }}">
+                   href="{{ route('documents', ['page' => 1, 'collection' => $collection]) }}">
                   <span>&laquo;&nbsp;{{ __('First') }}</span>
                 </a>
               </li>
               <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
                 <a class="page-link"
-                   href="{{ route('iframes.documents', ['page' => $currentPage <= 1 ? 1 : $currentPage - 1, 'collection' => $collection]) }}">
+                   href="{{ route('documents', ['page' => $currentPage <= 1 ? 1 : $currentPage - 1, 'collection' => $collection]) }}">
                   <span>&lt;&nbsp;{{ __('Previous') }}</span>
                 </a>
               </li>
               <li class="page-item">
                 <a class="page-link active"
-                   href="{{ route('iframes.documents', ['page' => $currentPage, 'collection' => $collection]) }}">
+                   href="{{ route('documents', ['page' => $currentPage, 'collection' => $collection]) }}">
                   {{ $currentPage }}
                 </a>
               </li>
               <li class="page-item {{ $currentPage >= $nbPages ? 'disabled' : '' }}">
                 <a class="page-link"
-                   href="{{ route('iframes.documents', ['page' => $currentPage >= $nbPages ? $nbPages : $currentPage + 1, 'collection' => $collection])}}">
+                   href="{{ route('documents', ['page' => $currentPage >= $nbPages ? $nbPages : $currentPage + 1, 'collection' => $collection])}}">
                   <span>{{ __('Next') }}&nbsp;&gt;</span>
                 </a>
               </li>
               <li class="page-item {{ $currentPage >= $nbPages ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ route('iframes.documents', ['page' => $nbPages]) }}">
+                <a class="page-link" href="{{ route('documents', ['page' => $nbPages]) }}">
                   <span>{{ __('Last') }}&nbsp;&raquo;</span>
                 </a>
               </li>
