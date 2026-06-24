@@ -1,5 +1,3 @@
-@include('theme::iframes._json-rpc')
-
 <p class="mb-2">
   Pour utiliser Cywise depuis Telegram, vous devez créer un bot Telegram et configurer son webhook.
 </p>

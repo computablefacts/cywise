@@ -1,5 +1,3 @@
-@include('theme::iframes._json-rpc')
-
 <p class="mb-2">
   Pour utiliser Cywise depuis WhatsApp, vous devez configurer une application sur le portail <a
       href="https://developers.facebook.com/" target="_blank">Meta for Developers</a>.
