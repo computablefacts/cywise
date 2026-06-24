@@ -14,6 +14,8 @@
     <!-- FILLED DYNAMICALLY -->
     </tbody>
 </table>
+
+@push('scripts')
 <script>
 
     const escapeHtml = (str) => String(str || '')
@@ -131,3 +133,4 @@
     });
 
 </script>
+@endpush
