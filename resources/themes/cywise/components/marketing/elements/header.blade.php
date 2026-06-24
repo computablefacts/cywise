@@ -42,7 +42,7 @@
         <div class="z-30 flex items-center justify-between h-24 md:space-x-8">
             <div class="z-20 flex items-center justify-between w-full md:w-auto">
                 <div class="relative z-20 inline-flex">
-                    <a href="{{ route('home') }}" wire:navigate class="flex items-center justify-center space-x-3 font-bold text-zinc-900">
+                    <a href="{{ route('home') }}" class="flex items-center justify-center space-x-3 font-bold text-zinc-900">
                     <x-logo class="w-auto h-8 md:h-9"></x-logo>
                     </a>
                 </div>

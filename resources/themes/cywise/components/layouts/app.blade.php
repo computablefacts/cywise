@@ -9,13 +9,6 @@
                 document.documentElement.classList.add('dark');
             }
         }
-        document.addEventListener("livewire:navigated", () => {
-            if (localStorage.getItem('theme') === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        });
     </script>
 
     <!-- FastBootstrap -->
@@ -36,12 +29,10 @@
 </head>
 <body x-data class="flex flex-col lg:min-h-screen bg-zinc-50 dark:bg-zinc-900 @if(config('wave.dev_bar')){{ 'pb-10' }}@endif">
 
-@persist('blueprintjs')
 @include('theme::iframes._blueprintjs')
 @include('theme::iframes._toaster')
 <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
 @include('theme::iframes._json-rpc')
-@endpersist
 
     <x-app.sidebar />
 
@@ -59,7 +50,6 @@
         </main>
     </div>
 
-    @livewire('notifications')
     @if(!auth()->guest() && auth()->user()->hasChangelogNotifications())
         @include('theme::partials.changelogs')
     @endif

@@ -29,7 +29,7 @@
                             <time datetime="{{ Carbon\Carbon::parse($changelog->created_at)->toIso8601String() }}" class="ml-1">{{ Carbon\Carbon::parse($changelog->created_at)->toFormattedDateString() }}</time>
                         </div>
                         <div class="relative">
-                            <a href="{{ route('changelog', ['changelog' => $changelog->id]) }}" class="text-xl no-underline hover:underline" wire:navigate>{{ $changelog->title }}</a>
+                            <a href="{{ route('changelog', ['changelog' => $changelog->id]) }}" class="text-xl no-underline hover:underline">{{ $changelog->title }}</a>
                             <div class="mx-auto mt-5 prose-sm prose text-zinc-600 dark:text-zinc-300">
                                 {!! $changelog->body !!}
                             </div>
