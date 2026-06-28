@@ -17,29 +17,31 @@
     ]"
 >
     <x-app.container>
-        <x-card class="lg:p-10">
+        <div class="card mt-3">
+            <div class="card-body p-4">
             <x-app.heading
                 title="{{ __('Changelog') }}"
                 description="{{ __('Latest updates and enhancements') }}"
             />
-        <div class="max-w-full mt-8 prose-sm prose dark:prose-invert">
+        <div class="mt-3">
                 @foreach($logs as $changelog)
-                    <div class="flex flex-col items-start space-y-3 lg:flex-row lg:space-y-0 lg:space-x-5">
-                        <div class="flex-shrink-0 px-2 py-1 text-xs translate-y-1 rounded-full text-blue-900 bg-blue-100 border-blue-200">
-                            <time datetime="{{ Carbon\Carbon::parse($changelog->created_at)->toIso8601String() }}" class="ml-1">{{ Carbon\Carbon::parse($changelog->created_at)->toFormattedDateString() }}</time>
+                    <div class="d-flex flex-column align-items-start gap-3 flex-lg-row gap-lg-4 mb-4">
+                        <div class="flex-shrink-0 px-2 py-1 small rounded-pill text-primary bg-primary bg-opacity-10 border border-primary border-opacity-25">
+                            <time datetime="{{ Carbon\Carbon::parse($changelog->created_at)->toIso8601String() }}">{{ Carbon\Carbon::parse($changelog->created_at)->toFormattedDateString() }}</time>
                         </div>
-                        <div class="relative">
-                            <a href="{{ route('changelog', ['changelog' => $changelog->id]) }}" class="text-xl no-underline hover:underline">{{ $changelog->title }}</a>
-                            <div class="mx-auto mt-5 prose-sm prose text-zinc-600 dark:text-zinc-300">
+                        <div>
+                            <a href="{{ route('changelog', ['changelog' => $changelog->id]) }}" class="h5 text-decoration-none hover-underline">{{ $changelog->title }}</a>
+                            <div class="mt-2 text-muted">
                                 {!! $changelog->body !!}
                             </div>
                             @if(!$loop->last)
-                                <hr class="block my-10 border-dashed">
+                                <hr class="my-4 border-secondary opacity-25">
                             @endif
                         </div>
                     </div>
                 @endforeach
             </div>
-        </x-card>
+        </div>
+        </div>
     </x-app.container>
 </x-dynamic-component>
