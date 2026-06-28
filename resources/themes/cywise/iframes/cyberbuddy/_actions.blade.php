@@ -39,9 +39,9 @@
       'text' => __('Quel doit être la complexité d\'un mot de passe administrateur ?')
       ])
       @include('theme::iframes.cyberbuddy._action', [
-      'title' => __('COMAR'),
-      'subtitle' => __('Comité d\'architecture'),
-      'text' => __('Que peux-tu me dire sur le comité d\'architecture ?')
+      'title' => __('WeTransfer'),
+      'subtitle' => __('Envoi de fichiers'),
+      'text' => __('Puis-je envoyer un fichier via WeTransfer ?')
       ])
       @include('theme::iframes.cyberbuddy._action', [
       'title' => __('USB'),
