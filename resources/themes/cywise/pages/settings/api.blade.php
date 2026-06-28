@@ -122,21 +122,21 @@
 
 <x-layouts.app>
     @volt('settings.api') 
-        <div class="relative">
+        <div class="">
             <x-app.settings-layout
                 title="API Keys"
                 description="Manage your API Keys"
             >
-                <div class="flex flex-col">
-                    <form wire:submit="add" class="w-full max-w-lg">
+                <div class="d-flex flex-column">
+                    <form wire:submit="add" class="w-100 max-w-lg">
                         {{ $this->form }}
-                        <div class="w-full pt-6 text-right">
+                        <div class="w-100 pt-4 text-end">
                             <x-button type="submit">Create New Key</x-button>
                         </div>
                     </form>
-                    <hr class="my-8 border-zinc-200">
-                    <x-elements.label class="block text-sm font-medium leading-5 text-zinc-700">Current API Keys</x-elements.label>
-                    <div class="pt-5">
+                    <hr class="my-5">
+                    <label class="d-block small fw-bold mb-3">Current API Keys</label>
+                    <div class="pt-2">
                         {{ $this->table }}
                     </div>
                 </div>

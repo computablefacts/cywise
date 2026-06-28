@@ -79,14 +79,14 @@
 
 <x-layouts.app>
     @volt('settings.security')
-        <div class="relative">
+        <div class="">
             <x-app.settings-layout
                 title="Security"
                 description="Update and change your current account password."
             >
-                <form wire:submit="save" class="w-full max-w-lg">
+                <form wire:submit="save" class="w-100 max-w-lg">
                     {{ $this->form }}
-                    <div class="w-full pt-6 text-right">
+                    <div class="w-100 pt-4 text-end">
                         <x-button type="submit">Save</x-button>
                     </div>
                 </form>
