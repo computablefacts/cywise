@@ -31,7 +31,7 @@ class FrameworksProcedure extends Procedure
         ]);
 
         /** @var YnhFramework $framework */
-        $framework = YnhFramework::findOrFail('id', $params['framework_id']);
+        $framework = YnhFramework::findOrFail($params['framework_id']);
 
         /** @var \App\Models\Collection $collection */
         $collection = \App\Models\Collection::where('name', $framework->collectionName())
