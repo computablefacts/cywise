@@ -364,7 +364,7 @@ render(function (Request $request) {
                 <tbody>
                 @foreach($leaks as $l)
                 <tr>
-                  <td style="color:var(--bs-body-color);">{{ empty($l->leak_date) ? '-' : $l->leak_date }}</td>
+                  <td style="color:var(--bs-body-color);">{{ empty($l->leak_date) ? '-' : $l->leak_date?->format('Y-m-d') }}</td>
                   <td style="color:var(--bs-body-color);">{{ $l->email }}</td>
                   <td>{{ empty($l->website) ? '-' : $l->website }}</td>
                   <td style="color:var(--bs-body-color);">{{ empty($l->password) ? '-' : $l->password }}</td>
