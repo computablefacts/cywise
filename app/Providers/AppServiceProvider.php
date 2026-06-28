@@ -47,11 +47,7 @@ use App\Rules\OnlyLettersAndDigits;
 use Exception;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
@@ -138,13 +134,6 @@ class AppServiceProvider extends ServiceProvider
 
             return true;
         });
-
-        RateLimiter::for('api', function (Request $request) {
-            Log::info("RateLimiter triggered!");
-            return Limit::perMinute(60)->by($request->user()?->id ?: (request()->header('CF-Connecting-IP') ?? request()->ip()));
-        });
-
-        Log::info("RateLimiter loaded!");
 
         YnhServer::observe(YnhServerObserver::class);
 

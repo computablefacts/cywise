@@ -78,9 +78,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(\RalphJSmit\Livewire\Urls\Middleware\LivewireUrlsMiddleware::class);
         $middleware->web(\App\Http\Middleware\RedirectToCyberBuddy::class);
 
-        // Group 'api'
-        $middleware->throttleApi();
-
         // Group 'saml'
         $middleware->group('saml', [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
