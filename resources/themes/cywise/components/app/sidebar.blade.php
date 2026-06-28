@@ -32,6 +32,34 @@ $user = \Auth::user();
           </a>
         </div>
 
+        <div class="py-2 border-top border-bottom mb-2">
+          <div class="px-3">
+            <input type="text"
+                   name="tld"
+                   id="sidebar_tld"
+                   class="form-control form-control-sm"
+                   placeholder="{{ __('Domain or IP...') }}"
+                   aria-label="{{ __('Domain or IP') }}"
+                   onkeydown="if(event.key === 'Enter') { event.preventDefault(); sidebarCreateAsset(); }">
+            <button type="button"
+                    onclick="sidebarCreateAsset()"
+                    class="btn btn-primary btn-sm w-100 mt-2">
+              {{ __('Monitor >') }}
+            </button>
+          </div>
+        </div>
+        <script>
+          function sidebarCreateAsset() {
+            const asset = document.querySelector('#sidebar_tld').value;
+            if (asset) {
+              createAssetApiCall(asset, true, () => {
+                window.toaster.toastSuccess("{{ __('The monitoring started.') }}");
+                document.querySelector('#sidebar_tld').value = '';
+              });
+            }
+          }
+        </script>
+
         <div
           class="d-flex flex-column justify-content-start align-items-center px-3 gap-1 w-100 h-100 text-muted">
           @if($user->canView('iframes.dashboard'))
