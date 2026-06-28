@@ -406,6 +406,7 @@ render(function (Request $request) {
     }
 
     .tw-answer-message-html p {
+      color: rgb(0, 0, 0);
       margin-bottom: 0;
     }
 
