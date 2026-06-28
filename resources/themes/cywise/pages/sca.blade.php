@@ -145,7 +145,7 @@ render(function (Request $request) {
           <div class="col">
             <h6>
               @if(isset($check->created_by) || \Auth::user()?->isCywiseAdmin())
-              <a href="{{ route('iframes.sca-editor', ['check_id' => $check->id]) }}">
+              <a href="{{ route('sca-editor', ['check_id' => $check->id]) }}">
                 {{ $check->title }}
               </a>
               @else
