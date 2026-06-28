@@ -5,6 +5,7 @@ use App\Jobs\Cleanup;
 use App\Jobs\DeleteEmbeddedChunks;
 use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Jobs\EmbedChunks;
+use App\Jobs\FetchLeaks;
 use App\Jobs\ProcessIncomingEmails;
 use App\Jobs\RunScheduledTasks;
 use App\Jobs\TriggerAssetsDiscovery;
@@ -106,6 +107,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->job(new Cleanup())->everyFifteenMinutes();
         $schedule->job(new DownloadDebianSecurityBugTracker())->daily();
         $schedule->command('telescope:prune --hours=48')->daily();
+
+        // Gargantum
+        $schedule->job(new FetchLeaks())->dailyAt('03:00');
 
         // AdversaryMeter
         $schedule->job(new TriggerScan())->everyMinute();

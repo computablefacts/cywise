@@ -87,8 +87,8 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
 
         Log::debug("{$leaks->count()} leaks found.");
 
-        $leaks->each(function (array $leak) {
-            $leak['created_by'] = request()->user()->id;
+        $leaks->each(function (array $leak) use ($user) {
+            $leak['created_by'] = $user->id;
             Leak::updateOrCreate([
                 'website' => $leak['website'],
                 'email' => $leak['email'],
