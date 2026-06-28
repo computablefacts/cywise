@@ -80,8 +80,8 @@ RUN echo "log_errors_max_len=16384" >> /php-config/max-limit.ini
 
 # Setup opcache. See https://www.php.net/manual/fr/opcache.configuration.php for details
 RUN echo "opcache.enable=1" > /php-config/opcache.ini
-RUN echo "opcache.revalidate_freq=0" >> /php-config/opcache.ini
-RUN echo "opcache.validate_timestamps=0" >> /php-config/opcache.ini
+RUN echo "opcache.revalidate_freq=2" >> /php-config/opcache.ini
+RUN echo "opcache.validate_timestamps=1" >> /php-config/opcache.ini
 RUN echo "opcache.max_accelerated_files=20000" >> /php-config/opcache.ini
 RUN echo "opcache.memory_consumption=256" >> /php-config/opcache.ini
 RUN echo "opcache.max_wasted_percentage=10" >> /php-config/opcache.ini
@@ -154,10 +154,6 @@ COPY --chown=www-data:www-data --from=frontend /app/public/build/ /var/www/html/
 
 RUN chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Generate API docs
-RUN php artisan cywise:docs 'v2.public.rpc.endpoint' --path='/public/docs/' --name 'docs.public.html'
-RUN php artisan cywise:docs 'v2.private.rpc.endpoint' --path='/public/docs/' --name 'docs.private.html'
-
 COPY <<-EOT /etc/apache2/sites-available/laravel.conf
 <VirtualHost *:80>
   DocumentRoot /var/www/html/public
@@ -171,7 +167,6 @@ RUN a2dissite 000-default.conf \
     && a2enmod rewrite \
     && a2ensite laravel.conf
 
-
 # Start script
 COPY <<-"EOT" /usr/local/bin/start
 #!/usr/bin/env bash
@@ -180,15 +175,22 @@ set -e
 role=${CONTAINER_ROLE:-app}
 queue_name=${QUEUE_NAME:-default}
 if [[ "$role" = "app" ]]; then
+    echo "cleanup"
+    (cd /var/www/html && rm app.tar.gz)
     echo "artisan storage:link && artisan vendor:publish ..."
     (cd /var/www/html && php artisan storage:link && php artisan vendor:publish --tag=telescope-assets)
+    echo "creating docs directory"
+    mkdir -p /var/www/html/storage/app/public/docs
+    chown -R www-data:www-data /var/www/html/storage/app/public/docs
+    echo "artisan cywise:docs 'v2.public.rpc.endpoint' --path='/docs/' --name 'docs.public.html'"
+    (cd /var/www/html && php artisan cywise:docs 'v2.public.rpc.endpoint' --path='/docs/' --name 'docs.public.html')
+    echo "artisan cywise:docs 'v2.private.rpc.endpoint' --path='/docs/' --name 'docs.private.html'"
+    (cd /var/www/html && php artisan cywise:docs 'v2.private.rpc.endpoint' --path='/docs/' --name 'docs.private.html')
     echo "artisan optimize ..."
     (cd /var/www/html && php artisan optimize)
     echo "artisan filament:optimize ..."
     (cd /var/www/html && php artisan filament:optimize)
     echo "chown -R www-data:www-data ..."
-    mkdir -p /var/www/html/storage/app/public/docs
-    chown -R www-data:www-data /var/www/html/storage/app/public/docs
     mkdir -p /var/www/html/storage/framework/views
     chown -R www-data:www-data /var/www/html/storage/framework/views
     echo "Start apache..."
