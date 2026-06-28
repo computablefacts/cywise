@@ -37,7 +37,7 @@ render(function (Request $request) {
       </div>
       @else
       <div class="card-body p-0">
-        <table class="table table-hover no-bottom-margin">
+        <table class="table no-bottom-margin">
           <thead>
           <tr>
             <th>{{ __('Name') }}</th>
@@ -47,8 +47,8 @@ render(function (Request $request) {
             <th></th>
           </tr>
           </thead>
-          <tbody>
           @foreach($prompts as $prompt)
+          <tbody x-data="{ isExpanded: false }">
           <tr>
             <td>{{ $prompt->name }}</td>
             <td class="text-end">
@@ -57,28 +57,30 @@ render(function (Request $request) {
             <td>{{ $prompt->created_at->format('Y-m-d H:i') }}</td>
             <td>{{ $prompt->createdBy->name }}</td>
             <td class="text-end">
-              <a href="#" onclick="deletePrompt({{ $prompt->id }})" class="text-decoration-none" style="color:red">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M4 7l16 0"/>
-                  <path d="M10 11l0 6"/>
-                  <path d="M14 11l0 6"/>
-                  <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
-                  <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-                </svg>
-              </a>
-              &nbsp;&nbsp;&nbsp;&nbsp;
-              <a data-bs-toggle="collapse" href="#prompt{{ $prompt->id }}" class="text-decoration-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M9 6l6 6l-6 6"/>
-                </svg>
-              </a>
+              <div class="d-flex justify-content-end align-items-center">
+                <a href="#" onclick="deletePrompt({{ $prompt->id }})" class="text-decoration-none me-3" style="color:red">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M4 7l16 0"/>
+                    <path d="M10 11l0 6"/>
+                    <path d="M14 11l0 6"/>
+                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
+                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+                  </svg>
+                </a>
+                <button class="btn btn-link p-0 text-decoration-none" type="button" @click="isExpanded = !isExpanded">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                       :style="isExpanded ? 'transform: rotate(90deg); transition: transform 0.2s;' : 'transition: transform 0.2s;'">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M9 6l6 6l-6 6"/>
+                  </svg>
+                </button>
+              </div>
             </td>
           </tr>
-          <tr class="collapse" id="prompt{{ $prompt->id }}">
+          <tr x-show="isExpanded" x-cloak>
             <td colspan="5" style="background-color:#fff3cd;">
               <div style="display:grid;">
                 <div class="overflow-auto">
@@ -88,8 +90,8 @@ render(function (Request $request) {
               </div>
             </td>
           </tr>
-          @endforeach
           </tbody>
+          @endforeach
         </table>
         <div class="row">
           <div class="col">
