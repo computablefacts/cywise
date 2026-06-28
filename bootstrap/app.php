@@ -12,7 +12,6 @@ use App\Jobs\TriggerAssetsDiscovery;
 use App\Jobs\TriggerScan;
 use App\Jobs\TriggerSendAuditReport;
 use App\Jobs\UpdateTables;
-use App\Providers\AppServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -96,7 +95,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Redirections
         $middleware->redirectGuestsTo(fn() => route('login'));
-        $middleware->redirectUsersTo(AppServiceProvider::HOME);
+        $middleware->redirectUsersTo(fn() => route('dashboard'));
     })
     // Disable Events discovery
     // Events and corresponding Listeners are listed in App\Providers\EventServiceProvider
