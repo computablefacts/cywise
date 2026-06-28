@@ -94,7 +94,7 @@
                     return `
                         <tr>
                           <td>
-                            <span class="lozenge new">${table.name}</span>
+                            <span class="badge bg-light text-dark border">${table.name}</span>
                           </td>
                           <td class="text-end">${table.nb_rows}</td>
                           <td class="text-end">${table.nb_columns}</td>
@@ -119,7 +119,7 @@
                           </td>
                           <td>${table.last_update}</td>
                           <td>
-                            <span class="lozenge new">${status}</span>
+                            <span class="badge bg-light text-dark border">${status}</span>
                           </td>
                           <td>${btnAction}</td>
                         </tr>
