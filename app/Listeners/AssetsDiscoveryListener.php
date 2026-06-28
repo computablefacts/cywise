@@ -56,7 +56,7 @@ class AssetsDiscoveryListener extends AbstractListener
                         ->orderByRaw('LENGTH(asset) DESC')
                         ->first();
 
-                    CreateAsset::dispatch($user, $domain, $parent->auto_monitor_new_subdomains ?? true);
+                    CreateAsset::dispatch($user, $domain, $parent->auto_monitor_new_subdomains ?? false);
                 });
 
                 Log::debug("Assets discovery ended for {$tld} ({$assets->count()})");

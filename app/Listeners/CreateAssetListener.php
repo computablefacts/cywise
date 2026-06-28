@@ -55,7 +55,7 @@ class CreateAssetListener extends AbstractListener
                 'asset' => $asset,
                 'type' => $assetType,
                 'is_monitored' => $monitor,
-                'auto_monitor_new_subdomains' => $monitor,
+                'auto_monitor_new_subdomains' => false,
                 'created_by' => $user->id,
                 'ynh_trial_id' => $trialId > 0 ? $trialId : null,
             ]);

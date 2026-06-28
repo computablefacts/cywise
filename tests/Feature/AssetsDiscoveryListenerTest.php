@@ -90,7 +90,7 @@ class AssetsDiscoveryListenerTest extends \Tests\TestCaseWithDb
 
         $this->assertNotNull($subdomain, 'Le sous-domaine devrait avoir été créé.');
         $this->assertTrue($subdomain->is_monitored, 'Le sous-domaine devrait être surveillé car le parent a auto_monitor_new_subdomains à true.');
-        $this->assertTrue($subdomain->auto_monitor_new_subdomains, 'La case auto_monitor_new_subdomains devrait être à true par défaut pour le sous-domaine.');
+        $this->assertFalse($subdomain->auto_monitor_new_subdomains, 'La case auto_monitor_new_subdomains devrait être à false par défaut pour le sous-domaine.');
     }
 
     public function test_it_does_not_inherit_from_sibling_subdomain()
@@ -137,6 +137,6 @@ class AssetsDiscoveryListenerTest extends \Tests\TestCaseWithDb
 
         $this->assertNotNull($subdomain, 'Le sous-domaine www2.example.com devrait avoir été créé.');
         $this->assertTrue($subdomain->is_monitored, 'www2.example.com devrait hériter de example.com (true) et non de www.example.com.');
-        $this->assertTrue($subdomain->auto_monitor_new_subdomains, 'La case auto_monitor_new_subdomains devrait être à true par défaut pour le sous-domaine.');
+        $this->assertFalse($subdomain->auto_monitor_new_subdomains, 'La case auto_monitor_new_subdomains devrait être à false par défaut pour le sous-domaine.');
     }
 }
