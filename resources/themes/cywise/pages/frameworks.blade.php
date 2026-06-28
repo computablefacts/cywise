@@ -85,11 +85,11 @@ render(function (Request $request) {
             <th>{{ __('Framework') }}</th>
             <th>{{ __('Version') }}</th>
             <th>{{ __('Language') }}</th>
-            <th style="width:100px"></th>
+            <th></th>
           </tr>
           </thead>
-          <tbody>
           @foreach($frameworks as $framework)
+          <tbody x-data="{ isExpanded: false }">
           <tr>
             <td>
               <span class="lozenge information">{{ \Illuminate\Support\Str::lower($framework->provider) }}</span>
@@ -128,23 +128,24 @@ render(function (Request $request) {
                     </svg>
                   </a>
                 @endif
-                <a data-bs-toggle="collapse" href="#framework{{ $framework->id }}" class="text-decoration-none">
+                <button class="btn btn-link p-0 text-decoration-none" type="button" @click="isExpanded = !isExpanded">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                       stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                       stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                       :style="isExpanded ? 'transform: rotate(90deg); transition: transform 0.2s;' : 'transition: transform 0.2s;'">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                     <path d="M9 6l6 6l-6 6"/>
                   </svg>
-                </a>
+                </button>
               </div>
             </td>
           </tr>
-          <tr class="collapse" id="framework{{ $framework->id }}">
+          <tr x-show="isExpanded" x-cloak>
             <td colspan="5" style="background-color:#fff3cd;">
               {!! $framework->html() !!}
             </td>
           </tr>
-          @endforeach
           </tbody>
+          @endforeach
         </table>
       </div>
       @endif

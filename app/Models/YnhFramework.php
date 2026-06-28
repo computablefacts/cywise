@@ -126,14 +126,14 @@ class YnhFramework extends Model
         $tree = $this->tree();
         $generateIndentedText = function (array $tree, int $level = 0, $uid = null) use (&$generateIndentedText, &$text) {
             if (array_is_list($tree)) {
-                $text .= "<div class=\"collapse\" id=\"$uid\"><div style=\"display:grid;\"><div class=\"overflow-auto\"><p>";
+                $text .= "<div x-show=\"isExpanded\" x-cloak><div style=\"display:grid;\"><div class=\"overflow-auto\"><p>";
             }
             foreach ($tree as $key => $value) {
                 $indentation = str_repeat('  ', $level);
                 if (is_array($value)) {
                     $uid = Str::random(10);
                     if (array_is_list($value)) {
-                        $text .= "<li>{$indentation} <a data-bs-toggle=\"collapse\" href=\"#$uid\" class=\"text-decoration-none\">{$key}</a><ul class=\"ul-small-padding\">";
+                        $text .= "<li x-data=\"{ isExpanded: false }\">{$indentation} <a href=\"#\" @click.prevent=\"isExpanded = !isExpanded\" class=\"text-decoration-none\">{$key}</a><ul class=\"ul-small-padding\">";
                     } else {
                         $text .= "<li>{$indentation} {$key}<ul class=\"ul-small-padding\">";
                     }
