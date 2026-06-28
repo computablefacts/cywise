@@ -1,3 +1,3 @@
-<section {{ $attributes->twMerge('py-5 sm:py-8 lg:py-10 mx-auto w-full max-w-4xl') }}>
+<section {{ $attributes->twMerge('py-4 py-md-5 mx-auto w-100') }} style="max-width: 900px;">
     {{ $slot }}
 </section>
