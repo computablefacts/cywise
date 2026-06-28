@@ -7,11 +7,11 @@
             </div>
         </div>
     </div>
-    <div class="d-flex flex-column pt-4 d-lg-row">
-        <aside class="flex-shrink-0 pb-4 lg-pb-0" style="width: 200px;">
+    <div class="d-flex flex-column pt-4 flex-lg-row">
+        <aside class="flex-shrink-0 pb-4 pb-lg-0" style="width: 200px;">
             <nav class="d-flex align-items-start justify-content-start flex-lg-column gap-1">
                 <div class="px-2 pb-1 small d-none d-lg-block fw-bold text-muted">Settings</div>
-                <div class="d-flex align-items-center w-auto gap-1 flex-lg-column w-lg-100">
+                <div class="d-flex align-items-center w-100 gap-1 flex-lg-column">
                     <x-settings-sidebar-link :href="route('settings.profile')" icon="phosphor-user-circle-duotone">Profile</x-settings-sidebar-link>
                     <x-settings-sidebar-link :href="route('settings.security')" icon="phosphor-lock-duotone">Security</x-settings-sidebar-link>
                     <x-settings-sidebar-link :href="route('settings.notifications')" icon="phosphor-bell-duotone">Notifications</x-settings-sidebar-link>

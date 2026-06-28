@@ -27,7 +27,7 @@
     @stack('styles')
 
 </head>
-<body x-data class="flex flex-col lg:min-h-screen bg-zinc-50 dark:bg-zinc-900 @if(config('wave.dev_bar')){{ 'pb-10' }}@endif">
+<body x-data class="d-flex flex-column min-vh-100 bg-light @if(config('wave.dev_bar')){{ 'pb-5' }}@endif">
 
 @include('theme::iframes._blueprintjs')
 @include('theme::iframes._toaster')
@@ -36,16 +36,23 @@
 
     <x-app.sidebar />
 
-    <div class="flex flex-col pl-0 min-h-screen justify-stretch lg:pl-64">
+    <style>
+        @media (min-width: 992px) {
+            .sidebar-margin {
+                padding-left: 260px !important;
+            }
+        }
+    </style>
+    <div class="d-flex flex-column flex-grow-1 min-vh-100 ps-0 sidebar-margin">
         {{-- Mobile Header --}}
-        <header class="lg:hidden px-5 block flex justify-between sticky top-0 z-40 bg-gray-50 dark:bg-zinc-900 -mb-px border-b border-zinc-200/70 dark:border-zinc-700 h-[72px] items-center">
-            <button x-on:click="window.dispatchEvent(new CustomEvent('open-sidebar'))" class="flex shrink-0 justify-center items-center w-10 h-10 rounded-md text-zinc-700 dark:text-zinc-200 hover:bg-gray-200/70 dark:hover:bg-zinc-700/70">
-                <svg class="w-5 h-5 size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" /></svg>
+        <header class="d-lg-none px-3 d-flex justify-content-between sticky-top z-3 bg-light border-bottom h-72px align-items-center">
+            <button x-on:click="window.dispatchEvent(new CustomEvent('open-sidebar'))" class="d-flex flex-shrink-0 justify-content-center align-items-center w-40px h-40px rounded text-dark hover-bg-light border-0 bg-transparent">
+                <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" /></svg>
             </button>
             <x-app.user-menu position="top" />
         </header>
         {{-- End Mobile Header --}}
-        <main class="flex flex-col flex-1 xl:px-0 lg:pt-0 lg:h-screen lg:border-l border-solid border-gray-200/60">
+        <main class="d-flex flex-column flex-grow-1 ps-lg-0 min-vh-100 border-start-lg">
             {{ $slot }}
         </main>
     </div>
