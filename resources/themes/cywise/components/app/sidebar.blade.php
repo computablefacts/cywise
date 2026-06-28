@@ -32,7 +32,7 @@ $user = \Auth::user();
           </a>
         </div>
 
-        <div class="py-2 border-top border-bottom mb-2">
+        <div class="py-2 border-top border-bottom mb-2 mt-2">
           <div class="px-3">
             <input type="text"
                    name="tld"
