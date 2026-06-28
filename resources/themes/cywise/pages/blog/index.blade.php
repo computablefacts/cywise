@@ -14,7 +14,7 @@
     ]"
 >
     <x-container>
-        <div class="relative pt-6">
+        <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 relative pt-12">
             <x-marketing.elements.heading
                 title="Blog"
                 description="{{ __('Check out some of our latest blog posts below.') }}"

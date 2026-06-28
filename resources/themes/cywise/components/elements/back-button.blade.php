@@ -1,6 +1,6 @@
-<div {{ $attributes->merge(['class' => 'mx-auto w-100']) }}>
-    <a href="{{ $href ?? '' }}" class="btn btn-sm btn-light border rounded-pill mb-3 text-primary d-inline-flex align-items-center">
-        <svg class="me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        {{ $text ?? '' }}
-    </a>
-</div>
+<a href="{{ $href ?? '' }}" class="inline-flex items-center gap-x-2 px-4 py-2 text-xs font-medium rounded-full border bg-blue-100 border-blue-200 text-blue-600 transition hover:bg-blue-200 hover:text-blue-800 group">
+    <svg class="h-4 w-4 transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd" />
+    </svg>
+    <span class="uppercase tracking-wider">{{ $text ?? '' }}</span>
+</a>
