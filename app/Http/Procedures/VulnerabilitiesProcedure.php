@@ -110,7 +110,7 @@ if (empty(\$alert->cve_id)) {
             ->where('is_monitored', true)
             ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
             ->when($asset, fn($query, $assetId) => $query->where('asset', $assetId))
-            ->when($tld, fn($query, $domain) => $query->where('tld', $tld))
+            ->when($tld, fn($query, $tld) => $query->where(fn($q) => $q->where('tld', 'LIKE', '%' . $tld . '%')->orWhere('asset', 'LIKE', '%' . $tld . '%')))
             ->when($tags, fn($query, $domain) => $query
                 ->join('am_assets_tags', 'am_assets_tags.asset_id', '=', 'am_assets.id')
                 ->whereIn('am_assets_tags.tag', $tags)

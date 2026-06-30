@@ -230,7 +230,7 @@ abstract class AbstractTimelineController extends Controller
         $filter = function ($query) use ($assetId, $tld, $tags) {
             return $query
                 ->when($assetId, fn($q, $assetId) => $q->where('id', $assetId))
-                ->when($tld, fn($q, $tld) => $q->where('tld', Str::lower($tld)))
+                ->when($tld, fn($q, $tld) => $q->where(fn($q) => $q->where('tld', 'LIKE', '%' . Str::lower($tld) . '%')->orWhere('asset', 'LIKE', '%' . Str::lower($tld) . '%')))
                 ->when($tags && count($tags) > 0, function ($q) use ($tags) {
                     $q->whereHas('tags', function ($sub) use ($tags) {
                         $sub->whereIn('tag', $tags);
