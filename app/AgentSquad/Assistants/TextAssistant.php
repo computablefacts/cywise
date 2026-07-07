@@ -4,6 +4,8 @@ namespace App\AgentSquad\Assistants;
 
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
+use App\Models\AppTrace;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -86,11 +88,26 @@ class TextAssistant
             return '';
         }
 
+        $before = microtime(true);
         $response = $this->callDeepInfra($messages);
-
         $answer = $response['choices'][0]['message']['content'] ?? '';
         $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
-        return Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
+        $answer = Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
+        $after = microtime(true);
+
+        try {
+            /** @var AppTrace $trace */
+            $trace = AppTrace::create([
+                'user_id' => Auth::user()?->id,
+                'verb' => 'GET',
+                'endpoint' => "/agent-squad/assistant?name=text" . ($this->threadId ? '&thread_id=' . $this->threadId : '') . ($this->model ? '&model=' . $this->model : ''),
+                'duration_in_ms' => (int)(($after - $before) * 1000),
+                'failed' => false,
+            ]);
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+        }
+        return $answer;
     }
 
     public function structured(): object
