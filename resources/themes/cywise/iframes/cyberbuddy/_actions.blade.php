@@ -31,7 +31,7 @@
       @include('theme::iframes.cyberbuddy._action', [
       'title' => __('Hardening'),
       'subtitle' => __('Durcissement des systèmes'),
-      'text' => __('Qu\'est-ce que le hardening ?')
+      'text' => __('Qu\'est-ce que le durcissement en cybersécurité ?')
       ])
       @include('theme::iframes.cyberbuddy._action', [
       'title' => __('Mots de passe'),
@@ -41,7 +41,7 @@
       @include('theme::iframes.cyberbuddy._action', [
       'title' => __('WeTransfer'),
       'subtitle' => __('Envoi de fichiers'),
-      'text' => __('Puis-je envoyer un fichier via WeTransfer ?')
+      'text' => __('Est-il sécurisé de partager un fichier par WeTransfer ?')
       ])
       @include('theme::iframes.cyberbuddy._action', [
       'title' => __('USB'),
