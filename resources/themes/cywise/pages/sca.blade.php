@@ -72,8 +72,8 @@ render(function (Request $request) {
     </div>
     @if(\App\Helpers\OssecCheckScript::hasScript($checks))
     <div class="row mt-3">
-      <div class="col text-end">
-        <b>{{ __('Script') }}</b>
+      <div class="col d-flex justify-content-end">
+        <b class="align-content-center mr-2">{{ __('Script') }}</b>
         @if(\App\Helpers\OssecCheckScript::hasScript($checks, \App\Helpers\OssecCheckScript::OS_WINDOWS))
         <a
             href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($checks, \App\Helpers\OssecCheckScript::OS_WINDOWS)) }}"
@@ -267,7 +267,7 @@ render(function (Request $request) {
           <div class="col col-2 text-end">
             <b>{{ __('Script') }}</b>
           </div>
-          <div class="col">
+          <div class="col d-flex justify-content-start">
             @if(\App\Helpers\OssecCheckScript::hasScript($check, \App\Helpers\OssecCheckScript::OS_WINDOWS))
             <a
                 href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($check, \App\Helpers\OssecCheckScript::OS_WINDOWS)) }}"
