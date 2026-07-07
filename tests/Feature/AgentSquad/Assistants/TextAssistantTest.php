@@ -4,7 +4,6 @@ namespace Tests\Feature\AgentSquad\Assistants;
 
 use App\AgentSquad\Assistants\TextAssistant;
 use App\Models\Tenant;
-use App\Models\Trace;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCaseWithDb;
@@ -36,18 +35,6 @@ class TextAssistantTest extends TestCaseWithDb
 
         $this->assertNotEmpty($result);
         $this->assertStringContainsString('Hi Junie!', $result);
-
-        // Vérifier qu'une trace a été créée
-        $this->assertDatabaseHas('cb_traces', [
-            'thread_id' => 'test-thread-123',
-            'created_by' => $this->user->id,
-        ]);
-
-        $trace = Trace::where('thread_id', 'test-thread-123')->first();
-
-        $this->assertNotNull($trace);
-        $this->assertStringContainsString('Junie', $trace->input);
-        $this->assertStringContainsString($result, $trace->output);
     }
 
     public function test_text_assistant_structured_returns_object()

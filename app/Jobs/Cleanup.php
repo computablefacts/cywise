@@ -11,7 +11,6 @@ use App\Models\ScheduledTask;
 use App\Models\Tenant;
 use App\Models\TimelineFact;
 use App\Models\TimelineItem;
-use App\Models\Trace;
 use App\Models\Trial;
 use App\Models\User;
 use App\Models\Vector;
@@ -132,8 +131,6 @@ class Cleanup implements ShouldQueue
             Log::debug("Vectors with missing references for user {$user->email} removed.");
             Log::debug("Purging conversations of user {$user->email} that are over 6 months old...");
 
-            Trace::where('updated_at', '<=', Carbon::now()->startOfDay()->subMonths(6))
-                ->delete();
             Conversation::where('updated_at', '<=', Carbon::now()->startOfDay()->subMonths(6))
                 ->delete();
 

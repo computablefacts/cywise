@@ -4,8 +4,6 @@ namespace App\AgentSquad\Assistants;
 
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
-use App\Models\Trace;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -88,17 +86,7 @@ class TextAssistant
             return '';
         }
 
-        $start = microtime(true);
         $response = $this->callDeepInfra($messages);
-        $stop = microtime(true);
-
-        Trace::create([
-            'thread_id' => $this->threadId,
-            'input' => cywise_truncate_string(json_encode($messages), 16000),
-            'output' => cywise_truncate_string(json_encode($response), 16000),
-            'elapsed_time_in_seconds' => (int)ceil($stop - $start),
-            'created_by' => Auth::id(),
-        ]);
 
         $answer = $response['choices'][0]['message']['content'] ?? '';
         $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
