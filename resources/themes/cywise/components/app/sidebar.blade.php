@@ -178,42 +178,34 @@ $user = \Auth::user();
           </x-app.sidebar-link>
           @endif
           -->
-          @if($user->canView('iframes.frameworks')
-          || $user->canView('iframes.sca')
+          @if($user->canView('iframes.sca')
           || $user->canView('iframes.rules'))
-          <x-app.sidebar-dropdown text="{{ __('Libraries') }}"
-                                  icon="phosphor-books"
+          <x-app.sidebar-dropdown text="{{ __('Agent') }}"
+                                  icon="phosphor-cube"
                                   id="libraries_dropdown"
                                   :active="false"
                                   :open="(
-                          Request::is('frameworks') ||
                           Request::is('sca') ||
                           Request::is('rules')
                         ) ? '1' : '0'">
-            @if($user->canView('iframes.frameworks'))
-            <x-app.sidebar-link href="{{ route('frameworks') }}"
-                                icon="phosphor-cube"
-                                :active="Request::is('frameworks')">
-              {{ __('Frameworks') }}
-            </x-app.sidebar-link>
-            @endif
             @if($user->canView('iframes.rules'))
             <x-app.sidebar-link href="{{ route('rules') }}"
-                                icon="phosphor-cube"
+                                icon="phosphor-magnifying-glass"
                                 :active="Request::is('rules')">
               {{ __('Security Rules') }}
             </x-app.sidebar-link>
             @endif
             @if($user->canView('iframes.sca'))
             <x-app.sidebar-link href="{{ route('sca') }}"
-                                icon="phosphor-cube"
+                                icon="phosphor-flow-arrow"
                                 :active="Request::is('sca')">
               {{ __('Security Checks Automation') }}
             </x-app.sidebar-link>
             @endif
           </x-app.sidebar-dropdown>
           @endif
-          @if($user->canView('iframes.tables')
+          @if($user->canView('iframes.frameworks')
+          || $user->canView('iframes.tables')
           || $user->canView('iframes.collections')
           || $user->canView('iframes.documents')
           || $user->canView('iframes.chunks'))
@@ -222,11 +214,19 @@ $user = \Auth::user();
                                   id="datamanagement_dropdown"
                                   :active="false"
                                   :open="(
+                          Request::is('frameworks') ||
                           Request::is('tables') ||
                           Request::is('collections') ||
                           Request::is('documents') ||
                           Request::is('chunks')
                         ) ? '1' : '0'">
+            @if($user->canView('iframes.frameworks'))
+            <x-app.sidebar-link href="{{ route('frameworks') }}"
+                                icon="phosphor-books"
+                                :active="Request::is('frameworks')">
+              {{ __('Frameworks') }}
+            </x-app.sidebar-link>
+            @endif
             @if($user->canView('iframes.tables'))
             <x-app.sidebar-link href="{{ route('tables') }}"
                                 icon="phosphor-table"
