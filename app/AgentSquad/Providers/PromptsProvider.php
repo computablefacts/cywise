@@ -7,7 +7,7 @@ use App\Http\Requests\JsonRpcRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class PromptsProvider
+class PromptsProvider extends AbstractProvider
 {
     private string $name;
     private array $variables = [];
@@ -29,7 +29,7 @@ class PromptsProvider
         return $this;
     }
 
-    public function provide(): string
+    protected function provide2(): string
     {
         try {
             $request = new JsonRpcRequest(['name' => $this->name]);

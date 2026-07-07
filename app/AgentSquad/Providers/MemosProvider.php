@@ -7,7 +7,7 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
-class MemosProvider
+class MemosProvider extends AbstractProvider
 {
     private User $user;
     private ?string $scope = null;
@@ -29,7 +29,7 @@ class MemosProvider
         return $this;
     }
 
-    public function provide(): string
+    protected function provide2(): string
     {
         try {
             $request = new JsonRpcRequest(['scope' => $this->scope]);

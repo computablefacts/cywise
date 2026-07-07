@@ -10,7 +10,7 @@ use App\Models\Vector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-class ChunksProvider
+class ChunksProvider extends AbstractProvider
 {
     private Collection $collections;
     private int $limit = 8;
@@ -56,7 +56,7 @@ class ChunksProvider
     }
 
     /** @return Collection<Chunk> */
-    public function provide(): Collection
+    protected function provide2(): Collection
     {
         if ($this->collections->isEmpty()) {
             return collect();
