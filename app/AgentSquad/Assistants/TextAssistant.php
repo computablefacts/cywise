@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class TextAssistant
 {
-    private string $model = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
+    private string $model = 'deepseek-ai/DeepSeek-V4-Flash';
     private int $timeoutInSeconds = 60;
     private string|array|null $messages = null;
     private ?string $threadId = null;

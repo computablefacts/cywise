@@ -22,7 +22,7 @@ class Orchestrator
     /** @var AbstractAction[] $commands */
     private array $commands = [];
 
-    public function __construct(string $model = 'Qwen/Qwen3-Next-80B-A3B-Instruct')
+    public function __construct(string $model = 'deepseek-ai/DeepSeek-V4-Flash')
     {
         $this->model = $model;
     }
