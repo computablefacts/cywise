@@ -52,7 +52,7 @@ The action's input must always be in French, regardless of the user's language.
         $this->dir = $in;
     }
 
-    public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
+    protected function execute2(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
         // Build a table of contents from the context
         $tocs = \File::get("{$this->dir}/tocs.txt");

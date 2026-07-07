@@ -51,7 +51,7 @@ class QueryKnowledgeBase extends AbstractAction
         //
     }
 
-    public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
+    protected function execute2(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
         // Extract collection (if any)
         $collection = Str::before($input, ':');
