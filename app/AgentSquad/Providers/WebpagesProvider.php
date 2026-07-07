@@ -34,6 +34,11 @@ class WebpagesProvider extends AbstractProvider
         return $this;
     }
 
+    protected function trace(): bool
+    {
+        return true;
+    }
+
     protected function provide2(): string
     {
         try {
