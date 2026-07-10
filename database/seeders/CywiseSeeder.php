@@ -32,6 +32,7 @@ class CywiseSeeder extends Seeder
      */
     public function run(): void
     {
+        ini_set('memory_limit', '1024M');
         $this->setupConfig(); // Should be call first
         $this->setupPermissionsRolesAndPlans();
         $this->setupWave();
