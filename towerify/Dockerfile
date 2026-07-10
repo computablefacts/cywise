@@ -16,7 +16,7 @@ RUN composer install \
     --no-ansi \
     --no-plugins \
     --no-scripts \
-    --prefer-source
+    --prefer-dist
 
 # ==============================================
 # Frontend
