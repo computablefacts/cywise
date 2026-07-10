@@ -52,6 +52,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Folio\Folio;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -160,6 +161,10 @@ class AppServiceProvider extends ServiceProvider
 
         // SAML
         Event::subscribe(SamlEventSubscriber::class);
+
+        // By default, Folio routes are defined from the application’s resources/views/pages directory
+        // Set it to the selected theme
+        Folio::path(resource_path("themes/cywise/pages"));
     }
 
     private function setSchemaDefaultLength(): void
