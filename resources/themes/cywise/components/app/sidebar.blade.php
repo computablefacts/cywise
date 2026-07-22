@@ -71,7 +71,6 @@ $user = \Auth::user();
           @endif
           @if($user->canView('iframes.vulnerabilities')
           || $user->canView('iframes.leaks')
-          || $user->canView('iframes.ioc')
           || $user->canView('iframes.assets')
           || $user->canView('iframes.events')
           || $user->canView('iframes.conversations')
@@ -83,7 +82,6 @@ $user = \Auth::user();
                                   :open="(
                           Request::is('vulnerabilities') ||
                           Request::is('leaks') ||
-                          Request::is('ioc') ||
                           Request::is('assets') ||
                           Request::is('events') ||
                           Request::is('conversations') ||
@@ -103,14 +101,6 @@ $user = \Auth::user();
               icon="phosphor-user"
               :active="Request::is('leaks')">
               {{ __('Leaks') }}
-            </x-app.sidebar-link>
-            @endif
-            @if($user->canView('iframes.ioc'))
-            <x-app.sidebar-link
-              href="{{ route('ioc') }}"
-              icon="phosphor-magnifying-glass"
-              :active="Request::is('ioc')">
-              {{ __('Indicators of Compromise') }}
             </x-app.sidebar-link>
             @endif
             @if($user->canView('iframes.events'))

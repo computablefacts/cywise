@@ -191,7 +191,7 @@ render(function (Request $request) {
                   <b>{{ $nb_iocs_high }}</b> {{ __('IoCs') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('ioc', [ 'level' => 'high' ]) }}" class="link">
+                  <a href="{{ route('events', [ 'level' => 'high' ]) }}" class="link">
                     {{ __('High') }}
                   </a>
                 </div>
@@ -216,7 +216,7 @@ render(function (Request $request) {
                   <b>{{ $nb_iocs_medium }}</b> {{ __('IoCs') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('ioc', [ 'level' => 'medium' ]) }}" class="link">
+                  <a href="{{ route('events', [ 'level' => 'medium' ]) }}" class="link">
                     {{ __('Medium') }}
                   </a>
                 </div>
@@ -241,7 +241,7 @@ render(function (Request $request) {
                   <b>{{ $nb_iocs_low }}</b> {{ __('IoCs') }}
                 </div>
                 <div class="text-muted">
-                  <a href="{{ route('ioc', [ 'level' => 'low' ]) }}" class="link">
+                  <a href="{{ route('events', [ 'level' => 'low' ]) }}" class="link">
                     {{ __('Low') }}
                   </a>
                 </div>
@@ -319,7 +319,7 @@ render(function (Request $request) {
                 @else
                 <span class="dot-blue"></span>
                 @endif
-                &nbsp;<a href="{{ route('ioc') }}#eid-{{ $item->id }}" class="link text-truncate">
+                &nbsp;<a href="{{ route('events') }}#eid-{{ $item->id }}" class="link text-truncate">
                   {{ $item->server_name }}
                 </a>
               </div>

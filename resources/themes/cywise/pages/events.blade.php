@@ -48,6 +48,9 @@ render(function (Request $request) {
                   {{ __('Reset') }}
                 </a>
               </div>
+              @if(request('level'))
+              <input type="hidden" name="level" value="{{ request('level') }}">
+              @endif
               @if(request('server_id'))
               <input type="hidden" name="server_id" value="{{ request('server_id') }}">
               @endif

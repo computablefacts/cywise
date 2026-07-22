@@ -54,7 +54,7 @@ abstract class AbstractTimelineController extends Controller
     {
         $params = $request->validate([
             'status' => ['nullable', 'string', 'in:monitorable,monitored'],
-            'level' => ['nullable', 'string', 'in:low,medium,high'],
+            'level' => ['nullable', 'string', 'in:low,medium,high,suspect,other'],
             'server_id' => ['nullable', 'integer', 'exists:ynh_servers,id'],
             'asset_id' => ['nullable', 'integer', 'exists:am_assets,id'],
             'tld' => ['nullable', 'string'],
@@ -65,13 +65,6 @@ abstract class AbstractTimelineController extends Controller
 
         $rulesList = YnhOsqueryRule::where('enabled', true)->orderBy('name')->get();
         $objects = $this->objects();
-
-        if ($objects === 'events') {
-            $rulesList = $rulesList->filter(fn(YnhOsqueryRule $rule) => $rule->score <= 0);
-        } else if ($objects === 'ioc') {
-            $rulesList = $rulesList->filter(fn(YnhOsqueryRule $rule) => $rule->score > 0);
-        }
-
         $items = match ($objects) {
             'assets' => $this->assets(
                 $params['status'] ?? null,
@@ -87,8 +80,7 @@ abstract class AbstractTimelineController extends Controller
                     null
             ),
             'conversations' => $this->conversations(),
-            'events' => $this->events($params['server_id'] ?? null, $params['rule_name'] ?? null),
-            'ioc' => $this->iocs(10, $params['server_id'] ?? null, $params['level'] ?? null, $params['rule_name'] ?? null),
+            'events' => $this->eventsAndIoCs($params['server_id'] ?? null, $params['level'] ?? null, $params['rule_name'] ?? null),
             'leaks' => $this->leaks(),
             'notes-and-memos' => $this->notesAndMemos(),
             'vulnerabilities' => $this->vulnerabilities(
@@ -320,6 +312,28 @@ abstract class AbstractTimelineController extends Controller
                     ])->render(),
                 ];
             }),
+        ];
+    }
+
+    private function eventsAndIoCs(?int $serverId = null, ?string $level = null, ?string $ruleName = null): array
+    {
+        $events = $this->events($serverId, $ruleName);
+        $iocs = $this->iocs(1, $serverId, $level, $ruleName);
+
+        if ($level === 'suspect' || $level === 'low' || $level === 'medium' || $level === 'high') {
+            $items = $iocs['items'];
+        } else if ($level === 'other') {
+            $items = $events['items'];
+        } else {
+            $items = collect($events['items'])->concat($iocs['items'])->sortByDesc(fn($item) => $item['timestamp']);
+        }
+        return [
+            'nb_events' => $events['nb_events'],
+            'nb_high' => $iocs['nb_high'],
+            'nb_medium' => $iocs['nb_medium'],
+            'nb_low' => $iocs['nb_low'],
+            'nb_suspect' => $iocs['nb_suspect'],
+            'items' => $items,
         ];
     }
 
