@@ -1,5 +1,5 @@
 <div class="row mt-3 mb-3">
-  <div class="col ps-0">
+  <div class="col">
     <div class="card">
       <div class="card-body p-3">
         <div class="row align-items-center">
