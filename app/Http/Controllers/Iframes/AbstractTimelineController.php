@@ -63,7 +63,16 @@ abstract class AbstractTimelineController extends Controller
             'rule_name' => ['nullable', 'string'],
         ]);
 
-        $rulesList = YnhOsqueryRule::where('enabled', true)->orderBy('name')->get();
+        // Keep in sync with the default value of the window parameter expected by EventsProcedure::list
+        $minDate = Carbon::now()->subDays(2)->startOfDay();
+        $maxDate = Carbon::now()->endOfDay();
+        $rules = YnhOsqueryRule::where('enabled', true)->orderBy('name')->get();
+        $eventCountsByRule = YnhOsquery::query()
+            ->select('ynh_osquery_rule_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            ->where('calendar_time', '>=', $minDate)
+            ->where('calendar_time', '<=', $maxDate)
+            ->groupBy('ynh_osquery_rule_id')
+            ->pluck('total', 'ynh_osquery_rule_id');
         $objects = $this->objects();
         $items = match ($objects) {
             'assets' => $this->assets(
@@ -107,11 +116,12 @@ abstract class AbstractTimelineController extends Controller
             default => [],
         };
 
-        $rulesDetails = $rulesList->mapWithKeys(function (YnhOsqueryRule $rule) {
+        $rulesDetails = $rules->mapWithKeys(function (YnhOsqueryRule $rule) use ($eventCountsByRule) {
             return [$rule->name => [
                 'id' => $rule->id,
                 'name' => $rule->name,
                 'display_name' => $rule->displayName(),
+                'nb_events' => $eventCountsByRule->get($rule->id, 0),
                 'description' => $rule->displayDescription(),
                 'platform' => $rule->platform->value,
                 'interval' => \Carbon\CarbonInterval::seconds($rule->interval)->cascade()->forHumans(),
@@ -154,7 +164,7 @@ abstract class AbstractTimelineController extends Controller
             'nb_notes' => $items['nb_notes'] ?? 0,
             'nb_events' => $items['nb_events'] ?? 0,
             'nb_leaks' => $items['nb_leaks'] ?? 0,
-            'rules' => $rulesList,
+            'rules' => $rules,
             'rulesDetails' => $rulesDetails,
             'selectedRule' => $params['rule_name'] ?? null ? YnhOsqueryRule::where('name', $params['rule_name'])->first() : null,
             'tags' => AssetTag::query()
