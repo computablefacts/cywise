@@ -188,7 +188,7 @@ render(function (Request $request) {
               </div>
               <div class="col">
                 <div class="h5 mb-0">
-                  <b>{{ $nb_iocs_high }}</b> {{ __('IoCs') }}
+                  <b>{{ $nb_iocs_high }}</b> {{ __('events') }}
                 </div>
                 <div class="text-muted">
                   <a href="{{ route('events', [ 'level' => 'high' ]) }}" class="link">
@@ -213,7 +213,7 @@ render(function (Request $request) {
               </div>
               <div class="col">
                 <div class="h5 mb-0">
-                  <b>{{ $nb_iocs_medium }}</b> {{ __('IoCs') }}
+                  <b>{{ $nb_iocs_medium }}</b> {{ __('events') }}
                 </div>
                 <div class="text-muted">
                   <a href="{{ route('events', [ 'level' => 'medium' ]) }}" class="link">
@@ -238,7 +238,7 @@ render(function (Request $request) {
               </div>
               <div class="col">
                 <div class="h5 mb-0">
-                  <b>{{ $nb_iocs_low }}</b> {{ __('IoCs') }}
+                  <b>{{ $nb_iocs_low }}</b> {{ __('events') }}
                 </div>
                 <div class="text-muted">
                   <a href="{{ route('events', [ 'level' => 'low' ]) }}" class="link">
