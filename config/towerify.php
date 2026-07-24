@@ -24,6 +24,10 @@ return [
         'drop_discovery_events_after_x_minutes' => env('DROP_DISCOVERY_EVENTS_AFTER_X_MINUTES', 60),
         'days_between_scans' => env('DAYS_BETWEEN_SCANS', 5),
     ],
+    'ossec' => [
+        // Pilot rule. Set to null to install the runner without scheduling it.
+        'pilot_rule_uid' => env('OSSEC_PILOT_RULE_UID', 50004),
+    ],
     'cyberbuddy' => [
         'api' => env('CB_API'),
         'api_username' => env('CB_API_USERNAME'),

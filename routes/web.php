@@ -42,6 +42,7 @@ use App\Http\Controllers\Iframes\UsersController;
 use App\Http\Controllers\Iframes\UsersInvitationController;
 use App\Http\Controllers\Iframes\WebsiteController;
 use App\Http\Controllers\MultiLevelHealthCheckController;
+use App\Http\Controllers\OssecAgentRuleController;
 use App\Http\Middleware\CheckPermissionsHttpRequest;
 use App\Http\Middleware\LogHttpRequests;
 use App\Jobs\DownloadDebianSecurityBugTracker;
@@ -348,6 +349,10 @@ Route::get('/osquery/{secret}', function (string $secret, \Illuminate\Http\Reque
     return response($config, 200)
         ->header('Content-Type', 'text/plain');
 })->middleware('throttle:6,1');
+
+Route::get('/ossec-agent/{secret}/rules/{ruleUid}', OssecAgentRuleController::class)
+    ->whereNumber('ruleUid')
+    ->middleware('throttle:120,1');
 
 Route::get('/localmetrics/{secret}', function (string $secret, \Illuminate\Http\Request $request) {
 

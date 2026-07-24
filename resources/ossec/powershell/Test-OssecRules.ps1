@@ -85,7 +85,7 @@ function InvokeRuleCommand {
   }
   catch {
     Add-Exception `
-      -Message "Erreur lors de l'exécution de la commande '$command'." `
+      -Message "Erreur lors de l'exÃ©cution de la commande '$command'." `
       -Exception $_.Exception
     return $null
   }
@@ -111,7 +111,7 @@ function Convert-RegistryKey {
       }
   }
 
-  # Retourner la clé inchangée si aucun remplacement n'est trouvé
+  # Retourner la clÃ© inchangÃ©e si aucun remplacement n'est trouvÃ©
   return $Key
 }
 
@@ -155,7 +155,7 @@ function FetchRegistryValue {
   }
 }
 
-# Définition des constantes de couleur ANSI
+# DÃ©finition des constantes de couleur ANSI
 #$ANSI_BLACK = "`e[30m"
 #$ANSI_RED = "`e[31m"
 $ANSI_GREEN = "`e[32m"
@@ -182,7 +182,7 @@ function Show-RuleResult {
   )
 
   if ($exceptions.Count -gt 0) {
-    Write-Output "${ANSI_BRIGHT_YELLOW}✘ $($rule['rule_name'])${ANSI_RESET}"
+    Write-Output "${ANSI_BRIGHT_YELLOW}âœ˜ $($rule['rule_name'])${ANSI_RESET}"
     foreach ($exception in $exceptions) {
       Write-Output "${ANSI_BRIGHT_YELLOW}$($exception.Message)${ANSI_RESET}"
       Write-Output "$($exception.Exception.Message)"
@@ -190,10 +190,10 @@ function Show-RuleResult {
   }
   else {
     if ($testResult) {
-      Write-Output "${ANSI_GREEN}✔ $($rule['rule_name'])${ANSI_RESET}"
+      Write-Output "${ANSI_GREEN}âœ” $($rule['rule_name'])${ANSI_RESET}"
     }
     else {
-      Write-Output "${ANSI_BRIGHT_RED}✘ $($rule['rule_name'])${ANSI_RESET}"
+      Write-Output "${ANSI_BRIGHT_RED}âœ˜ $($rule['rule_name'])${ANSI_RESET}"
     }
   }
 
@@ -211,7 +211,7 @@ function Show-TestResult {
 
   $TotalCount = $PassedCount + $FailedCount + $ErrorCount
   if ($TotalCount -eq 0) {
-    Write-Output "${ANSI_YELLOW}Aucun test lancé.${ANSI_RESET}"
+    Write-Output "${ANSI_YELLOW}Aucun test lancÃ©.${ANSI_RESET}"
     return
   }
 
@@ -222,7 +222,7 @@ function Show-TestResult {
     $Color = $ANSI_BRIGHT_RED
   }
   elseif ($Percentage -lt 50) {
-    $Level = "Médiocre"
+    $Level = "MÃ©diocre"
     $Color = $ANSI_BRIGHT_MAGENTA
   }
   elseif ($Percentage -lt 75) {
@@ -238,7 +238,7 @@ function Show-TestResult {
     $Color = $ANSI_BRIGHT_GREEN
   }
 
-  Write-Output "Tests ${ANSI_GREEN}réussis: $PassedCount, ${ANSI_BRIGHT_RED}échoués: $FailedCount, ${ANSI_BRIGHT_YELLOW}erreurs: $ErrorCount${ANSI_RESET}"
+  Write-Output "Tests ${ANSI_GREEN}rÃ©ussis: $PassedCount, ${ANSI_BRIGHT_RED}Ã©chouÃ©s: $FailedCount, ${ANSI_BRIGHT_YELLOW}erreurs: $ErrorCount${ANSI_RESET}"
   Write-Output "${Color}Score: $Percentage/100 (${Level})${ANSI_RESET}"
 }
 
@@ -355,7 +355,7 @@ function MatchPattern {
     }
     catch {
       Add-Exception `
-        -Message "Erreur: expression régulière invalide '$pattern'." `
+        -Message "Erreur: expression rÃ©guliÃ¨re invalide '$pattern'." `
         -Exception $_.Exception
       $result = $false
     }
@@ -426,7 +426,8 @@ function MatchPattern {
 
 function Test-RulesList {
     param(
-        [string[]]$RulesList
+        [string[]]$RulesList,
+        [switch]$Json
     )
 
     $ctx = @{
@@ -450,24 +451,46 @@ function Test-RulesList {
         $exceptions = Get-ExceptionList
         if ($exceptions.Count -gt 0) {
             $errorCount++
+            $status = 'error'
         }
         else {
             if ($result) {
                 $passedCount++
+                $status = 'passed'
             }
             else {
                 $failedCount++
+                $status = 'failed'
             }
         }
-        Show-RuleResult $result $ruleObject $exceptions
-    }
-    Show-TestResult $passedCount $failedCount $errorCount
 
+        if ($Json) {
+            $errors = @($exceptions | ForEach-Object {
+                [ordered]@{
+                    message = $_.Message
+                    detail  = $_.Exception.Message
+                }
+            })
+            [ordered]@{
+                rule_name = $ruleObject['rule_name']
+                status    = $status
+                errors    = $errors
+            } | ConvertTo-Json -Compress -Depth 5
+        }
+        else {
+            Show-RuleResult $result $ruleObject $exceptions
+        }
+    }
+
+    if (-not $Json) {
+        Show-TestResult $passedCount $failedCount $errorCount
+    }
 }
 
 function Test-OssecRules {
     param(
-        [string]$RulesFile
+        [string]$RulesFile,
+        [switch]$Json
     )
 
     # Déclaration de la variable $rules par défaut
@@ -482,12 +505,10 @@ __PUT_RULES_HERE__
         $rulesList = $rules -split "`n" | Where-Object { $_ -match '\S' }
     }
     
-    Test-RulesList $rulesList
+    Test-RulesList $rulesList -Json:$Json
 }
 
 # Appel de la fonction si le script est exécuté directement
 if ($MyInvocation.InvocationName -ne '.') {
     Test-OssecRules @args
 }
-
-

@@ -41,4 +41,14 @@ Describe 'Test-OssecRules function' {
     # Cleanup
     Remove-Item $testFile
   }
+
+  It 'Should return one machine-readable result per rule with -Json' {
+    # Act
+    $result = Test-OssecRules -Json | ForEach-Object { $_ | ConvertFrom-Json }
+
+    # Assert
+    $result.Count | Should -Be 2
+    $result[0].status | Should -Be 'passed'
+    $result[0].errors.Count | Should -Be 0
+  }
 }

@@ -14,7 +14,8 @@
 
 function Test-RulesList {
     param(
-        [string[]]$RulesList
+        [string[]]$RulesList,
+        [switch]$Json
     )
 
     $ctx = @{
@@ -38,24 +39,46 @@ function Test-RulesList {
         $exceptions = Get-ExceptionList
         if ($exceptions.Count -gt 0) {
             $errorCount++
+            $status = 'error'
         }
         else {
             if ($result) {
                 $passedCount++
+                $status = 'passed'
             }
             else {
                 $failedCount++
+                $status = 'failed'
             }
         }
-        Show-RuleResult $result $ruleObject $exceptions
-    }
-    Show-TestResult $passedCount $failedCount $errorCount
 
+        if ($Json) {
+            $errors = @($exceptions | ForEach-Object {
+                [ordered]@{
+                    message = $_.Message
+                    detail  = $_.Exception.Message
+                }
+            })
+            [ordered]@{
+                rule_name = $ruleObject['rule_name']
+                status    = $status
+                errors    = $errors
+            } | ConvertTo-Json -Compress -Depth 5
+        }
+        else {
+            Show-RuleResult $result $ruleObject $exceptions
+        }
+    }
+
+    if (-not $Json) {
+        Show-TestResult $passedCount $failedCount $errorCount
+    }
 }
 
 function Test-OssecRules {
     param(
-        [string]$RulesFile
+        [string]$RulesFile,
+        [switch]$Json
     )
 
     # Déclaration de la variable $rules par défaut
@@ -71,7 +94,7 @@ function Test-OssecRules {
         $rulesList = $rules -split "`n" | Where-Object { $_ -match '\S' }
     }
     
-    Test-RulesList $rulesList
+    Test-RulesList $rulesList -Json:$Json
 }
 
 # Appel de la fonction si le script est exécuté directement

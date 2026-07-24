@@ -125,4 +125,22 @@ class YnhOssecCheck extends Model
     {
         return json_encode($this->requirementsWithCywiseLink());
     }
+
+    public function agentPayload(): array
+    {
+        $requirements = $this->requirementsWithCywiseLink();
+        $revision = hash('sha256', json_encode([
+            'uid' => $this->uid,
+            'policy_uid' => $this->policy->uid,
+            'requirements' => $this->requirements,
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+
+        return [
+            'uid' => $this->uid,
+            'policy_uid' => $this->policy->uid,
+            'title' => $this->title,
+            'revision' => $revision,
+            'requirements' => $requirements,
+        ];
+    }
 }

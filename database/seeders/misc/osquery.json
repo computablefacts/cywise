@@ -1243,5 +1243,20 @@
     "is_ioc": 1,
     "score": 95,
     "comments": "Execution of offensive security tools detected. These tools are commonly used for lateral movement, credential dumping, and privilege escalation."
+  },
+  {
+    "name": "cywise_ossec_rule_result",
+    "description": "Stores the result of a Cywise OSSEC security check executed by the server agent.",
+    "query": "SELECT * FROM osquery_info WHERE 1 = 0;",
+    "version": "1.0.0",
+    "interval": 86400,
+    "snapshot": 1,
+    "platform": "all",
+    "category": "security_check",
+    "enabled": 1,
+    "attck": null,
+    "is_ioc": 0,
+    "score": 0,
+    "comments": "A Cywise OSSEC rule was executed on the monitored server."
   }
 ]

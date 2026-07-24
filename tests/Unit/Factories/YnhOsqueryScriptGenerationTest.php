@@ -42,6 +42,36 @@ test('monitorLinuxServer contains the app url', function () {
     expect($script)->toContain(app_url());
 });
 
+test('monitorLinuxServer installs the mono-rule OSSEC agent and its daily pilot cron', function () {
+    config(['towerify.ossec.pilot_rule_uid' => 50004]);
+    $user = User::factory()->create(['performa_domain' => null]);
+    $server = YnhServer::factory()->for($user, 'user')->create([
+        'platform' => OsqueryPlatformEnum::LINUX,
+    ]);
+
+    $script = YnhOsquery::monitorLinuxServer($server);
+
+    expect($script)
+        ->toContain('/opt/cywise/bin/run-ossec-rule 50004')
+        ->toContain("/ossec-agent/{$server->secret}/rules/\$rule_uid")
+        ->toContain('/opt/cywise/lib/Test-OssecRules.ps1')
+        ->toContain('apt-get install -y powershell')
+        ->not->toContain('{ossec_runner}')
+        ->not->toContain('{ossec_evaluator}');
+});
+
+test('Linux LogAlert configuration monitors OSSEC results', function () {
+    $user = User::factory()->create();
+    $server = YnhServer::factory()->for($user, 'user')->create([
+        'platform' => OsqueryPlatformEnum::LINUX,
+    ]);
+
+    $config = YnhOsquery::configLogAlert($server);
+
+    expect(collect($config['monitors'])->pluck('path'))
+        ->toContain('/var/log/cywise/ossec-results.log');
+});
+
 test('monitorLinuxServer does not contain performa section when user has no performa domain', function () {
     $user = User::factory()->create(['performa_domain' => null]);
     $server = YnhServer::factory()->for($user, 'user')->create([

@@ -68,15 +68,25 @@ class YnhOsquery extends Model
     {
         $url = app_url();
         $path = ($server->platform === OsqueryPlatformEnum::WINDOWS) ? "C:\\Program Files\\osquery\\log\\osqueryd.*.log" : "/var/log/osquery/osqueryd.*.log";
-        return ["monitors" => [
+        $monitors = [
             [
                 "name" => "Monitor Osquery Daemon Output",
                 "path" => $path,
                 "match" => ".*",
                 "regexp" => true,
                 "url" => "{$url}/logalert/{$server->secret}"
-            ]
-        ],
+            ],
+        ];
+        if ($server->platform !== OsqueryPlatformEnum::WINDOWS) {
+            $monitors[] = [
+                "name" => "Monitor Cywise OSSEC Results",
+                "path" => "/var/log/cywise/ossec-results.log",
+                "match" => ".*",
+                "regexp" => true,
+                "url" => "{$url}/logalert/{$server->secret}",
+            ];
+        }
+        return ["monitors" => $monitors,
             "sleep" => 5,
             "echo" => false,
             "verbose" => 1
@@ -157,6 +167,16 @@ class YnhOsquery extends Model
     public static function monitorLinuxServer(YnhServer $server): string
     {
         $url = app_url();
+        $installPowershell = ScriptProvider::provide('linux/install-powershell.sh');
+        $ossecRunner = ScriptProvider::provide('linux/run-ossec-rule.sh', [
+            'url' => $url,
+            'secret' => $server->secret,
+        ]);
+        $ossecEvaluator = file_get_contents(resource_path('ossec/powershell/Test-OssecRules.ps1'));
+        $ossecRuleUid = config('towerify.ossec.pilot_rule_uid');
+        $ossecCron = empty($ossecRuleUid)
+            ? "crontab -l 2>/dev/null | grep -v '/opt/cywise/bin/run-ossec-rule' | crontab -"
+            : "cat <(crontab -l 2>/dev/null | grep -v '/opt/cywise/bin/run-ossec-rule') <(echo '44 4 * * * /opt/cywise/bin/run-ossec-rule {$ossecRuleUid} >> /var/log/cywise/ossec-agent.log 2>&1') | crontab -";
         $whitelist = collect(config('towerify.adversarymeter.ip_addresses'))
             ->map(fn(string $ip) => "sed -i '/^ignoreip/ { /{$ip}/! s/$/ {$ip}/ }' /etc/fail2ban/jail.conf")
             ->join("\n");
@@ -172,6 +192,10 @@ class YnhOsquery extends Model
         return ScriptProvider::provide('linux/monitor-server.sh', [
             'url' => $url,
             'secret' => $server->secret,
+            'install_powershell' => $installPowershell,
+            'ossec_runner' => $ossecRunner,
+            'ossec_evaluator' => $ossecEvaluator,
+            'ossec_cron' => $ossecCron,
             'whitelist' => $whitelist,
             'install_performa' => $installPerforma,
             'update_performa_config' => $updatePerformaConfig,
