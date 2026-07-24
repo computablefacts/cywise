@@ -1,0 +1,13 @@
+services:
+  ossec-agent-test:
+    build:
+      context: .
+      dockerfile: tests/Agent/Dockerfile
+    environment:
+      CYWISE_URL: ${CYWISE_AGENT_TEST_URL:-http://app}
+      CYWISE_SERVER_SECRET: ${CYWISE_AGENT_TEST_SERVER_SECRET:?Set CYWISE_AGENT_TEST_SERVER_SECRET}
+      CYWISE_RULE_UID: ${CYWISE_AGENT_TEST_RULE_UID:-50004}
+      CYWISE_OSSEC_RULE_TIMEOUT: ${CYWISE_AGENT_TEST_TIMEOUT:-300}
+    depends_on:
+      app:
+        condition: service_started
