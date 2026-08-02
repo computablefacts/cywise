@@ -81,8 +81,8 @@ class Asset extends Model
     public function tld(): ?string
     {
         if ($this->isDns()) {
-            if ($this->tld) {
-                return $this->tld;
+            if ($this->getRawOriginal('tld')) {
+                return $this->getRawOriginal('tld');
             }
 
             // Url need to start with protocol
@@ -96,9 +96,9 @@ class Asset extends Model
             $prevElement = prev($UrlElements);
 
             if (count($UrlElements) >= 2) {
-                $this->tld = mb_strtolower($prevElement . '.' . $lastElement);
+                $this->setRawAttributes(['tld' => mb_strtolower($prevElement . '.' . $lastElement)]);
                 $this->save();
-                return $this->tld;
+                return $this->getRawOriginal('tld');
             }
         }
         return null;

@@ -53,13 +53,14 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
     public function list(JsonRpcRequest $request): array
     {
         $params = $request->validate([
+            'asset_id' => 'integer|nullable|exists:am_assets,id',
             'asset' => 'string|nullable|min:1|max:191',
+            'tags' => 'array|nullable',
             'created_at_or_after' => 'date|nullable',
         ]);
 
         /** @var Carbon $createdAtOrAfter */
         $createdAtOrAfter = isset($params['created_at_or_after']) ? Carbon::parse($params['created_at_or_after'])->startOfDay() : null;
-        $asset = isset($params['asset']) ?? null;
 
         Log::debug("Fetching leaks of the last 15 days...");
 
@@ -67,11 +68,20 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
         $user = $request->user();
         $now = Carbon::now()->utc()->subDays(15);
         $leaks = Leak::where('created_at', '>=', $now)->orderByDesc('created_at')->get();
+        $assetId = $params['asset_id'] ?? null;
+        $asset = $params['asset'] ?? null;
+        $tags = $params['tags'] ?? null;
         $tlds = Asset::select('am_assets.*')
             ->join('users', 'users.id', '=', 'am_assets.created_by')
             ->when($user->tenant_id, fn($query, $tenantId) => $query->where('users.tenant_id', $tenantId))
             ->when($user->customer_id, fn($query, $customerId) => $query->where('users.customer_id', $customerId))
-            ->when($asset, fn($query, $asset) => $query->whereLike('am_assets.asset', "%{$asset}"))
+            ->when($assetId, fn($q, $id) => $q->where('am_assets.id', $id))
+            ->when($asset, fn($q, $asset) => $q->where(fn($q) => $q->where('am_assets.tld', 'LIKE', '%' . Str::lower($asset) . '%')->orWhere('am_assets.asset', 'LIKE', '%' . Str::lower($asset) . '%')))
+            ->when($tags && count($tags) > 0, function ($q) use ($tags) {
+                $q->whereHas('tags', function ($sub) use ($tags) {
+                    $sub->whereIn('tag', $tags);
+                });
+            })
             ->get()
             ->map(fn(Asset $asset) => $asset->tld())
             ->filter(fn(?string $tld) => !empty($tld))
@@ -79,7 +89,9 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
 
         Log::debug("Searching leaked credentials for {$tlds->count()} TLDs...");
 
-        if ($leaks->isEmpty()) {
+        if (app()->runningUnitTests()) {
+            $leaks = collect();
+        } else if ($leaks->isEmpty()) {
             $leaks = $this->fetchLeaks($tlds);
         } else {
             $leaks = $this->fetchLeaks($tlds, $leaks->first()->created_at);
@@ -89,6 +101,9 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
 
         $leaks->each(function (array $leak) use ($user) {
             $leak['created_by'] = $user->id;
+            $leak['website'] = Str::limit($leak['website'], 191, '');
+            $leak['email'] = Str::limit($leak['email'], 191, '');
+            $leak['password'] = Str::limit($leak['password'], 191, '');
             Leak::updateOrCreate([
                 'website' => $leak['website'],
                 'email' => $leak['email'],
@@ -98,6 +113,12 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
         return [
             'leaks' => Leak::query()
                 ->when($createdAtOrAfter, fn($query, $date) => $query->where('created_at', '>=', $date))
+                ->where(function ($query) use ($tlds) {
+                    foreach ($tlds as $tld) {
+                        $query->orWhere('email', 'LIKE', "%@{$tld}")
+                            ->orWhere('website', 'LIKE', "%{$tld}%");
+                    }
+                })
                 ->get()
                 ->map(fn(Leak $leak) => (object)[
                     'timestamp' => $leak->created_at,

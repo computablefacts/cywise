@@ -97,7 +97,18 @@ abstract class AbstractTimelineController extends Controller
             ),
             'conversations' => $this->conversations(),
             'events' => $this->eventsAndIoCs($params['server_id'] ?? null, $params['level'] ?? null, $params['rule_name'] ?? null),
-            'leaks' => $this->leaks(),
+            'leaks' => $this->leaks(
+                $params['asset_id'] ?? null,
+                $params['asset'] ?? null,
+                !empty($params['tags']) ?
+                    collect(explode(',', $params['tags']))
+                        ->map(fn(string $tag) => Str::trim($tag))
+                        ->filter(fn(string $tag) => !empty($tag))
+                        ->unique()
+                        ->values()
+                        ->all() :
+                    null
+            ),
             'notes-and-memos' => $this->notesAndMemos(),
             'vulnerabilities' => $this->vulnerabilities(
                 $params['level'] ?? null,
@@ -548,12 +559,17 @@ abstract class AbstractTimelineController extends Controller
         ];
     }
 
-    private function leaks(): array
+    private function leaks(?int $assetId = null, ?string $asset = null, ?array $tags = null): array
     {
         /** @var User $user */
         $user = Auth::user();
         $request = new JsonRpcRequest();
         $request->setUserResolver(fn() => $user);
+        $request->merge([
+            'asset_id' => $assetId,
+            'asset' => $asset,
+            'tags' => $tags,
+        ]);
         $leaks = (new LeaksProcedure())->list($request)['leaks'];
 
         return [
