@@ -24,7 +24,7 @@ render(function (Request $request) {
             <form method="get" action="{{ route('assets') }}" class="row g-2 align-items-end">
               <div class="col-sm-3">
                 <label for="tld" class="form-label">
-                  {{ __('Domain') }}
+                  {{ __('Asset') }}
                 </label>
                 <input type="text"
                        id="tld"
@@ -35,7 +35,7 @@ render(function (Request $request) {
               </div>
               <div class="col-sm-5">
                 <label for="tags" class="form-label">
-                  {{ __('Tag') }}
+                  {{ __('User tag') }}
                 </label>
                 <select id="tags" name="tags" class="form-select">
                   <option value="">{{ __('All tags') }}</option>

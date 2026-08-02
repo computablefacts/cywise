@@ -24,7 +24,7 @@ render(function (Request $request) {
             <form method="get" action="{{ route('vulnerabilities') }}" class="row g-2 align-items-end">
               <div class="col-sm-3">
                 <label for="tld" class="form-label">
-                  {{ __('Domain') }}
+                  {{ __('Asset') }}
                 </label>
                 <input type="text"
                        id="tld"
