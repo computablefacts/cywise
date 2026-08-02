@@ -62,8 +62,6 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
         /** @var Carbon $createdAtOrAfter */
         $createdAtOrAfter = isset($params['created_at_or_after']) ? Carbon::parse($params['created_at_or_after'])->startOfDay() : null;
 
-        Log::debug("Fetching leaks of the last 15 days...");
-
         /** @var User $user */
         $user = $request->user();
         $now = Carbon::now()->utc()->subDays(15);
@@ -76,7 +74,7 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
             ->when($user->tenant_id, fn($query, $tenantId) => $query->where('users.tenant_id', $tenantId))
             ->when($user->customer_id, fn($query, $customerId) => $query->where('users.customer_id', $customerId))
             ->when($assetId, fn($q, $id) => $q->where('am_assets.id', $id))
-            ->when($asset, fn($q, $asset) => $q->where(fn($q) => $q->where('am_assets.tld', 'LIKE', '%' . Str::lower($asset) . '%')->orWhere('am_assets.asset', 'LIKE', '%' . Str::lower($asset) . '%')))
+            ->when($asset, fn($q, $asset) => $q->where(fn($q) => $q->whereLike('am_assets.tld', '%' . Str::lower($asset) . '%')->orWhereLike('am_assets.asset', '%' . Str::lower($asset) . '%')))
             ->when($tags && count($tags) > 0, function ($q) use ($tags) {
                 $q->whereHas('tags', function ($sub) use ($tags) {
                     $sub->whereIn('tag', $tags);
@@ -87,7 +85,7 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
             ->filter(fn(?string $tld) => !empty($tld))
             ->unique();
 
-        Log::debug("Searching leaked credentials for {$tlds->count()} TLDs...");
+        Log::debug("Fetching new leaked credentials for {$tlds->count()} TLDs...");
 
         if (app()->runningUnitTests()) {
             $leaks = collect();
@@ -113,22 +111,27 @@ These credentials enable the user to log in to the website {{ \$leak['website'] 
         return [
             'leaks' => Leak::query()
                 ->when($createdAtOrAfter, fn($query, $date) => $query->where('created_at', '>=', $date))
-                ->where(function ($query) use ($tlds) {
-                    foreach ($tlds as $tld) {
-                        $query->orWhere('email', 'LIKE', "%@{$tld}")
-                            ->orWhere('website', 'LIKE', "%{$tld}%");
+                ->when($assetId || $asset || ($tags && count($tags) > 0), function ($query) use ($tlds) {
+                    if (count($tlds) <= 0) {
+                        $query->whereRaw('1=0');
+                    } else {
+                        foreach ($tlds as $tld) {
+                            $query->orWhereLike('email', "%@{$tld}")->orWhereLike('website', "%{$tld}%");
+                        }
                     }
                 })
+                ->whereNotNull('leak_date')
+                ->orderByDesc('leak_date')
+                ->limit(1000)
                 ->get()
                 ->map(fn(Leak $leak) => (object)[
-                    'timestamp' => $leak->created_at,
+                    'timestamp' => $leak->leak_date, // day separators in timeline and dates in tables must match
                     'leak_date' => $leak->leak_date?->format('Y-m-d'),
                     'leak_type' => $leak->leak_type,
                     'email' => $leak->email,
                     'website' => $leak->website,
                     'password' => $leak->password,
-                ])
-                ->sortBy('leak_date', SORT_NATURAL | SORT_FLAG_CASE),
+                ]),
         ];
     }
 

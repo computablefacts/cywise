@@ -23,13 +23,13 @@ render(function (Request $request) {
           <div class="card-body p-3">
             <form method="get" action="{{ route('leaks') }}" class="row g-2 align-items-end">
               <div class="col-sm-3">
-                <label for="asset" class="form-label">
+                <label for="tld" class="form-label">
                   {{ __('Asset') }}
                 </label>
                 <input type="text"
-                       id="asset"
-                       name="asset"
-                       value="{{ request('asset') }}"
+                       id="tld"
+                       name="tld"
+                       value="{{ request('tld') }}"
                        class="form-control"
                        placeholder="example.com">
               </div>

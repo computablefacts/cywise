@@ -99,7 +99,7 @@ abstract class AbstractTimelineController extends Controller
             'events' => $this->eventsAndIoCs($params['server_id'] ?? null, $params['level'] ?? null, $params['rule_name'] ?? null),
             'leaks' => $this->leaks(
                 $params['asset_id'] ?? null,
-                $params['asset'] ?? null,
+                $params['tld'] ?? null,
                 !empty($params['tags']) ?
                     collect(explode(',', $params['tags']))
                         ->map(fn(string $tag) => Str::trim($tag))
@@ -574,24 +574,25 @@ abstract class AbstractTimelineController extends Controller
 
         return [
             'nb_leaks' => $leaks->count(),
-            'items' => $leaks->chunk(25)->map(function (Collection $leaks) use ($user) {
+            'items' => $leaks->chunkWhile(fn(object $leak, int $key, Collection $chunk) => $leak->leak_date === $chunk->last()->leak_date)
+                ->map(function (Collection $leaks) use ($user) {
 
-                $timestamp = $leaks->first()->timestamp->utc()->format('Y-m-d H:i:s');
-                $date = Str::before($timestamp, ' ');
-                $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
+                    $timestamp = $leaks->first()->timestamp->utc()->format('Y-m-d H:i:s');
+                    $date = Str::before($timestamp, ' ');
+                    $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
 
-                return [
-                    'timestamp' => $timestamp,
-                    'date' => $date,
-                    'time' => $time,
-                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._leak', [
+                    return [
+                        'timestamp' => $timestamp,
                         'date' => $date,
                         'time' => $time,
-                        'user' => $user,
-                        'leaks' => $leaks,
-                    ])->render(),
-                ];
-            }),
+                        'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._leak', [
+                            'date' => $date,
+                            'time' => $time,
+                            'user' => $user,
+                            'leaks' => $leaks,
+                        ])->render(),
+                    ];
+                })->values(),
         ];
     }
 
