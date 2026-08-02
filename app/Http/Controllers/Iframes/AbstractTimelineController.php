@@ -702,11 +702,11 @@ abstract class AbstractTimelineController extends Controller
         ];
     }
 
-    private function alerts(?int $assetId = null, ?string $tld = null, ?array $tags = null, ?array $portTags = null): Collection
+    private function alerts(?int $assetId = null, ?string $asset = null, ?array $tags = null, ?array $portTags = null): Collection
     {
         $request = new JsonRpcRequest([
             'asset_id' => $assetId,
-            'tld' => $tld,
+            'asset' => $asset,
             'tags' => $tags,
             'port_tags' => $portTags,
         ]);
