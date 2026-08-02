@@ -116,7 +116,7 @@
             </div>
             <div class="text-muted">
               <a href="{{ route('events', [ 'level' => 'other' ]) }}" class="link">
-                {{ __('Miscellaneous') }}
+                {{ __('Other') }}
               </a>
             </div>
           </div>
