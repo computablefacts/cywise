@@ -16,7 +16,6 @@ class NotesProcedure extends Procedure
 {
     public static string $name = 'notes';
 
-    public const string SCOPE_IS_ORCHESTRATOR = 'Orchestrator';
     public const string SCOPE_IS_CYBERBUDDY = 'CyberBuddy';
     public const string SCOPE_IS_SOC_OPERATOR = 'SOC Operator';
 
@@ -25,7 +24,7 @@ class NotesProcedure extends Procedure
         params: [
             'subject' => 'An optional subject of the note. (string|nullable|min:1|max:1000)',
             'note' => 'The note content. (string|required|min:1|max:1000)',
-            'scopes' => "An optional set of scopes associated with the note such as 'CyberBuddy', 'Orchestrator' or 'SOC Operator' (array|nullable|min:0|max:3)",
+            'scopes' => "An optional set of scopes associated with the note such as 'CyberBuddy' or 'SOC Operator' (array|nullable|min:0|max:3)",
         ],
         result: [
             'msg' => 'A success message.',
@@ -97,7 +96,7 @@ class NotesProcedure extends Procedure
     #[RpcMethod(
         description: 'List all notes.',
         params: [
-            'scope' => "An optional scope such as 'CyberBuddy', 'Orchestrator' or 'SOC Operator'.",
+            'scope' => "An optional scope such as 'CyberBuddy' or 'SOC Operator'.",
         ],
         result: [
             'notes' => 'A list of notes.',

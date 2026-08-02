@@ -140,7 +140,7 @@ $user = \Auth::user();
               href="{{ route('notes-and-memos') }}"
               icon="phosphor-pencil-simple"
               :active="Request::is('notes-and-memos')">
-              {{ __('Notes & Memos') }}
+              {{ __('Notes') }}
             </x-app.sidebar-link>
             @endif
           </x-app.sidebar-dropdown>

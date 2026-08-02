@@ -16,7 +16,7 @@
             </div>
             <div class="text-muted">
               <a href="{{ route('notes-and-memos') }}" class="link">
-                {{ __('Notes & Memos') }}
+                {{ __('Notes') }}
               </a>
             </div>
           </div>

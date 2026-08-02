@@ -140,7 +140,7 @@ class Orchestrator
                 'INPUT' => $input,
                 'HISTORY' => $history,
                 'MEMOS' => MemosProvider::use()
-                    ->withScope(NotesProcedure::SCOPE_IS_ORCHESTRATOR)
+                    ->withScope(NotesProcedure::SCOPE_IS_CYBERBUDDY)
                     ->withUser($user)
                     ->provide(),
             ])
