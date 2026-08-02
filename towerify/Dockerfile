@@ -186,6 +186,8 @@ if [[ "$role" = "app" ]]; then
     (cd /var/www/html && php artisan cywise:docs 'v2.public.rpc.endpoint' --path='/docs/' --name 'docs.public.html')
     echo "artisan cywise:docs 'v2.private.rpc.endpoint' --path='/docs/' --name 'docs.private.html'"
     (cd /var/www/html && php artisan cywise:docs 'v2.private.rpc.endpoint' --path='/docs/' --name 'docs.private.html')
+    echo "artisan optimize:clear ..."
+    (cd /var/www/html && php artisan optimize:clear)
     echo "artisan optimize ..."
     (cd /var/www/html && php artisan optimize)
     echo "artisan filament:optimize ..."

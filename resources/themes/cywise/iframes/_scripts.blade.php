@@ -244,7 +244,7 @@
 
   /* RULES DYNAMIC DISPLAY */
 
-  const rulesDetails = @json($rulesDetails);
+  const rulesDetails = @json($rules_details);
 
   const updateRuleDisplay = (ruleName) => {
 

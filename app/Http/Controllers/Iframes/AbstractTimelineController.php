@@ -66,25 +66,6 @@ abstract class AbstractTimelineController extends Controller
         // Keep in sync with the default value of the window parameter expected by EventsProcedure::list
         $minDate = Carbon::now()->subDays(2)->startOfDay();
         $maxDate = Carbon::now()->endOfDay();
-        $rules = YnhOsqueryRule::where('enabled', true)->orderBy('name')->get();
-        $eventCountsByRule = YnhOsquery::query()
-            ->select('ynh_osquery_rule_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
-            ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
-            ->join('users', 'users.id', '=', 'ynh_servers.created_by')
-            ->where('calendar_time', '>=', $minDate)
-            ->where('calendar_time', '<=', $maxDate)
-            ->where('users.tenant_id', Auth::user()->tenant_id)
-            ->groupBy('ynh_osquery_rule_id')
-            ->pluck('total', 'ynh_osquery_rule_id');
-        $eventCountsByServer = YnhOsquery::query()
-            ->select('ynh_server_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
-            ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
-            ->join('users', 'users.id', '=', 'ynh_servers.created_by')
-            ->where('calendar_time', '>=', $minDate)
-            ->where('calendar_time', '<=', $maxDate)
-            ->where('users.tenant_id', Auth::user()->tenant_id)
-            ->groupBy('ynh_server_id')
-            ->pluck('total', 'ynh_server_id');
 
         $objects = $this->objects();
         $items = match ($objects) {
@@ -140,28 +121,56 @@ abstract class AbstractTimelineController extends Controller
             default => [],
         };
 
-        $rulesDetails = $rules->mapWithKeys(function (YnhOsqueryRule $rule) use ($eventCountsByRule) {
-            return [$rule->name => [
-                'id' => $rule->id,
-                'name' => $rule->name,
-                'display_name' => $rule->displayName(),
-                'nb_events' => $eventCountsByRule->get($rule->id, 0),
-                'description' => $rule->displayDescription(),
-                'platform' => $rule->platform->value,
-                'interval' => \Carbon\CarbonInterval::seconds($rule->interval)->cascade()->forHumans(),
-                'is_ioc' => $rule->is_ioc,
-                'score' => $rule->score,
-                'query' => $rule->query,
-                'tactics' => collect($rule->mitreAttckTactics())->map(fn(string $t) => Str::lower($t))->values(),
-                'mitre' => $rule->attck ? collect(explode(',', $rule->attck))->map(fn(string $uid) => [
-                    'uid' => $uid,
-                    'url' => Str::startsWith($uid, 'TA') ? "https://attack.mitre.org/tactics/$uid/" : "https://attack.mitre.org/techniques/$uid/"
-                ])->values() : [],
-                'can_edit' => isset($rule->created_by) || \Auth::user()?->isCywiseAdmin(),
-                'editor_url' => route('rules-editor', ['rule_id' => $rule->id]),
-            ]];
-        })->toArray();
-
+        if ($objects === 'events') {
+            $rules = YnhOsqueryRule::where('enabled', true)->orderBy('name')->get();
+            $eventCountsByRule = YnhOsquery::query()
+                ->select('ynh_osquery_rule_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+                ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
+                ->join('users', 'users.id', '=', 'ynh_servers.created_by')
+                ->where('ynh_osquery.calendar_time', '>=', $minDate)
+                ->where('ynh_osquery.calendar_time', '<=', $maxDate)
+                ->where('users.tenant_id', Auth::user()->tenant_id)
+                ->groupBy('ynh_osquery_rule_id')
+                ->pluck('total', 'ynh_osquery_rule_id');
+            $eventCountsByServer = YnhOsquery::query()
+                ->select('ynh_server_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+                ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
+                ->join('users', 'users.id', '=', 'ynh_servers.created_by')
+                ->where('ynh_osquery.calendar_time', '>=', $minDate)
+                ->where('ynh_osquery.calendar_time', '<=', $maxDate)
+                ->where('users.tenant_id', Auth::user()->tenant_id)
+                ->groupBy('ynh_server_id')
+                ->pluck('total', 'ynh_server_id');
+            $rulesDetails = $rules->mapWithKeys(function (YnhOsqueryRule $rule) use ($eventCountsByRule) {
+                return [$rule->name => [
+                    'id' => $rule->id,
+                    'name' => $rule->name,
+                    'display_name' => $rule->displayName(),
+                    'nb_events' => $eventCountsByRule->get($rule->id, 0),
+                    'description' => $rule->displayDescription(),
+                    'platform' => $rule->platform->value,
+                    'interval' => \Carbon\CarbonInterval::seconds($rule->interval)->cascade()->forHumans(),
+                    'is_ioc' => $rule->is_ioc,
+                    'score' => $rule->score,
+                    'query' => $rule->query,
+                    'tactics' => collect($rule->mitreAttckTactics())->map(fn(string $t) => Str::lower($t))->values(),
+                    'mitre' => $rule->attck ? collect(explode(',', $rule->attck))->map(fn(string $uid) => [
+                        'uid' => $uid,
+                        'url' => Str::startsWith($uid, 'TA') ? "https://attack.mitre.org/tactics/$uid/" : "https://attack.mitre.org/techniques/$uid/"
+                    ])->values() : [],
+                    'can_edit' => isset($rule->created_by) || \Auth::user()?->isCywiseAdmin(),
+                    'editor_url' => route('rules-editor', ['rule_id' => $rule->id]),
+                ]];
+            })->toArray();
+            $serversWithActiveEvents = YnhServer::forUser(Auth::user())
+                ->filter(fn(YnhServer $server) => $eventCountsByServer->has($server->id))
+                ->map(function (YnhServer $server) use ($eventCountsByServer) {
+                    $server->nb_events = $eventCountsByServer->get($server->id, 0);
+                    return $server;
+                })
+                ->sortBy('name')
+                ->values();
+        }
         return view($this->viewname(), [
             'today_separator' => $this->separator(Carbon::now()),
             'items' => (
@@ -188,17 +197,10 @@ abstract class AbstractTimelineController extends Controller
             'nb_notes' => $items['nb_notes'] ?? 0,
             'nb_events' => $items['nb_events'] ?? 0,
             'nb_leaks' => $items['nb_leaks'] ?? 0,
-            'rules' => $rules,
-            'rulesDetails' => $rulesDetails,
-            'selectedRule' => $params['rule_name'] ?? null ? YnhOsqueryRule::where('name', $params['rule_name'])->first() : null,
-            'servers_with_active_events' => YnhServer::forUser(Auth::user())
-                ->filter(fn(YnhServer $server) => $eventCountsByServer->has($server->id))
-                ->map(function (YnhServer $server) use ($eventCountsByServer) {
-                    $server->nb_events = $eventCountsByServer->get($server->id, 0);
-                    return $server;
-                })
-                ->sortBy('name')
-                ->values(),
+            'rules' => $rules ?? [],
+            'rules_details' => $rulesDetails ?? [],
+            'selected_rule' => $params['rule_name'] ?? null ? YnhOsqueryRule::where('name', $params['rule_name'])->first() : null,
+            'servers_with_active_events' => $serversWithActiveEvents ?? [],
             'tags' => AssetTag::query()
                 ->select('tag')
                 ->distinct()

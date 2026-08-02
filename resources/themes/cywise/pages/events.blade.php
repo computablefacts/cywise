@@ -42,9 +42,9 @@ render(function (Request $request) {
                 <select id="rule_name" name="rule_name" class="form-select">
                   <option value="">{{ __('All rules') }}</option>
                   @foreach($rules as $rule)
-                  @if(($rulesDetails[$rule->name]['nb_events'] ?? 0) > 0)
+                  @if(($rules_details[$rule->name]['nb_events'] ?? 0) > 0)
                   <option value="{{ $rule->name }}" {{ request('rule_name') === $rule->name ? 'selected' : '' }}>
-                  {{ $rule->displayName() }} ({{ $rulesDetails[$rule->name]['nb_events'] ?? 0 }})
+                  {{ $rule->displayName() }} ({{ $rules_details[$rule->name]['nb_events'] ?? 0 }})
                   </option>
                   @endif
                   @endforeach

@@ -6,18 +6,18 @@
         <div class="row mt-2">
           <div class="col">
             <h6 id="rule-title">
-              @if(isset($selectedRule->created_by) || \Auth::user()?->isCywiseAdmin())
-              <a href="{{ route('rules-editor', ['rule_id' => $selectedRule->id]) }}">
-                {{ $selectedRule->displayName() }}
+              @if(isset($selected_rule->created_by) || \Auth::user()?->isCywiseAdmin())
+              <a href="{{ route('rules-editor', ['rule_id' => $selected_rule->id]) }}">
+                {{ $selected_rule->displayName() }}
               </a>
               @else
-              {{ $selectedRule->displayName() }}
+              {{ $selected_rule->displayName() }}
               @endif
             </h6>
           </div>
           <div class="col col-auto" id="rule-tactics">
-            @if(!empty($selectedRule->mitreAttckTactics()))
-            @foreach($selectedRule->mitreAttckTactics() as $tactic)
+            @if(!empty($selected_rule->mitreAttckTactics()))
+            @foreach($selected_rule->mitreAttckTactics() as $tactic)
             <span class="lozenge new">{{ \Illuminate\Support\Str::lower($tactic) }}</span>&nbsp;
             @endforeach
             @endif
@@ -31,12 +31,12 @@
           </div>
           <div class="col">
             <div class="text-muted" id="rule-description">
-              @if(\Illuminate\Support\Str::startsWith($selectedRule->comments, 'Needs further work on the collected
+              @if(\Illuminate\Support\Str::startsWith($selected_rule->comments, 'Needs further work on the collected
               data
               to be useful'))
-              {{ $selectedRule->description }}
+              {{ $selected_rule->description }}
               @else
-              {{ $selectedRule->comments }}
+              {{ $selected_rule->comments }}
               @endif
             </div>
           </div>
@@ -47,10 +47,10 @@
           </div>
           <div class="col" id="rule-platform-info">
         <span class="lozenge information" id="rule-platform">
-          {{ $selectedRule->platform->value }}
+          {{ $selected_rule->platform->value }}
         </span>&nbsp;
             <span class="lozenge information" id="rule-interval">
-          {{ \Carbon\CarbonInterval::seconds($selectedRule->interval)->cascade()->forHumans() }}
+          {{ \Carbon\CarbonInterval::seconds($selected_rule->interval)->cascade()->forHumans() }}
         </span>
           </div>
         </div>
@@ -59,29 +59,29 @@
             <b>{{ __('IoC') }}</b>
           </div>
           <div class="col" id="rule-ioc-info">
-            @if($selectedRule->is_ioc)
+            @if($selected_rule->is_ioc)
             <span class="lozenge error">{{ __('yes') }}</span>&nbsp;
             @else
             <span class="lozenge success">{{ __('no') }}</span>&nbsp;
             @endif
-            @if($selectedRule->score >= 75)
-            <span class="lozenge error">{{ $selectedRule->score }}&nbsp;/&nbsp;100</span>
-            @elseif($selectedRule->score >= 50)
-            <span class="lozenge warning">{{ $selectedRule->score }}&nbsp;/&nbsp;100</span>
-            @elseif($selectedRule->score >= 25)
-            <span class="lozenge information">{{ $selectedRule->score }}&nbsp;/&nbsp;100</span>
+            @if($selected_rule->score >= 75)
+            <span class="lozenge error">{{ $selected_rule->score }}&nbsp;/&nbsp;100</span>
+            @elseif($selected_rule->score >= 50)
+            <span class="lozenge warning">{{ $selected_rule->score }}&nbsp;/&nbsp;100</span>
+            @elseif($selected_rule->score >= 25)
+            <span class="lozenge information">{{ $selected_rule->score }}&nbsp;/&nbsp;100</span>
             @else
-            <span class="lozenge neutral">{{ $selectedRule->score }}&nbsp;/&nbsp;100</span>
+            <span class="lozenge neutral">{{ $selected_rule->score }}&nbsp;/&nbsp;100</span>
             @endif
           </div>
         </div>
-        <div id="rule-mitre-row" class="row mt-2" @if(empty($selectedRule->attck)) style="display: none;" @endif>
+        <div id="rule-mitre-row" class="row mt-2" @if(empty($selected_rule->attck)) style="display: none;" @endif>
           <div class="col col-2 text-end">
             <b>{{ __('Mitre') }}</b>
           </div>
           <div class="col" id="rule-mitre-links">
-            @if(!empty($selectedRule->attck))
-            @foreach(explode(',', $selectedRule->attck) as $attck)
+            @if(!empty($selected_rule->attck))
+            @foreach(explode(',', $selected_rule->attck) as $attck)
             @if(\Illuminate\Support\Str::startsWith($attck, 'TA'))
             <a href="https://attack.mitre.org/tactics/{{ $attck }}/" target="_blank">{{ $attck }}</a>&nbsp;
             @else
@@ -98,7 +98,7 @@
           <div class="col">
             <div style="display:grid;">
               <div class="overflow-auto">
-                <pre id="rule-query" class="mb-0 w-100 pre-light">{{ $selectedRule->query }}</pre>
+                <pre id="rule-query" class="mb-0 w-100 pre-light">{{ $selected_rule->query }}</pre>
               </div>
             </div>
           </div>
