@@ -69,14 +69,20 @@ abstract class AbstractTimelineController extends Controller
         $rules = YnhOsqueryRule::where('enabled', true)->orderBy('name')->get();
         $eventCountsByRule = YnhOsquery::query()
             ->select('ynh_osquery_rule_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
+            ->join('users', 'users.id', '=', 'ynh_servers.created_by')
             ->where('calendar_time', '>=', $minDate)
             ->where('calendar_time', '<=', $maxDate)
+            ->where('users.tenant_id', Auth::user()->tenant_id)
             ->groupBy('ynh_osquery_rule_id')
             ->pluck('total', 'ynh_osquery_rule_id');
         $eventCountsByServer = YnhOsquery::query()
             ->select('ynh_server_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            ->join('ynh_servers', 'ynh_servers.id', '=', 'ynh_osquery.ynh_server_id')
+            ->join('users', 'users.id', '=', 'ynh_servers.created_by')
             ->where('calendar_time', '>=', $minDate)
             ->where('calendar_time', '<=', $maxDate)
+            ->where('users.tenant_id', Auth::user()->tenant_id)
             ->groupBy('ynh_server_id')
             ->pluck('total', 'ynh_server_id');
 
