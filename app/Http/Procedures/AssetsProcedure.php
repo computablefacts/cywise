@@ -340,7 +340,7 @@ A port scan will start soon for {{ \$result['asset'] }}.
             AssetsDiscovery::dispatch($request->user(), $obj->tld());
         }
         return [
-            'asset' => $this->convertAsset($obj->refresh()),
+            'asset' => $this->convertAsset($obj),
         ];
     }
 
@@ -1022,6 +1022,7 @@ No {{ \$params['type'] === 'domain' ? 'domain' : 'IP address' }} found.
 
     private function convertAsset(Asset $asset): array
     {
+        Log::error($asset);
         return [
             'uid' => $asset->id,
             'asset' => $asset->asset,
