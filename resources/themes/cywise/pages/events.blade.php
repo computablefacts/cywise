@@ -22,7 +22,20 @@ render(function (Request $request) {
         <div class="card">
           <div class="card-body p-3">
             <form method="get" action="{{ route('events') }}" class="row g-2 align-items-end">
-              <div class="col-sm-8">
+              <div class="col-sm-3">
+                <label for="server_id" class="form-label">
+                  {{ __('Asset') }}
+                </label>
+                <select id="server_id" name="server_id" class="form-select">
+                  <option value="">{{ __('All assets') }}</option>
+                  @foreach($servers_with_active_events as $server)
+                  <option value="{{ $server->id }}" {{ (int)request('server_id') === $server->id ? 'selected' : '' }}>
+                  {{ $server->name }} ({{ $server->nb_events ?? 0 }})
+                  </option>
+                  @endforeach
+                </select>
+              </div>
+              <div class="col-sm-5">
                 <label for="rule_name" class="form-label">
                   {{ __('Rule') }}
                 </label>
@@ -49,9 +62,6 @@ render(function (Request $request) {
                   {{ __('Reset') }}
                 </a>
               </div>
-              @if(request('server_id'))
-              <input type="hidden" name="server_id" value="{{ request('server_id') }}">
-              @endif
             </form>
           </div>
         </div>

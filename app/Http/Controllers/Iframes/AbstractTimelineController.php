@@ -73,6 +73,13 @@ abstract class AbstractTimelineController extends Controller
             ->where('calendar_time', '<=', $maxDate)
             ->groupBy('ynh_osquery_rule_id')
             ->pluck('total', 'ynh_osquery_rule_id');
+        $eventCountsByServer = YnhOsquery::query()
+            ->select('ynh_server_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            ->where('calendar_time', '>=', $minDate)
+            ->where('calendar_time', '<=', $maxDate)
+            ->groupBy('ynh_server_id')
+            ->pluck('total', 'ynh_server_id');
+
         $objects = $this->objects();
         $items = match ($objects) {
             'assets' => $this->assets(
@@ -167,6 +174,14 @@ abstract class AbstractTimelineController extends Controller
             'rules' => $rules,
             'rulesDetails' => $rulesDetails,
             'selectedRule' => $params['rule_name'] ?? null ? YnhOsqueryRule::where('name', $params['rule_name'])->first() : null,
+            'servers_with_active_events' => YnhServer::forUser(Auth::user())
+                ->filter(fn(YnhServer $server) => $eventCountsByServer->has($server->id))
+                ->map(function (YnhServer $server) use ($eventCountsByServer) {
+                    $server->nb_events = $eventCountsByServer->get($server->id, 0);
+                    return $server;
+                })
+                ->sortBy('name')
+                ->values(),
             'tags' => AssetTag::query()
                 ->select('tag')
                 ->distinct()
