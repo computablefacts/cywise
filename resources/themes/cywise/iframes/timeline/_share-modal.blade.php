@@ -38,6 +38,8 @@
       </div>
     </div>
   </div>
+  @once
+  @push('scripts')
   <script>
 
     const widgets = {elTags: null, elEmail: null};
@@ -127,4 +129,6 @@
       closeShareModal();
     }
   </script>
+  @endpush
+  @endonce
 </div>

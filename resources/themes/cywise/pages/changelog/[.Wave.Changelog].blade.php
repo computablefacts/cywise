@@ -8,18 +8,18 @@
 
 <x-dynamic-component 
 	:component="$layout"
-	bodyClass="bg-zinc-50"
 >
     
     <x-app.container>
-        <x-card class="lg:p-10">
+        <div class="card mt-3">
+            <div class="card-body p-4">
 
             <x-elements.back-button
                 text="{{ __('View Full Changelog') }}"
                 :href="route('changelogs')"
             />
 
-            <article id="changelog-{{ $changelog->id }}" class="max-w-4xl mx-auto mt-5">
+            <article id="changelog-{{ $changelog->id }}" class="mt-3">
 
                 <meta property="name" content="{{ $changelog->title }}">
                 <meta property="author" typeof="Person" content="admin">
@@ -31,18 +31,19 @@
                     :description="$changelog->description"
                 />
 
-                <p class="mt-5 text-xs font-medium tracking-wider text-zinc-800">
-                  {!! __('Posted on <time datetime=":datetime" class="ml-1">:date</time>', [
+                <p class="mt-3 small fw-bold text-muted text-uppercase tracking-wider">
+                  {!! __('Posted on <time datetime=":datetime">:date</time>', [
                   'datetime' => Carbon\Carbon::parse($changelog->created_at)->toIso8601String(),
                   'date' => Carbon\Carbon::parse($changelog->created_at)->toFormattedDateString(),
                   ]) !!}
                 </p>
-                <div class="max-w-full mx-auto mt-5 prose prose-base dark:prose-invert text-zinc-600 dark:text-zinc-300">
+                <div class="mt-3 text-muted">
                     {!! $changelog->body !!}
                 </div>
 
             </article>
-        </x-card>
+            </div>
+        </div>
     </x-app.container>
 
 </x-dynamic-component>

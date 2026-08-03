@@ -1,5 +1,3 @@
-@include('theme::iframes._json-rpc')
-
 <p class="mb-2">
   Pour utiliser Cywise depuis WhatsApp, vous devez configurer une application sur le portail <a
       href="https://developers.facebook.com/" target="_blank">Meta for Developers</a>.
@@ -62,18 +60,14 @@
 <p>
   Une fois le webhook validé par Meta, envoyez un message WhatsApp à votre numéro : Cywise vous répondra en
   utilisant <a
-      href="{{ route('iframes.cyberbuddy') }}">{{ tenant_custom_text('CyberBuddy') }}</a>.
+      href="{{ route('cyberbuddy') }}">{{ tenant_custom_text('CyberBuddy') }}</a>.
 </p>
-
-@push('scripts')
 <script>
   function copyToClipboard(id) {
     const el = document.getElementById(id);
     el.select();
     document.execCommand('copy');
-    if (toaster) {
-      toaster.toastSuccess("Copié dans le presse-papier");
-    }
+    window.toaster.toastSuccess("Copié dans le presse-papier");
   }
 
   (function () {
@@ -98,17 +92,13 @@
         const token = (elToken.value || '').trim();
 
         if (!phoneId || !token) {
-          if (toaster) {
-            toaster.toastError("Veuillez saisir l'ID de numéro de téléphone et le token d'accès.");
-          }
+          window.toaster.toastError("Veuillez saisir l'ID de numéro de téléphone et le token d'accès.");
           return;
         }
 
         elBtn.setAttribute('disabled', 'disabled');
         setWhatsAppConfigurationApiCall(token, phoneId, (result) => {
-          if (toaster) {
-            toaster.toastSuccess("Configuration enregistrée. Configurez maintenant le webhook côté Meta.");
-          }
+          window.toaster.toastSuccess("Configuration enregistrée. Configurez maintenant le webhook côté Meta.");
           updateWebhookOutputs(result.webhook, result.verify_token);
         }, () => elBtn.removeAttribute('disabled'));
       });
@@ -122,4 +112,3 @@
     }
   })();
 </script>
-@endpush

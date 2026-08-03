@@ -38,6 +38,6 @@ class CyberBuddyController extends Controller
             'format' => Conversation::FORMAT_V1,
         ]);
 
-        return view('theme::iframes.cyberbuddy', ['threadId' => $conversation->thread_id]);
+        return view('theme::pages.cyberbuddy', ['threadId' => $conversation->thread_id]);
     }
 }

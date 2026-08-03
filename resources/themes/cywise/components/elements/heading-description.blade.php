@@ -1,1 +1,1 @@
-<p class="mx-auto mt-4 max-w-2xl text-base font-medium text-center text-zinc-500 text-balance">{{ $slot }}</p>
+<p {{ $attributes->merge(['class' => 'mx-auto mt-3 text-muted text-center fw-medium', 'style' => 'max-width: 650px;']) }}>{{ $slot }}</p>

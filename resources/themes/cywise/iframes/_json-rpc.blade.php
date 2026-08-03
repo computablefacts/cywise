@@ -1,63 +1,69 @@
 @once
 <script>
 
-  const onSuccessDefault = (result) => {
-    if (toaster && result.msg) {
-      toaster.toastSuccess(result.msg);
-    }
-  };
+  if (!window.onSuccessDefault) {
+    window.onSuccessDefault = (result) => {
+      if (window.toaster && result.msg) {
+        window.toaster.toastSuccess(result.msg);
+      }
+    };
+  }
 
-  const onErrorDefault = (error) => {
-    if (toaster && error.message) {
-      const errors = [];
-      if (error.data) {
-        for (const [attribute, messages] of Object.entries(error.data)) {
-          if (Array.isArray(messages)) {
-            errors.push(...messages);
-          } else {
-            errors.push(messages);
+  if (!window.onErrorDefault) {
+    window.onErrorDefault = (error) => {
+      if (window.toaster && error.message) {
+        const errors = [];
+        if (error.data) {
+          for (const [attribute, messages] of Object.entries(error.data)) {
+            if (Array.isArray(messages)) {
+              errors.push(...messages);
+            } else {
+              errors.push(messages);
+            }
           }
         }
+        window.toaster.toastError(error.message + (errors.length > 0 ? "\n" + errors.join("\n") : ""));
       }
-      toaster.toastError(error.message + (errors.length > 0 ? "\n" + errors.join("\n") : ""));
+    };
+  }
+
+  if (!window.onFinallyDefault) {
+    window.onFinallyDefault = () => {
+      //
+    };
+  }
+
+  if (!window.executeJsonRpcApiCall) {
+    window.executeJsonRpcApiCall = function (method, params = {}, onSuccess = window.onSuccessDefault, onError = window.onErrorDefault,
+                                             onFinally = window.onFinallyDefault) {
+      axios.post('/api/v2/private/endpoint', {
+        jsonrpc: "2.0", id: "1", method: method, params: params,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Accept-Encoding': 'gzip',
+          'Authorization': 'Bearer {{ Auth::user()->sentinelApiToken() }}',
+        }
+      })
+        .then(response => {
+          if (response.data && response.data.error && onError) {
+            onError(response.data.error);
+          } else if (response.data && response.data.result && onSuccess) {
+            onSuccess(response.data.result);
+          } else {
+            console.log(response);
+          }
+        })
+        .catch(error => {
+          window.toaster.toastAxiosError(error);
+        })
+        .finally(() => {
+          if (onFinally) {
+            onFinally();
+          }
+        });
     }
-  };
-
-  const onFinallyDefault = () => {
-    //
-  };
-
-  function executeJsonRpcApiCall(method, params = {}, onSuccess = onSuccessDefault, onError = onErrorDefault,
-                                 onFinally = onFinallyDefault) {
-    axios.post('/api/v2/private/endpoint', {
-      jsonrpc: "2.0", id: "1", method: method, params: params,
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Accept-Encoding': 'gzip',
-        'Authorization': 'Bearer {{ Auth::user()->sentinelApiToken() }}',
-      }
-    })
-      .then(response => {
-        if (response.data && response.data.error && onError) {
-          onError(response.data.error);
-        } else if (response.data && response.data.result && onSuccess) {
-          onSuccess(response.data.result);
-        } else {
-          console.log(response);
-        }
-      })
-      .catch(error => {
-        if (toaster) {
-          toaster.toastAxiosError(error);
-        }
-      })
-      .finally(() => {
-        if (onFinally) {
-          onFinally();
-        }
-      });
   }
 
   function createInvitationsApiCall(users, onFinally = onFinallyDefault) {
@@ -312,6 +318,10 @@
 
   function toggleGetsAuditReportApiCall(userId, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('users@toggleGetsAuditReport', {user_id: userId}, onSuccess);
+  }
+
+  function toggleAutoMonitorNewSubdomainsApiCall(assetId, onSuccess = onSuccessDefault) {
+    executeJsonRpcApiCall('assets@toggleAutoMonitorNewSubdomains', {asset_id: assetId}, onSuccess);
   }
 
   function sendAuditReportApiCall(userId, onSuccess = onSuccessDefault) {

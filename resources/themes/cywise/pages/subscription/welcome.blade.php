@@ -5,13 +5,13 @@
 ?>
 
 <x-layouts.app>
-	<x-app.container x-data class="space-y-6" x-cloak>
-        <div class="w-full">
+	<x-app.container x-data class="gap-3" x-cloak>
+        <div class="w-100">
             <x-app.heading
                 title="{{ __('Successfully purchased 🎉') }}"
                 description="{{ __('Thanks for upgrading to a subscription plan.') }}"
             />
-            <div class="py-5 space-y-5">
+            <div class="py-4 gap-3">
                 <p></p>
                 <p></p>
             </div>

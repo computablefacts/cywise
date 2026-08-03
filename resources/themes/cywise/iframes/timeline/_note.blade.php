@@ -26,7 +26,9 @@
         <span class="bp4-icon bp4-icon-trash"></span>
       </button>
       @foreach(json_decode($attributes['scopes'] ?? "[]") as $scope)
-      <span class="lozenge new d-inline-flex align-items-center" style="margin-top: 16px;">{{ $scope }}</span>
+      <span class="lozenge new d-inline-flex align-items-center" style="margin-top: 16px;">
+        {{ $scope === 'CyberBuddy' ? 'General' : $scope }}
+      </span>
       @endforeach
     </div>
   </div>

@@ -209,8 +209,8 @@ Route::group(['prefix' => 'v2', 'as' => 'v2.'], function () {
             ->middleware([\App\Http\Middleware\Authenticate::class]);
 
         Route::get('/docs', function (Request $request) {
-            if (Storage::exists('/public/docs/docs.private.html')) {
-                return response(Storage::get('/public/docs/docs.private.html'))
+            if (Storage::exists('/app/public/docs/docs.private.html')) {
+                return response(Storage::get('/app/public/docs/docs.private.html'))
                     ->header('Content-Type', 'text/html')
                     ->header('Cache-Control', 'public, max-age=3600');
             }

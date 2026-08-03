@@ -7,14 +7,11 @@ use App\Events\CreateAsset;
 use App\Events\DeleteAsset;
 use App\Helpers\SshKeyPair;
 use App\Http\Requests\JsonRpcRequest;
-use App\Models\YnhDomain;
 use App\Models\YnhServer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Sajya\Server\Procedure;
-use Symfony\Component\Process\Process;
 
 class ServersProcedure extends Procedure
 {
@@ -152,35 +149,6 @@ class ServersProcedure extends Procedure
         if ($server->isReady()) {
             throw new \Exception("The server has already been setup. Please, contact the support for more informations.");
         }
-
-        $principal = $server->domain();
-
-        if ($principal && $principal->name !== $params['domain']) {
-            throw new \Exception("{$principal->name} is already a principal domain.");
-        }
-
-        $domain = trim($params['domain']);
-        $process = new Process(['dig', '+short', "*.{$domain}"]);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            $cmd = $process->getCommandLine();
-            $output = $process->getErrorOutput();
-            Log::error("{$cmd} : {$output}");
-            throw new \Exception("The 'dig' command is unavailable.");
-        }
-
-        $ip = Str::trim($process->getOutput());
-
-        if (!$ip) {
-            $cmd = $process->getCommandLine();
-            $output = $process->getOutput();
-            Log::error("{$cmd} : {$output}");
-            throw new \Exception("The DNS record for {$params['domain']} is not ready yet. Please, wait for DNS propagation and try again.");
-        }
-        if ($params['ip'] !== $ip) {
-            throw new \Exception("IP mismatch: {$params['domain']}'s IP address is {$ip} and not {$params['ip']}.");
-        }
         if (!$server->sshKeyPair()->isSshConnectionUpAndRunning($params['ip'], $params['port'], $params['username'])) {
             throw new \Exception("SSH connection failed!");
         }
@@ -192,19 +160,8 @@ class ServersProcedure extends Procedure
         $server->save();
 
         CreateAsset::dispatch($server->user()->first(), $server->ip(), true, [$server->name]);
+        CreateAsset::dispatch($server->user()->first(), $params['domain'], true, [$server->name]);
 
-        if (!$principal) {
-            $server->domains()->save(YnhDomain::updateOrCreate([
-                'ynh_server_id' => $server->id,
-                'name' => $params['domain'],
-            ], [
-                'name' => $params['domain'],
-                'is_principal' => true,
-                'ynh_server_id' => $server->id,
-                'updated' => false,
-            ]));
-            CreateAsset::dispatch($server->user()->first(), $params['domain'], true, [$server->name]);
-        }
         return [
             "msg" => "Your host is being configured!"
         ];

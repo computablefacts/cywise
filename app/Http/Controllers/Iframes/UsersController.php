@@ -20,7 +20,7 @@ class UsersController extends Controller
             ->get()
             ->sortBy('fullname', SORT_NATURAL | SORT_FLAG_CASE);
         
-        return view('theme::iframes.users', [
+        return view('theme::pages.users', [
             'users' => $users,
         ]);
     }

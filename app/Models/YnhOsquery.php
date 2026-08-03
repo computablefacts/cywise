@@ -292,13 +292,35 @@ class YnhOsquery extends Model
         return $this->action === 'removed';
     }
 
+    public function indicatorOfCompromise(): string
+    {
+        $score = $this->score ?? 0;
+        if ($score >= 75 && $score <= 100) {
+            return 'high';
+        }
+        if ($score >= 50 && $score <= 74) {
+            return 'medium';
+        }
+        if ($score >= 25 && $score <= 49) {
+            return 'low';
+        }
+        if ($score >= 1 && $score <= 24) {
+            return 'suspect';
+        }
+        return 'none';
+    }
+
+    public function category(): string
+    {
+        return $this->rule_category ?? $this->rule->category;
+    }
+
     public function logLine(): string
     {
         // Attributes server_name, server_ip_address, comments and score are loaded by EventsProcedure::list
-        $criticality = $this->score ?? 0;
         $time = $this->calendar_time->utc()->format('Y-m-d H:i:s');
         $message = $this->message();
-        return empty($message) ? '' : "{$time} - {$this->server_name} (ip address: {$this->server_ip_address}) - {$message} (criticality: {$criticality})";
+        return empty($message) ? '' : "{$time} - {$this->server_name} ({$this->server_ip_address}) - {$message}";
     }
 
     public function message(): string
@@ -500,19 +522,30 @@ class YnhOsquery extends Model
             if ($this->isRemoved()) {
                 $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} ({$type}) a été désinstallé.";
             }
+        } else if ($this->name === 'tcpdump_installed' ||
+            $this->name === 'wireshark_installed' ||
+            $this->name === 'busybox_installed' ||
+            $this->name === 'dsniff_installed' ||
+            $this->name === 'hping3_installed' ||
+            $this->name === 'nbtscan_installed' ||
+            $this->name === 'netcat_installed' ||
+            $this->name === 'scapy_installed' ||
+            $this->name === 'nmap_installed') {
+            $msg = "Le paquet {$this->columns['name']} {$this->columns['version']} a été installé ou mis à jour.";
+        } else if (!empty($this->columns['cmdline'])) {
+            $msg = "La ligne de commande {$this->columns['cmdline']} a été exécutée.";
+        } else if (!empty($this->columns['text'])) {
+            $msg = $this->columns['text'];
         } else {
-            $msg = isset($this->columns['text']) ? $this->columns['text'] : "Un événement de type {$this->name} est arrivé.";
-            $msg = isset($this->columns['text'])
-                ? $this->columns['text']
-                : "Un événement de type {$this->name} est arrivé. Champs disponibles : " . implode(', ', array_map(
-                    fn($k, $v) => "$k=$v",
-                    array_keys($this->columns),
-                    $this->columns
-                ));
+            $attributes = implode(', ', array_map(
+                fn($k, $v) => "$k=$v",
+                array_keys(is_array($this->columns) ? $this->columns : []),
+                is_array($this->columns) ? $this->columns : []
+            ));
+            $attributes = empty($attributes) ? 'empty' : $attributes;
+            $msg = "Un événement a été généré : {$attributes}";
         }
-        if ($this->score > 0) {
-            $msg .= " ({$this->comments})";
-        }
+        // $msg .= " (event_category={$this->category()}, event_threat_level={$this->indicatorOfCompromise()})";
         return $msg;
     }
 }

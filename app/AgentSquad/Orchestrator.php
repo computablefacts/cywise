@@ -22,7 +22,7 @@ class Orchestrator
     /** @var AbstractAction[] $commands */
     private array $commands = [];
 
-    public function __construct(string $model = 'Qwen/Qwen3-Next-80B-A3B-Instruct')
+    public function __construct(string $model = 'deepseek-ai/DeepSeek-V4-Flash')
     {
         $this->model = $model;
     }
@@ -140,7 +140,7 @@ class Orchestrator
                 'INPUT' => $input,
                 'HISTORY' => $history,
                 'MEMOS' => MemosProvider::use()
-                    ->withScope(NotesProcedure::SCOPE_IS_ORCHESTRATOR)
+                    ->withScope(NotesProcedure::SCOPE_IS_CYBERBUDDY)
                     ->withUser($user)
                     ->provide(),
             ])

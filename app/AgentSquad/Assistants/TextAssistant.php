@@ -4,7 +4,7 @@ namespace App\AgentSquad\Assistants;
 
 use App\AgentSquad\Providers\PromptsProvider;
 use App\Enums\RoleEnum;
-use App\Models\Trace;
+use App\Models\AppTrace;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class TextAssistant
 {
-    private string $model = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
+    private string $model = 'deepseek-ai/DeepSeek-V4-Flash';
     private int $timeoutInSeconds = 60;
     private string|array|null $messages = null;
     private ?string $threadId = null;
@@ -88,21 +88,26 @@ class TextAssistant
             return '';
         }
 
-        $start = microtime(true);
+        $before = microtime(true);
         $response = $this->callDeepInfra($messages);
-        $stop = microtime(true);
-
-        Trace::create([
-            'thread_id' => $this->threadId,
-            'input' => cywise_truncate_string(json_encode($messages), 16000),
-            'output' => cywise_truncate_string(json_encode($response), 16000),
-            'elapsed_time_in_seconds' => (int)ceil($stop - $start),
-            'created_by' => Auth::id(),
-        ]);
-
         $answer = $response['choices'][0]['message']['content'] ?? '';
         $answer = Str::trim(preg_replace('/<think>.*?<\/think>/s', '', $answer));
-        return Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
+        $answer = Str::trim(Str::replace(['[OUTPUT]', '[/OUTPUT]'], '', $answer, false));
+        $after = microtime(true);
+
+        try {
+            /** @var AppTrace $trace */
+            $trace = AppTrace::create([
+                'user_id' => Auth::user()?->id,
+                'verb' => 'GET',
+                'endpoint' => "/agent-squad/assistant?name=text" . ($this->threadId ? '&thread_id=' . $this->threadId : '') . ($this->model ? '&model=' . $this->model : ''),
+                'duration_in_ms' => (int)(($after - $before) * 1000),
+                'failed' => false,
+            ]);
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+        }
+        return $answer;
     }
 
     public function structured(): object

@@ -15,7 +15,6 @@ use Carbon\Carbon;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Parsedown;
 
 class SendAuditReportListener extends AbstractListener
@@ -242,6 +241,29 @@ class SendAuditReportListener extends AbstractListener
 
         Log::debug("{$nbAlerts} alerts found for user {$user->email}");
 
+        $noIpAssets = $assets->filter(fn(Asset $asset) => $asset->isIpAddressMissing())
+            ->map(fn(Asset $asset) => $asset->asset)
+            ->unique()
+            ->sort();
+        $cloudflareAssets = $assets->filter(fn(Asset $asset) => $asset->isProtectedByCloudflare())
+            ->map(fn(Asset $asset) => $asset->asset)
+            ->unique()
+            ->sort();
+        $noIpSection = '';
+        $cloudflareSection = '';
+
+        if ($noIpAssets->isNotEmpty()) {
+            $noIpSection = "<li>J'ai découvert <b>{$noIpAssets->count()}</b> domaines sans adresse IP :<ul>";
+            $noIpSection .= $noIpAssets->map(fn(string $asset) => "<li>{$asset}</li>")->join('');
+            $noIpSection .= '</ul></li>';
+        }
+        if ($cloudflareAssets->isNotEmpty()) {
+            $url = app_url();
+            $cloudflareSection = "<li>J'ai découvert <b>{$cloudflareAssets->count()}</b> actifs protégés par Cloudflare (n'oubliez pas d'autoriser <a href=\"{$url}/ips-v4.txt\">nos adresses IP</a> !) :<ul>";
+            $cloudflareSection .= $cloudflareAssets->map(fn(string $asset) => "<li>{$asset}</li>")->join('');
+            $cloudflareSection .= '</ul></li>';
+        }
+
         $newAssets = match ($nbNewAssets) {
             0 => '',
             1 => "<li>J'ai mis sous surveillance <b>{$nbNewAssets}</b> nouvel actif.</li>",
@@ -291,6 +313,8 @@ class SendAuditReportListener extends AbstractListener
               {$newAssets}
               {$perimeter}
               {$vulns}
+              {$noIpSection}
+              {$cloudflareSection}
               {$leaks}
             </ul>";
     }
@@ -360,7 +384,7 @@ class SendAuditReportListener extends AbstractListener
                 $title = $alert->translated('title');
                 $vulnerability = $alert->translated('vulnerability');
                 $remediation = $alert->translated('remediation');
-                $link = route('iframes.assets') . "#aid-{$alert->asset()->id}";
+                $link = route('assets') . "#aid-{$alert->asset()->id}";
 
                 return "
                     <h3>{$title} {$level}</h3>
@@ -384,7 +408,10 @@ class SendAuditReportListener extends AbstractListener
             ->get()
             ->map(function (YnhServer $server) use ($user) {
 
-                $request = new JsonRpcRequest(['server_id' => $server->id]);
+                $request = new JsonRpcRequest([
+                    'server_id' => $server->id,
+                    'include_events' => false,
+                ]);
                 $request->setUserResolver(fn() => $user);
                 $result = (new EventsProcedure())->socOperator($request);
 
@@ -396,10 +423,7 @@ class SendAuditReportListener extends AbstractListener
                     return '';
                     // return "<li>Il n'y a eu aucun événement notable sur le serveur <b>{$server->name}</b> d'adresse IP {$server->ip()} ces derniers jours.</li>";
                 }
-
-                $report = Str::replace("\n\n**", "\n- **", $result['report']);
-                $html = (new Parsedown)->text("## {$server->name} ({$server->ip()})\n- {$report}");
-                return "<li>{$html}</li>";
+                return (new Parsedown)->text("**{$server->name} ({$server->ip()})**\n\n{$result['report']}");
             })
             ->filter(fn(string $event) => !empty($event))
             ->sort()
@@ -407,10 +431,7 @@ class SendAuditReportListener extends AbstractListener
 
         Log::debug("SOC operator report: " . json_encode(['activity' => $activity]));
 
-        return $activity->isEmpty() ? '' : "
-            <h3>Analyse de l'activité des serveurs</h3>
-            <ul>{$activity->implode('')}</ul>
-        ";
+        return $activity->isEmpty() ? '' : "<h3>Analyse de l'activité des serveurs</h3>{$activity->implode('')}";
     }
 
     private function fetchLeaks(User $user, ?Carbon $createdAtOrAfter = null): Collection

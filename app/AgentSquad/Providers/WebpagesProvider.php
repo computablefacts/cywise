@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class WebpagesProvider
+class WebpagesProvider extends AbstractProvider
 {
     private string $url;
     private LanguageEnum $proxyCountry = LanguageEnum::FRENCH;
@@ -34,7 +34,12 @@ class WebpagesProvider
         return $this;
     }
 
-    public function provide(): string
+    protected function trace(): bool
+    {
+        return true;
+    }
+
+    protected function provide2(): string
     {
         try {
             return self::callScrapflyOrScraperApi($this->url, $this->proxyCountry->value);

@@ -16,7 +16,6 @@ use App\Models\File;
 use App\Models\HiddenAlert;
 use App\Models\Honeypot;
 use App\Models\Prompt;
-use App\Models\RemoteAction;
 use App\Models\ScheduledTask;
 use App\Models\Table;
 use App\Models\Template;
@@ -34,7 +33,6 @@ use App\Observers\FilesObserver;
 use App\Observers\HiddenAlertObserver;
 use App\Observers\HoneypotObserver;
 use App\Observers\PromptObserver;
-use App\Observers\RemoteActionObserver;
 use App\Observers\ScheduledTaskObserver;
 use App\Observers\TableObserver;
 use App\Observers\TemplateObserver;
@@ -49,15 +47,12 @@ use App\Rules\OnlyLettersAndDigits;
 use Exception;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Folio\Folio;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -129,19 +124,17 @@ class AppServiceProvider extends ServiceProvider
             );
 
             // check file format
-            if (! in_array($format, $allow)) {
+            if (!in_array($format, $allow)) {
                 return false;
             }
 
             // check base64 format
-            if (! preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $explode[1])) {
+            if (!preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $explode[1])) {
                 return false;
             }
 
             return true;
         });
-
-        $this->bootRoute();
 
         YnhServer::observe(YnhServerObserver::class);
 
@@ -168,6 +161,10 @@ class AppServiceProvider extends ServiceProvider
 
         // SAML
         Event::subscribe(SamlEventSubscriber::class);
+
+        // By default, Folio routes are defined from the application’s resources/views/pages directory
+        // Set it to the selected theme
+        Folio::path(resource_path("themes/cywise/pages"));
     }
 
     private function setSchemaDefaultLength(): void
@@ -176,13 +173,5 @@ class AppServiceProvider extends ServiceProvider
             Schema::defaultStringLength(191);
         } catch (Exception $exception) {
         }
-    }
-
-    public function bootRoute()
-    {
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: (request()->header('CF-Connecting-IP') ?? request()->ip()));
-        });
-
     }
 }

@@ -13,7 +13,7 @@ class CollectionsController extends Controller
     public function __invoke(Request $request): View
     {
         $collections = (new CollectionsProcedure())->list(JsonRpcRequest::createFrom($request));
-        return view('theme::iframes.collections', [
+        return view('theme::pages.collections', [
             'collections' => $collections['collections'],
             'nbPages' => $collections['nb_pages'],
             'currentPage' => $collections['page'],

@@ -49,7 +49,7 @@ class ScaController extends Controller
             ->filter(fn(YnhOssecCheck $check) => !$framework || in_array($framework, $check->frameworks()))
             ->sort(fn(YnhOssecCheck $check1, YnhOssecCheck $check2) => strcmp($check1->title, $check2->title));
 
-        return view('theme::iframes.sca', [
+        return view('theme::pages.sca', [
             'frameworks' => $frameworks,
             'checks' => $checks,
             'policies' => $policies,

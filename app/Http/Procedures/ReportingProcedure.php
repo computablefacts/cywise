@@ -272,7 +272,7 @@ class ReportingProcedure extends Procedure
 
     private function plainText(mixed $value): string
     {
-        $markdown = trim((string) $value);
+        $markdown = Str::trim((string) $value);
 
         if ($markdown === '') {
             return 'N/A';

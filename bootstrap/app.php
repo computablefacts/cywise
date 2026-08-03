@@ -5,13 +5,13 @@ use App\Jobs\Cleanup;
 use App\Jobs\DeleteEmbeddedChunks;
 use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Jobs\EmbedChunks;
+use App\Jobs\FetchLeaks;
 use App\Jobs\ProcessIncomingEmails;
 use App\Jobs\RunScheduledTasks;
 use App\Jobs\TriggerAssetsDiscovery;
 use App\Jobs\TriggerScan;
 use App\Jobs\TriggerSendAuditReport;
 use App\Jobs\UpdateTables;
-use App\Providers\AppServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -78,9 +78,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(\RalphJSmit\Livewire\Urls\Middleware\LivewireUrlsMiddleware::class);
         $middleware->web(\App\Http\Middleware\RedirectToCyberBuddy::class);
 
-        // Group 'api'
-        $middleware->throttleApi();
-
         // Group 'saml'
         $middleware->group('saml', [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
@@ -95,7 +92,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Redirections
         $middleware->redirectGuestsTo(fn() => route('login'));
-        $middleware->redirectUsersTo(AppServiceProvider::HOME);
+        $middleware->redirectUsersTo(fn() => route('dashboard'));
     })
     // Disable Events discovery
     // Events and corresponding Listeners are listed in App\Providers\EventServiceProvider
@@ -106,6 +103,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->job(new Cleanup())->everyFifteenMinutes();
         $schedule->job(new DownloadDebianSecurityBugTracker())->daily();
         $schedule->command('telescope:prune --hours=48')->daily();
+
+        // Gargantum
+        $schedule->job(new FetchLeaks())->dailyAt('03:00');
 
         // AdversaryMeter
         $schedule->job(new TriggerScan())->everyMinute();

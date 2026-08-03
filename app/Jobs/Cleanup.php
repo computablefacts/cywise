@@ -11,7 +11,6 @@ use App\Models\ScheduledTask;
 use App\Models\Tenant;
 use App\Models\TimelineFact;
 use App\Models\TimelineItem;
-use App\Models\Trace;
 use App\Models\Trial;
 use App\Models\User;
 use App\Models\Vector;
@@ -29,6 +28,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Wave\Page;
 
 class Cleanup implements ShouldQueue
 {
@@ -47,6 +47,7 @@ class Cleanup implements ShouldQueue
 
     public function handle()
     {
+        $this->removeOldPages();
         $this->deleteTenantsWithoutUsers();
         $this->removeTrialsWithoutDomains();
         $this->deleteAssetsOfTenantsWithoutSubscription();
@@ -130,8 +131,6 @@ class Cleanup implements ShouldQueue
             Log::debug("Vectors with missing references for user {$user->email} removed.");
             Log::debug("Purging conversations of user {$user->email} that are over 6 months old...");
 
-            Trace::where('updated_at', '<=', Carbon::now()->startOfDay()->subMonths(6))
-                ->delete();
             Conversation::where('updated_at', '<=', Carbon::now()->startOfDay()->subMonths(6))
                 ->delete();
 
@@ -382,5 +381,13 @@ class Cleanup implements ShouldQueue
         Leak::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->delete();
         TimelineItem::whereIn('owned_by', $userIds)->delete();
         TimelineFact::whereIn('owned_by', $userIds)->delete();
+
+        // 5. Pages
+        Page::whereIn('author_id', $userIds)->delete();
+    }
+
+    private function removeOldPages(): void
+    {
+        Page::where('updated_at', '<=', Carbon::now()->subDays(10)->startOfDay())->delete();
     }
 }

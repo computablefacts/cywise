@@ -8,6 +8,7 @@ use App\Models\Table;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCaseWithDb;
 
 class SqlAssistantTest extends TestCaseWithDb
@@ -56,7 +57,7 @@ class SqlAssistantTest extends TestCaseWithDb
 
         $this->assertIsString($sql);
         $this->assertNotEmpty($sql);
-        $this->assertStringContainsStringIgnoringCase('SELECT COUNT() FROM users', $sql);
+        $this->assertStringContainsStringIgnoringCase('SELECT COUNT(*) FROM users', $sql);
     }
 
     public function test_normalize_table_name()

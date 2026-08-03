@@ -31,21 +31,23 @@ new class extends Component {
 <x-dynamic-component component="layouts.app" :title="__('AI-generated remediation recipe')">
     @volt('recipe')
     <x-app.container>
-        <x-card class="lg:p-10">
+        <div class="card mt-3">
+            <div class="card-body p-4">
             <x-app.heading
                     title="{!! __('AI-generated remediation recipe') !!}"
                     description=""
             />
-            <div class="max-w-full mt-8 prose-sm prose dark:prose-invert">
-                <div class="flex flex-col items-start space-y-3 lg:flex-row lg:space-y-0 lg:space-x-5">
-                    <div class="relative">
-                        <div class="mx-auto mt-5 prose-sm prose text-zinc-600 dark:text-zinc-300">
+            <div class="mt-3">
+                <div class="d-flex flex-column align-items-start gap-3 flex-lg-row gap-lg-4">
+                    <div>
+                        <div class="mt-2 text-muted">
                             {!! $this->recipe !!}
                         </div>
                     </div>
                 </div>
             </div>
-        </x-card>
+            </div>
+        </div>
     </x-app.container>
     @endvolt
 </x-dynamic-component>

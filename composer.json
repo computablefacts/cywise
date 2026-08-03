@@ -36,7 +36,7 @@
         "juanantoniodelgado/stopwords": "^1.4",
         "lab404/laravel-impersonate": "^1.7.5",
         "laravel/folio": "^1.1",
-        "laravel/framework": "^12.18",
+        "laravel/framework": "^12.59",
         "laravel/pail": "^1.2.2",
         "laravel/sanctum": "^4.1",
         "laravel/tinker": "^2.10.1",
@@ -132,7 +132,8 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": false
         }
     },
     "minimum-stability": "stable",

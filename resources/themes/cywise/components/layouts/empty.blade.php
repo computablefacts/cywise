@@ -37,10 +37,16 @@
   font-style: normal;
 }
 </style>
-    <script src="https://cdn.tailwindcss.com"></script>
-    {{-- <script src="//unpkg.com/alpinejs" defer></script> --}}
+    <!-- FastBootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/fastbootstrap@2.2.0/dist/css/fastbootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha256-V6lu+OdYNKTKTsVFBuQsyIlDiRWiOmtC8VQ8Lzdm2i4="
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
 </head>
-<body class="flex flex-col px-10 min-h-screen bg-white lg:px-0 dark:bg-zinc-950">
+<body class="d-flex flex-column px-3 min-vh-100 bg-white px-lg-0">
     {{ $slot }}
 </body>
 </html>

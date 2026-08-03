@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Procedures\AssetsProcedure;
 use App\Http\Procedures\EventsProcedure;
 use App\Http\Procedures\HoneypotsProcedure;
-use App\Http\Procedures\LeaksProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Honeypot;
+use App\Models\Leak;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -59,9 +59,9 @@ class DashboardController extends Controller
             $alerts = $alerts->concat($procedure->list($req)['low']);
         }
 
-        $leaks = (new LeaksProcedure())->list(JsonRpcRequest::createFrom($request))['leaks']
-            ->reverse()
-            ->take(10);
+        $leaks = Leak::orderByDesc('leak_date')
+            ->limit(10)
+            ->get();
 
         $todo = $alerts->sortBy(function (Alert $alert) {
             if ($alert->isCritical()) {
@@ -119,7 +119,7 @@ class DashboardController extends Controller
             ->take(3)
             ->toArray();
 
-        return view('theme::iframes.dashboard', [
+        return view('theme::pages.dashboard', [
             'nb_monitored' => $nbMonitored,
             'nb_monitorable' => $nbMonitorable,
             'nb_vulns_high' => $nbVulnsHigh,

@@ -111,65 +111,67 @@
 
 <x-layouts.app>
     @volt('settings.export') 
-        <div class="relative">
+        <div class="">
             <x-app.settings-layout
                 title="Export Data"
                 description="Download a copy of all your data stored in our system."
             >
-                <div class="w-full max-w-lg space-y-6">
+                <div class="w-100 max-w-lg">
                     <!-- Export Card -->
-                    <div class="p-6 bg-white dark:bg-zinc-800 border rounded-lg shadow-sm border-zinc-200 dark:border-zinc-700">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                                </svg>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0 me-3">
+                                    <svg class="text-primary" style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="fw-bold mb-2">Download Your Data</h5>
+                                    <p class="small text-muted mb-3">
+                                        Export a complete copy of your account data including:
+                                    </p>
+                                    <ul class="mb-3 small text-muted">
+                                        <li>Profile information and settings</li>
+                                        <li>Activity logs and account history</li>
+                                        <li>Blog posts you've authored</li>
+                                        <li>API keys (partially masked)</li>
+                                        <li>Privacy and notification preferences</li>
+                                        <li>Subscription information</li>
+                                        <li>Roles and permissions</li>
+                                    </ul>
+                                    <p class="small text-muted">
+                                        Your data will be exported in JSON format for easy processing and portability.
+                                    </p>
+                                </div>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-medium text-zinc-900 dark:text-zinc-100">Download Your Data</h3>
-                                <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                                    Export a complete copy of your account data including:
-                                </p>
-                                <ul class="mt-3 space-y-1 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside">
-                                    <li>Profile information and settings</li>
-                                    <li>Activity logs and account history</li>
-                                    <li>Blog posts you've authored</li>
-                                    <li>API keys (partially masked)</li>
-                                    <li>Privacy and notification preferences</li>
-                                    <li>Subscription information</li>
-                                    <li>Roles and permissions</li>
-                                </ul>
-                                <p class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-                                    Your data will be exported in JSON format for easy processing and portability.
-                                </p>
+                            
+                            <div class="mt-4">
+                                <button 
+                                    wire:click="exportData"
+                                    type="button"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    <svg class="me-2" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Export My Data
+                                </button>
                             </div>
-                        </div>
-                        
-                        <div class="mt-6">
-                            <button 
-                                wire:click="exportData"
-                                type="button"
-                                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-zinc-800"
-                            >
-                                <svg class="w-4 h-4 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                </svg>
-                                Export My Data
-                            </button>
                         </div>
                     </div>
 
                     <!-- GDPR Info -->
-                    <div class="p-4 rounded-md bg-blue-50 dark:bg-blue-900/20">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="w-5 h-5 text-blue-400 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="alert alert-info mb-4" role="alert">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0 me-3">
+                                <svg class="text-info" style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                                 </svg>
                             </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">Data Privacy</h3>
-                                <p class="mt-1 text-sm text-blue-700 dark:text-blue-400">
+                            <div>
+                                <h6 class="alert-heading fw-bold small">Data Privacy</h6>
+                                <p class="mb-0 small">
                                     This feature complies with GDPR data portability requirements. Your data export will be logged in your activity history for security purposes.
                                 </p>
                             </div>
@@ -177,12 +179,14 @@
                     </div>
 
                     <!-- Additional Actions -->
-                    <div class="p-4 border rounded-md border-zinc-200 dark:border-zinc-700">
-                        <h4 class="text-sm font-medium text-zinc-900 dark:text-zinc-100">Need to delete your account?</h4>
-                        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                            If you'd like to permanently delete your account and all associated data, visit the 
-                            <a href="{{ route('settings.deletion') }}" wire:navigate class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">Account Security</a> page.
-                        </p>
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="fw-bold small mb-2">Need to delete your account?</h6>
+                            <p class="mb-0 small text-muted">
+                                If you'd like to permanently delete your account and all associated data, visit the 
+                                <a href="{{ route('settings.deletion') }}" class="text-primary text-decoration-none fw-medium">Account Security</a> page.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </x-app.settings-layout>

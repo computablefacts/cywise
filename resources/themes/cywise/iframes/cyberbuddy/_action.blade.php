@@ -58,6 +58,7 @@
   </div>
 </div>
 @once
+@push('scripts')
 <script>
 
   const onActionClick = (text) => {
@@ -74,4 +75,5 @@
   };
 
 </script>
+@endpush
 @endonce

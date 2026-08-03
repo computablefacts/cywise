@@ -105,14 +105,18 @@
 
 <x-layouts.app>
     @volt('settings.social') 
-        <div class="relative">
+        <div class="">
             <x-app.settings-layout
                 title="Social Media"
                 description="Connect your social media accounts and personal website."
             >
-                <form wire:submit="save" class="w-full max-w-lg space-y-6">
-                    {{ $this->form }}
-                    <div class="w-full pt-6 text-right">
+                <form wire:submit="save" class="w-100 max-w-lg">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            {{ $this->form }}
+                        </div>
+                    </div>
+                    <div class="w-100 pt-4 text-end">
                         <x-button type="submit">Save Links</x-button>
                     </div>
                 </form>

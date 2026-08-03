@@ -13,7 +13,7 @@
         {!! __('<b>:user</b> has added the asset <b>:asset</b> (<a href=":href" class="link">:count vulnerabilities</a>)', [
         'asset' => $asset->asset,
         'count' => $alerts->count(),
-        'href' => route('iframes.vulnerabilities', [ 'asset_id' => $asset->id ]),
+        'href' => route('vulnerabilities', [ 'asset_id' => $asset->id ]),
         'user' => $asset->createdBy->name
         ]) !!}
         @else
@@ -24,6 +24,31 @@
         @endif
       </span>
     </div>
+    @if($asset->isProtectedByCloudflare())
+    <div class="mt-1">
+      <small class="text-muted">
+        {!! __('This asset seems protected by Cloudflare. Do not forget to whitelist <a href="/ips-v4.txt" target="_blank">our IP addresses</a>.') !!}
+      </small>
+    </div>
+    @endif
+    @if($asset->isIpAddressMissing())
+    <div class="mt-1">
+      <small class="text-muted">
+        {{ __('This asset is not associated with any IP address.') }}
+      </small>
+    </div>
+    @endif
+    @if($asset->isDns())
+    <div class="mt-1">
+      <input type="checkbox"
+             id="auto-monitor-{{ $asset->id }}"
+             {{ $asset->auto_monitor_new_subdomains ? 'checked' : '' }}
+      onclick="toggleAutoMonitorNewSubdomains('{{ $asset->id }}')">
+      <label class="p-2 mb-0 cursor-pointer" for="auto-monitor-{{ $asset->id }}">
+        {{ __('Auto Monitor New Subdomains') }}
+      </label>
+    </div>
+    @endif
     <div class="d-flex align-items-center flex-wrap" style="gap:10px;">
       <button id="start-monitoring-{{ $asset->id }}" class="show-replies {{ $asset->is_monitored ? 'd-none' : '' }}"
               title="{{ __('Start Monitoring') }}"

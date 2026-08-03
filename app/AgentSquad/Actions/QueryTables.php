@@ -50,7 +50,7 @@ class QueryTables extends AbstractAction
         //
     }
 
-    public function execute(User $user, string $threadId, array $messages, string $input): AbstractAnswer
+    protected function execute2(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
         try {
 

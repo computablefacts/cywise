@@ -215,7 +215,7 @@ if (!function_exists('cywise_compress_log_buffer')) {
             $line = $buffer[$i];
             $lineCount = 1;
 
-            // Check if next line is similar (single line compression)
+            // Check if next line is similar
             while ($i + 1 < $size) {
 
                 $nextLine = $buffer[$i + 1];
@@ -229,40 +229,9 @@ if (!function_exists('cywise_compress_log_buffer')) {
                 }
             }
             if ($lineCount > 1) { // If single line compression worked, output it
-                $compressed[] = "[BEGIN {$lineCount}x REPEATED LINE]";
-                $compressed[] = $line;
-                $compressed[] = "[END {$lineCount}x REPEATED LINE]";
+                $compressed[] = "[{$lineCount}x REPEATED LINE] $line";
                 $i++;
                 continue;
-            }
-
-            // Try 2-line block compression
-            if ($i + 1 < $size) {
-
-                $block = $line . "\n" . $buffer[$i + 1];
-                $blockCount = 1;
-                $j = $i + 2;
-
-                while ($j + 1 < $size) {
-
-                    $nextBlock = $buffer[$j] . "\n" . $buffer[$j + 1];
-                    $ratio = 1.0 - cywise_levenshtein_ratio(mb_strtolower($block), mb_strtolower($nextBlock));
-
-                    if ($ratio > $threshold) {
-                        $blockCount++;
-                        $j += 2;
-                    } else {
-                        break;
-                    }
-                }
-                if ($blockCount > 1) { // If 2-line block compression worked, output it
-                    $compressed[] = "[BEGIN {$blockCount}x REPEATED BLOCK]";
-                    $compressed[] = $line;
-                    $compressed[] = $buffer[$i + 1];
-                    $compressed[] = "[END {$blockCount}x REPEATED BLOCK]";
-                    $i = $j;
-                    continue;
-                }
             }
 
             // No compression possible, output single line

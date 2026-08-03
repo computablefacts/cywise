@@ -15,7 +15,7 @@ class ActionsEditorController extends Controller
             'action_id' => 'nullable|integer|exists:cb_remote_actions,id',
         ]);
         $action = isset($params['action_id']) ? RemoteAction::findOrFail($params['action_id']) : new RemoteAction();
-        return view('theme::iframes.actions-editor', [
+        return view('theme::pages.actions-editor', [
             'action' => $action,
         ]);
     }

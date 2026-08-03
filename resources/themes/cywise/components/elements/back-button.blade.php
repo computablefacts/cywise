@@ -1,6 +1,6 @@
-<div {{ $attributes->twMerge('lg:px-5 mx-auto w-full lg:px-0') }}>
-    <a href="{{ $href ?? '' }}" wire:navigate class="inline-flex items-center px-2.5 py-1.5 mb-3 lg:mb-1 md:mb-6 text-xs font-semibold rounded-full border cursor-pointer text-blue-900 bg-blue-100 border-blue-200 group">
-        <svg class="relative mr-2 -ml-0.5 w-3.5 h-3.5 duration-200 ease-out translate-x-1 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        {{ $text ?? '' }}
-    </a>
-</div>
+<a href="{{ $href ?? '' }}" class="inline-flex items-center gap-x-2 px-4 py-2 text-xs font-medium rounded-full border bg-blue-100 border-blue-200 text-blue-600 transition hover:bg-blue-200 hover:text-blue-800 group">
+    <svg class="h-4 w-4 transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd" />
+    </svg>
+    <span class="uppercase tracking-wider">{{ $text ?? '' }}</span>
+</a>

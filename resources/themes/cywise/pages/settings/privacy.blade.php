@@ -96,28 +96,32 @@
 
 <x-layouts.app>
     @volt('settings.privacy') 
-        <div class="relative">
+        <div class="">
             <x-app.settings-layout
                 title="Privacy Settings"
                 description="Control your privacy and what information is visible to others."
             >
-                <form wire:submit="save" class="w-full max-w-lg space-y-6">
-                    {{ $this->form }}
-                    <div class="w-full pt-6 text-right">
+                <form wire:submit="save" class="w-100 max-w-lg">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            {{ $this->form }}
+                        </div>
+                    </div>
+                    <div class="w-100 pt-4 text-end">
                         <x-button type="submit">Save Settings</x-button>
                     </div>
                 </form>
 
                 <!-- Privacy Information -->
-                <div class="mt-8 max-w-lg">
-                    <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <div class="flex gap-3">
-                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <div class="mt-5 max-w-lg">
+                    <div class="alert alert-info" role="alert">
+                        <div class="d-flex">
+                            <svg class="flex-shrink-0 me-3 mt-1" style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
-                            <div class="flex-1">
-                                <h4 class="text-sm font-medium text-blue-900 dark:text-blue-100">Your Privacy Matters</h4>
-                                <p class="mt-1 text-sm text-blue-800 dark:text-blue-200">
+                            <div>
+                                <h6 class="alert-heading fw-bold small">Your Privacy Matters</h6>
+                                <p class="mb-0 small">
                                     These settings help you control your privacy and data. Changes take effect immediately and you can update them at any time.
                                 </p>
                             </div>

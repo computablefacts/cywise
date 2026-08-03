@@ -42,6 +42,6 @@ class ActionsController extends Controller
 
         $users = User::where('tenant_id', $user->tenant_id)->orderBy('name')->get();
 
-        return view('theme::iframes.actions', compact('actions', 'tenantSettings', 'userSettings', 'users', 'userSelected'));
+        return view('theme::pages.actions', compact('actions', 'tenantSettings', 'userSettings', 'users', 'userSelected'));
     }
 }

@@ -15,8 +15,8 @@
               <b>{{ $nb_notes }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.notes-and-memos') }}" class="link">
-                {{ __('Notes & Memos') }}
+              <a href="{{ route('notes-and-memos') }}" class="link">
+                {{ __('Notes') }}
               </a>
             </div>
           </div>

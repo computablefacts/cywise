@@ -6,6 +6,7 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\HiddenAlert;
+use Illuminate\Support\Str;
 use Sajya\Server\Procedure;
 
 class VulnerabilitiesProcedure extends Procedure
@@ -35,9 +36,8 @@ class VulnerabilitiesProcedure extends Procedure
         description: "List the user's vulnerabilities.",
         params: [
             "asset_id" => "An optional asset id.",
-            "asset" => "An optional asset as a domain or an IP address. (string|nullable|min:1|max:191|exists:am_assets,asset)",
+            "asset" => "An optional asset as a domain or an IP address. (string|nullable|min:1|max:191)",
             "level" => "An optional criticality level such as high, medium or low. (string|nullable|min:3|max:6|in:high,medium,low)",
-            "tld" => "An optional asset TLD to match. (string|nullable)",
             "tags" => "An optional list of assets tags to match.",
             "port_tags" => "An optional list of ports tags to match.",
         ],
@@ -92,9 +92,8 @@ if (empty(\$alert->cve_id)) {
     {
         $params = $request->validate([
             'asset_id' => 'integer|nullable|prohibited_if:asset,true|exists:am_assets,id',
-            'asset' => 'string|nullable|prohibited_if:asset_id,true|min:1|max:191|exists:am_assets,asset',
+            'asset' => 'string|nullable|prohibited_if:asset_id,true|min:1|max:191',
             'level' => 'string|nullable|min:3|max:6|in:high,medium,low',
-            'tld' => 'string|nullable',
             'tags' => 'array|nullable|min:1|max:10',
             'tags.*' => 'string',
             'port_tags' => 'array|nullable|min:1|max:10',
@@ -103,18 +102,17 @@ if (empty(\$alert->cve_id)) {
 
         $asset = $params['asset'] ?? null;
         $assetId = $params['asset_id'] ?? null;
-        $tld = $params['tld'] ?? null;
         $tags = $params['tags'] ?? null;
         $portTags = $params['port_tags'] ?? null;
         $alerts = Asset::query()
             ->where('is_monitored', true)
             ->when($assetId, fn($query, $assetId) => $query->where('id', $assetId))
-            ->when($asset, fn($query, $assetId) => $query->where('asset', $assetId))
-            ->when($tld, fn($query, $domain) => $query->where('tld', $tld))
-            ->when($tags, fn($query, $domain) => $query
-                ->join('am_assets_tags', 'am_assets_tags.asset_id', '=', 'am_assets.id')
-                ->whereIn('am_assets_tags.tag', $tags)
-            )
+            ->when($asset, fn($q, $asset) => $q->where(fn($q) => $q->whereLike('am_assets.tld', '%' . Str::lower($asset) . '%')->orWhereLike('am_assets.asset', '%' . Str::lower($asset) . '%')))
+            ->when($tags && count($tags) > 0, function ($q) use ($tags) {
+                $q->whereHas('tags', function ($sub) use ($tags) {
+                    $sub->whereIn('tag', $tags);
+                });
+            })
             ->get()
             ->flatMap(function (Asset $asset) use ($params, $portTags) {
                 if (($params['level'] ?? '') === 'high') {

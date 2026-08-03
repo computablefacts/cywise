@@ -63,9 +63,13 @@ class TriggerScan implements ShouldQueue
                 return $scans->isEmpty() || $scans->sortBy('vulns_scan_ends_at')->last()?->vulns_scan_ends_at <= $minDate;
             })
             ->each(function (Asset $asset) {
-                Log::debug("Starting scan of asset {$asset->asset} ({$asset->id})...");
-                (new BeginPortsScanListener())->handle(new BeginPortsScan($asset));
-                Log::debug("Scan of asset {$asset->asset} ({$asset->id}) started.");
+                if ($asset->isIpAddressMissing(true)) {
+                    Log::debug("Asset {$asset->asset} ({$asset->id}) has no IP associated, skipping scan.");
+                } else {
+                    Log::debug("Starting scan of asset {$asset->asset} ({$asset->id})...");
+                    (new BeginPortsScanListener())->handle(new BeginPortsScan($asset));
+                    Log::debug("Scan of asset {$asset->asset} ({$asset->id}) started.");
+                }
             });
     }
 }

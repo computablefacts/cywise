@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\DB;
  * @property ?string next_scan_id
  * @property ?string discovery_id
  * @property bool is_monitored
+ * @property bool auto_monitor_new_subdomains
  * @property int created_by
  * @property int ynh_trial_id
  */
@@ -43,6 +44,7 @@ class Asset extends Model
         'next_scan_id',
         'discovery_id',
         'is_monitored',
+        'auto_monitor_new_subdomains',
         'created_by',
         'ynh_trial_id',
     ];
@@ -50,6 +52,7 @@ class Asset extends Model
     protected $casts = [
         'type' => AssetTypesEnum::class,
         'is_monitored' => 'boolean',
+        'auto_monitor_new_subdomains' => 'boolean',
         'ynh_trial_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -78,7 +81,7 @@ class Asset extends Model
     public function tld(): ?string
     {
         if ($this->isDns()) {
-            if ($this->tld) {
+            if ($this->getRawOriginal('tld')) {
                 return $this->tld;
             }
 
@@ -192,5 +195,37 @@ class Asset extends Model
         return Scan::where('asset_id', $this->id)
             ->where('ports_scan_id', $this->next_scan_id)
             ->get();
+    }
+
+    public function isProtectedByCloudflare(): bool
+    {
+        return DB::table('am_ports')
+            ->join('am_ports_tags', 'am_ports.id', '=', 'am_ports_tags.port_id')
+            ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
+            ->where('am_scans.asset_id', $this->id)
+            ->where('am_ports_tags.tag', 'like', '%cloudflare%')
+            ->exists();
+    }
+
+    public function isIpAddressMissing(bool $invalidateCache = false): bool
+    {
+        if (!$this->isDns()) {
+            return false;
+        }
+
+        $key = "ip_address_missing:{$this->id}";
+        $dateKey = "ip_address_missing_date:{$this->id}";
+
+        if ($invalidateCache) {
+            $cachedAt = \Cache::get($dateKey);
+            if (!$cachedAt || now()->subDays(3)->timestamp >= $cachedAt) {
+                \Cache::forget($key);
+                \Cache::forget($dateKey);
+            }
+        }
+        return \Cache::remember($key, now()->addDays(7), function () use ($dateKey) {
+            \Cache::put($dateKey, now()->timestamp, now()->addDays(7));
+            return $this->isDns() && empty(@dns_get_record($this->asset, DNS_A + DNS_AAAA));
+        });
     }
 }

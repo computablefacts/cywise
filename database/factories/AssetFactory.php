@@ -33,6 +33,7 @@ class AssetFactory extends Factory
                 }
             },
             'is_monitored' => $this->faker->boolean,
+            'auto_monitor_new_subdomains' => false,
             'created_by' => Auth::user()->id ?? User::factory(),
         ];
     }

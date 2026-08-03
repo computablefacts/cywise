@@ -15,7 +15,7 @@
               <b>{{ $nb_conversations }}</b>
             </div>
             <div class="text-muted">
-              <a href="{{ route('iframes.conversations') }}" class="link">
+              <a href="{{ route('conversations') }}" class="link">
                 {{ __('Conversations') }}
               </a>
             </div>

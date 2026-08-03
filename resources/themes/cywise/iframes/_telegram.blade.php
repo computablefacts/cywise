@@ -1,5 +1,3 @@
-@include('theme::iframes._json-rpc')
-
 <p class="mb-2">
   Pour utiliser Cywise depuis Telegram, vous devez créer un bot Telegram et configurer son webhook.
 </p>
@@ -60,18 +58,14 @@
 </p>
 <p>
   Une fois le webhook actif, envoyez un message à votre bot Telegram : il répondra via <a
-      href="{{ route('iframes.cyberbuddy') }}">{{ tenant_custom_text('CyberBuddy') }}</a>, dans le contexte de votre compte Cywise.
+      href="{{ route('cyberbuddy') }}">{{ tenant_custom_text('CyberBuddy') }}</a>, dans le contexte de votre compte Cywise.
 </p>
-
-@push('scripts')
 <script>
   function copyToClipboard(id) {
     const el = document.getElementById(id);
     el.select();
     document.execCommand('copy');
-    if (toaster) {
-      toaster.toastSuccess("Copié dans le presse-papier");
-    }
+    window.toaster.toastSuccess("Copié dans le presse-papier");
   }
 
   (function () {
@@ -94,16 +88,12 @@
       elBtn.addEventListener('click', function () {
         const token = (elInput.value || '').trim();
         if (!token) {
-          if (toaster) {
-            toaster.toastError("Veuillez saisir un token de bot Telegram.");
-          }
+          window.toaster.toastError("Veuillez saisir un token de bot Telegram.");
           return;
         }
         elBtn.setAttribute('disabled', 'disabled');
         setTelegramConfigurationApiCall(token, (result) => {
-          if (toaster) {
-            toaster.toastSuccess("Token enregistré. Configurez maintenant le webhook côté Telegram.");
-          }
+          window.toaster.toastSuccess("Token enregistré. Configurez maintenant le webhook côté Telegram.");
           updateWebhookOutputs(result.webhook, token);
         }, () => elBtn.removeAttribute('disabled'));
       });
@@ -118,4 +108,3 @@
     }
   })();
 </script>
-@endpush

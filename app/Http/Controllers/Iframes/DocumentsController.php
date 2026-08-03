@@ -13,7 +13,7 @@ class DocumentsController extends Controller
     public function __invoke(Request $request): View
     {
         $files = (new FilesProcedure())->list(JsonRpcRequest::createFrom($request));
-        return view('theme::iframes.documents', [
+        return view('theme::pages.documents', [
             'files' => $files['files'],
             'collection' => $files['collection'],
             'nbPages' => $files['nb_pages'],

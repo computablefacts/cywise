@@ -96,7 +96,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/ignition" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/laravel-ignition" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/laravel-package-tools" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/temporary-directory" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/clock" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/console" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/css-selector" />
@@ -143,7 +142,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/laravel-health" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/regex" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/alebatistella/duskapiconf" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/anourvalar/eloquent-serialize" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/bacon/bacon-qr-code" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/baril/sqlout" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/bezhansalleh/filament-google-analytics" />
@@ -190,7 +188,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/folio" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/pail" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/socialite" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/lcobucci/clock" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/lcobucci/jwt" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/league/csv" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/league/oauth1-client" />
@@ -277,6 +274,13 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/mpdf/psr-log-aware-trait" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpoffice/phpspreadsheet" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/setasign/fpdi" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/azure-oss/identity" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/azure-oss/storage-common" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/sentinel" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/php-http/discovery" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/soundasleep/html2text" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-deepclone" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/anourvalar/eloquent-serialize" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

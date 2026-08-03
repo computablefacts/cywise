@@ -28,7 +28,7 @@
         })
     "
     x-on:click="toggle()"
-    class="flex items-center px-1 py-2 text-xs rounded-md cursor-pointer select-none hover:bg-zinc-100 dark:hover:bg-zinc-800"
+    class="d-flex align-items-center px-2 py-1 small rounded cursor-pointer select-none hover-bg-light"
 >
 
     <input type="hidden" name="toggleDarkMode" :value="theme">
@@ -39,20 +39,19 @@
         role="switch"
         :aria-checked="theme == 'dark'"
         :aria-labelledby="$id('toggle-label')"
-        :class="(theme == 'dark') ? 'bg-zinc-700' : 'bg-slate-300'"
-        class="relative inline-flex shrink-0 py-1 ml-1 transition rounded-full w-7 focus:ring-0"
+        :class="(theme == 'dark') ? 'bg-secondary' : 'bg-light'"
+        class="position-relative d-inline-flex border-0 py-1 ms-1 transition rounded-pill" style="width: 2rem;"
     >
         <span
-            :class="(theme == 'dark') ? 'translate-x-[13px]' : 'translate-x-1'"
-            class="w-3 h-3 transition bg-white rounded-full shadow-md focus:outline-hidden"
+            :class="(theme == 'dark') ? 'translate-x-[16px]' : 'translate-x-[2px]'"
+            class="transition bg-white rounded-circle shadow-sm"
+            style="width: 0.75rem; height: 0.75rem;"
             aria-hidden="true"
         ></span>
     </button>
-
     <label
         :id="$id('toggle-label')"
-        :class="{ 'text-zinc-600' : theme == 'light' || theme == null, 'text-zinc-300' : theme == 'dark'  }"
-        class="shrink-0 ml-1.5 font-medium cursor-pointer"
+        class="ms-2 fw-medium cursor-pointer mb-0"
     >
         <span x-show="(theme == 'light' || theme == null)">Dark Mode</span>
         <span x-show="(theme == 'dark')">Light Mode</span>
