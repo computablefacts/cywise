@@ -120,18 +120,18 @@ Important analysis guidelines:
    - Are new IP addresses, domains, or ports appearing?
    - Are new parent-child process relationships visible?
 
-High-interest entities include:
-- privileged users;
-- service accounts;
-- SSH keys;
-- unknown binaries;
-- temporary directories;
-- hidden directories;
-- unusual paths such as /tmp, /dev/shm, /var/tmp, /run, or user home directories;
-- public IP addresses;
-- uncommon ports;
-- interpreters spawning shells;
-- shells opening network connections.
+   High-interest entities include:
+   - privileged users;
+   - service accounts;
+   - SSH keys;
+   - unknown binaries;
+   - temporary directories;
+   - hidden directories;
+   - unusual paths such as /tmp, /dev/shm, /var/tmp, /run, or user home directories;
+   - public IP addresses;
+   - uncommon ports;
+   - interpreters spawning shells;
+   - shells opening network connections.
 
 Important reasoning rules:
 
