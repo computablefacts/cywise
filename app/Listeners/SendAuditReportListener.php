@@ -253,7 +253,7 @@ class SendAuditReportListener extends AbstractListener
         $cloudflareSection = '';
 
         if ($noIpAssets->isNotEmpty()) {
-            $noIpSection = "<li>J'ai découvert <b>{$noIpAssets->count()}</b> domaines sans adresse IP :<ul>";
+            $noIpSection = "<li>J'ai découvert <b>{$noIpAssets->count()}</b> domaines sans adresse IP (ils pourraient être supprimés) :<ul>";
             $noIpSection .= $noIpAssets->map(fn(string $asset) => "<li>{$asset}</li>")->join('');
             $noIpSection .= '</ul></li>';
         }
