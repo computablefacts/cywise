@@ -4,8 +4,6 @@ Your task is to compare the server activity observed during a current 7-day wind
 
 The goal is not to compare logs line by line. The goal is to compare behavior, sequence, context, and intent.
 
-The final report must be understandable by a developer or sysadmin, focusing on concrete, verifiable facts (e.g., files, commands, users, processes) and clear next steps for investigation.
-
 Server:
 - Name: {SERVER_NAME}
 - IP address: {SERVER_IP_ADDRESS}
@@ -155,8 +153,30 @@ Return exactly this JSON structure:
 
 {
   "activity": "NORMAL | SUSPICIOUS | ANORMAL | UNKNOWN",
-  "report": "A concise analysis in English. Explain the baseline comparison, the key differences, the most relevant evidence, possible benign explanations, confidence level, and recommended next steps if needed."
+  "report": "A **TL;DR** in English."
 }
 
-The report must be concise but sufficiently explicit. It should help a developer or sysadmin understand why the activity was classified this way.
-Separate each paragraph in the report with a --8<--- line.
+The **TL;DR** must:
+1. Starts with the classification (e.g., "Activity is SUSPICIOUS").
+2. Lists **each suspicious behavior** in a bullet-point format.
+3. For each behavior, provide:
+   - A **brief description** (1-2 words, e.g., "Unusual `nc` command").
+   - A **one-line explanation** of why it is suspicious (e.g., "`nc` used to probe `yunohost.org:25` (SMTP), which is unusual for this server").
+   - A **next step** for the user to confirm or rule out malicious behavior (e.g., "Check cron jobs for scripts using `nc`").
+4. Keep the entire TL;DR to **2-3 lines max per behavior** and **avoid technical jargon** where possible. It must be understandable by a developer or sysadmin.
+
+Examples of **TL;DR**:
+
+TL;DR: Activity is SUSPICIOUS due to:
+- **`nc` command to `yunohost.org:25`:** Executed on 2026-08-04 at 17:15:55; probing SMTP port is unusual for a server primarily logging systemd units. Next step: Check cron jobs or scripts running `/bin/nc -4 -z -w2 yunohost.org 25`.
+- **Hidden file `/root/.rnd`:** Created by root on 2026-08-02 at 01:48:33; suggests a scheduled task or OpenSSL activity requiring verification. Next step: Inspect `/root/.rnd` and check for unexpected OpenSSL usage.
+
+TL;DR: Activity is SUSPICIOUS due to:
+- **Localhost nmap scans on port 666:** Multiple scans targeting `localhost:666`, which is unusual and suggests local service discovery or debugging. Next step: Investigate the process or user responsible for the scans.
+- **New `phpsessionclean.timer`:** A systemd timer for PHP session cleanup appeared for the first time on 2026-08-03 at 15:22:34, indicating a new scheduled task. Next step: Review the timer configuration for unexpected settings.
+- **Frequent hidden file creation:** Files like `/home/twr_admin/.clickhouse-client-history` and `/root/.tld_set` created more frequently than in the baseline, potentially indicating reconnaissance activity. Next step: Inspect the contents of these files and check their creation context.
+
+TL;DR: Activity is SUSPICIOUS due to:
+- **Repeated `firewalld.service` manipulation:** Frequent additions and removals of `firewalld.service`, suggesting attempts to modify firewall configurations. Next step: Audit `firewalld` unit files and logs for unauthorized changes.
+- **ClickHouse queries to new domains:** Queries targeting domains like `seinesaintdenis.fr` and `angardia.ai` (previously only `brisacier.net` was queried), suggesting a shift in data collection focus. Next step: Verify the legitimacy of these queries and check for unauthorized access.
+- **`sudo ls /lib/udev/rules.d/`:** Executed by `twr_admin` on 2026-08-02 at 10:15:00, which is unusual and may indicate an attempt to inspect udev rules for persistence. Next step: Investigate `twr_admin`'s session history and check for unauthorized udev rule modifications.
