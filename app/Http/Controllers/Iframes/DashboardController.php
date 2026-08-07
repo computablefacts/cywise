@@ -11,6 +11,7 @@ use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Honeypot;
 use App\Models\Leak;
+use Wave\Page;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -61,6 +62,10 @@ class DashboardController extends Controller
 
         $leaks = Leak::orderByDesc('leak_date')
             ->limit(10)
+            ->get();
+
+        $reports = Page::where('author_id', $request->user()?->id)
+            ->orderByDesc('created_at')
             ->get();
 
         $todo = $alerts->sortBy(function (Alert $alert) {
@@ -130,6 +135,7 @@ class DashboardController extends Controller
             'nb_iocs_low' => $nbIocsLow,
             'todo' => $todo,
             'investigate' => $investigate,
+            'reports' => $reports,
             'leaks' => $leaks,
             'honeypots' => $honeypots,
             'most_recent_honeypot_events' => $mostRecentHoneypotEvents,

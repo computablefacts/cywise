@@ -336,6 +336,43 @@ render(function (Request $request) {
       </div>
     </div>
     <!-- CYBERTODO : END -->
+    <!-- SOC OPERATOR : BEGIN -->
+    @if(count($reports) > 0)
+    <div class="row pt-3">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">
+              {!! __('SOC operator reports') !!}
+            </h6>
+            <div class="card-text">
+              <table class="table table-sm mb-0">
+                <thead>
+                <tr>
+                  <th style="color:var(--bs-body-color); width: 120px;">{{ __('Report Date') }}</th>
+                  <th>{{ __('Title') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($reports as $report)
+                <tr>
+                  <td style="color:var(--bs-body-color);">{{ $report->created_at?->format('Y-m-d') }}</td>
+                  <td>
+                    <a href="{{ $report->link() }}" target="_blank" class="link">
+                      {{ $report->title }}
+                    </a>
+                  </td>
+                </tr>
+                @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    @endif
+    <!-- SOC OPERATOR : END -->
     <!-- LEAKS : BEGIN -->
     @if(count($leaks) > 0)
     <div class="row pt-3">
