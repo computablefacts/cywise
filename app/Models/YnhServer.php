@@ -117,6 +117,12 @@ class YnhServer extends Model
         return $this->is_ready !== null && $this->is_ready;
     }
 
+    public function isMonitored(): bool
+    {
+        $ips = collect([$this->ip(), $this->ipv6()])->filter()->unique();
+        return $ips->isNotEmpty() && Port::whereIn('ip', $ips)->exists();
+    }
+
     /** @deprecated */
     public function isYunoHost(): bool
     {

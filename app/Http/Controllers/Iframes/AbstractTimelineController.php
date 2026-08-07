@@ -177,7 +177,7 @@ abstract class AbstractTimelineController extends Controller
             'today_separator' => $this->separator(Carbon::now()),
             'items' => (
             $objects === 'assets' ?
-                $items['items']->concat($this->servers($params['server_id'] ?? null)) :
+                $items['items']->concat($this->servers($params['server_id'] ?? null, $params['monitoring_type'] ?? null)) :
                 $items['items']
             )->sortByDesc('timestamp')
                 ->groupBy(fn(array $event) => $event['date'])
@@ -235,8 +235,12 @@ abstract class AbstractTimelineController extends Controller
         ])->render());
     }
 
-    private function servers(?int $serverId = null): Collection
+    private function servers(?int $serverId = null, ?string $monitoringType = null): Collection
     {
+        if ($monitoringType === 'external') {
+            return collect();
+        }
+
         /** @var User $user */
         $user = Auth::user();
 
