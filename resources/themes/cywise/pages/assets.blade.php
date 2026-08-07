@@ -55,11 +55,11 @@ render(function (Request $request) {
                   <option value="">{{ __('All monitoring types') }}</option>
                   <option value="internal" {{ request(
                   'monitoring_type') === 'internal' ? 'selected' : '' }}>
-                  {{ __('Internal Monitoring (Agent)') }}
+                  {{ __('Internal (Agent)') }}
                   </option>
                   <option value="external" {{ request(
                   'monitoring_type') === 'external' ? 'selected' : '' }}>
-                  {{ __('External Monitoring (Scanner)') }}
+                  {{ __('External (Scanner)') }}
                   </option>
                 </select>
               </div>
