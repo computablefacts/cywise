@@ -366,7 +366,7 @@ render(function (Request $request) {
                   <td class="text-end">
                     @php
                         $activity = 'UNKNOWN';
-                        if (preg_match('/Activité\s*:\s*([^\s(]+)/u', $report->body, $matches)) {
+                        if (preg_match('/Activité\s*(?:<[^>]+>)*\s*:\s*(?:<[^>]+>)*\s*([^\s<]+)/u', $report->body, $matches)) {
                             $val = mb_strtolower(trim($matches[1]));
                             $activity = match($val) {
                                 'normale' => 'NORMAL',
