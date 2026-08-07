@@ -54,6 +54,7 @@ abstract class AbstractTimelineController extends Controller
     {
         $params = $request->validate([
             'status' => ['nullable', 'string', 'in:monitorable,monitored'],
+            'monitoring_type' => ['nullable', 'string', 'in:internal,external'],
             'level' => ['nullable', 'string', 'in:low,medium,high,suspect,other'],
             'server_id' => ['nullable', 'integer', 'exists:ynh_servers,id'],
             'asset_id' => ['nullable', 'integer', 'exists:am_assets,id'],
@@ -80,7 +81,8 @@ abstract class AbstractTimelineController extends Controller
                         ->unique()
                         ->values()
                         ->all() :
-                    null
+                    null,
+                $params['monitoring_type'] ?? null
             ),
             'conversations' => $this->conversations(),
             'events' => $this->eventsAndIoCs($params['server_id'] ?? null, $params['level'] ?? null, $params['rule_name'] ?? null),
@@ -260,7 +262,7 @@ abstract class AbstractTimelineController extends Controller
             });
     }
 
-    private function assets(?string $status = null, ?int $assetId = null, ?string $tld = null, ?array $tags = null): array
+    private function assets(?string $status = null, ?int $assetId = null, ?string $tld = null, ?array $tags = null, ?string $monitoringType = null): array
     {
         // Helper to apply shared filters
         $filter = function ($query) use ($assetId, $tld, $tags) {
@@ -273,58 +275,62 @@ abstract class AbstractTimelineController extends Controller
                     });
                 });
         };
+
+        $items = $filter(Asset::query())
+            ->when($status, function ($query, $status) {
+                if ($status === 'monitorable') {
+                    $query->where('is_monitored', false);
+                } else if ($status === 'monitored') {
+                    $query->where('is_monitored', true);
+                }
+            })
+            ->get();
+
+        if ($monitoringType) {
+            $items = $items->filter(function (Asset $asset) use ($monitoringType) {
+                $hasAgent = $asset->hasAgent();
+                return $monitoringType === 'internal' ? $hasAgent : !$hasAgent;
+            });
+        }
         return [
-            'nb_monitored' => $filter(Asset::query())
-                ->where('is_monitored', true)
-                ->count(),
-            'nb_monitorable' => $filter(Asset::query())
-                ->where('is_monitored', false)
-                ->count(),
-            'items' => $filter(Asset::query())
-                ->when($status, function ($query, $status) {
-                    if ($status === 'monitorable') {
-                        $query->where('is_monitored', false);
-                    } else if ($status === 'monitored') {
-                        $query->where('is_monitored', true);
-                    }
-                })
-                ->get()
-                ->map(function (Asset $asset) {
+            'nb_monitored' => $items->where('is_monitored', true)->count(),
+            'nb_monitorable' => $items->where('is_monitored', false)->count(),
+            'items' => $items->map(function (Asset $asset) {
 
-                    $timestamp = $asset->created_at->utc()->format('Y-m-d H:i:s');
-                    $date = Str::before($timestamp, ' ');
-                    $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
+                $timestamp = $asset->created_at->utc()->format('Y-m-d H:i:s');
+                $date = Str::before($timestamp, ' ');
+                $time = Str::beforeLast(Str::after($timestamp, ' '), ':');
 
-                    $alerts = $asset->is_monitored ?
-                        $asset->alerts()->get()->filter(fn(Alert $alert) => $alert->is_hidden === 0) :
-                        collect();
-                    $hasHigh = $alerts->contains(fn(Alert $alert) => $alert->isHigh());
-                    $hasMedium = $alerts->contains(fn(Alert $alert) => $alert->isMedium());
-                    $hasLow = $alerts->contains(fn(Alert $alert) => $alert->isLow());
+                $alerts = $asset->is_monitored ?
+                    $asset->alerts()->get()->filter(fn(Alert $alert) => $alert->is_hidden === 0) :
+                    collect();
+                $hasHigh = $alerts->contains(fn(Alert $alert) => $alert->isHigh());
+                $hasMedium = $alerts->contains(fn(Alert $alert) => $alert->isMedium());
+                $hasLow = $alerts->contains(fn(Alert $alert) => $alert->isLow());
 
-                    if ($hasHigh) {
-                        $bgColor = 'var(--c-red)';
-                    } elseif ($hasMedium) {
-                        $bgColor = 'var(--c-orange-light)';
-                    } elseif ($hasLow) {
-                        $bgColor = 'var(--c-green)';
-                    } else {
-                        $bgColor = 'var(--c-blue)';
-                    }
-                    return [
-                        'timestamp' => $timestamp,
+                if ($hasHigh) {
+                    $bgColor = 'var(--c-red)';
+                } elseif ($hasMedium) {
+                    $bgColor = 'var(--c-orange-light)';
+                } elseif ($hasLow) {
+                    $bgColor = 'var(--c-green)';
+                } else {
+                    $bgColor = 'var(--c-blue)';
+                }
+                return [
+                    'timestamp' => $timestamp,
+                    'date' => $date,
+                    'time' => $time,
+                    'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._asset', [
                         'date' => $date,
                         'time' => $time,
-                        'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._asset', [
-                            'date' => $date,
-                            'time' => $time,
-                            'asset' => $asset,
-                            'bgColor' => $bgColor,
-                            'alerts' => $alerts,
-                        ])->render(),
-                        '_asset' => $asset,
-                    ];
-                }),
+                        'asset' => $asset,
+                        'bgColor' => $bgColor,
+                        'alerts' => $alerts,
+                    ])->render(),
+                    '_asset' => $asset,
+                ];
+            }),
         ];
     }
 

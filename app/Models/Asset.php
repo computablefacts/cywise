@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AssetTypesEnum;
 use App\Traits\HasTenant;
+use Cache;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -63,16 +64,6 @@ class Asset extends Model
         return $this->belongsTo(Trial::class, 'ynh_trial_id', 'id');
     }
 
-    public function isDns(): bool
-    {
-        return $this->type === AssetTypesEnum::DNS;
-    }
-
-    public function isIp(): bool
-    {
-        return $this->type === AssetTypesEnum::IP;
-    }
-
     public function isRange(): bool
     {
         return $this->type === AssetTypesEnum::RANGE;
@@ -104,6 +95,11 @@ class Asset extends Model
         return null;
     }
 
+    public function isDns(): bool
+    {
+        return $this->type === AssetTypesEnum::DNS;
+    }
+
     public function tags(): HasMany
     {
         return $this->hasMany(AssetTag::class, 'asset_id', 'id');
@@ -120,21 +116,6 @@ class Asset extends Model
     public function alertsWithCriticalityHigh(): Builder
     {
         return $this->alerts()->whereIn('level', ['Critical', 'High']);
-    }
-
-    public function alertsWithCriticalityMedium(): Builder
-    {
-        return $this->alerts()->where('level', 'Medium');
-    }
-
-    public function alertsWithCriticalityLow(): Builder
-    {
-        return $this->alerts()->where('level', 'Low');
-    }
-
-    public function alertsWithCriticalityUnverified(): Builder
-    {
-        return $this->alerts()->where('level', 'High (unverified)');
     }
 
     public function alerts(): Builder
@@ -176,6 +157,21 @@ class Asset extends Model
             ->where('rn', 1);
     }
 
+    public function alertsWithCriticalityMedium(): Builder
+    {
+        return $this->alerts()->where('level', 'Medium');
+    }
+
+    public function alertsWithCriticalityLow(): Builder
+    {
+        return $this->alerts()->where('level', 'Low');
+    }
+
+    public function alertsWithCriticalityUnverified(): Builder
+    {
+        return $this->alerts()->where('level', 'High (unverified)');
+    }
+
     /**
      * This method name is misleading because it does not tells you if all running scans on this asset completed.
      * It tells you what are the Scan objects for the last successful scan of this asset.
@@ -209,23 +205,45 @@ class Asset extends Model
 
     public function isIpAddressMissing(bool $invalidateCache = false): bool
     {
-        if (!$this->isDns()) {
-            return false;
+        return empty($this->ipAddresses($invalidateCache));
+    }
+
+    public function hasAgent(bool $invalidateCache = false): bool
+    {
+        $ips = $this->ipAddresses($invalidateCache);
+        return !empty($ips) && YnhServer::whereIn('ip_address', $ips)->exists();
+    }
+
+    public function isIp(): bool
+    {
+        return $this->type === AssetTypesEnum::IP;
+    }
+
+    private function ipAddresses(bool $invalidateCache = false): array
+    {
+        if ($this->isIp()) {
+            return [$this->asset];
         }
 
-        $key = "ip_address_missing:{$this->id}";
-        $dateKey = "ip_address_missing_date:{$this->id}";
+        $key = "ip_address:{$this->id}";
+        $dateKey = "ip_address_date:{$this->id}";
 
         if ($invalidateCache) {
-            $cachedAt = \Cache::get($dateKey);
+            $cachedAt = Cache::get($dateKey);
             if (!$cachedAt || now()->subDays(3)->timestamp >= $cachedAt) {
-                \Cache::forget($key);
-                \Cache::forget($dateKey);
+                Cache::forget($key);
+                Cache::forget($dateKey);
             }
         }
-        return \Cache::remember($key, now()->addDays(7), function () use ($dateKey) {
-            \Cache::put($dateKey, now()->timestamp, now()->addDays(7));
-            return $this->isDns() && empty(@dns_get_record($this->asset, DNS_A + DNS_AAAA));
+        return Cache::remember($key, now()->addDays(7), function () use ($dateKey) {
+            Cache::put($dateKey, now()->timestamp, now()->addDays(7));
+            $records = @dns_get_record($this->asset, DNS_A + DNS_AAAA);
+            return !$records ? [] : collect($records)
+                ->map(fn(array $record) => $record['ip'] ?? $record['ipv6'] ?? null)
+                ->filter()
+                ->unique()
+                ->values()
+                ->toArray();
         });
     }
 }

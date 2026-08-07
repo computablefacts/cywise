@@ -9,6 +9,16 @@
   <div class="timeline-item-wrapper">
     <div class="timeline-item-description">
       <span>
+        @if($asset->is_monitored)
+          <span class="badge bg-secondary me-1" title="{{ __('External Monitoring (Scanner)') }}">
+            <span class="bp4-icon bp4-icon-search"></span> {{ __('Scanner') }}
+          </span>&nbsp;
+        @endif
+        @if($asset->hasAgent())
+          <span class="badge bg-secondary me-1" title="{{ __('Internal Monitoring (Agent)') }}">
+            <span class="bp4-icon bp4-icon-pulse"></span> {{ __('Agent') }}
+          </span>&nbsp;
+        @endif
         @if($alerts->count() > 0)
         {!! __('<b>:user</b> has added the asset <b>:asset</b> (<a href=":href" class="link">:count vulnerabilities</a>)', [
         'asset' => $asset->asset,
@@ -27,7 +37,9 @@
     @if($asset->isProtectedByCloudflare())
     <div class="mt-1">
       <small class="text-muted">
-        {!! __('This asset seems protected by Cloudflare. Do not forget to whitelist <a href="/ips-v4.txt" target="_blank">our IP addresses</a>.') !!}
+        {!! __('This asset seems protected by Cloudflare. Do not forget to whitelist <a href="/ips-v4.txt"
+                                                                                        target="_blank">our IP
+          addresses</a>.') !!}
       </small>
     </div>
     @endif
