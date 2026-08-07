@@ -66,7 +66,9 @@ class DashboardController extends Controller
 
         $reports = Page::where('author_id', $request->user()?->id)
             ->orderByDesc('created_at')
-            ->get();
+            ->get()
+            ->unique('title')
+            ->values();
 
         $todo = $alerts->sortBy(function (Alert $alert) {
             if ($alert->isCritical()) {
