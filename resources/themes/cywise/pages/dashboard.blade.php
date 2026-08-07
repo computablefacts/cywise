@@ -351,6 +351,7 @@ render(function (Request $request) {
                 <tr>
                   <th style="color:var(--bs-body-color); width: 120px;">{{ __('Report Date') }}</th>
                   <th>{{ __('Title') }}</th>
+                  <th style="width: 100px;" class="text-end">{{ __('Activity') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -361,6 +362,30 @@ render(function (Request $request) {
                     <a href="{{ $report->link() }}" target="_blank" class="link">
                       {{ $report->title }}
                     </a>
+                  </td>
+                  <td class="text-end">
+                    @php
+                        $activity = 'UNKNOWN';
+                        if (preg_match('/Activité\s*:\s*([^\s(]+)/u', $report->body, $matches)) {
+                            $val = mb_strtolower(trim($matches[1]));
+                            $activity = match($val) {
+                                'normale' => 'NORMAL',
+                                'suspecte' => 'SUSPICIOUS',
+                                'anormale' => 'ANORMAL',
+                                default => 'UNKNOWN',
+                            };
+                        }
+                        $badgeClass = match($activity) {
+                            'NORMAL' => 'bg-green',
+                            'SUSPICIOUS' => 'bg-orange',
+                            'ANORMAL' => 'bg-red',
+                            default => '',
+                        };
+                        $badgeStyle = $activity === 'UNKNOWN' ? 'background-color: var(--c-grey-100); color: var(--bs-body-color);' : '';
+                    @endphp
+                    <span class="badge {{ $badgeClass }} text-lowercase" style="{{ $badgeStyle }}">
+                        {{ __($activity) }}
+                    </span>
                   </td>
                 </tr>
                 @endforeach
