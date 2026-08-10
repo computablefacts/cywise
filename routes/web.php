@@ -17,6 +17,7 @@ use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
 use App\Http\Controllers\Iframes\WebsiteController;
 use App\Http\Controllers\MultiLevelHealthCheckController;
+use App\Http\Controllers\OssecAgentPolicyRulesController;
 use App\Http\Controllers\OssecAgentRuleController;
 use App\Jobs\DownloadDebianSecurityBugTracker;
 use App\Jobs\TriggerAssetsDiscovery;
@@ -325,6 +326,10 @@ Route::get('/osquery/{secret}', function (string $secret, \Illuminate\Http\Reque
 
 Route::get('/ossec-agent/{secret}/rules/{ruleUid}', OssecAgentRuleController::class)
     ->whereNumber('ruleUid')
+    ->middleware('throttle:120,1');
+
+Route::get('/ossec-agent/{secret}/policies/{policyUid}/rules', OssecAgentPolicyRulesController::class)
+    ->where('policyUid', '[A-Za-z0-9_.-]+')
     ->middleware('throttle:120,1');
 
 Route::get('/localmetrics/{secret}', function (string $secret, \Illuminate\Http\Request $request) {

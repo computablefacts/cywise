@@ -27,6 +27,7 @@ function Test-RulesList {
         'fetch_registry_keys'   = { FetchRegistryKeys -entry $args[0] }
         'fetch_registry_value'  = { FetchRegistryValue -entry $args[0] -propertyName $args[1] }
         'execute'               = { InvokeRuleCommand -command $args[0] }
+        'execute_success'       = { Test-RuleCommand -command $args[0] }
     }
     
     $failedCount = 0

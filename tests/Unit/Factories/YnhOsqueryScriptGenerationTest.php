@@ -42,8 +42,8 @@ test('monitorLinuxServer contains the app url', function () {
     expect($script)->toContain(app_url());
 });
 
-test('monitorLinuxServer installs the mono-rule OSSEC agent and its daily pilot cron', function () {
-    config(['towerify.ossec.pilot_rule_uid' => 50004]);
+test('monitorLinuxServer installs the OSSEC policy agent and its daily pilot cron', function () {
+    config(['towerify.ossec.pilot_policy_uid' => 'cywise_ossec_unix']);
     $user = User::factory()->create(['performa_domain' => null]);
     $server = YnhServer::factory()->for($user, 'user')->create([
         'platform' => OsqueryPlatformEnum::LINUX,
@@ -52,8 +52,9 @@ test('monitorLinuxServer installs the mono-rule OSSEC agent and its daily pilot 
     $script = YnhOsquery::monitorLinuxServer($server);
 
     expect($script)
-        ->toContain('/opt/cywise/bin/run-ossec-rule 50004')
-        ->toContain("/ossec-agent/{$server->secret}/rules/\$rule_uid")
+        ->toContain('/opt/cywise/bin/run-ossec-rule')
+        ->toContain('cywise_ossec_unix')
+        ->toContain('/ossec-agent/$server_secret/policies/$policy_uid/rules')
         ->toContain('/opt/cywise/lib/Test-OssecRules.ps1')
         ->toContain('apt-get install -y powershell')
         ->not->toContain('{ossec_runner}')

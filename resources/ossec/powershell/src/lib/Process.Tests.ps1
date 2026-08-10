@@ -48,4 +48,29 @@ Describe 'Process library' {
       { InvokeRuleCommand -command $command } | Should -Not -Throw
     }
   }
+
+  Describe "Test-RuleCommand Tests" {
+    BeforeAll {
+      $successCommand = if ($IsWindows) { 'cmd /c exit 0' } else { 'sh -c "exit 0"' }
+      $failureCommand = if ($IsWindows) { 'cmd /c exit 1' } else { 'sh -c "exit 1"' }
+    }
+
+    It "Should return true when a command exits with zero" {
+      Test-RuleCommand -command $successCommand | Should -Be $true
+    }
+
+    It "Should return false when a command exits with a non-zero status" {
+      Test-RuleCommand -command $failureCommand | Should -Be $false
+    }
+
+    It "Should report an unknown command as an evaluation error" {
+      Clear-ExceptionList
+
+      Test-RuleCommand -command "UnknowCommand" | Should -Be $false
+
+      $exceptions = Get-ExceptionList
+      $exceptions.Count | Should -Be 1
+      $exceptions[0].Message | Should -BeLike '*exécution de la commande*'
+    }
+  }
 }

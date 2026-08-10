@@ -85,9 +85,28 @@ function InvokeRuleCommand {
   }
   catch {
     Add-Exception `
-      -Message "Erreur lors de l'exÃ©cution de la commande '$command'." `
+      -Message "Erreur lors de l'exécution de la commande '$command'." `
       -Exception $_.Exception
     return $null
+  }
+}
+
+function Test-RuleCommand {
+  param(
+    [string]$command
+  )
+
+  try {
+    $global:LASTEXITCODE = 0
+    $null = Invoke-Expression -Command "$command 2>&1"
+    $commandSucceeded = $?
+    return $commandSucceeded -and $global:LASTEXITCODE -eq 0
+  }
+  catch {
+    Add-Exception `
+      -Message "Erreur lors de l'exécution de la commande '$command'." `
+      -Exception $_.Exception
+    return $false
   }
 }
 
@@ -111,7 +130,7 @@ function Convert-RegistryKey {
       }
   }
 
-  # Retourner la clÃ© inchangÃ©e si aucun remplacement n'est trouvÃ©
+  # Retourner la clé inchangée si aucun remplacement n'est trouvé
   return $Key
 }
 
@@ -155,7 +174,7 @@ function FetchRegistryValue {
   }
 }
 
-# DÃ©finition des constantes de couleur ANSI
+# Définition des constantes de couleur ANSI
 #$ANSI_BLACK = "`e[30m"
 #$ANSI_RED = "`e[31m"
 $ANSI_GREEN = "`e[32m"
@@ -182,7 +201,7 @@ function Show-RuleResult {
   )
 
   if ($exceptions.Count -gt 0) {
-    Write-Output "${ANSI_BRIGHT_YELLOW}âœ˜ $($rule['rule_name'])${ANSI_RESET}"
+    Write-Output "${ANSI_BRIGHT_YELLOW}✘ $($rule['rule_name'])${ANSI_RESET}"
     foreach ($exception in $exceptions) {
       Write-Output "${ANSI_BRIGHT_YELLOW}$($exception.Message)${ANSI_RESET}"
       Write-Output "$($exception.Exception.Message)"
@@ -190,10 +209,10 @@ function Show-RuleResult {
   }
   else {
     if ($testResult) {
-      Write-Output "${ANSI_GREEN}âœ” $($rule['rule_name'])${ANSI_RESET}"
+      Write-Output "${ANSI_GREEN}✔ $($rule['rule_name'])${ANSI_RESET}"
     }
     else {
-      Write-Output "${ANSI_BRIGHT_RED}âœ˜ $($rule['rule_name'])${ANSI_RESET}"
+      Write-Output "${ANSI_BRIGHT_RED}✘ $($rule['rule_name'])${ANSI_RESET}"
     }
   }
 
@@ -211,7 +230,7 @@ function Show-TestResult {
 
   $TotalCount = $PassedCount + $FailedCount + $ErrorCount
   if ($TotalCount -eq 0) {
-    Write-Output "${ANSI_YELLOW}Aucun test lancÃ©.${ANSI_RESET}"
+    Write-Output "${ANSI_YELLOW}Aucun test lancé.${ANSI_RESET}"
     return
   }
 
@@ -222,7 +241,7 @@ function Show-TestResult {
     $Color = $ANSI_BRIGHT_RED
   }
   elseif ($Percentage -lt 50) {
-    $Level = "MÃ©diocre"
+    $Level = "Médiocre"
     $Color = $ANSI_BRIGHT_MAGENTA
   }
   elseif ($Percentage -lt 75) {
@@ -238,7 +257,7 @@ function Show-TestResult {
     $Color = $ANSI_BRIGHT_GREEN
   }
 
-  Write-Output "Tests ${ANSI_GREEN}rÃ©ussis: $PassedCount, ${ANSI_BRIGHT_RED}Ã©chouÃ©s: $FailedCount, ${ANSI_BRIGHT_YELLOW}erreurs: $ErrorCount${ANSI_RESET}"
+  Write-Output "Tests ${ANSI_GREEN}réussis: $PassedCount, ${ANSI_BRIGHT_RED}échoués: $FailedCount, ${ANSI_BRIGHT_YELLOW}erreurs: $ErrorCount${ANSI_RESET}"
   Write-Output "${Color}Score: $Percentage/100 (${Level})${ANSI_RESET}"
 }
 
@@ -307,7 +326,7 @@ function Match {
     'command' {
       return (@($rule['cmd']) | Where-Object {
           if (-not $rule.ContainsKey('expr') -or $null -eq $rule['expr']) { 
-            return $true
+            return $ctx['execute_success'].Invoke($_)
           }
         ($ctx['execute'].Invoke($_) | Where-Object { MatchExpression $_ $rule['expr'] } | Measure-Object | Select-Object -ExpandProperty Count) -gt 0
         } | Measure-Object | Select-Object -ExpandProperty Count) -gt 0
@@ -355,7 +374,7 @@ function MatchPattern {
     }
     catch {
       Add-Exception `
-        -Message "Erreur: expression rÃ©guliÃ¨re invalide '$pattern'." `
+        -Message "Erreur: expression régulière invalide '$pattern'." `
         -Exception $_.Exception
       $result = $false
     }
@@ -439,6 +458,7 @@ function Test-RulesList {
         'fetch_registry_keys'   = { FetchRegistryKeys -entry $args[0] }
         'fetch_registry_value'  = { FetchRegistryValue -entry $args[0] -propertyName $args[1] }
         'execute'               = { InvokeRuleCommand -command $args[0] }
+        'execute_success'       = { Test-RuleCommand -command $args[0] }
     }
     
     $failedCount = 0

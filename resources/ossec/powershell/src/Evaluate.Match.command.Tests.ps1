@@ -105,11 +105,6 @@ Describe 'Match function' {
         Context 'c:net.exe accounts' {
             BeforeAll {
                 $expectedCommand = 'net.exe accounts'
-                $expectedReturnValue = @(
-                    'Lockout threshold:                                    Never',
-                    'Lockout duration (minutes):                           30',
-                    'Lockout observation window (minutes):                 30'
-                )
                 $rule = @{
                     'match_type' = 'all'
                     'rules'      = @(
@@ -123,14 +118,13 @@ Describe 'Match function' {
                 }
                 # Avoid warning: "The variable 'xxx' is assigned but never used."
                 $expectedCommand | Out-Null
-                $expectedReturnValue | Out-Null
                 $rule | Out-Null
             }
 
-            It 'should return true if no expr to match' {
+            It 'should return true when a command without expression succeeds' {
                 # Arrange
                 $ctx = @{
-                    'execute' = { command_return_expected_value -command $args[0] }
+                    'execute_success' = { $args[0] -eq $expectedCommand }
                 }
       
                 # Act
@@ -140,15 +134,39 @@ Describe 'Match function' {
                 $result | Should -Be $true
             }
 
-            It 'should return true when command result matches' {
+            It 'should return false when a command without expression fails' {
                 # Arrange
                 $ctx = @{
-                    'execute' = { command_return_expected_value -command $args[0] }
+                    'execute_success' = { $false }
                 }
       
                 # Act
                 $result = Evaluate $ctx $rule
       
+                # Assert
+                $result | Should -Be $false
+            }
+
+            It 'should apply negate to the exit status of a command without expression' {
+                # Arrange
+                $ctx = @{
+                    'execute_success' = { $false }
+                }
+                $negatedRule = @{
+                    'match_type' = 'all'
+                    'rules'      = @(
+                        @{
+                            'negate' = $true
+                            'type'   = 'command'
+                            'cmd'    = 'test -x /etc/passwd'
+                            'expr'   = $null
+                        }
+                    )
+                }
+
+                # Act
+                $result = Evaluate $ctx $negatedRule
+
                 # Assert
                 $result | Should -Be $true
             }

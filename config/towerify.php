@@ -25,8 +25,7 @@ return [
         'days_between_scans' => env('DAYS_BETWEEN_SCANS', 5),
     ],
     'ossec' => [
-        // Pilot rule. Set to null to install the runner without scheduling it.
-        'pilot_rule_uid' => env('OSSEC_PILOT_RULE_UID', 50004),
+        'pilot_policy_uid' => env('OSSEC_PILOT_POLICY_UID', 'cywise_ossec_unix'),
     ],
     'cyberbuddy' => [
         'api' => env('CB_API'),
@@ -104,7 +103,7 @@ return [
         'username' => env('CH_USERNAME'),
         'password' => env('CH_PASSWORD'),
         'database' => env('CH_DATABASE'),
-        'client_extra_parameters' => env('CH_CLIENT_EXTRA_PARAMETERS', '--secure')
+        'client_extra_parameters' => env('CH_CLIENT_EXTRA_PARAMETERS', '--secure'),
     ],
     'josianne' => [
         'host' => env('JOSIANNE_HOST'),

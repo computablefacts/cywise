@@ -5,7 +5,7 @@ apt install wget curl jq -y
 # Install the persistent OSSEC evaluation dependency.
 {install_powershell}
 
-# Install the Cywise mono-rule OSSEC runner and evaluator.
+# Install the Cywise OSSEC policy runner and evaluator.
 mkdir -p /opt/cywise/bin /opt/cywise/lib /var/log/cywise
 cat > /opt/cywise/bin/run-ossec-rule <<'CYWISE_OSSEC_RUNNER'
 {ossec_runner}
@@ -170,7 +170,7 @@ cat <(fgrep -i -v 'rm /opt/logalert/log.txt' <(crontab -l)) <(echo '22 2 * * * r
 # Auto-update the server every day at 03:33 am
 cat <(crontab -l | sed '/curl -s https:\/\/.*\/update\/.*| bash/d') <(echo '33 3 * * * curl -s {url}/update/{secret} | bash') | crontab -
 
-# Pilot: execute exactly one Cywise Unix OSSEC rule every day at 04:44 am.
+# Pilot: execute every rule from the configured OSSEC policy every day at 04:44 am.
 {ossec_cron}
 
 # Delete entry that parse web logs every hour

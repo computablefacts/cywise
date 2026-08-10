@@ -2,18 +2,22 @@
 
 use App\Enums\OsqueryPlatformEnum;
 use App\Models\User;
-use App\Models\YnhOssecCheck;
-use App\Models\YnhOssecPolicy;
 use App\Models\YnhOsquery;
 use App\Models\YnhOsqueryRule;
+use App\Models\YnhOssecCheck;
+use App\Models\YnhOssecPolicy;
 use App\Models\YnhServer;
 
-function createUnixOssecRuleForAgentTest(int $uid = 50004): YnhOssecCheck
-{
-    $policy = YnhOssecPolicy::create([
-        'uid' => 'cywise_ossec_unix',
-        'name' => 'Cywise OSSEC Rules for Unix',
-        'description' => 'Cywise OSSEC Rules for Unix',
+function createOssecRuleForAgentTest(
+    int $uid = 50004,
+    string $policyUid = 'cywise_ossec_unix',
+    string $policyName = 'Cywise OSSEC Rules for Unix',
+): YnhOssecCheck {
+    $policy = YnhOssecPolicy::firstOrCreate([
+        'uid' => $policyUid,
+    ], [
+        'name' => $policyName,
+        'description' => $policyName,
         'references' => [],
         'requirements' => [],
     ]);
@@ -21,7 +25,7 @@ function createUnixOssecRuleForAgentTest(int $uid = 50004): YnhOssecCheck
     return YnhOssecCheck::create([
         'ynh_ossec_policy_id' => $policy->id,
         'uid' => $uid,
-        'title' => 'Check owner and permissions for /etc/passwd',
+        'title' => "Check {$uid}",
         'description' => 'Check /etc/passwd.',
         'rationale' => '',
         'impact' => '',
@@ -29,7 +33,7 @@ function createUnixOssecRuleForAgentTest(int $uid = 50004): YnhOssecCheck
         'references' => [],
         'compliance' => [],
         'requirements' => [
-            'rule_name' => 'Check owner and permissions for /etc/passwd',
+            'rule_name' => "Check {$uid}",
             'match_type' => 'all',
             'references' => [],
             'rules' => [[
@@ -49,7 +53,7 @@ test('the Linux agent can fetch exactly one Unix OSSEC rule by uid', function ()
         'secret' => 'agent-secret',
         'platform' => OsqueryPlatformEnum::LINUX,
     ]);
-    $check = createUnixOssecRuleForAgentTest();
+    $check = createOssecRuleForAgentTest();
 
     $response = $this->getJson("/ossec-agent/{$server->secret}/rules/{$check->uid}");
 
@@ -57,8 +61,8 @@ test('the Linux agent can fetch exactly one Unix OSSEC rule by uid', function ()
         ->assertOk()
         ->assertJsonPath('uid', 50004)
         ->assertJsonPath('policy_uid', 'cywise_ossec_unix')
-        ->assertJsonPath('title', 'Check owner and permissions for /etc/passwd')
-        ->assertJsonPath('requirements.rule_name', 'Check owner and permissions for /etc/passwd')
+        ->assertJsonPath('title', 'Check 50004')
+        ->assertJsonPath('requirements.rule_name', 'Check 50004')
         ->assertJsonStructure([
             'uid',
             'policy_uid',
@@ -76,8 +80,92 @@ test('the Linux agent can fetch exactly one Unix OSSEC rule by uid', function ()
     expect($response->json('revision'))->toMatch('/^[a-f0-9]{64}$/');
 });
 
+test('the Linux agent can fetch every rule from an OSSEC policy', function () {
+    $user = User::factory()->create();
+    $server = YnhServer::factory()->for($user, 'user')->create([
+        'secret' => 'agent-secret',
+        'platform' => OsqueryPlatformEnum::LINUX,
+    ]);
+    createOssecRuleForAgentTest(50005);
+    createOssecRuleForAgentTest(50004);
+
+    $response = $this->getJson(
+        "/ossec-agent/{$server->secret}/policies/cywise_ossec_unix/rules",
+    );
+
+    $response
+        ->assertOk()
+        ->assertJsonPath('uid', 'cywise_ossec_unix')
+        ->assertJsonPath('name', 'Cywise OSSEC Rules for Unix')
+        ->assertJsonCount(2, 'rules')
+        ->assertJsonPath('rules.0.uid', 50004)
+        ->assertJsonPath('rules.1.uid', 50005)
+        ->assertJsonPath('rules.0.policy_uid', 'cywise_ossec_unix')
+        ->assertJsonPath('rules.1.policy_uid', 'cywise_ossec_unix')
+        ->assertJsonStructure([
+            'uid',
+            'name',
+            'revision',
+            'rules' => [[
+                'uid',
+                'policy_uid',
+                'title',
+                'revision',
+                'requirements',
+            ]],
+        ]);
+
+    expect($response->json('revision'))->toMatch('/^[a-f0-9]{64}$/');
+});
+
+test('the agent can fetch another OSSEC policy compatible with its platform', function () {
+    $user = User::factory()->create();
+    $server = YnhServer::factory()->for($user, 'user')->create([
+        'secret' => 'centos-agent-secret',
+        'platform' => OsqueryPlatformEnum::CENTOS,
+    ]);
+    createOssecRuleForAgentTest(
+        uid: 60004,
+        policyUid: 'cywise_ossec_centos',
+        policyName: 'Cywise OSSEC Rules for CentOS',
+    );
+
+    $this->getJson(
+        "/ossec-agent/{$server->secret}/policies/cywise_ossec_centos/rules",
+    )
+        ->assertOk()
+        ->assertJsonPath('uid', 'cywise_ossec_centos')
+        ->assertJsonPath('rules.0.uid', 60004);
+});
+
+test('the agent only exposes tenant policies belonging to its server', function () {
+    $serverOwner = User::factory()->create();
+    $server = YnhServer::factory()->for($serverOwner, 'user')->create([
+        'secret' => 'tenant-agent-secret',
+        'platform' => OsqueryPlatformEnum::LINUX,
+    ]);
+    $otherTenantUser = User::factory()->create();
+    $ownPolicyUid = "cywise_{$serverOwner->tenant_id}_linux";
+    $otherPolicyUid = "cywise_{$otherTenantUser->tenant_id}_linux";
+
+    createOssecRuleForAgentTest(70001, $ownPolicyUid, 'Own Linux rules');
+    createOssecRuleForAgentTest(70002, $otherPolicyUid, 'Other tenant Linux rules');
+
+    $this->getJson(
+        "/ossec-agent/{$server->secret}/policies/{$ownPolicyUid}/rules",
+    )
+        ->assertOk()
+        ->assertJsonPath('rules.0.uid', 70001);
+
+    $this->getJson(
+        "/ossec-agent/{$server->secret}/policies/{$otherPolicyUid}/rules",
+    )
+        ->assertNotFound()
+        ->assertJsonPath('message', 'Unknown OSSEC policy.');
+});
+
 test('the OSSEC agent endpoint rejects an unknown server secret', function () {
-    createUnixOssecRuleForAgentTest();
+    createOssecRuleForAgentTest();
 
     $this->getJson('/ossec-agent/unknown/rules/50004')
         ->assertNotFound()
@@ -122,10 +210,25 @@ test('the Unix OSSEC endpoint rejects a Windows server', function () {
         'secret' => 'windows-agent-secret',
         'platform' => OsqueryPlatformEnum::WINDOWS,
     ]);
-    createUnixOssecRuleForAgentTest();
+    createOssecRuleForAgentTest();
 
     $this->getJson("/ossec-agent/{$server->secret}/rules/50004")
         ->assertStatus(422);
+});
+
+test('the OSSEC policy endpoint rejects a policy incompatible with the server', function () {
+    $user = User::factory()->create();
+    $server = YnhServer::factory()->for($user, 'user')->create([
+        'secret' => 'windows-agent-secret',
+        'platform' => OsqueryPlatformEnum::WINDOWS,
+    ]);
+    createOssecRuleForAgentTest();
+
+    $this->getJson(
+        "/ossec-agent/{$server->secret}/policies/cywise_ossec_unix/rules",
+    )
+        ->assertStatus(422)
+        ->assertJsonPath('message', 'The server is not compatible with this OSSEC policy.');
 });
 
 test('an OSSEC result is ingested through the existing osquery JSON pipeline', function () {

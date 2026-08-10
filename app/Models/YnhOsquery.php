@@ -173,10 +173,12 @@ class YnhOsquery extends Model
             'secret' => $server->secret,
         ]);
         $ossecEvaluator = file_get_contents(resource_path('ossec/powershell/Test-OssecRules.ps1'));
-        $ossecRuleUid = config('towerify.ossec.pilot_rule_uid');
-        $ossecCron = empty($ossecRuleUid)
+        $ossecPolicyUid = config('towerify.ossec.pilot_policy_uid');
+        $ossecPolicyArgument = escapeshellarg((string) $ossecPolicyUid);
+        $ossecCronLine = "44 4 * * * /opt/cywise/bin/run-ossec-rule {$ossecPolicyArgument} >> /var/log/cywise/ossec-agent.log 2>&1";
+        $ossecCron = empty($ossecPolicyUid)
             ? "crontab -l 2>/dev/null | grep -v '/opt/cywise/bin/run-ossec-rule' | crontab -"
-            : "cat <(crontab -l 2>/dev/null | grep -v '/opt/cywise/bin/run-ossec-rule') <(echo '44 4 * * * /opt/cywise/bin/run-ossec-rule {$ossecRuleUid} >> /var/log/cywise/ossec-agent.log 2>&1') | crontab -";
+            : "cat <(crontab -l 2>/dev/null | grep -v '/opt/cywise/bin/run-ossec-rule') <(printf '%s\\n' ".escapeshellarg($ossecCronLine).') | crontab -';
         $whitelist = collect(config('towerify.adversarymeter.ip_addresses'))
             ->map(fn(string $ip) => "sed -i '/^ignoreip/ { /{$ip}/! s/$/ {$ip}/ }' /etc/fail2ban/jail.conf")
             ->join("\n");

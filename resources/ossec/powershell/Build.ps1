@@ -1,4 +1,4 @@
-$sourceScript = Get-Content -Path '.\src\Test-OssecRules.ps1' -Raw
+$sourceScript = Get-Content -Path '.\src\Test-OssecRules.ps1' -Raw -Encoding utf8
 $outputPath = '.\build\Test-OssecRules.ps1'
 $utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
 
@@ -6,7 +6,7 @@ $pattern = '^\. "\$PSScriptRoot/(.+)"$'
 $scriptParts = $sourceScript -split '\r?\n' | ForEach-Object {
     if ($_ -match $pattern) {
         $importPath = Join-Path './src' $Matches[1]
-        (Get-Content $importPath -Raw) -replace "`r`n", "`n"
+        (Get-Content $importPath -Raw -Encoding utf8) -replace "`r`n", "`n"
     } else {
         $_
     }

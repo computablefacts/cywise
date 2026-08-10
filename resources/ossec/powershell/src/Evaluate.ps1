@@ -63,7 +63,7 @@ function Match {
     'command' {
       return (@($rule['cmd']) | Where-Object {
           if (-not $rule.ContainsKey('expr') -or $null -eq $rule['expr']) { 
-            return $true
+            return $ctx['execute_success'].Invoke($_)
           }
         ($ctx['execute'].Invoke($_) | Where-Object { MatchExpression $_ $rule['expr'] } | Measure-Object | Select-Object -ExpandProperty Count) -gt 0
         } | Measure-Object | Select-Object -ExpandProperty Count) -gt 0
