@@ -333,7 +333,7 @@
   "Would you like to protect a new server?": "Vous souhaitez protéger un nouveau serveur ?",
   "Would you like to redirect one of your domains to this honeypot? Contact support!": "Vous souhaitez rediriger un de vos domaines vers ce honeypot ? Contactez le support !",
   "Yearly": "Annuellement",
-  "Your 5 most critical indicators of compromise (IoCs) to investigate!": "Vos 5 indicateurs de compromission (IoCs) les plus critiques à investiguer !",
+  "Your 5 most critical events to investigate!": "Vos 5 événements les plus critiques à investiguer !",
   "Your 5 most critical vulnerabilities to fix!": "Vos 5 vulnérabilités les plus critiques à corriger !",
   "Your last 10 leaks discovered!": "Vos 10 dernières fuites de données découvertes !",
   "all": "toutes",

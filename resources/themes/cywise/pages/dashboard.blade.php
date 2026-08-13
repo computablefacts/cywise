@@ -300,7 +300,7 @@ render(function (Request $request) {
         <div class="card">
           <div class="card-body">
             <h6 class="card-title">
-              {!! __('Your 5 most critical indicators of compromise (IoCs) to investigate!') !!}
+              {!! __('Your 5 most critical events to investigate!') !!}
             </h6>
             @if(count($investigate) <= 0)
             <div class="card-text">
