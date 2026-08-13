@@ -351,6 +351,7 @@ render(function (Request $request) {
                 <tr>
                   <th style="color:var(--bs-body-color); width: 120px;">{{ __('Report Date') }}</th>
                   <th>{{ __('Title') }}</th>
+                  <th style="width: 100px;" class="text-end">{{ __('Events') }}</th>
                   <th style="width: 100px;" class="text-end">{{ __('Activity') }}</th>
                 </tr>
                 </thead>
@@ -362,6 +363,15 @@ render(function (Request $request) {
                     <a href="{{ $report->link() }}" target="_blank" class="link">
                       {{ $report->title }}
                     </a>
+                  </td>
+                  <td class="text-end">
+                    @php
+                        $eventsCount = '-';
+                        if (preg_match('/Evènements\s*\((\d+)\)/u', $report->body, $matches)) {
+                            $eventsCount = $matches[1];
+                        }
+                    @endphp
+                    {{ $eventsCount }}
                   </td>
                   <td class="text-end">
                     @php
