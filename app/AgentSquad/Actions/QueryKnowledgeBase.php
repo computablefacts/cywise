@@ -265,8 +265,9 @@ class QueryKnowledgeBase extends AbstractAction
     private function enhanceWithSources(string $answer): string
     {
         $matches = [];
-        // Remove [[Memo ...]]
+        // Remove [[Memo ...]], [[A...]], [[R...]]
         $answer = preg_replace('/\[\[Memo\s+.*?]]/i', '', $answer);
+        $answer = preg_replace('/\s*\[\[[AR]\d+]]/i', '', $answer);
         // Replace [[Note 1234]] by [[1234]]
         $answer = preg_replace('/\[\[Note\s+/i', '[[', $answer);
         // Extract: [12] from [[12]] or [[12] and [13]] from [[12],[13]]
