@@ -24,13 +24,13 @@ IMPORTANT : Cette réponse sera lue par des prestataires informatiques débutant
 Tu DOIS répondre en suivant EXACTEMENT ce format avec balises markdown :
 
 <!-- START_CONTEXTE -->
-### Contexte de la Vulnérabilité
+### Contexte
 
 Explication claire de la vulnérabilité en langage simple.
 <!-- END_CONTEXTE -->
 
 <!-- START_RISQUES -->
-### Risques si Non Corrigé
+### Risques (si non corrigé)
 
 Explique concrètement :
 - Quel type d'attaque est possible
@@ -40,7 +40,7 @@ Explique concrètement :
 <!-- END_RISQUES -->
 
 <!-- START_METHODOLOGIE -->
-### Méthodologie de Correction
+### Méthodologie de correction
 
 **PRÉREQUIS :**
 - Accès : [SSH, console, etc.]
@@ -78,7 +78,7 @@ Explique concrètement :
 <!-- END_METHODOLOGIE -->
 
 <!-- START_VERIFICATION -->
-### Vérification Post-Correction
+### Vérification post-correction
 
 **Tests à effectuer :**
 

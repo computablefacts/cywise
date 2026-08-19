@@ -12,7 +12,7 @@ MÉTHODOLOGIE À AUTOMATISER :
 
 RÈGLES DU SCRIPT BASH :
 1. Le script doit commencer par `#!/bin/bash` et `set -e`.
-2. Tu DOIS AUTOMATISER les étapes de la section "Méthodologie de Correction" (Backup, Update, Verification).
+2. Tu DOIS AUTOMATISER les étapes de la section "Méthodologie de correction" (Backup, Update, Verification).
 3. Ne propose PAS de solutions de contournement (ex: règles Nginx pour bloquer une URL) si la méthodologie recommande une mise à jour logicielle, SAUF si l'automatisation de la mise à jour est techniquement impossible par script.
 4. Pour CHAQUE commande critique ou potentiellement destructrice (suppression de fichier, mise à jour, redémarrage de service, modification de configuration), tu DOIS demander une confirmation à l'utilisateur.
    Exemple : `read -p "Voulez-vous vraiment appliquer cette action ? [y/N] " response; if [[ ! $response =~ ^[Yy]$ ]]; then exit 1; fi`
