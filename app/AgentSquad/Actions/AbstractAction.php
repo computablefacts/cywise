@@ -48,7 +48,7 @@ abstract class AbstractAction
             $answer = unserialize(Cache::get($key));
         } else {
             $answer = $this->execute2($user, $threadId, $messages, $input);
-            if ($this->isCacheEnabled()) {
+            if ($this->isCacheEnabled() && !$answer->failure()) {
                 Cache::put($key, serialize($answer), now()->addDays(7));
             }
         }
