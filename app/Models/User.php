@@ -266,12 +266,7 @@ class User extends WaveUser
             Log::debug("[{$this->email}] Updating user's prompts...");
 
             // Cleanup
-            $this->dropPrompt('default_assistant');
-            $this->dropPrompt('default_chat');
-            $this->dropPrompt('default_chat_history');
-            $this->dropPrompt('default_debugger');
-            $this->dropPrompt('default_soc_operator_daily');
-            $this->dropPrompt('default_soc_operator_weekly');
+            //
 
             // Default prompts
             $this->setupPrompts('default_answer_question', 'seeders/prompts/default_answer_question.txt');
