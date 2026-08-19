@@ -51,6 +51,11 @@ class QueryKnowledgeBase extends AbstractAction
         //
     }
 
+    public function isCacheEnabled(): bool
+    {
+        return true;
+    }
+
     protected function execute2(User $user, string $threadId, array $messages, string $input): AbstractAnswer
     {
         // Extract collection (if any)
