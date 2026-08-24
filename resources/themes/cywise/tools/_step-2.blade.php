@@ -2,14 +2,27 @@
 
   .terms {
     margin-bottom: var(--spacing-large);
-    text-align: left;
     accent-color: var(--color-cywise);
     display: flex;
     align-items: center;
   }
 
-  .terms label {
-    margin-left: var(--spacing-medium);
+  .terms input[type="checkbox"] {
+    margin-right: var(--spacing-medium);
+  }
+
+  .select-all {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: var(--spacing-medium);
+    padding: var(--spacing-medium);
+    font-weight: bold;
+    text-align: right;
+  }
+
+  .select-all label {
+    margin-right: var(--spacing-medium);
   }
 
 </style>
@@ -21,6 +34,10 @@
     <!-- FILLED DYNAMICALLY -->
   </p>
   <p>Ne vous inquiétez pas, <b>l'audit est non intrusif et sans impact sur vos serveurs.</b></p>
+  <div class="select-all">
+    <label for="select-all" id="select-all-label">Tout désélectionner</label>
+    <input type="checkbox" id="select-all" checked>
+  </div>
   <div class="list">
     <!-- FILLED DYNAMICALLY -->
   </div>
@@ -102,20 +119,38 @@
 
     // Set the list of domains
     const elDomains = document.querySelector('.list');
+    const elSelectAll = document.querySelector('#select-all');
+
     domains.sort().forEach((domain, idx) => {
 
       const elDomain = document.createElement('div');
       elDomain.classList.add('list-item');
       elDomain.innerHTML = `
         <input type="checkbox" name="d-${idx}" value="${domain}" checked>
-        <label for="d1-${idx}">${domain}</label>
+        <label for="d-${idx}">${domain}</label>
       `;
       elDomains.appendChild(elDomain);
     });
 
+    // Handle select all checkbox
+    elSelectAll.addEventListener('change', () => {
+      document.querySelectorAll('input[type="checkbox"][name^="d-"]').forEach(el => {
+        el.checked = elSelectAll.checked;
+      });
+      document.querySelector('#select-all-label').innerText = elSelectAll.checked ? "Tout désélectionner" : "Tout sélectionner";
+      toggleButtons();
+    });
+
     // Capture the change event
-    document.querySelectorAll('input[type="checkbox"][name^="d-"]:checked').forEach(
-      el => el.addEventListener('change', toggleButtons));
+    document.querySelectorAll('input[type="checkbox"][name^="d-"]').forEach(
+      el => el.addEventListener('change', () => {
+        const total = document.querySelectorAll('input[type="checkbox"][name^="d-"]').length;
+        const checked = document.querySelectorAll('input[type="checkbox"][name^="d-"]:checked').length;
+        elSelectAll.checked = (total === checked);
+        elSelectAll.indeterminate = (checked > 0 && checked < total);
+        document.querySelector('#select-all-label').innerText = (total === checked) ? "Tout désélectionner" : "Tout sélectionner";
+        toggleButtons();
+      }));
 
     // Hide the loader
     const elLoader = document.querySelector('.loader-container');

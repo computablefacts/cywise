@@ -153,7 +153,6 @@
     .list-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       padding: var(--spacing-medium);
       border: 2px solid var(--color-secondary);
       margin-bottom: var(--spacing-medium);
@@ -162,7 +161,6 @@
 
     .list-item input[type="checkbox"] {
       margin-right: var(--spacing-medium);
-      accent-color: var(--color-cywise);
     }
 
     .list-item label {
