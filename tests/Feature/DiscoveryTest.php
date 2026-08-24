@@ -29,8 +29,8 @@ class DiscoveryTest extends TestCaseWithDb
         $response = $this->post(route('tools.discovery'), ['hash' => $hash]);
         $response->assertStatus(200);
         $this->assertEquals(['www.example.com'], $response->json());
-        $this->assertTrue(Cache::has("cybercheck:discovery:{$hash}"));
-        $this->assertEquals(['www.example.com'], Cache::get("discovery_{$hash}"));
+        $this->assertTrue(Cache::has("cybercheck:discovery:example.com"));
+        $this->assertEquals(['www.example.com'], Cache::get("cybercheck:discovery:example.com"));
     }
 
     public function test_discovery_uses_cache_when_valid()
@@ -41,7 +41,7 @@ class DiscoveryTest extends TestCaseWithDb
             'domain' => 'example.com',
         ]);
 
-        Cache::put("cybercheck:discovery:{$hash}", ['cached.example.com'], now()->addDay());
+        Cache::put("cybercheck:discovery:example.com", ['cached.example.com'], now()->addDay());
 
         ApiUtils::shouldReceive('discover_public')->never();
 
@@ -67,5 +67,28 @@ class DiscoveryTest extends TestCaseWithDb
         $this->post(route('tools.discovery'), ['hash' => $hash]);
         $trial->refresh();
         $this->assertEquals(['user.selected.com'], $trial->subdomains);
+    }
+
+    public function test_discovery_uses_correct_root_domain_for_complex_tlds()
+    {
+        $hash = Str::random(128);
+        $domain = 'sub.example.co.uk';
+        $rootDomain = 'example.co.uk';
+
+        Trial::create([
+            'hash' => $hash,
+            'domain' => $domain,
+        ]);
+
+        ApiUtils::shouldReceive('discover_public')
+            ->once()
+            ->with($domain)
+            ->andReturn(['subdomains' => ['www.example.co.uk']]);
+
+        $response = $this->post(route('tools.discovery'), ['hash' => $hash]);
+        $response->assertStatus(200);
+
+        $this->assertTrue(Cache::has("cybercheck:discovery:{$rootDomain}"));
+        $this->assertFalse(Cache::has("cybercheck:discovery:co.uk"));
     }
 }

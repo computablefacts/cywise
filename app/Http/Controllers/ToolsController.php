@@ -170,7 +170,17 @@ class ToolsController extends Controller
         /** @var Trial $trial */
         $trial = Trial::where('hash', $hash)->firstOrFail();
 
-        return Cache::remember("cybercheck:discovery:{$hash}", now()->addDay(), function () use ($trial, $request) {
+        // Extract root domain from trial domain (e.g. jenkins.cywise.io -> cywise.io)
+        $domainParts = explode('.', $trial->domain);
+        $count = count($domainParts);
+
+        // Handle TLDs like .co.uk, .com.au, etc.
+        if ($count >= 3 && in_array($domainParts[$count - 2], ['co', 'com', 'org', 'net', 'gov', 'edu', 'ac'])) {
+            $rootDomain = implode('.', array_slice($domainParts, -3));
+        } else {
+            $rootDomain = implode('.', array_slice($domainParts, -2));
+        }
+        return Cache::remember("cybercheck:discovery:{$rootDomain}", now()->addDay(), function () use ($trial, $request) {
             $request->replace(['domain' => $trial->domain]);
             return (new AssetsProcedure())->discover(JsonRpcRequest::createFrom($request))['subdomains'];
         });
