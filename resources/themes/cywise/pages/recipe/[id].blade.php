@@ -14,15 +14,11 @@ new class extends Component {
   #[Computed]
   public function recipe(): string
   {
-    $alert = \App\Models\Alert::select('am_alerts.*')
-        ->join('am_ports', 'am_ports.id', '=', 'am_alerts.port_id')
-        ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
-        ->join('am_assets', 'am_assets.id', '=', 'am_scans.asset_id')
-        ->join('users', 'users.id', '=', 'am_assets.created_by')
-        ->where('am_alerts.id', $this->id)
-        ->where('users.tenant_id', auth()->user()->tenant_id)
-        ->first();
-    return (new Parsedown)->text($alert?->ai_remediation ?? __('There is no remediation information available for this alert.'));
+    $alert = \App\Models\Alert::find($this->id);
+    if ($alert && $alert->asset()) {
+        return (new Parsedown)->text($alert->ai_remediation ?? __('There is no remediation information available for this alert.'));
+    }
+    return (new Parsedown)->text(__('There is no remediation information available for this alert.'));
   }
 }
 
