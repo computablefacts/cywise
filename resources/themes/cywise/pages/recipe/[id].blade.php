@@ -16,9 +16,30 @@ new class extends Component {
   {
     $alert = \App\Models\Alert::find($this->id);
     if ($alert && $alert->asset()) {
-        return (new Parsedown)->text($alert->ai_remediation ?? __('There is no remediation information available for this alert.'));
+      return (new Parsedown)->text($alert->remediationText() ?: __('There is no remediation information available for this alert.'));
     }
     return (new Parsedown)->text(__('There is no remediation information available for this alert.'));
+  }
+
+  #[Computed]
+  public function script(): ?string
+  {
+    $alert = \App\Models\Alert::find($this->id);
+    if ($alert && $alert->asset()) {
+      return $alert->remediationScript();
+    }
+    return null;
+  }
+
+  public function downloadScript()
+  {
+    $script = $this->script;
+    if (!$script) {
+      return;
+    }
+    return response()->streamDownload(function () use ($script) {
+      echo $script;
+    }, 'remediation.sh');
   }
 }
 
@@ -38,6 +59,14 @@ new class extends Component {
             <div class="mt-3">
               <div class="d-flex flex-column align-items-start gap-3 flex-lg-row gap-lg-4">
                 <div>
+                  @if($this->script)
+                  <div class="mt-3">
+                    <x-elements.button wire:click="downloadScript" class="btn btn-primary w-full">
+                      {{ __('Download remediation script') }}
+                    </x-elements.button>
+                  </div>
+                  <hr class="mt-6">
+                  @endif
                   <div class="mt-2 text-muted">
                     {!! $this->recipe !!}
                   </div>

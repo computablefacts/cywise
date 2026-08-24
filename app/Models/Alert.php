@@ -117,4 +117,47 @@ class Alert extends Model
     {
         return $this->level === 'High (unverified)';
     }
+
+    /**
+     * Get the remediation text before the bash script section.
+     * @deprecated Fix code in `EndVulnsScanListener.php`
+     */
+    public function remediationText(): string
+    {
+        $content = $this->ai_remediation ?? '';
+        $marker = '/Script de remédiation \(BASH\)/iu';
+
+        if (preg_match($marker, $content)) {
+            $content = trim(preg_split($marker, $content)[0]);
+        }
+        if (Str::contains($content, '#')) {
+            $parts = explode('#', $content, 2);
+            $content = '#' . $parts[1];
+        }
+        return Str::trim($content);
+    }
+
+    /**
+     * Extract the bash script from the remediation content.
+     * @deprecated Fix code in `EndVulnsScanListener.php`
+     */
+    public function remediationScript(): ?string
+    {
+        $content = $this->ai_remediation ?? '';
+        $marker = '/Script de remédiation \(BASH\)/iu';
+
+        if (!preg_match($marker, $content)) {
+            return null;
+        }
+
+        $afterMarker = preg_split($marker, $content)[1];
+
+        if (preg_match('/```bash\n(.*?)\n```/s', $afterMarker, $matches)) {
+            return $matches[1];
+        }
+        if (preg_match('/```\n(.*?)\n```/s', $afterMarker, $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
 }
