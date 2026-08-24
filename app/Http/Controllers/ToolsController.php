@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Notifications\HoneypotRequestedNotification;
 use App\Notifications\Notifiables\FreshdeskNotifiable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -168,8 +169,10 @@ class ToolsController extends Controller
         // Load trial (if any)
         /** @var Trial $trial */
         $trial = Trial::where('hash', $hash)->firstOrFail();
-        $request->replace(['domain' => $trial->domain]);
 
-        return (new AssetsProcedure())->discover(JsonRpcRequest::createFrom($request))['subdomains'];
+        return Cache::remember("cybercheck:discovery:{$hash}", now()->addDay(), function () use ($trial, $request) {
+            $request->replace(['domain' => $trial->domain]);
+            return (new AssetsProcedure())->discover(JsonRpcRequest::createFrom($request))['subdomains'];
+        });
     }
 }
