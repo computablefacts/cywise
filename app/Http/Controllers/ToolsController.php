@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Notifications\HoneypotRequestedNotification;
 use App\Notifications\Notifiables\FreshdeskNotifiable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -168,8 +169,20 @@ class ToolsController extends Controller
         // Load trial (if any)
         /** @var Trial $trial */
         $trial = Trial::where('hash', $hash)->firstOrFail();
-        $request->replace(['domain' => $trial->domain]);
 
-        return (new AssetsProcedure())->discover(JsonRpcRequest::createFrom($request))['subdomains'];
+        // Extract root domain from trial domain (e.g. jenkins.cywise.io -> cywise.io)
+        $domainParts = explode('.', $trial->domain);
+        $count = count($domainParts);
+
+        // Handle TLDs like .co.uk, .com.au, etc.
+        if ($count >= 3 && in_array($domainParts[$count - 2], ['co', 'com', 'org', 'net', 'gov', 'edu', 'ac'])) {
+            $rootDomain = implode('.', array_slice($domainParts, -3));
+        } else {
+            $rootDomain = implode('.', array_slice($domainParts, -2));
+        }
+        return Cache::remember("cybercheck:discovery:{$rootDomain}", now()->addDay(), function () use ($trial, $request) {
+            $request->replace(['domain' => $trial->domain]);
+            return (new AssetsProcedure())->discover(JsonRpcRequest::createFrom($request))['subdomains'];
+        });
     }
 }

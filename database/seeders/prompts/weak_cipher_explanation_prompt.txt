@@ -47,7 +47,7 @@ IMPORTANT : Un script bash automatisé existe déjà dans `scripts/fix_weak_ciph
 Tu DOIS répondre en suivant EXACTEMENT ce format MARKDOWN avec balises de commentaire:
 
 <!-- START_CONTEXTE -->
-### Contexte de la Vulnérabilité
+### Contexte
 
 **Service exposé:** {technology} sur {domain}:{port}  
 **Type de risque:** {type}  
@@ -56,7 +56,7 @@ Tu DOIS répondre en suivant EXACTEMENT ce format MARKDOWN avec balises de comme
 <!-- END_CONTEXTE -->
 
 <!-- START_RISQUES -->
-### Risques si Non Corrigé
+### Risques (si non corrigé)
 
 **Vulnérabilités associées aux ciphers faibles:**
 - **SSLv2/SSLv3** : Vulnérable à POODLE, DROWN
@@ -78,7 +78,7 @@ Les ciphers faibles sont interdits par PCI-DSS 3.2+, HIPAA, et les recommandatio
 <!-- END_RISQUES -->
 
 <!-- START_METHODOLOGIE -->
-### Méthodologie de Correction
+### Méthodologie de correction
 
 **Script automatisé disponible :**
 Un script bash complet `fix_weak_ciphers.bash` est disponible et gère automatiquement la correction pour Apache, Nginx, SSH et HAProxy.
@@ -137,7 +137,7 @@ KexAlgorithms curve25519-sha256,diffie-hellman-group16-sha512
 <!-- END_METHODOLOGIE -->
 
 <!-- START_VERIFICATION -->
-### Vérification Post-Correction
+### Vérification post-correction
 
 **Tests à effectuer:**
 

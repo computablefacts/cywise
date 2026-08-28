@@ -145,6 +145,15 @@ class TextAssistant
 
             Log::error($response->body());
 
+            if (isset($response->json()['error']['message'])) {
+                return [
+                    'choices' => [[
+                        'message' => [
+                            'content' => $response->json()['error']['message'],
+                        ],
+                    ]]
+                ];
+            }
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }

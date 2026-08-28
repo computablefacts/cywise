@@ -2,12 +2,10 @@
 
 namespace App\Http\Procedures;
 
-use App\AgentSquad\Actions\LabourLawyerConclusionsWriter;
 use App\AgentSquad\ActionsRegistry;
 use App\AgentSquad\Answers\FailedAnswer;
 use App\AgentSquad\Assistants\TextAssistant;
 use App\AgentSquad\Orchestrator;
-use App\AgentSquad\Vectors\FileVectorStore;
 use App\Enums\RoleEnum;
 use App\Http\Requests\JsonRpcRequest;
 use App\Jobs\ProcessIncomingEmails;
@@ -75,10 +73,6 @@ class CyberBuddyProcedure extends Procedure
                 foreach ($actions as $name => $action) { // Register agents based on admin configuration
                     $orchestrator->registerAgent($action);
                 }
-            }
-            if ($user->isCywiseAdmin()) { // TODO : move to the registry
-                $output = FileVectorStore::unpack("labour_lawyer." . config('app.env') . ".zip.enc");
-                $orchestrator->registerAgent(new LabourLawyerConclusionsWriter($output));
             }
 
             $answer = $orchestrator->run($user, $threadId, $messages, $question);

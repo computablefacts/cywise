@@ -9,46 +9,75 @@ name('recipe');
 
 new class extends Component {
 
-    public $id;
+  public $id;
 
-    #[Computed]
-    public function recipe(): string
-    {
-        $alert = \App\Models\Alert::select('am_alerts.*')
-                ->join('am_ports', 'am_ports.id', '=', 'am_alerts.port_id')
-                ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
-                ->join('am_assets', 'am_assets.id', '=', 'am_scans.asset_id')
-                ->join('users', 'users.id', '=', 'am_assets.created_by')
-                ->where('am_alerts.id', $this->id)
-                ->where('users.tenant_id', auth()->user()->tenant_id)
-                ->first();
-        return (new Parsedown)->text($alert?->ai_remediation ?? __('There is no remediation information available for this alert.'));
+  #[Computed]
+  public function recipe(): string
+  {
+    $alert = \App\Models\Alert::find($this->id);
+    if ($alert && $alert->asset()) {
+      return (new Parsedown)->text($alert->remediationText() ?: __('There is no remediation information available for this alert.'));
     }
+    return (new Parsedown)->text(__('There is no remediation information available for this alert.'));
+  }
+
+  #[Computed]
+  public function script(): ?string
+  {
+    $alert = \App\Models\Alert::find($this->id);
+    if ($alert && $alert->asset()) {
+      return $alert->remediationScript();
+    }
+    return null;
+  }
+
+  public function downloadScript()
+  {
+    $script = $this->script;
+    if (!$script) {
+      return;
+    }
+    return response()->streamDownload(function () use ($script) {
+      echo $script;
+    }, 'remediation.sh');
+  }
 }
 
 ?>
 
-<x-dynamic-component component="layouts.app" :title="__('AI-generated remediation recipe')">
-    @volt('recipe')
-    <x-app.container>
+<x-dynamic-component component="layouts.app" :title="__('Remediation recipe')">
+  @volt('recipe')
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
         <div class="card mt-3">
-            <div class="card-body p-4">
+          <div class="card-body p-4">
             <x-app.heading
-                    title="{!! __('AI-generated remediation recipe') !!}"
-                    description=""
+                title="{!! __('Remediation recipe') !!}"
+                description=""
             />
             <div class="mt-3">
-                <div class="d-flex flex-column align-items-start gap-3 flex-lg-row gap-lg-4">
-                    <div>
-                        <div class="mt-2 text-muted">
-                            {!! $this->recipe !!}
-                        </div>
-                    </div>
+              <div class="d-flex flex-column align-items-start gap-3 flex-lg-row gap-lg-4">
+                <div>
+                  @if($this->script)
+                  <div class="mt-3">
+                    <x-elements.button wire:click="downloadScript" class="btn btn-primary w-full">
+                      {{ __('Download remediation script') }}
+                    </x-elements.button>
+                  </div>
+                  <hr class="mt-6">
+                  @endif
+                  <div class="mt-2 text-muted">
+                    {!! $this->recipe !!}
+                  </div>
                 </div>
+              </div>
             </div>
-            </div>
+          </div>
         </div>
-    </x-app.container>
-    @endvolt
+      </div>
+    </div>
+  </div>
+  @endvolt
 </x-dynamic-component>
 

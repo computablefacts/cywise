@@ -195,10 +195,16 @@ class SendAuditReportListener extends AbstractListener
     {
         Log::debug("Building summary for user {$user->email}...");
 
-        $nbNewAssets = Asset::where('created_at', '>=', Carbon::now()->startOfDay()->subWeek())
+        $nbNewAssetsFound = Asset::where('created_at', '>=', Carbon::now()->startOfDay()->subWeek())
             ->count();
 
-        Log::debug("{$nbNewAssets} new assets found for user {$user->email}");
+        Log::debug("{$nbNewAssetsFound} new assets found for user {$user->email}");
+
+        $nbNewAssetsMonitored = Asset::where('created_at', '>=', Carbon::now()->startOfDay()->subWeek())
+            ->where('is_monitored', true)
+            ->count();
+
+        Log::debug("{$nbNewAssetsMonitored} new assets monitored for user {$user->email}");
 
         $nbLeaks = $this->fetchLeaks($user)->unique()->count();
 
@@ -253,7 +259,7 @@ class SendAuditReportListener extends AbstractListener
         $cloudflareSection = '';
 
         if ($noIpAssets->isNotEmpty()) {
-            $noIpSection = "<li>J'ai découvert <b>{$noIpAssets->count()}</b> domaines sans adresse IP :<ul>";
+            $noIpSection = "<li>J'ai découvert <b>{$noIpAssets->count()}</b> domaines sans adresse IP (ils pourraient être supprimés) :<ul>";
             $noIpSection .= $noIpAssets->map(fn(string $asset) => "<li>{$asset}</li>")->join('');
             $noIpSection .= '</ul></li>';
         }
@@ -264,10 +270,16 @@ class SendAuditReportListener extends AbstractListener
             $cloudflareSection .= '</ul></li>';
         }
 
-        $newAssets = match ($nbNewAssets) {
+        $newAssetsFound = match ($nbNewAssetsFound) {
             0 => '',
-            1 => "<li>J'ai mis sous surveillance <b>{$nbNewAssets}</b> nouvel actif.</li>",
-            default => "<li>J'ai mis sous surveillance <b>{$nbNewAssets}</b> nouveaux actifs.</li>",
+            1 => "<li>J'ai découvert <b>{$nbNewAssetsFound}</b> nouvel actif.</li>",
+            default => "<li>J'ai découvert <b>{$nbNewAssetsFound}</b> nouveaux actifs.</li>",
+        };
+
+        $newAssetsMonitored = match ($nbNewAssetsMonitored) {
+            0 => '',
+            1 => "<li>J'ai mis sous surveillance <b>{$nbNewAssetsMonitored}</b> nouvel actif.</li>",
+            default => "<li>J'ai mis sous surveillance <b>{$nbNewAssetsMonitored}</b> nouveaux actifs.</li>",
         };
 
         $leaks = match ($nbLeaks) {
@@ -310,7 +322,8 @@ class SendAuditReportListener extends AbstractListener
         return "
             <p>Voici un résumé des résultats de l'audit :</p>
             <ul>
-              {$newAssets}
+              {$newAssetsFound}
+              {$newAssetsMonitored}
               {$perimeter}
               {$vulns}
               {$noIpSection}

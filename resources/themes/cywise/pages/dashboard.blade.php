@@ -300,7 +300,7 @@ render(function (Request $request) {
         <div class="card">
           <div class="card-body">
             <h6 class="card-title">
-              {!! __('Your 5 most critical indicators of compromise (IoCs) to investigate!') !!}
+              {!! __('Your 5 most critical events to investigate!') !!}
             </h6>
             @if(count($investigate) <= 0)
             <div class="card-text">
@@ -336,6 +336,78 @@ render(function (Request $request) {
       </div>
     </div>
     <!-- CYBERTODO : END -->
+    <!-- SOC OPERATOR : BEGIN -->
+    @if(count($reports) > 0)
+    <div class="row pt-3">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">
+              {!! __('SOC operator reports') !!}
+            </h6>
+            <div class="card-text">
+              <table class="table table-sm mb-0">
+                <thead>
+                <tr>
+                  <th style="color:var(--bs-body-color); width: 120px;">{{ __('Report Date') }}</th>
+                  <th>{{ __('Title') }}</th>
+                  <th style="width: 100px;" class="text-end">{{ __('Events') }}</th>
+                  <th style="width: 100px;" class="text-end">{{ __('Activity') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($reports as $report)
+                <tr>
+                  <td style="color:var(--bs-body-color);">{{ $report->created_at?->format('Y-m-d') }}</td>
+                  <td>
+                    <a href="{{ $report->link() }}" target="_blank" class="link">
+                      {{ $report->title }}
+                    </a>
+                  </td>
+                  <td class="text-end">
+                    @php
+                        $eventsCount = '-';
+                        if (preg_match('/Evènements\s*\((\d+)\)/u', $report->body, $matches)) {
+                            $eventsCount = $matches[1];
+                        }
+                    @endphp
+                    {{ $eventsCount }}
+                  </td>
+                  <td class="text-end">
+                    @php
+                        $activity = 'UNKNOWN';
+                        if (preg_match('/Activité\s*(?:<[^>]+>)*\s*:\s*(?:<[^>]+>)*\s*([^\s<]+)/u', $report->body, $matches)) {
+                            $val = mb_strtolower(trim($matches[1]));
+                            $activity = match($val) {
+                                'normale' => 'NORMAL',
+                                'suspecte' => 'SUSPICIOUS',
+                                'anormale' => 'ANORMAL',
+                                default => 'UNKNOWN',
+                            };
+                        }
+                        $badgeClass = match($activity) {
+                            'NORMAL' => 'bg-green',
+                            'SUSPICIOUS' => 'bg-orange',
+                            'ANORMAL' => 'bg-red',
+                            default => '',
+                        };
+                        $badgeStyle = $activity === 'UNKNOWN' ? 'background-color: var(--c-grey-100); color: var(--bs-body-color);' : '';
+                    @endphp
+                    <span class="badge {{ $badgeClass }} text-lowercase" style="{{ $badgeStyle }}">
+                        {{ __($activity) }}
+                    </span>
+                  </td>
+                </tr>
+                @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    @endif
+    <!-- SOC OPERATOR : END -->
     <!-- LEAKS : BEGIN -->
     @if(count($leaks) > 0)
     <div class="row pt-3">

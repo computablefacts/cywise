@@ -29,7 +29,7 @@ class QueryKnowledgeBase extends AbstractAction
             "type" => "function",
             "function" => [
                 "name" => "query_knowledge_base",
-                "description" => "Retrieve answers by searching the organization's internal knowledge base—including documents such as PDFs, Word files (DOCX) and audio recordings (WAV, MP3) to quickly locate relevant rules, security policies, procedures, or other institutional information. The action's input must use the same language as the user's input: if the user asks their question in French, the input must be in French; if they ask in English, the input must be in English.",
+                "description" => "Retrieve answers by searching the organization's internal knowledge base — including documents such as PDFs, Word files (DOCX) and audio recordings (WAV, MP3) to quickly locate relevant rules, security policies, procedures, or other institutional information. The action's input must use the same language as the user's input: if the user asks their question in French, the input must be in French; if they ask in English, the input must be in English.",
                 "parameters" => [
                     "type" => "object",
                     "properties" => [
@@ -49,6 +49,11 @@ class QueryKnowledgeBase extends AbstractAction
     public function __construct()
     {
         //
+    }
+
+    public function isCacheEnabled(): bool
+    {
+        return true;
     }
 
     protected function execute2(User $user, string $threadId, array $messages, string $input): AbstractAnswer
@@ -160,8 +165,11 @@ class QueryKnowledgeBase extends AbstractAction
                 'QUESTION' => $question,
             ])
             ->text();
+        $answer = Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)));
 
-        return new SuccessfulAnswer($this->enhanceWithSources(Str::trim(Str::replace('I_DONT_KNOW', '', strip_tags($answer)))));
+        return $answer === '' ?
+            new SuccessfulAnswer("Sorry, I could not find an answer in the organization’s internal knowledge base. Use your general capabilities to answer the question.") :
+            new SuccessfulAnswer($this->enhanceWithSources($answer), [], true);
     }
 
     private function loadChunks(User $user, string $questionEn, string $questionFr, array $keywordsEn, array $keywordsFr, ?string $collection = null): array
@@ -262,8 +270,9 @@ class QueryKnowledgeBase extends AbstractAction
     private function enhanceWithSources(string $answer): string
     {
         $matches = [];
-        // Remove [[Memo ...]]
+        // Remove [[Memo ...]], [[A...]], [[R...]]
         $answer = preg_replace('/\[\[Memo\s+.*?]]/i', '', $answer);
+        $answer = preg_replace('/\s*\[\[[AR]\d+]]/i', '', $answer);
         // Replace [[Note 1234]] by [[1234]]
         $answer = preg_replace('/\[\[Note\s+/i', '[[', $answer);
         // Extract: [12] from [[12]] or [[12] and [13]] from [[12],[13]]

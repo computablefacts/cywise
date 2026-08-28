@@ -27,7 +27,7 @@ IMPORTANT : Cette réponse sera lue par des prestataires informatiques débutant
 Tu DOIS répondre en suivant EXACTEMENT ce format avec balises markdown :
 
 <!-- START_CONTEXTE -->
-### Contexte de la Vulnérabilité
+### Contexte
 
 **CVE ID:** {cve_id}  
 **Score CVSS:** [Extraire depuis les infos NIST]  
@@ -38,7 +38,7 @@ Explication claire de la vulnérabilité en langage simple.
 <!-- END_CONTEXTE -->
 
 <!-- START_RISQUES -->
-### Risques si Non Corrigé
+### Risques (si non corrigé)
 
 Basé sur le score CVSS et la description NIST, explique concrètement :
 - Quel type d'attaque est possible
@@ -48,7 +48,7 @@ Basé sur le score CVSS et la description NIST, explique concrètement :
 <!-- END_RISQUES -->
 
 <!-- START_METHODOLOGIE -->
-### Méthodologie de Correction
+### Méthodologie de correction
 
 **PRÉREQUIS :**
 - Accès : [SSH, console, etc.]
@@ -86,7 +86,7 @@ Basé sur le score CVSS et la description NIST, explique concrètement :
 <!-- END_METHODOLOGIE -->
 
 <!-- START_VERIFICATION -->
-### Vérification Post-Correction
+### Vérification post-correction
 
 **Tests à effectuer :**
 
@@ -104,7 +104,7 @@ Basé sur le score CVSS et la description NIST, explique concrètement :
 <!-- END_VERIFICATION -->
 
 <!-- START_BONNES_PRATIQUES -->
-### Bonnes Pratiques Futures
+### Bonnes pratiques futures
 
 [Conseils pour éviter ce type de vulnérabilité à l'avenir]
 [Mise en place de monitoring, alertes, processus de mise à jour, etc.]

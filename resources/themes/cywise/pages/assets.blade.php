@@ -33,7 +33,7 @@ render(function (Request $request) {
                        class="form-control"
                        placeholder="example.com">
               </div>
-              <div class="col-sm-5">
+              <div class="col-sm-3">
                 <label for="tags" class="form-label">
                   {{ __('User tag') }}
                 </label>
@@ -45,6 +45,22 @@ render(function (Request $request) {
                   {{ $tag }}
                   </option>
                   @endforeach
+                </select>
+              </div>
+              <div class="col-sm-2">
+                <label for="monitoring_type" class="form-label">
+                  {{ __('Monitoring Type') }}
+                </label>
+                <select id="monitoring_type" name="monitoring_type" class="form-select">
+                  <option value="">{{ __('All monitoring types') }}</option>
+                  <option value="internal" {{ request(
+                  'monitoring_type') === 'internal' ? 'selected' : '' }}>
+                  {{ __('Internal (Agent)') }}
+                  </option>
+                  <option value="external" {{ request(
+                  'monitoring_type') === 'external' ? 'selected' : '' }}>
+                  {{ __('External (Scanner)') }}
+                  </option>
                 </select>
               </div>
               <div class="col-sm-2">

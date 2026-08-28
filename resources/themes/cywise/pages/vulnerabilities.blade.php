@@ -85,6 +85,7 @@ render(function (Request $request) {
       </div>
     </div>
     @include('theme::iframes.timeline._timeline')
+    @include('theme::iframes.timeline._share-modal')
   </div>
   @include('theme::iframes._scripts')
 </x-layouts.app>

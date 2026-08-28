@@ -33,7 +33,7 @@ Le script sera fourni séparément via un autre endpoint.
 Tu DOIS répondre en suivant EXACTEMENT ce format MARKDOWN avec balises de commentaire:
 
 <!-- START_CONTEXTE -->
-### Contexte de la Vulnérabilité
+### Contexte
 
 **Fichier exposé:** {filename}
 **Serveur:** {technology}
@@ -43,7 +43,7 @@ Tu DOIS répondre en suivant EXACTEMENT ce format MARKDOWN avec balises de comme
 <!-- END_CONTEXTE -->
 
 <!-- START_RISQUES -->
-### Risques si Non Corrigé
+### Risques (si non corrigé)
 
 **Éléments sensibles identifiés:**
 [Analyse précisément {content} pour identifier ce qui est sensible : versions (Node.js, Next.js, etc.), chemins, ou secrets]
@@ -54,7 +54,7 @@ Tu DOIS répondre en suivant EXACTEMENT ce format MARKDOWN avec balises de comme
 <!-- END_RISQUES -->
 
 <!-- START_METHODOLOGIE -->
-### Méthodologie de Correction
+### Méthodologie de correction
 
 **Étapes recommandées:**
 1. [Première étape de correction]
@@ -65,7 +65,7 @@ Tu DOIS répondre en suivant EXACTEMENT ce format MARKDOWN avec balises de comme
 <!-- END_METHODOLOGIE -->
 
 <!-- START_VERIFICATION -->
-### Vérification Post-Correction
+### Vérification post-correction
 
 **Tests à effectuer:**
 1. **Vérifier que le fichier n'existe plus:** Tenter d'accéder à l'URL du fichier exposé

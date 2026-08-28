@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class ChunkAssistant
 {
+    private string $model = 'deepseek-ai/DeepSeek-V4-Flash';
     private string $chunk;
     private int $timeoutInSeconds = 60;
     private LanguageEnum $lang = LanguageEnum::FRENCH;
@@ -57,7 +58,7 @@ class ChunkAssistant
                     'TEXT' => $this->chunk,
                     'LANG' => $lang->value,
                 ])
-                ->withDeepInfraModel('meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo')
+                ->withDeepInfraModel($this->model)
                 ->text();
 
             if ($answer === '') {
