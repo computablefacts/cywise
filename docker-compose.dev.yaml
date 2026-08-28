@@ -35,6 +35,10 @@ x-watch-app-sync: &watch-app-sync
   action: sync
   path: ./app
   target: /var/www/html/app
+x-watch-cywise-website-sync: &watch-cywise-website-sync
+  action: sync
+  path: ./public/cywise/website-v2
+  target: /var/www/html/public/cywise/website-v2
 
 x-common: &common
   image: cywise-ui:local-build
@@ -55,6 +59,7 @@ services:
     develop:
       watch:
         - <<: *watch-app-sync
+        - <<: *watch-cywise-website-sync
         - <<: *watch-dockerfile-rebuild
         - <<: *watch-composer-rebuild
         - <<: *watch-package-rebuild

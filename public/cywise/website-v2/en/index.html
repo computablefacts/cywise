@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Cywise — Cybersecurity for Humans</title>
+<meta content="Redesign conceptuel de Cywise avec FastBootstrap et une direction neo-brutalist." name="description"/>
+<!-- FastBootstrap v2.2.0 -->
+<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/fastbootstrap@2.2.0/dist/css/fastbootstrap.min.css" integrity="sha256-V6lu+OdYNKTKTsVFBuQsyIlDiRWiOmtC8VQ8Lzdm2i4=" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="styles.css?v=20260828-2" rel="stylesheet"/>
+</head>
+<body>
+<header class="site-header sticky-top">
+<nav class="navbar navbar-expand-lg">
+<div class="container-fluid shell">
+<a class="site-brand-lockup" href="#top"><img alt="" class="cw-picto" src="assets/cywise-picto-riso.png"/><span class="cw-wordmark">Cywise</span></a>
+<button aria-controls="mainNav" aria-expanded="false" aria-label="Ouvrir la navigation" class="navbar-toggler brutal-icon" data-bs-target="#mainNav" data-bs-toggle="collapse" type="button">
+<span>☰</span>
+</button>
+<div class="collapse navbar-collapse" id="mainNav">
+<ul class="navbar-nav mx-auto gap-lg-1">
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Solutions</a>
+<ul class="dropdown-menu brutal-menu">
+<li><a class="dropdown-item" href="solutions/attack-surface.html">Attack Surface</a></li>
+<li><a class="dropdown-item" href="solutions/vulnerability-management.html">Vulnerability Management</a></li>
+<li><a class="dropdown-item" href="solutions/credential-monitoring.html">Credential Monitoring</a></li>
+<li><a class="dropdown-item" href="solutions/cyberbuddy.html">CyberBuddy</a></li>
+<li><a class="dropdown-item" href="solutions/pssi.html">PSSI</a></li>
+<li><a class="dropdown-item" href="solutions/pentest.html">Pentest</a></li>
+</ul>
+</li>
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">For Whom</a>
+<ul class="dropdown-menu brutal-menu">
+<li><a class="dropdown-item" href="for-whom/smbs.html">SMBs</a></li>
+<li><a class="dropdown-item" href="for-whom/startups.html">Startups</a></li>
+<li><a class="dropdown-item" href="for-whom/it-teams.html">IT Teams</a></li>
+<li><a class="dropdown-item" href="for-whom/cisos.html">CISOs</a></li>
+<li><a class="dropdown-item" href="for-whom/msps.html">MSPs</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="use-cases/index.html">Use Cases</a></li>
+<li class="nav-item"><a class="nav-link" href="blog/index.html">Blog</a></li>
+<li class="nav-item"><a class="nav-link" href="pricing/index.html">Pricing</a></li>
+</ul>
+<div class="d-flex gap-2 align-items-center header-actions"><div aria-label="Language selector" class="lang-switcher"><a class="lang-option" href="/" lang="fr">FR</a><span class="lang-sep">/</span><a class="lang-option active" href="#" lang="en">EN</a></div>
+<a class="btn btn-ghost-brutal" href="/auth/login">Login</a>
+<a class="btn btn-acid" href="#cta">GET PROTECTED →</a>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<main id="top">
+<section class="hero section-pad">
+<div class="container-fluid shell">
+<div class="row g-5 align-items-center">
+<div class="col-lg-7">
+<div class="eyebrow mono mb-4">CYBERSECURITY FOR HUMANS / 01</div>
+<h1 class="display-monster">
+              YOUR COMPANY<br/>
+              IS ALREADY<br/>
+<span class="marker">A TARGET.</span>
+</h1>
+<p class="hero-lead">
+              Cywise finds your exposed assets, vulnerabilities and leaked credentials
+              before attackers do.
+            </p>
+<div class="d-flex flex-wrap gap-3 mt-4">
+<a class="btn btn-acid btn-lg" href="#cta">START PROTECTING →</a>
+<a class="btn btn-ghost-brutal btn-lg" href="#solutions">EXPLORE CYWISE</a>
+</div>
+<div class="hero-stats row g-0 mt-5">
+<div class="col-6 col-md-4 stat-box">
+<strong>24/7</strong>
+<span>MONITORING</span>
+</div>
+<div class="col-6 col-md-4 stat-box">
+<strong>1K+</strong>
+<span>SERVERS</span>
+</div>
+<div class="col-12 col-md-4 stat-box">
+<strong>170B+</strong>
+<span>CREDENTIALS</span>
+</div>
+</div>
+</div>
+<div class="col-lg-5">
+<div class="dashboard-shell">
+<div class="dash-titlebar">
+<span class="mono">CYWISE / LIVE</span>
+<span class="blink-dot"></span>
+</div>
+<div class="dash-body">
+<div class="d-flex justify-content-between align-items-end mb-4">
+<div>
+<span class="mono small">SECURITY SCORE</span>
+<div class="score">72<span>/100</span></div>
+</div>
+<div class="risk-badge">↑ 12 RISKS</div>
+</div>
+<div class="risk-row">
+<div><span class="risk risk-critical">CRITICAL</span> Exposed admin portal</div>
+<strong>01</strong>
+</div>
+<div class="risk-row">
+<div><span class="risk risk-high">HIGH</span> CVE on public server</div>
+<strong>04</strong>
+</div>
+<div class="risk-row">
+<div><span class="risk risk-medium">MEDIUM</span> TLS configuration</div>
+<strong>07</strong>
+</div>
+<div class="mini-chart mt-4">
+<span style="height:35%"></span>
+<span style="height:55%"></span>
+<span style="height:42%"></span>
+<span style="height:78%"></span>
+<span style="height:62%"></span>
+<span style="height:88%"></span>
+<span style="height:71%"></span>
+</div>
+</div>
+</div>
+<div class="floating-note mono">
+              ATTACKERS SEE IT.<br/>NOW YOU DO TOO. ↗
+            </div>
+</div>
+</div>
+</div>
+</section>
+<section class="manifesto border-y" id="problem">
+<div class="container-fluid shell">
+<div class="row g-0">
+<div class="col-lg-5 manifesto-title">
+<span class="mono">THE PROBLEM / 02</span>
+<h2>SECURITY SHOULD NOT NEED A 50-PERSON TEAM.</h2>
+</div>
+<div class="col-lg-7 manifesto-grid">
+<div class="principle">
+<span class="mono">01 / VISIBILITY</span>
+<h3>KNOW WHAT IS EXPOSED.</h3>
+</div>
+<div class="principle principle-blue">
+<span class="mono">02 / PRIORITY</span>
+<h3>KNOW WHAT MATTERS.</h3>
+</div>
+<div class="principle principle-pink">
+<span class="mono">03 / ACTION</span>
+<h3>KNOW WHAT TO FIX.</h3>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="section-pad" id="solutions">
+<div class="container-fluid shell">
+<div class="section-heading">
+<span class="mono">SOLUTIONS / 03</span>
+<h2>ONE PLATFORM.<br/>MULTIPLE DEFENSES.</h2>
+<p>Simple tools for the security work your company must do every day.</p>
+</div>
+<div class="row g-4 mt-2">
+<div class="col-md-6 col-xl-4">
+<article class="solution-card acid-card">
+<span class="mono">01 / ATTACK SURFACE</span>
+<h3>SEE WHAT ATTACKERS SEE.</h3>
+<p>Monitor public domains, servers, ports and exposed services.</p>
+<a href="#">EXPLORE →</a>
+</article>
+</div>
+<div class="col-md-6 col-xl-4">
+<article class="solution-card">
+<span class="mono">02 / VULNERABILITIES</span>
+<h3>FIND THE WEAK POINTS.</h3>
+<p>Identify vulnerabilities and focus on the most important risks.</p>
+<a href="#">EXPLORE →</a>
+</article>
+</div>
+<div class="col-md-6 col-xl-4">
+<article class="solution-card blue-card">
+<span class="mono">03 / CREDENTIALS</span>
+<h3>KNOW WHAT LEAKED.</h3>
+<p>Detect compromised credentials linked to your company.</p>
+<a href="#">EXPLORE →</a>
+</article>
+</div>
+<div class="col-md-6 col-xl-4">
+<article class="solution-card pink-card">
+<span class="mono">04 / CYBERBUDDY</span>
+<h3>ASK. UNDERSTAND. ACT.</h3>
+<p>Get clear cybersecurity guidance from your company context.</p>
+<a href="#cyberbuddy">EXPLORE →</a>
+</article>
+</div>
+<div class="col-md-6 col-xl-4">
+<article class="solution-card">
+<span class="mono">05 / PSSI</span>
+<h3>BUILD YOUR SECURITY POLICY.</h3>
+<p>Create a practical security policy for your organization.</p>
+<a href="#">EXPLORE →</a>
+</article>
+</div>
+<div class="col-md-6 col-xl-4">
+<article class="solution-card dark-card">
+<span class="mono">06 / PENTEST</span>
+<h3>PUT HUMANS ON THE ATTACK.</h3>
+<p>Test critical applications with experienced security experts.</p>
+<a href="#pentest">EXPLORE →</a>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class="cyberbuddy border-y" id="cyberbuddy">
+<div class="container-fluid shell">
+<div class="row g-0">
+<div class="col-lg-5 buddy-copy">
+<span class="mono">CYBERBUDDY / 04</span>
+<h2>YOUR CYBERSECURITY TEAM GOT AN AI COLLEAGUE.</h2>
+<p>
+              Ask direct questions about risks, policies and security actions.
+            </p>
+<a class="btn btn-dark-brutal mt-3" href="#">MEET CYBERBUDDY →</a>
+</div>
+<div class="col-lg-7 buddy-chat">
+<div class="chat-window">
+<div class="chat-top mono">CYBERBUDDY / COMPANY CONTEXT ON</div>
+<div class="chat-message user-message">
+<span>YOU</span>
+                Are any of our public servers vulnerable?
+              </div>
+<div class="chat-message bot-message">
+<span>CYBERBUDDY</span>
+                Yes. Three findings require action.
+                <div class="finding"><b>CRITICAL</b> Exposed administration portal</div>
+<div class="finding"><b>HIGH</b> Outdated web component</div>
+<div class="finding"><b>MEDIUM</b> TLS configuration</div>
+</div>
+<div class="chat-input">Ask Cywise anything... <strong>↵</strong></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="section-pad" id="for-whom">
+<div class="container-fluid shell">
+<div class="section-heading split-heading">
+<div>
+<span class="mono">FOR WHOM / 05</span>
+<h2>BUILT FOR TEAMS THAT NEED CLARITY.</h2>
+</div>
+<p>Choose the view that matches your organization and security role.</p>
+</div>
+<div class="row g-3 mt-3">
+<div class="col-md-6 col-xl-3"><a class="audience-card" href="#"><span>01</span><h3>SMBs</h3><p>Protect the business without heavy security operations.</p><b>→</b></a></div>
+<div class="col-md-6 col-xl-3"><a class="audience-card" href="#"><span>02</span><h3>IT TEAMS</h3><p>See risks clearly and know what to fix first.</p><b>→</b></a></div>
+<div class="col-md-6 col-xl-3"><a class="audience-card" href="#"><span>03</span><h3>CISOs</h3><p>Centralize visibility and support security decisions.</p><b>→</b></a></div>
+<div class="col-md-6 col-xl-3"><a class="audience-card" href="#"><span>04</span><h3>MSPs</h3><p>Manage security visibility across customer environments.</p><b>→</b></a></div>
+</div>
+</div>
+</section>
+<section class="use-cases" id="use-cases">
+<div class="container-fluid shell">
+<div class="use-intro">
+<span class="mono">USE CASES / 06</span>
+<h2>WHAT DO YOU NEED TO DO?</h2>
+</div>
+<div class="case-list">
+<a href="#"><span>01</span> FIND MY VULNERABILITIES <b>↗</b></a>
+<a href="#"><span>02</span> MONITOR MY ATTACK SURFACE <b>↗</b></a>
+<a href="#"><span>03</span> CHECK LEAKED CREDENTIALS <b>↗</b></a>
+<a href="#"><span>04</span> CREATE MY PSSI <b>↗</b></a>
+<a href="#"><span>05</span> PREPARE FOR AN AUDIT <b>↗</b></a>
+<a href="#"><span>06</span> RUN A PENTEST <b>↗</b></a>
+</div>
+</div>
+</section>
+<section class="pentest section-pad border-y" id="pentest">
+<div class="container-fluid shell">
+<div class="row g-5 align-items-center">
+<div class="col-lg-7">
+<span class="mono">PENTEST / 07</span>
+<h2>SOMETIMES YOU NEED A HUMAN.</h2>
+<p class="lead-copy">Expert testing for critical applications and infrastructure.</p>
+<a class="btn btn-acid btn-lg" href="#">BOOK A PENTEST →</a>
+</div>
+<div class="col-lg-5">
+<div class="pentest-sheet">
+<div><span>ENGAGEMENT</span><strong>4 DAYS</strong></div>
+<div><span>DELIVERABLE</span><strong>1 REPORT</strong></div>
+<div><span>STARTING AT</span><strong>€3,000</strong></div>
+<div class="stamp">HUMAN<br/>VERIFIED</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="section-pad" id="resources">
+<div class="container-fluid shell">
+<div class="section-heading split-heading">
+<div>
+<span class="mono">RESOURCES / 08</span>
+<h2>FROM THE CYWISE LAB.</h2>
+</div>
+<a class="btn btn-ghost-brutal" href="#">VIEW ALL →</a>
+</div>
+<div class="row g-4 mt-3">
+<div class="col-lg-4">
+<article class="article-card">
+<div class="article-visual visual-grid">01</div>
+<span class="mono">GUIDE / 8 MIN</span>
+<h3>HOW TO READ YOUR EXTERNAL ATTACK SURFACE.</h3>
+<a href="#">READ →</a>
+</article>
+</div>
+<div class="col-lg-4">
+<article class="article-card">
+<div class="article-visual visual-terminal">&gt;_</div>
+<span class="mono">PRACTICAL / 6 MIN</span>
+<h3>WHICH VULNERABILITIES SHOULD YOU FIX FIRST?</h3>
+<a href="#">READ →</a>
+</article>
+</div>
+<div class="col-lg-4">
+<article class="article-card">
+<div class="article-visual visual-lock">×</div>
+<span class="mono">PSSI / 10 MIN</span>
+<h3>A SIMPLE SECURITY POLICY FOR GROWING TEAMS.</h3>
+<a href="#">READ →</a>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class="pricing border-y" id="pricing">
+<div class="container-fluid shell">
+<div class="pricing-wrap">
+<div>
+<span class="mono">PRICING / 09</span>
+<h2>SECURITY WITHOUT ENTERPRISE COMPLEXITY.</h2>
+</div>
+<div class="pricing-card">
+<span class="mono">CYWISE PLATFORM</span>
+<h3>START SIMPLE.</h3>
+<p>Monitor your company. Find risks. Take action.</p>
+<a class="btn btn-dark-brutal w-100" href="#cta">SEE PRICING →</a>
+</div>
+</div>
+</div>
+</section>
+<section class="final-cta" id="cta">
+<div class="container-fluid shell text-center">
+<span class="mono">READY / 10</span>
+<h2>YOU DO NOT NEED MORE CYBERSECURITY COMPLEXITY.</h2>
+<h3>YOU NEED CYWISE.</h3>
+<div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+<a class="btn btn-dark-brutal btn-xl" href="/auth/register">START FOR FREE →</a>
+<a class="btn btn-white-brutal btn-xl" href="#">BOOK A DEMO</a>
+</div>
+</div>
+</section>
+</main>
+<footer>
+<div class="container-fluid shell">
+<div class="footer-top">
+<a class="site-brand-lockup footer-brand-lockup" href="#top"><img alt="" class="cw-picto" src="assets/cywise-picto-riso.png"/><span class="cw-wordmark">Cywise</span></a>
+<div class="mono">CYBERSECURITY FOR HUMANS.</div>
+</div>
+<div class="footer-grid">
+<div>
+<strong>SOLUTIONS</strong>
+<a href="solutions/attack-surface.html">Attack Surface</a>
+<a href="#solutions">Vulnerabilities</a>
+<a href="solutions/cyberbuddy.html">CyberBuddy</a>
+<a href="solutions/pentest.html">Pentest</a>
+</div>
+<div>
+<strong>FOR WHOM</strong>
+<a href="for-whom/smbs.html">SMBs</a>
+<a href="for-whom/it-teams.html">IT Teams</a>
+<a href="for-whom/cisos.html">CISOs</a>
+<a href="for-whom/msps.html">MSPs</a>
+</div>
+<div>
+<strong>RESOURCES</strong>
+<a href="blog/index.html">Blog</a>
+<a href="#resources">Guides</a>
+<a href="#resources">Customer Stories</a>
+</div>
+<div>
+<strong>CYWISE</strong>
+<a href="#">About</a>
+<a href="#">Contact</a>
+<a href="#">Privacy</a>
+</div>
+</div>
+<div class="footer-bottom mono">
+<span>© 2026 CYWISE</span>
+<span>CONCEPT REDESIGN / FASTBOOTSTRAP</span>
+</div>
+</div>
+</footer>
+<!-- FastBootstrap uses the official Bootstrap bundle for interactive components. -->
+<script crossorigin="anonymous" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -267,10 +267,11 @@ test('an OSSEC result is ingested through the existing osquery JSON pipeline', f
         'columns' => [
             'policy_uid' => 'cywise_ossec_unix',
             'rule_uid' => '50004',
+            'rule_title' => 'Check ownership and permissions for /etc/passwd',
             'status' => 'passed',
             'duration_ms' => '183',
             'error' => '[]',
-            'text' => 'OSSEC rule 50004 passed: the server is compliant.',
+            'text' => 'OSSEC rule Check ownership and permissions for /etc/passwd passed: the server is compliant.',
         ],
     ];
 
@@ -291,5 +292,7 @@ test('an OSSEC result is ingested through the existing osquery JSON pipeline', f
     expect($stored)->not->toBeNull()
         ->and($stored->ynh_osquery_rule_id)->toBe($eventRule->id)
         ->and($stored->columns['rule_uid'])->toBe('50004')
+        ->and($stored->columns['rule_title'])->toBe('Check ownership and permissions for /etc/passwd')
+        ->and($stored->message())->toBe('OSSEC rule Check ownership and permissions for /etc/passwd passed: the server is compliant.')
         ->and($stored->columns['status'])->toBe('passed');
 });

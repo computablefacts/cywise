@@ -176,7 +176,7 @@ role=${CONTAINER_ROLE:-app}
 queue_name=${QUEUE_NAME:-default}
 if [[ "$role" = "app" ]]; then
     echo "cleanup"
-    (cd /var/www/html && rm app.tar.gz)
+    (cd /var/www/html && rm -f app.tar.gz)
     echo "artisan storage:link && artisan vendor:publish ..."
     (cd /var/www/html && php artisan storage:link && php artisan vendor:publish --tag=telescope-assets)
     echo "creating docs directory"

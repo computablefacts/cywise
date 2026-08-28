@@ -15,7 +15,6 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
-use App\Http\Controllers\Iframes\WebsiteController;
 use App\Http\Controllers\MultiLevelHealthCheckController;
 use App\Http\Controllers\OssecAgentPolicyRulesController;
 use App\Http\Controllers\OssecAgentRuleController;
@@ -488,4 +487,5 @@ Route::post('/files/one', '\App\Http\Controllers\CyberBuddyController@uploadOneF
 
 Route::post('/files/many', '\App\Http\Controllers\CyberBuddyController@uploadManyFiles')->middleware('auth:sanctum');
 
-Route::get('/website', [WebsiteController::class, '__invoke'])->name('iframes.website');
+// Backward compatibility for the former iframe-based landing page.
+Route::redirect('/website', '/')->name('iframes.website');

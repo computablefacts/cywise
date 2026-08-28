@@ -2,6 +2,7 @@
 /node_modules
 /storage/*.key
 /vendor
+/bootstrap/cache/*.php
 /.idea
 /.vscode
 /towerify

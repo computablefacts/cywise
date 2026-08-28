@@ -122,20 +122,20 @@ for ((rule_index = 0; rule_index < rule_count; rule_index++)); do
 
   case "$status" in
     passed)
-      text="OSSEC rule $rule_uid passed: the server is compliant."
+      text="OSSEC rule $rule_title passed: the server is compliant."
       ;;
     failed)
-      text="OSSEC rule $rule_uid failed: the server is not compliant."
+      text="OSSEC rule $rule_title failed: the server is not compliant."
       if [ "$overall_exit_code" -eq 0 ]; then
         overall_exit_code=1
       fi
       ;;
     timeout)
-      text="OSSEC rule $rule_uid timed out."
+      text="OSSEC rule $rule_title timed out."
       overall_exit_code=2
       ;;
     *)
-      text="OSSEC rule $rule_uid could not be evaluated."
+      text="OSSEC rule $rule_title could not be evaluated."
       overall_exit_code=2
       ;;
   esac
