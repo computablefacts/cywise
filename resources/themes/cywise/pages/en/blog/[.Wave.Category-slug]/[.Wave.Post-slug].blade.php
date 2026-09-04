@@ -6,7 +6,7 @@ use Wave\Category;
 use Wave\Post;
 use function Laravel\Folio\{name, render};
 
-name('blog.post');
+name('blog.en.post');
 
 render(function (View $view, BlogContent $content, Category $category, Post $post) {
     $content->assertPost($post, $category);
@@ -16,8 +16,8 @@ render(function (View $view, BlogContent $content, Category $category, Post $pos
 ?>
 
 <x-layouts.website-v2
-    locale="fr"
-    :language-url="route('blog.en.post', ['category' => $category, 'post' => $post])"
+    locale="en"
+    :language-url="route('blog.post', ['category' => $category, 'post' => $post])"
     :seo="[
         'title' => ($post->seo_title ?: $post->title) . ' — Cywise',
         'description' => $post->meta_description ?: ($post->excerpt ?? ''),
@@ -26,7 +26,7 @@ render(function (View $view, BlogContent $content, Category $category, Post $pos
     <main>
         <section class="blogpost-hero">
             <div class="container-fluid shell">
-                <a class="mono blog-back" href="{{ route('blog') }}">← RETOUR AU BLOG</a>
+                <a class="mono blog-back" href="{{ route('blog.en') }}">← BACK TO THE BLOG</a>
                 <div class="mono blogpost-kicker">{{ $category->name }} / {{ $readingMinutes }} MIN</div>
                 <h1>{{ $post->title }}</h1>
 
@@ -36,7 +36,7 @@ render(function (View $view, BlogContent $content, Category $category, Post $pos
 
                 <div class="blogpost-meta mono">
                     <span>{{ $post->user->name }}</span>
-                    <span>{{ $post->created_at->format('d.m.Y') }}</span>
+                    <span>{{ $post->created_at->format('Y.m.d') }}</span>
                     <span>{{ $readingMinutes }} MIN</span>
                 </div>
             </div>
@@ -56,9 +56,9 @@ render(function (View $view, BlogContent $content, Category $category, Post $pos
 
         <section class="blogpost-cta">
             <div class="container-fluid shell text-center">
-                <span class="mono">CYWISE / PROCHAINE ÉTAPE</span>
-                <h2>VOYEZ VOTRE EXPOSITION AVANT LES ATTAQUANTS.</h2>
-                <a class="btn btn-dark-brutal btn-xl mt-4" href="{{ route('register') }}">DÉMARRER GRATUITEMENT →</a>
+                <span class="mono">CYWISE / NEXT STEP</span>
+                <h2>SEE YOUR EXPOSURE BEFORE ATTACKERS DO.</h2>
+                <a class="btn btn-dark-brutal btn-xl mt-4" href="{{ route('register') }}">START FOR FREE →</a>
             </div>
         </section>
     </main>

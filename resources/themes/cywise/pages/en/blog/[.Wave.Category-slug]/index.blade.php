@@ -5,7 +5,7 @@ use Illuminate\View\View;
 use Wave\Category;
 use function Laravel\Folio\{name, render};
 
-name('blog.category');
+name('blog.en.category');
 
 render(function (View $view, BlogContent $content, Category $category) {
     return $view->with([
@@ -16,11 +16,11 @@ render(function (View $view, BlogContent $content, Category $category) {
 ?>
 
 <x-layouts.website-v2
-    locale="fr"
-    :language-url="route('blog.en.category', ['category' => $category])"
+    locale="en"
+    :language-url="route('blog.category', ['category' => $category])"
     :seo="[
-        'title' => $category->name . ' — Blog Cywise',
-        'description' => 'Articles Cywise dans la catégorie ' . $category->name . '.',
+        'title' => $category->name . ' — Cywise Blog',
+        'description' => 'Cywise articles in the ' . $category->name . ' category.',
     ]"
 >
     <main>
@@ -28,7 +28,7 @@ render(function (View $view, BlogContent $content, Category $category) {
             <div class="container-fluid shell">
                 <span class="mono">BLOG / {{ $category->name }}</span>
                 <h1>{{ mb_strtoupper($category->name) }}</h1>
-                <p>Les derniers contenus de cette catégorie.</p>
+                <p>The latest content in this category.</p>
             </div>
         </section>
 
@@ -37,13 +37,13 @@ render(function (View $view, BlogContent $content, Category $category) {
                 @include('theme::partials.website-v2.categories', [
                     'categories' => $categories,
                     'category' => $category,
-                    'locale' => 'fr',
+                    'locale' => 'en',
                 ])
 
                 <div class="row g-4 mt-3">
                     @include('theme::partials.website-v2.posts-loop', [
                         'posts' => $posts,
-                        'locale' => 'fr',
+                        'locale' => 'en',
                     ])
                 </div>
 

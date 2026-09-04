@@ -1,36 +1,52 @@
 <?php
-    use function Laravel\Folio\{name};
-    name('blog');
 
-    $posts = \Wave\Post::where('status', 'PUBLISHED')->orderBy('created_at', 'DESC')->paginate(6);
-    $categories = \Wave\Category::all();
+use App\Services\BlogContent;
+use Illuminate\View\View;
+use function Laravel\Folio\{name, render};
+
+name('blog');
+
+render(function (View $view, BlogContent $content) {
+    return $view->with([
+        'posts' => $content->posts(),
+        'categories' => $content->categories(),
+    ]);
+});
 ?>
 
-<x-layouts.marketing
+<x-layouts.website-v2
+    locale="fr"
+    :language-url="route('blog.en')"
     :seo="[
-        'title' => 'Blog',
-        'description' => __('Check out some of our latest blog posts below.'),
-        'type' => 'website',
+        'title' => 'Blog — Cywise',
+        'description' => 'Guides et conseils pratiques de Cywise pour mieux gérer votre cybersécurité.',
     ]"
 >
-    <x-container>
-        <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 relative pt-12">
-            <x-marketing.elements.heading
-                title="Blog"
-                description="{{ __('Check out some of our latest blog posts below.') }}"
-                align="left"
-            />
-            
-            @include('theme::partials.blog.categories')
-
-            <div class="grid gap-5 mx-auto mt-5 md:mt-10 sm:grid-cols-2 lg:grid-cols-3">
-                @include('theme::partials.blog.posts-loop', ['posts' => $posts])
+    <main>
+        <section class="page-hero page-hero-pink">
+            <div class="container-fluid shell">
+                <span class="mono">BLOG / RESSOURCES</span>
+                <h1>DEPUIS LE LAB CYWISE.</h1>
+                <p>Des contenus cybersécurité pratiques pour les équipes qui veulent des réponses claires.</p>
             </div>
-        </div>
+        </section>
 
-        <div class="flex justify-center my-10">
-            {{ $posts->links('theme::partials.pagination') }}
-        </div>
+        <section class="section-pad">
+            <div class="container-fluid shell">
+                @include('theme::partials.website-v2.categories', [
+                    'categories' => $categories,
+                    'locale' => 'fr',
+                ])
 
-    </x-container>
-</x-layouts.marketing>
+                <div class="row g-4 mt-3">
+                    @include('theme::partials.website-v2.posts-loop', [
+                        'posts' => $posts,
+                        'locale' => 'fr',
+                    ])
+                </div>
+
+                {{ $posts->links('theme::partials.website-v2.pagination') }}
+            </div>
+        </section>
+    </main>
+</x-layouts.website-v2>

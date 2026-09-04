@@ -1,68 +1,24 @@
 <?php
-    use function Laravel\Folio\name;
 
-    name('home');
+use App\Services\BlogContent;
+use Illuminate\View\View;
+use function Laravel\Folio\{name, render};
+
+name('home');
+
+render(function (View $view, BlogContent $content) {
+    return $view->with('posts', $content->homePosts());
+});
 ?>
-<!DOCTYPE html>
 
-<html lang="fr">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="{{ csrf_token() }}" name="csrf-token"/>
-<title>Cywise — La cybersécurité pour tous</title>
-<meta content="Cywise aide les entreprises à détecter leurs actifs exposés, leurs vulnérabilités et leurs identifiants compromis." name="description"/>
-<link href="{{ asset('favicon.ico') }}" rel="icon"/>
-<!-- FastBootstrap v2.2.0 -->
-<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/fastbootstrap@2.2.0/dist/css/fastbootstrap.min.css" integrity="sha256-V6lu+OdYNKTKTsVFBuQsyIlDiRWiOmtC8VQ8Lzdm2i4=" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="{{ asset('cywise/website-v2/styles.css') }}?v={{ filemtime(public_path('cywise/website-v2/styles.css')) }}" rel="stylesheet"/>
-</head>
-<body>
-<header class="site-header sticky-top">
-<nav class="navbar navbar-expand-lg">
-<div class="container-fluid shell">
-<a class="site-brand-lockup" href="#top"><img alt="" class="cw-picto" src="/cywise/website-v2/assets/cywise-picto-riso.png"/><span class="cw-wordmark">Cywise</span></a>
-<button aria-controls="mainNav" aria-expanded="false" aria-label="Ouvrir la navigation" class="navbar-toggler brutal-icon" data-bs-target="#mainNav" data-bs-toggle="collapse" type="button">
-<span>☰</span>
-</button>
-<div class="collapse navbar-collapse" id="mainNav">
-<ul class="navbar-nav mx-auto gap-lg-1">
-<li class="nav-item dropdown">
-<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Solutions</a>
-<ul class="dropdown-menu brutal-menu">
-<li><a class="dropdown-item" href="/cywise/website-v2/solutions/attack-surface.html">Surface d’attaque</a></li>
-<li><a class="dropdown-item" href="/cywise/website-v2/solutions/vulnerability-management.html">Gestion des vulnérabilités</a></li>
-<li><a class="dropdown-item" href="/cywise/website-v2/solutions/credential-monitoring.html">Surveillance des identifiants</a></li>
-<li><a class="dropdown-item" href="/cywise/website-v2/solutions/cyberbuddy.html">CyberBuddy</a></li>
-<li><a class="dropdown-item" href="/cywise/website-v2/solutions/pssi.html">PSSI</a></li>
-<li><a class="dropdown-item" href="/cywise/website-v2/solutions/pentest.html">Pentest</a></li>
-</ul>
-</li>
-<li class="nav-item dropdown">
-<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Pour qui</a>
-<ul class="dropdown-menu brutal-menu">
-<li><a class="dropdown-item" href="/cywise/website-v2/for-whom/smbs.html">PME</a></li>
-<li><a class="dropdown-item" href="/cywise/website-v2/for-whom/startups.html">Startups</a></li>
-<li><a class="dropdown-item" href="/cywise/website-v2/for-whom/it-teams.html">Équipes IT</a></li>
-<li><a class="dropdown-item" href="/cywise/website-v2/for-whom/cisos.html">RSSI</a></li>
-<li><a class="dropdown-item" href="/cywise/website-v2/for-whom/msps.html">MSP</a></li>
-</ul>
-</li>
-<li class="nav-item"><a class="nav-link" href="/cywise/website-v2/use-cases/index.html">Cas d’usage</a></li>
-<li class="nav-item"><a class="nav-link" href="/cywise/website-v2/blog/index.html">Blog</a></li>
-<li class="nav-item"><a class="nav-link" href="/cywise/website-v2/pricing/index.html">Tarifs</a></li>
-</ul>
-<div class="d-flex gap-2 align-items-center header-actions"><div aria-label="Sélecteur de langue" class="lang-switcher"><a class="lang-option active" href="#" lang="fr">FR</a><span class="lang-sep">/</span><a class="lang-option" href="/cywise/website-v2/en/index.html" lang="en">EN</a></div>
-<a class="btn btn-ghost-brutal" href="{{ route('login') }}">Se connecter</a>
-<a class="btn btn-acid" href="#cta">COMMENCER →</a>
-</div>
-</div>
-</div>
-</nav>
-</header>
+<x-layouts.website-v2
+    locale="fr"
+    :language-url="route('website.en.home')"
+    :seo="[
+        'title' => 'Cywise — La cybersécurité pour tous',
+        'description' => 'Cywise aide les entreprises à détecter leurs actifs exposés, leurs vulnérabilités et leurs identifiants compromis.',
+    ]"
+>
 <main id="top">
 <section class="hero section-pad">
 <div class="container-fluid shell">
@@ -177,7 +133,7 @@
 <span class="mono">01 / SURFACE D’ATTAQUE</span>
 <h3>VOYEZ CE QUE LES ATTAQUANTS VOIENT.</h3>
 <p>Surveillez les domaines publics, serveurs, ports et services exposés.</p>
-<a href="{{ asset('cywise/website-v2/solutions/attack-surface.html') }}">DÉCOUVRIR →</a>
+<a href="{{ route('website.solutions.attack-surface') }}">DÉCOUVRIR →</a>
 </article>
 </div>
 <div class="col-md-6 col-xl-4">
@@ -185,7 +141,7 @@
 <span class="mono">02 / VULNÉRABILITÉS</span>
 <h3>TROUVEZ LES POINTS FAIBLES.</h3>
 <p>Identifiez les vulnérabilités et concentrez-vous sur les risques les plus importants.</p>
-<a href="{{ asset('cywise/website-v2/solutions/vulnerability-management.html') }}">DÉCOUVRIR →</a>
+<a href="{{ route('website.solutions.vulnerability-management') }}">DÉCOUVRIR →</a>
 </article>
 </div>
 <div class="col-md-6 col-xl-4">
@@ -193,7 +149,7 @@
 <span class="mono">03 / IDENTIFIANTS</span>
 <h3>SACHEZ CE QUI A FUITÉ.</h3>
 <p>Détectez les identifiants compromis liés à votre entreprise.</p>
-<a href="{{ asset('cywise/website-v2/solutions/credential-monitoring.html') }}">DÉCOUVRIR →</a>
+<a href="{{ route('website.solutions.credential-monitoring') }}">DÉCOUVRIR →</a>
 </article>
 </div>
 <div class="col-md-6 col-xl-4">
@@ -201,7 +157,7 @@
 <span class="mono">04 / CYBERBUDDY</span>
 <h3>DEMANDEZ. COMPRENEZ. AGISSEZ.</h3>
 <p>Obtenez des conseils clairs adaptés au contexte de votre entreprise.</p>
-<a href="{{ asset('cywise/website-v2/solutions/cyberbuddy.html') }}">DÉCOUVRIR →</a>
+<a href="{{ route('website.solutions.cyberbuddy') }}">DÉCOUVRIR →</a>
 </article>
 </div>
 <div class="col-md-6 col-xl-4">
@@ -209,7 +165,7 @@
 <span class="mono">05 / PSSI</span>
 <h3>CRÉEZ VOTRE POLITIQUE DE SÉCURITÉ.</h3>
 <p>Créez une politique de sécurité pratique pour votre organisation.</p>
-<a href="{{ asset('cywise/website-v2/solutions/pssi.html') }}">DÉCOUVRIR →</a>
+<a href="{{ route('website.solutions.pssi') }}">DÉCOUVRIR →</a>
 </article>
 </div>
 <div class="col-md-6 col-xl-4">
@@ -217,7 +173,7 @@
 <span class="mono">06 / PENTEST</span>
 <h3>FAITES TESTER PAR DES EXPERTS.</h3>
 <p>Faites tester vos applications critiques par des experts en sécurité.</p>
-<a href="{{ asset('cywise/website-v2/solutions/pentest.html') }}">DÉCOUVRIR →</a>
+<a href="{{ route('website.solutions.pentest') }}">DÉCOUVRIR →</a>
 </article>
 </div>
 </div>
@@ -232,7 +188,7 @@
 <p>
               Posez des questions directes sur les risques, les politiques et les actions de sécurité.
             </p>
-<a class="btn btn-dark-brutal mt-3" href="{{ asset('cywise/website-v2/solutions/cyberbuddy.html') }}">DÉCOUVRIR CYBERBUDDY →</a>
+<a class="btn btn-dark-brutal mt-3" href="{{ route('website.solutions.cyberbuddy') }}">DÉCOUVRIR CYBERBUDDY →</a>
 </div>
 <div class="col-lg-7 buddy-chat">
 <div class="chat-window">
@@ -264,10 +220,10 @@
 <p>Choisissez le profil qui correspond à votre organisation et à votre rôle.</p>
 </div>
 <div class="row g-3 mt-3">
-<div class="col-md-6 col-xl-3"><a class="audience-card" href="{{ asset('cywise/website-v2/for-whom/smbs.html') }}"><span>01</span><h3>PME</h3><p>Protégez l’entreprise sans opérations de sécurité lourdes.</p><b>→</b></a></div>
-<div class="col-md-6 col-xl-3"><a class="audience-card" href="{{ asset('cywise/website-v2/for-whom/it-teams.html') }}"><span>02</span><h3>ÉQUIPES IT</h3><p>Voyez clairement les risques et sachez quoi corriger en premier.</p><b>→</b></a></div>
-<div class="col-md-6 col-xl-3"><a class="audience-card" href="{{ asset('cywise/website-v2/for-whom/cisos.html') }}"><span>03</span><h3>RSSI</h3><p>Centralisez la visibilité et facilitez les décisions de sécurité.</p><b>→</b></a></div>
-<div class="col-md-6 col-xl-3"><a class="audience-card" href="{{ asset('cywise/website-v2/for-whom/msps.html') }}"><span>04</span><h3>MSP</h3><p>Gérez la visibilité sécurité sur plusieurs environnements clients.</p><b>→</b></a></div>
+<div class="col-md-6 col-xl-3"><a class="audience-card" href="{{ route('website.audiences.smbs') }}"><span>01</span><h3>PME</h3><p>Protégez l’entreprise sans opérations de sécurité lourdes.</p><b>→</b></a></div>
+<div class="col-md-6 col-xl-3"><a class="audience-card" href="{{ route('website.audiences.it-teams') }}"><span>02</span><h3>ÉQUIPES IT</h3><p>Voyez clairement les risques et sachez quoi corriger en premier.</p><b>→</b></a></div>
+<div class="col-md-6 col-xl-3"><a class="audience-card" href="{{ route('website.audiences.cisos') }}"><span>03</span><h3>RSSI</h3><p>Centralisez la visibilité et facilitez les décisions de sécurité.</p><b>→</b></a></div>
+<div class="col-md-6 col-xl-3"><a class="audience-card" href="{{ route('website.audiences.msps') }}"><span>04</span><h3>MSP</h3><p>Gérez la visibilité sécurité sur plusieurs environnements clients.</p><b>→</b></a></div>
 </div>
 </div>
 </section>
@@ -278,12 +234,12 @@
 <h2>QU’AVEZ-VOUS BESOIN DE FAIRE ?</h2>
 </div>
 <div class="case-list">
-<a href="{{ asset('cywise/website-v2/use-cases/find-vulnerabilities.html') }}"><span>01</span> TROUVER MES VULNÉRABILITÉS <b>↗</b></a>
-<a href="{{ asset('cywise/website-v2/use-cases/monitor-attack-surface.html') }}"><span>02</span> SURVEILLER MA SURFACE D’ATTAQUE <b>↗</b></a>
-<a href="{{ asset('cywise/website-v2/use-cases/check-leaked-credentials.html') }}"><span>03</span> VÉRIFIER LES IDENTIFIANTS COMPROMIS <b>↗</b></a>
-<a href="{{ asset('cywise/website-v2/use-cases/create-pssi.html') }}"><span>04</span> CRÉER MA PSSI <b>↗</b></a>
-<a href="{{ asset('cywise/website-v2/use-cases/prepare-audit.html') }}"><span>05</span> PRÉPARER UN AUDIT <b>↗</b></a>
-<a href="{{ asset('cywise/website-v2/use-cases/run-pentest.html') }}"><span>06</span> LANCER UN PENTEST <b>↗</b></a>
+<a href="{{ route('website.use-cases.find-vulnerabilities') }}"><span>01</span> TROUVER MES VULNÉRABILITÉS <b>↗</b></a>
+<a href="{{ route('website.use-cases.monitor-attack-surface') }}"><span>02</span> SURVEILLER MA SURFACE D’ATTAQUE <b>↗</b></a>
+<a href="{{ route('website.use-cases.check-leaked-credentials') }}"><span>03</span> VÉRIFIER LES IDENTIFIANTS COMPROMIS <b>↗</b></a>
+<a href="{{ route('website.use-cases.create-pssi') }}"><span>04</span> CRÉER MA PSSI <b>↗</b></a>
+<a href="{{ route('website.use-cases.prepare-audit') }}"><span>05</span> PRÉPARER UN AUDIT <b>↗</b></a>
+<a href="{{ route('website.use-cases.run-pentest') }}"><span>06</span> LANCER UN PENTEST <b>↗</b></a>
 </div>
 </div>
 </section>
@@ -294,7 +250,7 @@
 <span class="mono">PENTEST / 07</span>
 <h2>PARFOIS, IL FAUT UN HUMAIN.</h2>
 <p class="lead-copy">Des tests experts pour les applications et infrastructures critiques.</p>
-<a class="btn btn-acid btn-lg" href="{{ asset('cywise/website-v2/solutions/pentest.html') }}">RÉSERVER UN PENTEST →</a>
+<a class="btn btn-acid btn-lg" href="{{ route('website.solutions.pentest') }}">RÉSERVER UN PENTEST →</a>
 </div>
 <div class="col-lg-5">
 <div class="pentest-sheet">
@@ -314,33 +270,10 @@
 <span class="mono">RESSOURCES / 08</span>
 <h2>DEPUIS LE LAB CYWISE.</h2>
 </div>
-<a class="btn btn-ghost-brutal" href="{{ asset('cywise/website-v2/blog/index.html') }}">TOUT VOIR →</a>
+<a class="btn btn-ghost-brutal" href="{{ route('blog') }}">TOUT VOIR →</a>
 </div>
 <div class="row g-4 mt-3">
-<div class="col-lg-4">
-<article class="article-card">
-<div class="article-visual visual-grid">01</div>
-<span class="mono">GUIDE / 8 MIN</span>
-<h3>COMMENT LIRE VOTRE SURFACE D’ATTAQUE EXTERNE.</h3>
-<a href="{{ asset('cywise/website-v2/blog/blogpost.html') }}">LIRE →</a>
-</article>
-</div>
-<div class="col-lg-4">
-<article class="article-card">
-<div class="article-visual visual-terminal">&gt;_</div>
-<span class="mono">PRATIQUE / 6 MIN</span>
-<h3>QUELLES VULNÉRABILITÉS CORRIGER EN PREMIER ?</h3>
-<a href="{{ asset('cywise/website-v2/blog/blogpost.html') }}">LIRE →</a>
-</article>
-</div>
-<div class="col-lg-4">
-<article class="article-card">
-<div class="article-visual visual-lock">×</div>
-<span class="mono">PSSI / 10 MIN</span>
-<h3>UNE POLITIQUE DE SÉCURITÉ SIMPLE POUR LES ÉQUIPES EN CROISSANCE.</h3>
-<a href="{{ asset('cywise/website-v2/blog/blogpost.html') }}">LIRE →</a>
-</article>
-</div>
+@include('theme::partials.website-v2.posts-loop', ['posts' => $posts, 'locale' => 'fr'])
 </div>
 </div>
 </section>
@@ -355,7 +288,7 @@
 <span class="mono">PLATEFORME CYWISE</span>
 <h3>COMMENCEZ SIMPLEMENT.</h3>
 <p>Surveillez votre entreprise. Identifiez les risques. Agissez.</p>
-<a class="btn btn-dark-brutal w-100" href="#cta">VOIR LES TARIFS →</a>
+<a class="btn btn-dark-brutal w-100" href="{{ route('pricing') }}">VOIR LES TARIFS →</a>
 </div>
 </div>
 </div>
@@ -367,53 +300,9 @@
 <h3>VOUS AVEZ BESOIN DE CYWISE.</h3>
 <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
 <a class="btn btn-dark-brutal btn-xl" href="{{ route('register') }}">COMMENCER GRATUITEMENT →</a>
-<a class="btn btn-white-brutal btn-xl" href="#">DEMANDER UNE DÉMO</a>
+<a class="btn btn-white-brutal btn-xl" href="mailto:{{ config('towerify.freshdesk.from_email') }}">DEMANDER UNE DÉMO</a>
 </div>
 </div>
 </section>
 </main>
-<footer>
-<div class="container-fluid shell">
-<div class="footer-top">
-<a class="site-brand-lockup footer-brand-lockup" href="#top"><img alt="" class="cw-picto" src="/cywise/website-v2/assets/cywise-picto-riso.png"/><span class="cw-wordmark">Cywise</span></a>
-<div class="mono">LA CYBERSÉCURITÉ POUR TOUS.</div>
-</div>
-<div class="footer-grid">
-<div>
-<strong>SOLUTIONS</strong>
-<a href="/cywise/website-v2/solutions/attack-surface.html">Surface d’attaque</a>
-<a href="#solutions">Vulnérabilités</a>
-<a href="/cywise/website-v2/solutions/cyberbuddy.html">CyberBuddy</a>
-<a href="/cywise/website-v2/solutions/pentest.html">Pentest</a>
-</div>
-<div>
-<strong>POUR QUI</strong>
-<a href="/cywise/website-v2/for-whom/smbs.html">PME</a>
-<a href="/cywise/website-v2/for-whom/it-teams.html">Équipes IT</a>
-<a href="/cywise/website-v2/for-whom/cisos.html">RSSI</a>
-<a href="/cywise/website-v2/for-whom/msps.html">MSP</a>
-</div>
-<div>
-<strong>RESSOURCES</strong>
-<a href="/cywise/website-v2/blog/index.html">Blog</a>
-<a href="#resources">Guides</a>
-<a href="#resources">Témoignages clients</a>
-</div>
-<div>
-<strong>CYWISE</strong>
-<a href="{{ url('/a-propos') }}">À propos</a>
-<a href="#">Contact</a>
-<a href="{{ url('/privacy-policy') }}">Confidentialité</a>
-</div>
-</div>
-<div class="footer-bottom mono">
-<span>© 2026 CYWISE</span>
-<span>CYWISE / LA CYBERSÉCURITÉ POUR TOUS</span>
-</div>
-</div>
-</footer>
-<!-- FastBootstrap uses the official Bootstrap bundle for interactive components. -->
-<script crossorigin="anonymous" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ asset('cywise/website-v2/app.js') }}"></script>
-</body>
-</html>
+</x-layouts.website-v2>

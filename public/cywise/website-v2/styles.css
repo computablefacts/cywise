@@ -1069,6 +1069,11 @@ body{
   line-height:1.35;
   font-weight:700;
 }
+/* Rich-text paragraphs inherit the quote contrast color. */
+.blogpost-article blockquote p{
+  margin:0;
+  color:inherit;
+}
 .blogpost-cta{
   padding:90px 0;
   background:#FFFFFF;
@@ -1145,3 +1150,78 @@ body{
   .btn-xl{width:100%}
   .case-list a{grid-template-columns:30px minmax(0,1fr) auto;padding-left:0;padding-right:0}
 }
+
+/* Laravel-backed blog navigation and rich content. */
+.blog-categories{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:34px;
+}
+.blog-categories a,
+.blog-pagination a,
+.blog-pagination span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:8px 14px;
+  border:2px solid var(--ink);
+  background:#FFFFFF;
+  color:var(--ink);
+  box-shadow:3px 3px 0 var(--ink);
+  font-family:"IBM Plex Mono",monospace;
+  font-size:.78rem;
+  font-weight:700;
+  text-decoration:none;
+}
+.blog-categories a:hover,
+.blog-categories a.active,
+.blog-pagination a:hover,
+.blog-pagination span.active{
+  background:var(--acid);
+  color:var(--ink);
+}
+.blog-pagination{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+  margin-top:46px;
+}
+.blog-pagination span[aria-disabled="true"]{opacity:.45}
+.article-card p{color:#3B4666}
+.blogpost-image{
+  display:block;
+  width:min(100%, 980px);
+  max-height:560px;
+  margin:0 auto 48px;
+  border:2px solid var(--ink);
+  box-shadow:8px 8px 0 var(--acid);
+  object-fit:cover;
+}
+.blogpost-article{
+  max-width:900px;
+  margin:0 auto;
+}
+.blogpost-article h1,
+.blogpost-article h2,
+.blogpost-article h3{
+  margin:1.6em 0 .65em;
+  color:var(--ink);
+  font-weight:800;
+  letter-spacing:-.035em;
+}
+.blogpost-article h2{font-size:clamp(2rem,4vw,3.4rem)}
+.blogpost-article h3{font-size:clamp(1.5rem,3vw,2.25rem)}
+.blogpost-article p,
+.blogpost-article li{color:#3B4666}
+.blogpost-article img{
+  max-width:100%;
+  height:auto;
+  border:2px solid var(--ink);
+}
+.blogpost-article a{color:#D0432D;font-weight:700}
+.blogpost-article table{width:100%;border-collapse:collapse}
+.blogpost-article th,
+.blogpost-article td{padding:12px;border:2px solid var(--ink)}

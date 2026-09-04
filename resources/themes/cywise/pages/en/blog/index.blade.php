@@ -2,33 +2,32 @@
 
 use App\Services\BlogContent;
 use Illuminate\View\View;
-use Wave\Category;
 use function Laravel\Folio\{name, render};
 
-name('blog.category');
+name('blog.en');
 
-render(function (View $view, BlogContent $content, Category $category) {
+render(function (View $view, BlogContent $content) {
     return $view->with([
-        'posts' => $content->posts($category),
+        'posts' => $content->posts(),
         'categories' => $content->categories(),
     ]);
 });
 ?>
 
 <x-layouts.website-v2
-    locale="fr"
-    :language-url="route('blog.en.category', ['category' => $category])"
+    locale="en"
+    :language-url="route('blog')"
     :seo="[
-        'title' => $category->name . ' — Blog Cywise',
-        'description' => 'Articles Cywise dans la catégorie ' . $category->name . '.',
+        'title' => 'Blog — Cywise',
+        'description' => 'Practical cybersecurity guides and advice from Cywise.',
     ]"
 >
     <main>
         <section class="page-hero page-hero-pink">
             <div class="container-fluid shell">
-                <span class="mono">BLOG / {{ $category->name }}</span>
-                <h1>{{ mb_strtoupper($category->name) }}</h1>
-                <p>Les derniers contenus de cette catégorie.</p>
+                <span class="mono">BLOG / RESOURCES</span>
+                <h1>FROM THE CYWISE LAB.</h1>
+                <p>Practical cybersecurity content for teams that need clear answers.</p>
             </div>
         </section>
 
@@ -36,14 +35,13 @@ render(function (View $view, BlogContent $content, Category $category) {
             <div class="container-fluid shell">
                 @include('theme::partials.website-v2.categories', [
                     'categories' => $categories,
-                    'category' => $category,
-                    'locale' => 'fr',
+                    'locale' => 'en',
                 ])
 
                 <div class="row g-4 mt-3">
                     @include('theme::partials.website-v2.posts-loop', [
                         'posts' => $posts,
-                        'locale' => 'fr',
+                        'locale' => 'en',
                     ])
                 </div>
 
