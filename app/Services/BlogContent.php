@@ -45,7 +45,7 @@ class BlogContent
     public function categories(): Collection
     {
         return Category::query()
-            ->whereHas('posts', fn ($query) => $query
+            ->whereHas('posts', fn($query) => $query
                 ->where('status', self::PUBLISHED_STATUS))
             ->orderBy('name')
             ->get();
@@ -62,6 +62,6 @@ class BlogContent
         $text = trim(strip_tags($post->body));
         $words = $text === '' ? [] : (preg_split('/\s+/u', $text) ?: []);
 
-        return max(1, (int) ceil(count($words) / self::WORDS_PER_MINUTE));
+        return max(1, (int)ceil(count($words) / self::WORDS_PER_MINUTE));
     }
 }
