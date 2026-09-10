@@ -3,18 +3,20 @@
     $homeRoute = $isEnglish ? 'website.en.home' : 'home';
     $routePrefix = $isEnglish ? 'website.en.' : 'website.';
     $languageUrl = $languageUrl ?: route($isEnglish ? 'home' : 'website.en.home');
+    $logoPath = 'cywise/website-v2/assets/cywise-logo-riso.png';
 @endphp
 
 <header class="site-header sticky-top">
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid shell">
             <a class="site-brand-lockup" href="{{ route($homeRoute) }}">
-                <img
-                    alt=""
-                    class="cw-picto"
-                    src="{{ asset('cywise/website-v2/assets/cywise-picto-riso.png') }}"
-                >
-                <span class="cw-wordmark">Cywise</span>
+                <span class="cw-logo-frame">
+                    <img
+                        alt="Cywise"
+                        class="cw-logo"
+                        src="{{ asset($logoPath) }}?v={{ filemtime(public_path($logoPath)) }}"
+                    >
+                </span>
             </a>
 
             <button

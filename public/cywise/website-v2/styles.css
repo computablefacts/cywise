@@ -488,7 +488,6 @@ a:hover{color:inherit}
 
 .article-card{
   height:100%;
-  padding-bottom:18px;
   border-bottom:var(--line);
 }
 .article-visual{
@@ -496,11 +495,14 @@ a:hover{color:inherit}
   display:flex;
   align-items:center;
   justify-content:center;
-  margin-bottom:22px;
+  margin-bottom:0;
   border:var(--line);
   font-size:6rem;
   font-weight:800;
   box-shadow:6px 6px 0 var(--ink);
+}
+.article-card-content{
+  padding:22px 24px 24px;
 }
 .visual-grid{
   background-color:var(--acid);
@@ -631,10 +633,13 @@ footer{padding:65px 0 25px;background:var(--paper-2)}
 .detail-steps p{max-width:650px;margin:0}
 .page-cta{padding:100px 0;background:var(--acid);border-bottom:var(--line)}
 .page-cta h2{max-width:900px;margin:18px auto 0;font-size:clamp(3rem,6vw,6rem);line-height:.9;letter-spacing:-.06em;font-weight:800}
-.pricing-plan{height:100%;padding:34px;background:var(--paper-2);border:3px solid var(--ink);box-shadow:9px 9px 0 var(--ink)}
+.pricing-plan{height:100%;display:flex;flex-direction:column;padding:34px;background:var(--paper-2);border:3px solid var(--ink);box-shadow:9px 9px 0 var(--ink)}
 .pricing-plan h2{margin:32px 0 5px;font-size:3rem;font-weight:800;letter-spacing:-.05em}
 .pricing-plan .price{margin:18px 0 22px;font-size:2.6rem;font-weight:800}
+.pricing-plan .price small{font-family:"IBM Plex Mono",monospace;font-size:.85rem;letter-spacing:0}
+.pricing-plan .annual-price{margin:-14px 0 22px;font-family:"IBM Plex Mono",monospace;font-size:.85rem;font-weight:600}
 .pricing-plan ul{margin:25px 0 30px;padding-left:20px}.pricing-plan li{margin:10px 0}
+.pricing-plan .btn{margin-top:auto}
 .pricing-plan-dark{background:var(--ink);color:white;box-shadow:9px 9px 0 var(--acid)}
 @media (max-width:991.98px){.detail-band-title{padding:60px 0 40px}.detail-steps{border-left:0;border-top:var(--line)}}
 
@@ -811,25 +816,31 @@ body{
   box-shadow:9px 9px 0 var(--cw-yellow);
 }
 
-/* Logo replacement */
-.brutal-logo{
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  padding:0 !important;
+/* Crop the supplied artwork's canvas around the logo. */
+.cw-logo-frame{
+  display:block;
+  width:142px;
+  height:52px;
+  overflow:hidden;
 }
 .cw-logo{
   display:block;
-  width:auto;
-  height:54px;
-  object-fit:contain;
+  width:160px;
+  max-width:none;
+  height:auto;
+  transform:translate(-10px,-35px);
+}
+.footer-logo-frame{
+  width:174px;
+  height:63px;
 }
 .footer-logo{
-  height:58px;
+  width:195px;
+  transform:translate(-12px,-43px);
 }
 
 
-/* Riso v2: visible card accents and HTML/CSS wordmark */
+/* Riso v2: visible card accents and supplied wordmark. */
 .site-brand-lockup{
   display:inline-flex;
   align-items:center;
@@ -839,37 +850,6 @@ body{
 }
 .site-brand-lockup:hover{
   color:#16234A;
-}
-.site-header .site-brand-lockup{gap:0}
-.site-header .cw-picto{display:none}
-.cw-picto{
-  display:block;
-  width:44px;
-  height:44px;
-  object-fit:cover;
-  object-position:center;
-}
-.cw-wordmark{
-  position:relative;
-  display:inline-block;
-  color:#16234A;
-  font-family:"Space Grotesk",sans-serif;
-  font-size:1.55rem;
-  font-weight:800;
-  line-height:1;
-  letter-spacing:-.065em;
-}
-.cw-wordmark::before,
-.cw-wordmark::after{
-  content:none !important;
-  display:none !important;
-}
-.footer-brand-lockup .cw-picto{
-  width:50px;
-  height:50px;
-}
-.footer-brand-lockup .cw-wordmark{
-  font-size:1.7rem;
 }
 
 /* Keep each group visibly Riso-colored. */
@@ -903,6 +883,13 @@ body{
 .solution-card.blue-card{background:#3B4666 !important;color:#FFFFFF !important}
 .solution-card.pink-card{background:#E5533C !important;color:#FFFFFF !important}
 .solution-card.dark-card{background:#16234A !important;color:#FFFFFF !important}
+
+.row > :nth-child(5n+1) > .solution-card{
+  box-shadow:6px 6px 0 #16234A;
+}
+.row > :nth-child(5n+1) > .solution-card:hover{
+  box-shadow:10px 10px 0 #16234A;
+}
 
 /* Secondary text remains readable on dark/red cards. */
 .solution-card.blue-card p,
@@ -956,8 +943,10 @@ body{
 .finding:nth-of-type(3){border-left:8px solid #3B4666}
 
 @media (max-width:767.98px){
-  .cw-picto{width:38px;height:38px}
-  .cw-wordmark{font-size:1.35rem}
+  .cw-logo-frame{width:124px;height:45px}
+  .cw-logo{width:140px;transform:translate(-9px,-31px)}
+  .footer-logo-frame{width:174px;height:63px}
+  .footer-logo{width:195px;transform:translate(-12px,-43px)}
 }
 
 

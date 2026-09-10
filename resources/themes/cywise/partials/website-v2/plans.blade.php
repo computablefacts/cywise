@@ -1,27 +1,46 @@
 @php
     $isEnglish = $locale === 'en';
+    $plans = app(\App\Services\PricingContent::class)->plans();
 @endphp
 
-<div class="col-lg-5">
-    <article class="pricing-plan">
-        <span class="mono">{{ $isEnglish ? 'PLATFORM' : 'PLATEFORME' }}</span>
-        <h2>CYWISE</h2>
-        <div class="price">{{ $isEnglish ? 'CUSTOM' : 'SUR MESURE' }}</div>
-        <p>{{ $isEnglish ? 'Continuous security visibility for your organization.' : 'Une visibilité sécurité continue pour votre organisation.' }}</p>
-        <ul>
-            <li>{{ $isEnglish ? 'Attack surface monitoring' : 'Surveillance de la surface d’attaque' }}</li>
-            <li>{{ $isEnglish ? 'Vulnerability management' : 'Gestion des vulnérabilités' }}</li>
-            <li>{{ $isEnglish ? 'Credential monitoring' : 'Surveillance des identifiants' }}</li>
-            <li>CyberBuddy</li>
-            <li>{{ $isEnglish ? 'PSSI support' : 'Assistance PSSI' }}</li>
-        </ul>
-        <a class="btn btn-dark-brutal w-100" href="{{ route('register') }}">
-            {{ $isEnglish ? 'START →' : 'COMMENCER →' }}
-        </a>
-    </article>
-</div>
+@foreach ($plans as $plan)
+    @php
+        $features = array_filter(array_map('trim', explode(',', $plan->features ?? '')));
+    @endphp
 
-<div class="col-lg-5">
+    <div class="col-lg-4">
+        <article class="pricing-plan">
+            <span class="mono">{{ $isEnglish ? 'SUBSCRIPTION' : 'ABONNEMENT' }}</span>
+            <h2>{{ $plan->name }}</h2>
+            <div class="price">
+                {{ $plan->currency }}{{ $plan->monthly_price }}
+                <small>/ {{ $isEnglish ? 'MONTH' : 'MOIS' }}</small>
+            </div>
+
+            @if ($plan->yearly_price)
+                <div class="annual-price">
+                    {{ $plan->currency }}{{ $plan->yearly_price }} / {{ $isEnglish ? 'YEAR' : 'AN' }}
+                </div>
+            @endif
+
+            <p>{{ $plan->description }}</p>
+
+            @if ($features !== [])
+                <ul>
+                    @foreach ($features as $feature)
+                        <li>{{ strip_tags($feature) }}</li>
+                    @endforeach
+                </ul>
+            @endif
+
+            <a class="btn btn-dark-brutal w-100" href="{{ route('settings.subscription') }}">
+                {{ $isEnglish ? 'SELECT →' : 'CHOISIR →' }}
+            </a>
+        </article>
+    </div>
+@endforeach
+
+<div class="col-lg-4">
     <article class="pricing-plan pricing-plan-dark">
         <span class="mono">{{ $isEnglish ? 'EXPERT SERVICE' : 'SERVICE EXPERT' }}</span>
         <h2>PENTEST</h2>

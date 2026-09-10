@@ -2,18 +2,20 @@
     $isEnglish = $locale === 'en';
     $homeRoute = $isEnglish ? 'website.en.home' : 'home';
     $routePrefix = $isEnglish ? 'website.en.' : 'website.';
+    $logoPath = 'cywise/website-v2/assets/cywise-logo-riso.png';
 @endphp
 
 <footer>
     <div class="container-fluid shell">
         <div class="footer-top">
             <a class="site-brand-lockup footer-brand-lockup" href="{{ route($homeRoute) }}">
-                <img
-                    alt=""
-                    class="cw-picto"
-                    src="{{ asset('cywise/website-v2/assets/cywise-picto-riso.png') }}"
-                >
-                <span class="cw-wordmark">Cywise</span>
+                <span class="cw-logo-frame footer-logo-frame">
+                    <img
+                        alt="Cywise"
+                        class="cw-logo footer-logo"
+                        src="{{ asset($logoPath) }}?v={{ filemtime(public_path($logoPath)) }}"
+                    >
+                </span>
             </a>
             <div class="mono">{{ $isEnglish ? 'CYBERSECURITY FOR EVERYONE.' : 'LA CYBERSÉCURITÉ POUR TOUS.' }}</div>
         </div>
