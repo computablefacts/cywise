@@ -8,7 +8,6 @@ use App\Models\Table;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCaseWithDb;
 
 class SqlAssistantTest extends TestCaseWithDb
@@ -57,7 +56,10 @@ class SqlAssistantTest extends TestCaseWithDb
 
         $this->assertIsString($sql);
         $this->assertNotEmpty($sql);
-        $this->assertStringContainsStringIgnoringCase('SELECT COUNT(*) FROM users', $sql);
+        $this->assertTrue(
+            preg_match('/SELECT\s+COUNT\(\*\)(\s+AS\s+[a-zA-Z_]+)?\s+FROM\s+users/i', $sql) === 1,
+            'SQL should contain either "SELECT COUNT(*) FROM users" or "SELECT COUNT(*) AS xxx FROM users"'
+        );
     }
 
     public function test_normalize_table_name()
