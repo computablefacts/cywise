@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCaseWithDb;
 
@@ -121,7 +122,13 @@ final class ChunksProviderTest extends TestCaseWithDb
                 $this->assertEquals($vector->locale, LanguageEnum::FRENCH->value);
                 $this->assertContainsEquals($vector->hypothetical_question, [
                     "Quelle est la couleur du ciel aujourd'hui ?",
-                    "Quelle est la couleur de l'herbe en été ?"
+                    "Quelle est la couleur de l'herbe en été ?",
+                    "De quelle couleur est le ciel aujourd'hui ?",
+                    "Pourquoi l'herbe est-elle verte en été ?",
+                    "De quelle couleur est l'herbe en été ?",
+                    "L'herbe est-elle verte en été ?",
+                    "Pourquoi le ciel est-il bleu aujourd'hui ?",
+                    "L'herbe est de quelle couleur en été ?"
                 ]);
             }
 
