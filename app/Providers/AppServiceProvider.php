@@ -47,6 +47,7 @@ use App\Rules\OnlyLettersAndDigits;
 use Exception;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
@@ -162,9 +163,11 @@ class AppServiceProvider extends ServiceProvider
         // SAML
         Event::subscribe(SamlEventSubscriber::class);
 
-        // By default, Folio routes are defined from the application’s resources/views/pages directory
-        // Set it to the selected theme
-        Folio::path(resource_path("themes/cywise/pages"));
+        // Keep Cywise routing independent from the DB-selected theme.
+        $themePath = resource_path('themes/cywise');
+
+        Blade::anonymousComponentPath($themePath . '/components');
+        Folio::path($themePath . '/pages');
     }
 
     private function setSchemaDefaultLength(): void
