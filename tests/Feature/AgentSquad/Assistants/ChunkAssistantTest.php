@@ -7,6 +7,7 @@ use App\Enums\LanguageEnum;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Tests\TestCaseWithDb;
 
 class ChunkAssistantTest extends TestCaseWithDb
@@ -52,7 +53,11 @@ class ChunkAssistantTest extends TestCaseWithDb
 
         $this->assertIsString($translated);
         $this->assertNotEmpty($translated);
-        $this->assertStringContainsStringIgnoringCase('Bonjour monde', $translated);
+        $this->assertTrue(
+            Str::contains(Str::lower($translated), 'bonjour monde') ||
+            Str::contains(Str::lower($translated), 'bonjour le monde'),
+            'Translated text should contain either "Bonjour monde" or "Bonjour le monde"'
+        );
     }
 
     public function test_chunk_assistant_hypothetical_questions_returns_array()
