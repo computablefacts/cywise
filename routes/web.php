@@ -15,6 +15,8 @@ use App\Enums\OsqueryPlatformEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
+use App\Http\Controllers\Iframes\ChangelogController;
+use App\Http\Controllers\Iframes\ChangelogController2;
 use App\Http\Controllers\Iframes\WebsiteController;
 use App\Http\Controllers\MultiLevelHealthCheckController;
 use App\Jobs\DownloadDebianSecurityBugTracker;
@@ -479,3 +481,7 @@ Route::post('/files/one', '\App\Http\Controllers\CyberBuddyController@uploadOneF
 Route::post('/files/many', '\App\Http\Controllers\CyberBuddyController@uploadManyFiles')->middleware('auth:sanctum');
 
 Route::get('/website', [WebsiteController::class, '__invoke'])->name('iframes.website');
+
+Route::get('/changelog', [ChangelogController::class, '__invoke'])->name('irames.changelog');
+
+Route::get('/changelog2', [ChangelogController2::class, '__invoke'])->name('iframes.changelog2');
