@@ -166,6 +166,7 @@ class AppServiceProvider extends ServiceProvider
         // Keep Cywise routing independent from the DB-selected theme.
         $themePath = resource_path('themes/cywise');
 
+        $this->loadViewsFrom($themePath, 'theme');
         Blade::anonymousComponentPath($themePath . '/components');
         Folio::path($themePath . '/pages');
     }
