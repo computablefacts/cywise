@@ -3,7 +3,7 @@
     name('changelog');
     
     // use a dynamic layout based on whether or not the user is authenticated
-    $layout = ((auth()->guest()) ? 'layouts.marketing' : 'layouts.app');
+    $layout = ((auth()->guest()) ? 'layouts.website-v2' : 'layouts.app');
 ?>
 
 <x-dynamic-component 

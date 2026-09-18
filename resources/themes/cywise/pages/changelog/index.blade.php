@@ -5,7 +5,7 @@
     $logs = \Wave\Changelog::orderBy('created_at', 'desc')->paginate(10);
 
     // use a dynamic layout based on whether or not the user is authenticated
-    $layout = ((auth()->guest()) ? 'layouts.marketing' : 'layouts.app');
+    $layout = ((auth()->guest()) ? 'layouts.website-v2' : 'layouts.app');
 ?>
 
 <x-dynamic-component 

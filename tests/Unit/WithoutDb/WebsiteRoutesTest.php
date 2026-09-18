@@ -114,6 +114,25 @@ it('keeps the yellow feature-card shadow visible', function () {
         ->toContain('box-shadow:6px 6px 0 #16234A');
 });
 
+it('serves public changelogs with the website layout', function () {
+    $pages = [
+        resource_path('themes/cywise/pages/changelog/index.blade.php'),
+        resource_path('themes/cywise/pages/changelog/[.Wave.Changelog].blade.php'),
+    ];
+    $routes = file_get_contents(base_path('routes/web.php'));
+
+    expect($routes)->not->toContain("Route::get('/changelog'");
+
+    foreach ($pages as $page) {
+        $template = file_get_contents($page);
+
+        expect($template)
+            ->toContain("'layouts.website-v2'")
+            ->toContain("'layouts.app'")
+            ->not->toContain("'layouts.marketing'");
+    }
+});
+
 it('renders public website pages', function (string $path) {
     $this->get($path)->assertOk();
 })->with([
