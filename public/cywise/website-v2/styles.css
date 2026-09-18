@@ -145,8 +145,8 @@ a:hover{color:inherit}
   z-index:-1;
   left:-1%;
   right:-2%;
-  bottom:3%;
-  height:26%;
+  bottom:0%;
+  height:29%;
   background:var(--acid);
   border:2px solid var(--ink);
   transform:rotate(-1deg);
