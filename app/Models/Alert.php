@@ -95,27 +95,27 @@ class Alert extends Model
 
     public function isCritical(): bool
     {
-        return $this->level === 'Critical';
+        return !$this->false_positive && $this->level === 'Critical';
     }
 
     public function isHigh(): bool
     {
-        return $this->isCritical() || $this->level === 'High';
+        return !$this->false_positive && ($this->isCritical() || $this->level === 'High');
     }
 
     public function isMedium(): bool
     {
-        return $this->level === 'Medium';
+        return !$this->false_positive && $this->level === 'Medium';
     }
 
     public function isLow(): bool
     {
-        return $this->level === 'Low';
+        return !$this->false_positive && $this->level === 'Low';
     }
 
     public function isUnverified(): bool
     {
-        return $this->level === 'High (unverified)';
+        return !$this->false_positive && $this->level === 'High (unverified)';
     }
 
     /**

@@ -142,7 +142,8 @@ class Asset extends Model
             ->join('am_ports', 'am_ports.id', '=', 'am_alerts.port_id')
             ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
             ->join('am_assets', 'am_assets.cur_scan_id', '=', 'am_scans.ports_scan_id')
-            ->where('am_assets.id', $this->id);
+            ->where('am_assets.id', $this->id)
+            ->where('am_alerts.false_positive', false);
 
         // Dedup alerts to keep only one alert per UID (or ID if UID is null)
         $withRowNum = (clone $base)->select([
