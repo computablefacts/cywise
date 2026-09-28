@@ -27,7 +27,7 @@ abstract class AbstractListener implements ShouldQueue
         });
         try {
             $this->handle2($event);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error($e);
         }
     }
