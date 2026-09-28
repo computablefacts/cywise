@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Events\AssetsDiscovery;
 use App\Events\AssetsShared;
 use App\Events\BeginPortsScan;
 use App\Events\BeginVulnsScan;
@@ -9,6 +10,7 @@ use App\Events\CreateAsset;
 use App\Events\DeleteAsset;
 use App\Events\EndPortsScan;
 use App\Events\EndVulnsScan;
+use App\Events\GenerateAiRemediation;
 use App\Events\ImportTable;
 use App\Events\ImportVirtualTable;
 use App\Events\IngestFile;
@@ -19,7 +21,7 @@ use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Events\SendAuditReport;
 use App\Events\StartAssetsDiscover;
-use App\Events\AssetsDiscovery;
+use App\Listeners\AssetsDiscoveryListener;
 use App\Listeners\AssetsSharedListener;
 use App\Listeners\BeginPortsScanListener;
 use App\Listeners\BeginVulnsScanListener;
@@ -27,6 +29,7 @@ use App\Listeners\CreateAssetListener;
 use App\Listeners\DeleteAssetListener;
 use App\Listeners\EndPortsScanListener;
 use App\Listeners\EndVulnsScanListener;
+use App\Listeners\GenerateAiRemediationListener;
 use App\Listeners\ImportTableListener;
 use App\Listeners\ImportVirtualTableListener;
 use App\Listeners\IngestFileListener;
@@ -41,7 +44,6 @@ use App\Listeners\RebuildPackagesListListener;
 use App\Listeners\SendAuditReportListener;
 use App\Listeners\StartAssetsDiscoverListener;
 use App\Listeners\StoreLoginTime;
-use App\Listeners\AssetsDiscoveryListener;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -80,6 +82,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         EndVulnsScan::class => [
             EndVulnsScanListener::class,
+        ],
+        GenerateAiRemediation::class => [
+            GenerateAiRemediationListener::class,
         ],
         CreateAsset::class => [
             CreateAssetListener::class,
