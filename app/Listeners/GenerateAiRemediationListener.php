@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\AgentSquad\Assistants\TextAssistant;
 use App\Events\GenerateAiRemediation;
+use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\Port;
 use Illuminate\Support\Facades\Http;
@@ -51,7 +52,7 @@ class GenerateAiRemediationListener extends AbstractListener
         Log::debug("Alert updated for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert->title}, time: " . ((int)ceil($stop - $start)) . " seconds");
     }
 
-    private function generateAiRemediation(Port $port, array $alert, string $mode = 'both'): array
+    private function generateAiRemediation(Port $port, Alert $alert, string $mode = 'both'): array
     {
         $category = $this->detectVulnerabilityCategory($alert);
         $context = $this->gatherSecurityContext($port, $alert, $category);
@@ -78,8 +79,8 @@ class GenerateAiRemediationListener extends AbstractListener
             $aiRemediation = "### " . __('Analyse de la vulnérabilité') . "\n\n" .
                 __('Désolé, l\'explication détaillée n\'a pas pu être générée pour cette alerte.') . "\n\n" .
                 "**" . __('Détails détectés :') . "**\n" .
-                "- **" . __('Vulnerabilité :') . "** " . ($alert['vulnerability'] ?? 'N/A') . "\n" .
-                "- **" . __('Solution recommandée :') . "** " . ($alert['remediation'] ?? 'N/A');
+                "- **" . __('Vulnérabilité :') . "** " . ($alert->vulnerability ?? 'N/A') . "\n" .
+                "- **" . __('Solution recommandée :') . "** " . ($alert->remediation ?? 'N/A');
         }
 
         $scriptResult = trim($results['script'] ?? '');
@@ -117,22 +118,22 @@ class GenerateAiRemediationListener extends AbstractListener
         return trim($clean ?? '');
     }
 
-    private function detectVulnerabilityCategory(array $alert): string
+    private function detectVulnerabilityCategory(Alert $alert): string
     {
-        $type = Str::lower($alert['type'] ?? '');
+        $type = Str::lower($alert->type ?? '');
         if (Str::contains($type, ['quickhits_file', 'config_file', 'backup_file', 'file_alert', 'file_v3'])) {
             return 'file_exposed';
         }
         if (Str::contains($type, ['weak_cipher', 'ssl_certificate', 'tls_', 'cipher'])) {
             return "weak_cipher";
         }
-        if (!empty($alert['cve_id'])) {
+        if (!empty($alert->cve_id)) {
             return "cve";
         }
         return "general";
     }
 
-    private function gatherSecurityContext(Port $port, array $alert, string $category): array
+    private function gatherSecurityContext(Port $port, Alert $alert, string $category): array
     {
         /** @var Asset $asset */
         $asset = $port->scan->asset;
@@ -152,10 +153,10 @@ class GenerateAiRemediationListener extends AbstractListener
             'ip' => $port->ip ?? 'N/A',
             'port' => $port->port ?? 0,
             'protocol' => $port->protocol ?? 'tcp',
-            'vulnerability' => $alert['vulnerability'] ?? '',
-            'title' => $alert['title'] ?? '',
+            'vulnerability' => $alert->vulnerability ?? '',
+            'title' => $alert->title ?? '',
             'technology' => $technology,
-            'cve_id' => $alert['cve_id'] ?? null,
+            'cve_id' => $alert->cve_id ?? null,
             'tags' => implode(', ', $tags),
         ];
 
@@ -175,10 +176,10 @@ class GenerateAiRemediationListener extends AbstractListener
         return $context;
     }
 
-    private function extractExposedUrl(array $alert, Port $port): ?string
+    private function extractExposedUrl(Alert $alert, Port $port): ?string
     {
-        $url = $alert['url'] ?? $alert['matched_at'] ?? $alert['matched-at'] ?? null;
-        $searchIn = ($alert['vulnerability'] ?? '') . ' ' . ($alert['title'] ?? '');
+        $url = null;
+        $searchIn = ($alert->vulnerability ?? '') . ' ' . ($alert->title ?? '');
 
         if (!$url && preg_match('/(?:url|cible|target|host|matched|exposé)\s*:\s*(?:https?:\/\/)?([^\s<>"\']+)/i', $searchIn, $matches)) {
             $url = $matches[1];
@@ -252,10 +253,10 @@ class GenerateAiRemediationListener extends AbstractListener
         return 'unknown';
     }
 
-    private function processLlmPart(Port $port, array $alert, string $category, array $context, string $type, ?string $explanation = null, ?bool &$detectedFalsePositive = null): string
+    private function processLlmPart(Port $port, Alert $alert, string $category, array $context, string $type, ?string $explanation = null, ?bool &$detectedFalsePositive = null): string
     {
-        $title = $alert['title'] ?? '';
-        $alertType = $alert['type'] ?? '';
+        $title = $alert->title ?? '';
+        $alertType = $alert->type ?? '';
         $fileContent = $context['file_content'] ?? '';
 
         if ($category === 'file_exposed' && !empty($fileContent) && $type === 'explanation') {
@@ -279,8 +280,8 @@ class GenerateAiRemediationListener extends AbstractListener
             'content' => $fileContent,
             'title' => $title,
             'type' => $alertType,
-            'remediation' => $alert['remediation'] ?? '',
-            'technology_upper' => strtoupper($context['technology']),
+            'remediation' => $alert->remediation ?? '',
+            'technology_upper' => Str::upper($context['technology']),
             'domain' => $context['ip'],
             'filename' => basename(parse_url($context['exposed_url'] ?? '', PHP_URL_PATH) ?: 'file'),
             'analysis_context' => $explanation ?? '',
