@@ -144,12 +144,12 @@ class EndVulnsScanListener extends AbstractListener
 
         Auth::logout();
 
-        $this->setAlerts($port, $task);
+        $this->setAlerts($scan, $port, $task);
         $this->setScreenshot($port, $task);
         $this->markScanAsCompleted($scan);
     }
 
-    private function setAlerts(Port $port, array $task): void
+    private function setAlerts(Scan $scan, Port $port, array $task): void
     {
         /** @var Asset $asset */
         $asset = $port->scan->asset;
@@ -162,24 +162,33 @@ class EndVulnsScanListener extends AbstractListener
             ->filter(fn(array $data) => isset($data['alerts']) && count($data['alerts']))
             ->flatMap(fn(array $data) => $data['alerts'])
             ->filter(fn(array|string $alert) => is_array($alert))
-            ->each(function (array $alert) use ($port, $asset, $users) {
+            ->each(function (array $alert) use ($scan, $port, $asset, $users) {
                 try {
-                    $type = trim($alert['type']);
+                    $type = Str::trim($alert['type']);
 
-                    if (!str_ends_with($type, '_alert')) {
+                    if (!Str::endsWith($type, '_alert')) {
                         $type .= '_v3_alert';
                     }
 
                     $vulnerability = Str::limit(trim($alert['vulnerability'] ?? ''), 5000);
                     $remediation = Str::limit(trim($alert['remediation'] ?? ''), 5000);
-                    $level = trim($alert['level'] ?? '');
-                    $uid = trim($alert['uid'] ?? '');
+                    $level = Str::trim($alert['level'] ?? '');
+                    $uid = Str::trim($alert['uid'] ?? '');
                     $cve_id = empty($alert['cve_id']) ? null : $alert['cve_id'];
                     $cve_cvss = empty($alert['cve_cvss']) ? null : $alert['cve_cvss'];
                     $cve_vendor = empty($alert['cve_vendor']) ? null : $alert['cve_vendor'];
                     $cve_product = empty($alert['cve_product']) ? null : $alert['cve_product'];
-                    $title = trim($alert['title'] ?? '');
+                    $title = Str::trim($alert['title'] ?? '');
+
+                    Log::debug("Generating AI remediation for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}");
+                    $start = microtime(true);
+
                     $aiRemediation = $this->generateAiRemediation($port, $alert);
+
+                    $stop = microtime(true);
+                    Log::debug("AI remediation generated for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}, time: " . ((int)ceil($stop - $start)));
+                    Log::debug("Saving alert for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}");
+                    $start = microtime(true);
 
                     /** @var Alert $a */
                     $a = Alert::updateOrCreate([
@@ -202,12 +211,24 @@ class EndVulnsScanListener extends AbstractListener
                         'flarum_slug' => null, // TODO : remove?
                     ]);
 
+                    $stop = microtime(true);
+                    Log::debug("Alert saved for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}, time: " . ((int)ceil($stop - $start)));
+                    Log::debug("Caching translations for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}");
+                    $start = microtime(true);
+
                     // Cache translations
                     $a->translated('title');
                     $a->translated('vulnerability');
                     $a->translated('remediation');
 
+                    $stop = microtime(true);
+                    Log::debug("Translations cached for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}, time: " . ((int)ceil($stop - $start)));
+
                     if ($a->isHigh() || $a->isMedium()) {
+
+                        Log::debug("Sending notifications for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}");
+                        $start = microtime(true);
+
                         foreach ($users as $u) {
                             if ($asset->asset === $port->ip) {
                                 $u->notify(new Notification("{$port->ip}:{$port->port} - {$a->translated('title')} - {$a->translated('vulnerability')}"));
@@ -215,9 +236,12 @@ class EndVulnsScanListener extends AbstractListener
                                 $u->notify(new Notification("{$asset->asset} ({$port->ip}:{$port->port}) - {$a->translated('title')} - {$a->translated('vulnerability')}"));
                             }
                         }
+
+                        $stop = microtime(true);
+                        Log::debug("Notifications sent for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}, time: " . ((int)ceil($stop - $start)));
                     }
                 } catch (\Exception $exception) {
-                    Log::error($exception);
+                    Log::error("An error occurred while processing scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}, error: {$exception->getMessage()}");
                 }
             });
     }
