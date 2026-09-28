@@ -233,7 +233,7 @@ class EndVulnsScanListener extends AbstractListener
                         Log::debug("Notifications sent for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}, time: " . ((int)ceil($stop - $start)));
                     }
 
-                    GenerateAiRemediation::dispatch($scan, $port, $alert);
+                    GenerateAiRemediation::dispatch($scan, $port, $a);
 
                 } catch (\Exception $exception) {
                     Log::error("An error occurred while processing scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}, error: {$exception->getMessage()}");
