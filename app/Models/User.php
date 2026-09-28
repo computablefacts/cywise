@@ -227,9 +227,15 @@ class User extends WaveUser
         }
     }
 
-    public function isCywiseAdmin()
+    public function isCywiseAdmin(): bool
     {
         return $this->email === config('towerify.admin.email');
+    }
+
+    public function isCywiseAccount(): bool
+    {
+        $domains = collect(config('towerify.telescope.whitelist.domains'))->map(fn(string $domain) => '@' . $domain)->toArray();
+        return Str::endsWith($this->email, $domains);
     }
 
     public function tenant(): ?Tenant

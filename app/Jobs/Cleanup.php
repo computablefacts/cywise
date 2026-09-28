@@ -34,7 +34,7 @@ class Cleanup implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    const int DELETION_DELAY_DAYS = 3;
+    const int DELETION_DELAY_DAYS = 7;
 
     public $tries = 1;
     public $maxExceptions = 1;
@@ -251,8 +251,10 @@ class Cleanup implements ShouldQueue
             ->get()
             ->each(function (Tenant $tenant) {
 
-                $users = User::withoutGlobalScope('tenant_scope')->where('tenant_id', $tenant->id)->get();
-                $hasPayingUser = $users->contains(fn(User $user) => $user->subscriber());
+                $users = User::withoutGlobalScope('tenant_scope')
+                    ->where('tenant_id', $tenant->id)
+                    ->get();
+                $hasPayingUser = $users->contains(fn(User $user) => $user->isCywiseAccount() || $user->subscriber());
 
                 if ($hasPayingUser) {
                     if ($tenant->deletion_scheduled_at !== null) {
@@ -267,64 +269,42 @@ class Cleanup implements ShouldQueue
 
                 // No paying user
                 if ($tenant->deletion_scheduled_at === null) {
-                    if ($this->hasDataToCleanup($users)) {
 
-                        Log::debug("Tenant {$tenant->id} has no paying user but has data. Scheduling deletion in " . self::DELETION_DELAY_DAYS . " days.");
+                    Log::debug("Tenant {$tenant->id} has no paying user. Scheduling deletion in " . self::DELETION_DELAY_DAYS . " days.");
 
-                        $tenant->deletion_scheduled_at = now()->addDays(self::DELETION_DELAY_DAYS)->endOfDay();
-                        $tenant->save();
-
-                        $users->each(function (User $user) use ($tenant) {
-                            $terms = "https://www.cywise.io/terms";
-                            $delay = self::DELETION_DELAY_DAYS;
-                            $user->notify(Notification::viaEmail("
+                    $users->each(function (User $user) use ($tenant) {
+                        $terms = "https://www.cywise.io/terms";
+                        $delay = self::DELETION_DELAY_DAYS;
+                        $user->notify(Notification::viaEmail("
                               <p>Bonjour,</p>
                               <p>Votre période d'essai sur Cywise arrive à son terme. Conformément à nos <a href=\"{$terms}\">conditions d'utilisation</a>, <b>votre compte sera désactivé et les données associées seront supprimées dans {$delay} jours</b>, soit le {$tenant->deletion_scheduled_at->format('Y-m-d')}.</p>
                               <p>Si vous souhaitez prolonger votre expérience ou discuter d'une solution adaptée à vos besoins, n'hésitez pas à répondre à cet email.</p>
                               <p>Nous restons à votre disposition pour toute question.</p>
                               <p>Bonne journée !</p>
                             ", "📢 Fin de votre période d'essai sur Cywise"));
-                        });
-                    }
+                    });
+
+                    $tenant->deletion_scheduled_at = now()->addDays(self::DELETION_DELAY_DAYS)->endOfDay();
+                    $tenant->save();
+
                 } else if ($tenant->deletion_scheduled_at <= now()) {
 
                     Log::info("Tenant {$tenant->id} deletion delay expired. Cleaning up data.");
 
                     $this->cleanupTenantData($users);
-
-                    $tenant->deletion_scheduled_at = null;
-                    $tenant->save();
-
                     $users->each(function (User $user) {
                         $user->notify(Notification::viaEmail("
                             <p>Bonjour,</p>
-                            <p>Conformément à ce qui vous a été annoncé, vos données ont maintenant été supprimées. Cependant, votre compte utilisateur reste actif.</p>
+                            <p>Conformément à ce qui vous a été annoncé, vos données ont maintenant été supprimées.</p>
                             <p>Nous restons à votre disposition pour toute question.</p>
                             <p>Bonne journée !</p>
                         ", "📢 Confirmation de la suppression de vos données sur Cywise"));
+                        $user->delete();
                     });
+
+                    $tenant->delete();
                 }
             });
-    }
-
-    private function hasDataToCleanup(\Illuminate\Support\Collection $users): bool
-    {
-        $userIds = $users->pluck('id')->toArray();
-
-        if (empty($userIds)) {
-            return false;
-        }
-        return Asset::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || YnhServer::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || ScheduledTask::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || Conversation::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || File::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || Collection::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            // || Trial::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || Vector::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || Leak::withoutGlobalScope('tenant_scope')->whereIn('created_by', $userIds)->exists()
-            || TimelineItem::whereIn('owned_by', $userIds)->exists()
-            || TimelineFact::whereIn('owned_by', $userIds)->exists();
     }
 
     private function cleanupTenantData(\Illuminate\Support\Collection $users): void
