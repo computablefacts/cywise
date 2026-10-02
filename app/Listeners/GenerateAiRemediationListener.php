@@ -7,6 +7,8 @@ use App\Events\GenerateAiRemediation;
 use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\Port;
+use App\Models\User;
+use App\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -50,6 +52,27 @@ class GenerateAiRemediationListener extends AbstractListener
 
         $stop = microtime(true);
         Log::debug("Alert updated for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert->title}, time: " . ((int)ceil($stop - $start)) . " seconds");
+
+        if (!$alert->false_positive && ($alert->isHigh() || $alert->isMedium())) {
+
+            Log::debug("Sending notifications for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert->title}");
+            $start = microtime(true);
+
+            /** @var Asset $asset */
+            $asset = $scan->asset();
+            $users = User::where('tenant_id', $asset->tenant()?->id)->get();
+
+            foreach ($users as $u) {
+                if ($asset->asset === $port->ip) {
+                    $u->notify(new Notification("{$port->ip}:{$port->port} - {$alert->translated('title')} - {$alert->translated('vulnerability')}"));
+                } else {
+                    $u->notify(new Notification("{$asset->asset} ({$port->ip}:{$port->port}) - {$alert->translated('title')} - {$alert->translated('vulnerability')}"));
+                }
+            }
+
+            $stop = microtime(true);
+            Log::debug("Notifications sent to {$users->count()} users for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert->title}, time: " . ((int)ceil($stop - $start)) . " seconds");
+        }
     }
 
     private function generateAiRemediation(Port $port, Alert $alert, string $mode = 'both'): array
