@@ -12,7 +12,6 @@ use App\Models\Port;
 use App\Models\Scan;
 use App\Models\Trial;
 use App\Models\User;
-use App\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -215,23 +214,6 @@ class EndVulnsScanListener extends AbstractListener
 
                     $stop = microtime(true);
                     Log::debug("Translations cached for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}, time: " . ((int)ceil($stop - $start)));
-
-                    if ($a->isHigh() || $a->isMedium()) {
-
-                        Log::debug("Sending notifications for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}");
-                        $start = microtime(true);
-
-                        foreach ($users as $u) {
-                            if ($asset->asset === $port->ip) {
-                                $u->notify(new Notification("{$port->ip}:{$port->port} - {$a->translated('title')} - {$a->translated('vulnerability')}"));
-                            } else {
-                                $u->notify(new Notification("{$asset->asset} ({$port->ip}:{$port->port}) - {$a->translated('title')} - {$a->translated('vulnerability')}"));
-                            }
-                        }
-
-                        $stop = microtime(true);
-                        Log::debug("Notifications sent for scan: ({$scan->ports_scan_id}, {$scan->vulns_scan_id}), alert: {$alert['title']}, time: " . ((int)ceil($stop - $start)));
-                    }
 
                     GenerateAiRemediation::dispatch($scan, $port, $a);
 
