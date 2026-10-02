@@ -1,0 +1,109 @@
+/*
+ * Cywise design system (app UI).
+ *
+ * Coexists with legacy Bootstrap during the migration:
+ *
+ *   ┌──────────────────────────────┐
+ *   │ Bootstrap (legacy, CDN)      │  unlayered, element + class rules
+ *   ├──────────────────────────────┤
+ *   │ ui.css  (this file)          │  unlayered, "ui:" prefixed utilities
+ *   └──────────────────────────────┘
+ *
+ * - The "ui:" prefix avoids class collisions (e.g. Bootstrap ".p-3 !important").
+ * - Utilities are unlayered so they beat Bootstrap element rules (e.g. "a { color }")
+ *   by specificity instead of losing to them by cascade layer.
+ * - No preflight: Bootstrap reboot already normalizes elements.
+ */
+@import 'tailwindcss/theme.css' prefix(ui);
+@import 'tailwindcss/utilities.css' prefix(ui);
+
+@source '../../**/*.blade.php';
+@source '../../../../js/**/*.jsx';
+
+/* static: tokens are also read by legacy CSS through var(--ui-color-*) */
+@theme static {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand: action, accent */
+  --color-brand-50: #fff7ed;
+  --color-brand-100: #ffedd5;
+  --color-brand-200: #fed7aa;
+  --color-brand-500: #f97316;
+  --color-brand-600: #ea580c;
+  --color-brand-700: #c2410c;
+
+  /* Ink: structure, titles */
+  --color-ink: #0f172a;
+
+  /* Severity */
+  --color-critical: #dc2626;
+  --color-critical-soft: #fef2f2;
+  --color-high: #ef4444;
+  --color-high-soft: #fef2f2;
+  --color-medium: #f59e0b;
+  --color-medium-soft: #fffbeb;
+  --color-low: #10b981;
+  --color-low-soft: #ecfdf5;
+  --color-info: #3b82f6;
+  --color-info-soft: #eff6ff;
+
+  /* Surfaces */
+  --color-canvas: #f8fafc;
+  --color-surface: #ffffff;
+  --color-line: #e2e8f0;
+}
+
+/* Alpine: hide until initialized */
+[x-cloak] {
+  display: none !important;
+}
+
+/*
+ * Severity edge on list rows: <li data-severity="high">.
+ * The colour carries the severity; the text label next to it stays neutral.
+ * Pseudo-element above the row content, so child hover backgrounds never hide it.
+ */
+[data-severity] {
+  position: relative;
+  --severity-color: var(--ui-color-line);
+}
+
+/* Full-height bar, thickens on hover (3px → 6px). */
+[data-severity]::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--severity-color);
+  pointer-events: none;
+  transition: width .18s ease;
+}
+
+[data-severity]:hover::before {
+  width: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-severity]::before {
+    transition: none;
+  }
+}
+
+[data-severity="critical"] {
+  --severity-color: var(--ui-color-critical);
+}
+
+[data-severity="high"] {
+  --severity-color: var(--ui-color-high);
+}
+
+[data-severity="medium"] {
+  --severity-color: var(--ui-color-medium);
+}
+
+[data-severity="low"] {
+  --severity-color: var(--ui-color-low);
+}

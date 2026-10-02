@@ -1,4 +1,10 @@
 * text=auto
+# Keep LF inside containers: shebangs and Blade-rendered JS strings break with CRLF on Windows checkouts
+*.sh text eol=lf
+*.bash text eol=lf
+artisan text eol=lf
+Dockerfile text eol=lf
+*.blade.php text eol=lf
 
 *.blade.php diff=html
 *.css diff=css

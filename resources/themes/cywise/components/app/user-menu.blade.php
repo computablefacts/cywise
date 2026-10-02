@@ -1,48 +1,40 @@
-@props([
-    'position' => 'bottom'
-])
-<div x-data="{ dropdownOpen: false }" class="position-relative flex-shrink-0 d-flex align-items-center w-100" x-cloak>
-    <button @click="dropdownOpen=!dropdownOpen" class="d-flex p-2 w-100 gap-2 small hover-bg-light rounded border-0 bg-transparent justify-content-between align-items-center text-dark text-decoration-none">
-        <span class="position-relative d-flex align-items-center gap-2">
-            <x-avatar src="{{ auth()->user()->avatar() }}" alt="{{ auth()->user()->name }} photo" size="2xs" />
-            <span @class([
-                'transition-all',
-                'd-none' => ($position != 'bottom')
-            ])>{{ Auth::user()->name }}</span>
+@php
+    $user = auth()->user();
+    $initials = collect(preg_split('/\s+/', trim($user->name)))->take(2)->map(fn($w) => mb_substr($w, 0, 1))->join('');
+@endphp
+
+<div x-data="{ dropdownOpen: false }" @click.outside="dropdownOpen=false" @keydown.escape="dropdownOpen=false" class="ui:relative">
+    <button type="button" @click="dropdownOpen=!dropdownOpen" :aria-expanded="dropdownOpen"
+            class="ui:flex ui:items-center ui:gap-3 ui:rounded-lg ui:border-0 ui:bg-transparent ui:py-1.5 ui:pl-1.5 ui:pr-2 ui:hover:bg-slate-100 ui:cursor-pointer">
+        <span class="ui:flex ui:size-8 ui:shrink-0 ui:items-center ui:justify-center ui:rounded-lg ui:bg-ink ui:text-xs ui:font-semibold ui:uppercase ui:text-white">
+            {{ $initials }}
         </span>
-        <svg :class="{ 'rotate-180' : '{{ $position }}' == 'bottom' }" class="position-relative transition-transform" style="width: 1rem; height: 1rem;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        <span class="ui:hidden ui:max-w-44 ui:truncate ui:text-sm ui:font-medium ui:text-ink ui:md:block">{{ $user->name }}</span>
+        <x-phosphor-caret-down class="ui:size-4 ui:text-slate-400"/>
     </button>
-    <div wire:ignore x-show="dropdownOpen" @mouse.leave="dropdownOpen=false" @click.away="dropdownOpen=false" x-transition 
-        @class([
-            'z-index-1000',
-            'position-absolute w-100 bottom-0 mb-5 pb-2' => ($position == 'bottom'),
-            'position-fixed top-0 end-0 me-3 mt-5 w-100 shadow' => ($position != 'bottom')
-        ])
-        style="@if($position != 'bottom') max-width: 250px; @endif"
-        x-cloak>
-        <div class="bg-white border text-muted shadow-sm rounded-3">
-            <div class="px-3 py-2 small fw-bold text-truncate">{{ auth()->user()->email }}</div>
-            <div class="dropdown-divider my-1"></div>
-            <div class="position-relative d-flex flex-column p-2 gap-1">
-                <x-app.sidebar-link :hideUntilGroupHover="false" href="{{ route('notifications') }}" icon="phosphor-bell-duotone" active="false">Notifications</x-app.sidebar-link>
-                <x-app.sidebar-link :hideUntilGroupHover="false" href="{{ route('settings.profile') }}" icon="phosphor-gear-duotone" active="false">Settings</x-app.sidebar-link>
-                @notsubscriber
-                <x-app.sidebar-link href="/settings/subscription" icon="phosphor-sparkle-duotone">Upgrade</x-app.sidebar-link>
-                @endnotsubscriber
-                @if(auth()->user()->isAdmin())
-                <x-app.sidebar-link :hideUntilGroupHover="false" :ajax="false" href="/admin" icon="phosphor-crown-duotone" active="false">View Admin</x-app.sidebar-link>
-                @endif
-                <form method="POST" action="{{ route('logout') }}" class="w-100">
-                    @csrf
-                    <button onclick="event.preventDefault(); this.closest('form').submit();" class="position-relative w-100 d-flex cursor-pointer hover-text-dark select-none hover-bg-light align-items-center rounded border-0 bg-transparent p-2 small transition-colors">
-                        <x-phosphor-sign-out-duotone class="flex-shrink-0 me-2" style="width: 1.25rem; height: auto;" />
-                        <span>Log out</span>
-                    </button>
-                </form>
-                @impersonating
-                <x-app.sidebar-link href="{{ route('impersonate.leave') }}" icon="phosphor-user-circle-duotone" active="false">Leave impersonation</x-app.sidebar-link>
-                @endImpersonating
-            </div>
-        </div>
+
+    <div x-show="dropdownOpen" x-transition.origin.top.right x-cloak
+         class="ui:absolute ui:right-0 ui:z-50 ui:mt-2 ui:w-64 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-1.5 ui:shadow-lg">
+        <div class="ui:truncate ui:px-3 ui:py-2 ui:text-xs ui:font-medium ui:text-slate-500">{{ $user->email }}</div>
+        <div class="ui:my-1 ui:h-px ui:bg-line"></div>
+        <x-app.sidebar-link href="{{ route('settings.profile') }}" icon="phosphor-gear">{{ __('Settings') }}</x-app.sidebar-link>
+        @notsubscriber
+        <x-app.sidebar-link href="/settings/subscription" icon="phosphor-sparkle">{{ __('Upgrade') }}</x-app.sidebar-link>
+        @endnotsubscriber
+        @if($user->isAdmin())
+        <x-app.sidebar-link :ajax="false" href="/admin" icon="phosphor-crown">{{ __('View Admin') }}</x-app.sidebar-link>
+        @endif
+        @impersonating
+        <x-app.sidebar-link href="{{ route('impersonate.leave') }}" icon="phosphor-user-circle">{{ __('Leave impersonation') }}</x-app.sidebar-link>
+        @endImpersonating
+        <div class="ui:my-1 ui:h-px ui:bg-line"></div>
+        <form method="POST" action="{{ route('logout') }}" class="ui:m-0">
+            @csrf
+            <button type="submit"
+                    class="ui:flex ui:w-full ui:items-center ui:gap-3 ui:rounded-lg ui:border-0 ui:bg-transparent ui:px-3 ui:py-2 ui:text-sm ui:text-slate-600 ui:hover:bg-slate-100 ui:hover:text-ink ui:cursor-pointer">
+                <x-phosphor-sign-out class="ui:size-5 ui:shrink-0"/>
+                <span>{{ __('Log out') }}</span>
+            </button>
+        </form>
     </div>
 </div>

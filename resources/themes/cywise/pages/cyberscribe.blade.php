@@ -9,51 +9,49 @@ name('cyberscribe');
 ?>
 
 <x-layouts.app>
-  <div class="container-fluid">
-    <div class="card mt-3 mb-3">
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            <div id="templates" class="mb-3"></div>
-          </div>
+  {{--
+    header                        [import] [export] [clear] [delete] [Save]
+    template picker  |  import your own template (.json)  [Submit]
+    contents | document (BlockNote)
+    Blueprint widgets (#templates, #file, #submit) and the editor are mounted by the script below.
+  --}}
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-7xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
+
+    <x-ui.page-header title="CyberScribe" :subtitle="__('Write your security charters and policies from a template, with the help of AI.')">
+      <x-slot:actions>
+        <x-ui.icon-button icon="upload-simple" :title="__('Import a Markdown document')" onclick="importDocument()"/>
+        <x-ui.icon-button icon="download-simple" :title="__('Export as Markdown')" onclick="exportDocument()"/>
+        <x-ui.icon-button icon="eraser" :title="__('Clear the editor')" onclick="clearDocument()"/>
+        <x-ui.icon-button icon="trash" :title="__('Delete the document')" onclick="deleteDocument()"/>
+        <x-ui.button icon="floppy-disk" onclick="saveDocument()">{{ __('Save') }}</x-ui.button>
+      </x-slot:actions>
+    </x-ui.page-header>
+
+    <div class="ui:grid ui:items-end ui:gap-4 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-4 ui:shadow-xs ui:lg:grid-cols-2">
+      <x-ui.field :label="__('Template or document')">
+        <div id="templates"></div>
+      </x-ui.field>
+      <x-ui.field :label="__('Import your own template (.json)')">
+        <div class="ui:flex ui:items-center ui:gap-2">
+          <div id="file" class="ui:min-w-0 ui:flex-1"></div>
+          <div id="submit"></div>
         </div>
-        <div class="row">
-          <div class="col-10">
-            <div id="file"></div>
-          </div>
-          <div class="col">
-            <div id="submit"></div>
-          </div>
-        </div>
-      </div>
+      </x-ui.field>
     </div>
-    <div class="container-fluid mb-3">
-      <div class="row">
-        <div class="col text-end">
-          <span class="bp4-icon bp4-icon-eraser"></span>&nbsp;<a href="#" onclick="clearDocument()">
-            {{ __('clear') }}
-          </a>&nbsp;&nbsp;&nbsp;
-          <span class="bp4-icon bp4-icon-import"></span>&nbsp;<a href="#" onclick="importDocument()">
-            {{ __('import') }}
-          </a>&nbsp;&nbsp;&nbsp;
-          <span class="bp4-icon bp4-icon-export"></span>&nbsp;<a href="#" onclick="exportDocument()">
-            {{ __('export') }}
-          </a>&nbsp;&nbsp;&nbsp;
-          <span class="bp4-icon bp4-icon-trash"></span>&nbsp;<a href="#" onclick="deleteDocument()">
-            {{ __('delete') }}
-          </a>&nbsp;&nbsp;&nbsp;
-          <span class="bp4-icon bp4-icon-floppy-disk"></span>&nbsp;<a href="#" onclick="saveDocument()">
-            {{ __('save') }}
-          </a>
-        </div>
-      </div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-body p-2">
-        <x-block-note/>
-      </div>
-    </div>
+
+    <x-block-note/>
   </div>
+
+  <style>
+    /* Blueprint widgets: full width, aligned with the design system inputs */
+    #templates .bp4-popover2-target, #templates .bp4-button, #file .bp4-file-input { width: 100%; }
+    #templates .bp4-button, #file .bp4-file-input, #submit .bp4-button { min-height: 2.5rem; }
+    /* Editor typography aligned with the app: Inter, bold headings */
+    #block-note .bn-container { --bn-font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+    #block-note [data-content-type="heading"] .bn-inline-content { font-weight: 700; letter-spacing: -0.01em; color: var(--ui-color-ink); }
+    /* Keep headings clear of the sticky topbar when jumping from the table of contents */
+    #block-note [data-id] { scroll-margin-top: 5rem; }
+  </style>
   @viteReactRefresh
   @vite('resources/js/app.js')
   <script>

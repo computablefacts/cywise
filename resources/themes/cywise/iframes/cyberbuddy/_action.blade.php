@@ -1,62 +1,17 @@
-@once
-<style>
-
-  .tw-action {
-    cursor: pointer;
-    border-width: 2px;
-    border-color: rgb(226, 232, 240);
-    border-style: solid;
-    border-radius: 8px;
-    padding: 1rem;
-  }
-
-  .tw-action:hover {
-    --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-  }
-
-  .tw-action .tw-header {
-    flex-direction: column;
-    display: flex;
-    padding: 0.5rem
-  }
-
-  .tw-action .tw-body {
-    padding-bottom: 0.75rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    padding-top: 0.5rem;
-    font-size: 14px;
-    color: rgb(75, 85, 99)
-  }
-
-  .tw-action .tw-header h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-  }
-
-  .tw-action .tw-header p {
-    color: rgb(100, 116, 139);
-    font-size: 14px;
-  }
-
-  .tw-action .tw-body p {
-    display: -webkit-box;
-    overflow: hidden
-  }
-
-</style>
-@endonce
-<div class="tw-action" onclick="onActionClick('{{ e($text) }}')">
-  <div class="tw-header">
-    <h3>{{ $title }}</h3>
-    <p>{{ $subtitle }}</p>
-  </div>
-  <div class="tw-body">
-    <p>{{ $text }}</p>
-  </div>
-</div>
+{{-- Suggestion card: clicking it pre-fills the chat input. --}}
+<button type="button" onclick="onActionClick('{{ e($text) }}')"
+        class="ui:group ui:flex ui:flex-col ui:items-start ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-4 ui:text-left ui:cursor-pointer ui:transition ui:hover:border-brand-200 ui:hover:shadow-md">
+  <span class="ui:flex ui:items-center ui:gap-3">
+    <span class="ui:flex ui:size-9 ui:shrink-0 ui:items-center ui:justify-center ui:rounded-lg ui:bg-brand-50 ui:text-brand-500">
+      <x-dynamic-component :component="'phosphor-' . ($icon ?? 'chat-circle')" class="ui:size-5"/>
+    </span>
+    <span class="ui:flex ui:flex-col">
+      <span class="ui:text-sm ui:font-semibold ui:text-ink">{{ $title }}</span>
+      <span class="ui:text-xs ui:text-slate-500">{{ $subtitle }}</span>
+    </span>
+  </span>
+  <span class="ui:text-sm ui:text-slate-600 ui:group-hover:text-ink">« {{ $text }} »</span>
+</button>
 @once
 @push('scripts')
 <script>
@@ -70,8 +25,6 @@
     const elInputField = document.querySelector('.tw-chat-footer-input');
     elInputField.value = text;
     elInputField.focus();
-
-    console.log(text);
   };
 
 </script>

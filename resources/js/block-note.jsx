@@ -82,30 +82,27 @@ const QaBlock = createReactBlockSpec({
       .catch(error => console.log(error))
       .finally(() => setLoading(false));
     };
-    return (<div style={{width: "100%"}}>{props.block.props.questions.map(question => {
-      return (<div key={question}>
-        <div style={{
-          backgroundColor: "var(--ds-background-discovery)", color: "var(--ds-text-discovery)", padding: "3px"
-        }}>
-          {question}
-        </div>
-        <input type={"text"}
-               style={{width: "100%", border: "none", padding: "3px", outline: "unset"}}
-               onChange={(event) => handleChange(event, question)}
-               placeholder={"Saisissez votre réponse ici..."}
-               disabled={loading}
-               required>
-        </input>
-      </div>);
-    })}
-      <div className={"d-flex justify-content-center"}>
-        {!loading && <input type={"button"}
-                            value={"Générer!"}
-                            style={{backgroundColor: "#0d6efd", color: "white", border: "none", padding: "10px"}}
-                            disabled={loading}
-                            onClick={handleClick}>
-        </input>}
-        {loading && <span className="loader-25 align-self-center ml-3" style={{marginTop: "10px"}}></span>}
+    // Design system classes (ui: prefix, see resources/themes/cywise/assets/css/ui.css)
+    return (<div className="ui:my-2 ui:flex ui:w-full ui:flex-col ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-slate-50 ui:p-4">
+      {props.block.props.questions.map(question => {
+        return (<label key={question} className="ui:m-0 ui:flex ui:flex-col ui:gap-1.5">
+          <span className="ui:text-sm ui:font-medium ui:text-ink">{question}</span>
+          <input type={"text"}
+                 className="ui:h-9 ui:w-full ui:rounded-lg ui:border ui:border-solid ui:border-line ui:bg-white ui:px-3 ui:text-sm ui:text-ink ui:placeholder:text-slate-400 ui:focus:border-brand-500 ui:focus:outline-none ui:focus:ring-2 ui:focus:ring-brand-100"
+                 onChange={(event) => handleChange(event, question)}
+                 placeholder={"Saisissez votre réponse ici..."}
+                 disabled={loading}
+                 required>
+          </input>
+        </label>);
+      })}
+      <div className="ui:flex ui:items-center ui:justify-end">
+        {!loading && <button type={"button"}
+                             className="ui:inline-flex ui:h-9 ui:items-center ui:gap-2 ui:rounded-lg ui:border-0 ui:bg-brand-500 ui:px-4 ui:text-sm ui:font-medium ui:text-white ui:cursor-pointer ui:hover:bg-brand-600"
+                             onClick={handleClick}>
+          <HiSparkles size={16}/> Générer
+        </button>}
+        {loading && <span className="loader-25"></span>}
       </div>
     </div>);
   }
@@ -171,22 +168,15 @@ const AiBlock = createReactBlockSpec({
       }
     };
     return (
-      <div style={{width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexGrow: "1"}}>
-        <div style={{
-          backgroundColor: "var(--ds-background-discovery)", color: "var(--ds-text-discovery)", padding: "3px"
-        }}>
-          @{props.block.props.assistant_name}&nbsp;
-        </div>
+      <div className="ui:my-1 ui:flex ui:w-full ui:flex-1 ui:items-center ui:gap-2 ui:rounded-lg ui:border ui:border-solid ui:border-brand-200 ui:bg-brand-50 ui:px-2 ui:py-1">
+        <span className="ui:inline-flex ui:items-center ui:gap-1 ui:rounded-md ui:bg-brand-500 ui:px-2 ui:py-0.5 ui:text-xs ui:font-medium ui:text-white">
+          <HiSparkles size={12}/> {props.block.props.assistant_name}
+        </span>
         {props.block.props.collections.length > 0 && <Menu withinPortal={false} zIndex={999999}>
           <Menu.Target>
-            <div style={{
-              cursor: "pointer",
-              backgroundColor: "var(--ds-background-information)",
-              color: "var(--ds-text-information)",
-              padding: "3px"
-            }}>
-              &nbsp;{props.block.props.collection}&nbsp;
-            </div>
+            <span className="ui:cursor-pointer ui:rounded-md ui:bg-white ui:px-2 ui:py-0.5 ui:text-xs ui:font-medium ui:text-slate-700 ui:ring-1 ui:ring-inset ui:ring-slate-200 ui:hover:bg-slate-100">
+              {props.block.props.collection}
+            </span>
           </Menu.Target>
           <Menu.Dropdown>
             {props.block.props.collections.map(col => {
@@ -195,12 +185,12 @@ const AiBlock = createReactBlockSpec({
           </Menu.Dropdown>
         </Menu>}
         <input type={"text"}
-               style={{flexGrow: "1", border: "none", padding: "3px", outline: "unset", minHeight: "30px"}}
+               className="ui:min-h-8 ui:flex-1 ui:border-0 ui:bg-transparent ui:px-1 ui:text-sm ui:text-ink ui:placeholder:text-slate-400 ui:outline-none"
                ref={inputRef}
                disabled={loading}
                onKeyDown={handleKeyDown}
                onChange={handlePromptChange}
-               placeholder={"Saisissez vos instructions ici..."}
+               placeholder={"Saisissez vos instructions ici, puis Entrée..."}
                value={props.block.props.prompt}
                autoFocus
                required>
@@ -242,8 +232,10 @@ function BlockNoteElement() {
   const editor = useCreateBlockNote(ctx.settings);
   ctx.editor = editor;
   ctx.blocks = editor.document;
+  // Light theme forced: the app has no dark mode yet (BlockNote follows the OS setting otherwise)
   return (<BlockNoteView
     editor={editor}
+    theme="light"
     slashMenu={false}
     onChange={() => {
       ctx.blocks = editor.document;

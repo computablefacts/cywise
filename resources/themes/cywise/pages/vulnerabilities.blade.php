@@ -14,78 +14,59 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
-  @include('theme::iframes._styles')
-  <div class="container-fluid">
-    @include('theme::iframes.timeline._vulnerability-counters')
-    <div class="row mt-3 mb-1">
-      <div class="col">
-        <div class="card">
-          <div class="card-body p-3">
-            <form method="get" action="{{ route('vulnerabilities') }}" class="row g-2 align-items-end">
-              <div class="col-sm-3">
-                <label for="tld" class="form-label">
-                  {{ __('Asset') }}
-                </label>
-                <input type="text"
-                       id="tld"
-                       name="tld"
-                       value="{{ request('tld') }}"
-                       class="form-control"
-                       placeholder="example.com">
-              </div>
-              <div class="col-sm-3">
-                <label for="tags" class="form-label">
-                  {{ __('User tag') }}
-                </label>
-                <select id="tags" name="tags" class="form-select">
-                  <option value="">{{ __('All tags') }}</option>
-                  @foreach($tags as $tag)
-                  <option value="{{ $tag }}" {{ request(
-                  'tags') === $tag ? 'selected' : '' }}>
-                  {{ $tag }}
-                  </option>
-                  @endforeach
-                </select>
-              </div>
-              <div class="col-sm-3">
-                <label for="port_tags" class="form-label">
-                  {{ __('System tag') }}
-                </label>
-                <select id="port_tags" name="port_tags" class="form-select">
-                  <option value="">{{ __('All tags') }}</option>
-                  @foreach($port_tags as $tag)
-                  <option value="{{ $tag }}" {{ request(
-                  'port_tags') === $tag ? 'selected' : '' }}>
-                  {{ $tag }}
-                  </option>
-                  @endforeach
-                </select>
-              </div>
-              <div class="col-sm-1">
-                <label class="form-label d-block">&nbsp;</label>
-                <button type="submit" class="btn btn-primary w-100">
-                  {{ __('Filter!') }}
-                </button>
-              </div>
-              <div class="col-sm-2">
-                <label class="form-label d-block">&nbsp;</label>
-                <a href="{{ route('vulnerabilities') }}" class="btn btn-secondary w-100">
-                  {{ __('Reset') }}
-                </a>
-              </div>
-              @if(request('level'))
-              <input type="hidden" name="level" value="{{ request('level') }}">
-              @endif
-              @if(request('asset_id'))
-              <input type="hidden" name="asset_id" value="{{ request('asset_id') }}">
-              @endif
-            </form>
-          </div>
-        </div>
-      </div>
+  @php
+    // Timeline items (date → time → events) flattened, most critical first.
+    $rows = collect($items)
+      ->flatMap(fn($times) => collect($times)->flatMap(fn($events) => $events))
+      ->sortBy([['_severity', 'asc'], ['timestamp', 'desc']])
+      ->values();
+
+    $level = request('level');
+    $filters = request()->only(['tld', 'tags', 'port_tags', 'asset_id']);
+    $isFiltered = !empty(array_filter($filters)) || !empty($level);
+
+    // KPI tiles double as severity filters; clicking the active one clears it.
+    $kpis = [
+      ['level' => 'high', 'tone' => 'high', 'value' => $nb_high, 'label' => __('High vulnerabilities')],
+      ['level' => 'medium', 'tone' => 'medium', 'value' => $nb_medium, 'label' => __('Medium vulnerabilities')],
+      ['level' => 'low', 'tone' => 'low', 'value' => $nb_low, 'label' => __('Low vulnerabilities')],
+    ];
+  @endphp
+
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-7xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
+
+    <x-ui.page-header :title="__('Vulnerabilities')"
+                      :subtitle="__('Weaknesses found on your exposed assets, most critical first.')"/>
+
+    <div class="ui:grid ui:grid-cols-1 ui:gap-4 ui:sm:grid-cols-3">
+      @foreach($kpis as $kpi)
+        <x-ui.stat :tone="$kpi['tone']" icon="warning-octagon" :value="$kpi['value']" :label="$kpi['label']"
+                   :href="route('vulnerabilities', $level === $kpi['level'] ? $filters : array_merge($filters, ['level' => $kpi['level']]))"
+                   :class="$level === $kpi['level'] ? 'ui:ring-2 ui:ring-brand-500 ui:border-transparent!' : ''"/>
+      @endforeach
     </div>
-    @include('theme::iframes.timeline._timeline')
-    @include('theme::iframes.timeline._share-modal')
+
+    {{-- Ctrl+F like search: asset, tag (user or system), CVE, date… --}}
+    <x-ui.search target="#vulnerabilities-list" :reset="$isFiltered ? route('vulnerabilities') : null"/>
+
+    {{-- List --}}
+    <x-ui.card id="vulnerabilities-list" flush :title="trans_choice(':count vulnerability|:count vulnerabilities', $rows->count(), ['count' => $rows->count()])"
+               :subtitle="$rows->isEmpty() ? null : __('Click a row to see the problem, the solution and the available actions.')">
+      @if($rows->isEmpty())
+        <x-ui.empty>
+          {{ $isFiltered ? __('No vulnerability matches these filters.') : __('Good job! No vulnerabilities to fix.') }}
+        </x-ui.empty>
+      @else
+        <ul class="ui:m-0 ui:list-none ui:p-0">
+          @foreach($rows as $row)
+            {!! $row['html'] !!}
+          @endforeach
+        </ul>
+        <x-ui.empty icon="magnifying-glass" data-search-empty style="display: none">{{ __('No result for this search.') }}</x-ui.empty>
+      @endif
+    </x-ui.card>
   </div>
+
+  @include('theme::iframes.timeline._share-modal')
   @include('theme::iframes._scripts')
 </x-layouts.app>

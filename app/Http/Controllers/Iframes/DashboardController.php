@@ -9,8 +9,10 @@ use App\Http\Procedures\HoneypotsProcedure;
 use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
+use App\Models\Asset;
 use App\Models\Honeypot;
 use App\Models\Leak;
+use App\Models\YnhServer;
 use Wave\Page;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -19,6 +21,16 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        $hasAssets = Asset::query()->exists();
+        $hasServers = YnhServer::query()->exists();
+
+        // First visit: nothing monitored yet, guide the user instead of showing empty metrics.
+        if (!$hasAssets && !$hasServers) {
+            return view('theme::pages.dashboard', [
+                'onboarding' => true,
+            ]);
+        }
+
         $procedure = new AssetsProcedure();
 
         $counts = $procedure->counts(JsonRpcRequest::createFrom($request));
@@ -127,6 +139,8 @@ class DashboardController extends Controller
             ->toArray();
 
         return view('theme::pages.dashboard', [
+            'onboarding' => false,
+            'has_servers' => $hasServers,
             'nb_monitored' => $nbMonitored,
             'nb_monitorable' => $nbMonitorable,
             'nb_vulns_high' => $nbVulnsHigh,

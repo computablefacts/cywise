@@ -25,6 +25,116 @@
     });
   }
 
+  const MORPH_MS = 220;
+  const MORPH_EASING = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+
+  // Apply a layout change (e.g. row => two-column panel) then animate the element
+  // from its old height to the new one. Only [data-morph-fade] parts that just
+  // appeared fade in: fading the whole element makes it blink.
+  const morphHeight = async (el, change) => {
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      change();
+      return;
+    }
+
+    // Measured before cancelling: a running morph keeps its current height
+    const from = el.offsetHeight;
+    el.getAnimations({subtree: true}).forEach(a => a.cancel());
+
+    const fades = Array.from(el.querySelectorAll('[data-morph-fade]'));
+    const hidden = fades.filter(f => f.offsetParent === null);
+
+    // x-show reveals on the next animation frame: measure in that same frame, before it is painted
+    change();
+    await Alpine.nextTick();
+    await new Promise(resolve => document.visibilityState === 'visible' ? requestAnimationFrame(resolve) : setTimeout(resolve));
+
+    const to = el.offsetHeight;
+    el.style.overflow = 'hidden';
+
+    el.animate([{height: `${from}px`}, {height: `${to}px`}], {duration: MORPH_MS, easing: MORPH_EASING})
+      .finished.then(() => el.style.overflow = '').catch(() => null);
+
+    hidden.filter(f => f.offsetParent !== null)
+      .forEach(f => f.animate([{opacity: 0}, {opacity: 1}], {duration: MORPH_MS, easing: 'ease-out'}));
+  }
+
+  /* SEARCH (x-ui.search) */
+
+  // Case and accent insensitive: "Été" => "ete"
+  const normalizeSearch = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+  // Dates typed the French way match the ISO dates of the rows:
+  // "28/09/2026" => "2026-09-28", "28/09" => "09-28", "09/2026" => "2026-09"
+  const toIsoDate = (term) => {
+
+    const day = term.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?$/);
+    if (day) {
+      const [, d, m, y] = day;
+      const monthDay = `${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+      return y ? `${y}-${monthDay}` : monthDay;
+    }
+
+    const month = term.match(/^(\d{1,2})\/(\d{4})$/);
+    if (month) {
+      return `${month[2]}-${month[1].padStart(2, '0')}`;
+    }
+    return term;
+  };
+
+  // Keep the rows of the container containing every word of the query, e.g. "web-servers high".
+  // Returns the counts shown by the search bar: {shown: 3, total: 42}.
+  const searchRows = (container, query) => {
+
+    if (!container) {
+      return {shown: 0, total: 0};
+    }
+
+    const terms = normalizeSearch(query).split(/\s+/).filter(Boolean).map(toIsoDate);
+    const matches = (text) => terms.every(term => normalizeSearch(text).includes(term));
+    const show = (el, visible) => el.style.display = visible ? '' : 'none';
+    const isShown = (el) => el.style.display !== 'none';
+
+    const rows = Array.from(container.querySelectorAll('[data-search]'));
+    rows.forEach(row => show(row, matches(`${row.dataset.search} ${row.textContent}`)));
+
+    // Group (a domain and its subdomains): matching its name keeps all its rows,
+    // matching one of its rows keeps the group and opens it
+    container.querySelectorAll('[data-search-group]').forEach(group => {
+
+      const rowsOfGroup = Array.from(group.querySelectorAll('[data-search]'));
+      const isNameMatch = terms.length > 0 && matches(group.dataset.searchGroup);
+
+      if (isNameMatch) {
+        rowsOfGroup.forEach(row => show(row, true));
+      }
+
+      const isRowMatch = rowsOfGroup.some(isShown);
+      show(group, isNameMatch || isRowMatch);
+
+      if (terms.length > 0 && isRowMatch && !isNameMatch) {
+        Alpine.$data(group).expanded = true;
+      }
+    });
+
+    // Live counters, e.g. the inventory tab badges: <span data-search-count="#inventory-assets">
+    container.querySelectorAll('[data-search-count]').forEach(el => {
+      const list = container.querySelector(el.dataset.searchCount);
+      el.textContent = Array.from(list.querySelectorAll('[data-search]')).filter(isShown).length;
+    });
+
+    // Empty message per list (e.g. one per inventory tab)
+    container.querySelectorAll('[data-search-empty]').forEach(el => {
+      const rowsOfList = Array.from(el.parentElement.querySelectorAll('[data-search]'));
+      show(el, !rowsOfList.some(isShown));
+    });
+
+    const shown = rows.filter(isShown).length;
+
+    return {shown: shown, total: rows.length};
+  };
+
   const todaySeparatorHtmlTemplate = '{!! $today_separator !!}';
 
   const today = (() => {
@@ -37,25 +147,28 @@
 
   /* SCROLL TO TOP */
 
+  // Absent from most pages (only on conversations and notes): guard so the rest of the script still runs.
   const elScrollBtn = document.getElementById("scrollToTopBtn");
 
-  window.onscroll = () => {
-    if (document.body.scrollTop > (56 + 20) || document.documentElement.scrollTop > (56 + 20)) {
-      elScrollBtn.classList.add("show");
-    } else {
-      elScrollBtn.classList.remove("show");
-    }
-  };
+  if (elScrollBtn) {
+    window.onscroll = () => {
+      if (document.body.scrollTop > (56 + 20) || document.documentElement.scrollTop > (56 + 20)) {
+        elScrollBtn.classList.add("show");
+      } else {
+        elScrollBtn.classList.remove("show");
+      }
+    };
 
-  elScrollBtn.onclick = () => {
-    document.body.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
-  };
+    elScrollBtn.onclick = () => {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    };
+  }
 
   /* NOTES */
 
   const elInputField = document.querySelector('.new-comment input');
-  elInputField.addEventListener('keydown', (event) => {
+  elInputField?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
 
       event.preventDefault();
@@ -155,6 +268,15 @@
   const toggleAutoMonitorNewSubdomains = (assetId) => toggleAutoMonitorNewSubdomainsApiCall(assetId,
     (response) => window.toaster.toastSuccess(response.msg));
 
+  // e.g. link "assets#aid-42" on a subdomain: open its group, then scroll to the row (or to the group for a root asset)
+  const openGroupOf = (el) => {
+    const group = el.closest('[data-search-group]');
+    if (group) {
+      Alpine.$data(group).expanded = true;
+    }
+    Alpine.nextTick(() => (el.offsetParent ? el : group ?? el).scrollIntoView({block: 'center'}));
+  };
+
   /* ASSETS TAGGING */
 
   const addTagToAsset = (assetId) => {
@@ -190,33 +312,25 @@
         return;
       }
 
-      const wrapper = document.createElement('span');
+      // Same markup as the x-ui.tag chip rendered in iframes/timeline/_asset
+      const wrapper = createTagChip(tag.tag);
       wrapper.id = `tag-${tag.id}`;
-      wrapper.className = 'lozenge new d-inline-flex align-items-center';
-
-      const label = document.createElement('span');
-      label.textContent = tag.tag;
 
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.title = "{{ __('Remove tag') }}";
-      btn.className = 'bp4-button bp4-minimal border-0 bg-transparent cursor-pointer';
-      btn.style.minHeight = '15px';
-      btn.style.maxWidth = '15px';
+      btn.className = 'ui:flex ui:size-4 ui:items-center ui:justify-center ui:rounded ui:border-0 ui:bg-transparent ui:p-0 ui:text-slate-400 ui:cursor-pointer ui:hover:bg-slate-200 ui:hover:text-ink';
+      btn.innerHTML = '&times;';
 
       btn.onclick = () => removeTagFromAsset(String(assetId), String(tag.id));
 
-      const icon = document.createElement('span');
-      icon.className = 'bp4-icon bp4-icon-cross';
-      btn.appendChild(icon);
-
-      wrapper.appendChild(label);
       wrapper.appendChild(btn);
       list.appendChild(wrapper);
 
       window.toaster.toastSuccess("{{ __('Tag added.') }}");
 
       toggleTagInput(assetId);
+      renderRowTags(assetId);
     });
   }
 
@@ -229,13 +343,77 @@
       const msg = response && response.msg ? response.msg : "{{ __('Tag removed.') }}";
       window.toaster.toastSuccess(msg);
       toggleTagInput(assetId);
+      renderRowTags(assetId);
     });
   }
+
+  // Keep in sync with x-ui.tag tone="auto": same palette, same crc32 pick (e.g. "nginx" is always violet)
+  const TAG_HUES = [
+    'ui:bg-blue-50 ui:text-blue-700',
+    'ui:bg-violet-50 ui:text-violet-700',
+    'ui:bg-emerald-50 ui:text-emerald-700',
+    'ui:bg-amber-50 ui:text-amber-800',
+    'ui:bg-rose-50 ui:text-rose-700',
+    'ui:bg-cyan-50 ui:text-cyan-800',
+    'ui:bg-indigo-50 ui:text-indigo-700',
+    'ui:bg-lime-50 ui:text-lime-800',
+  ];
+
+  // Keep in sync with $maxRowTags and $maxTags (iframes/timeline/_asset)
+  const MAX_ROW_TAGS = 2;
+  const MAX_ASSET_TAGS = 5;
+
+  // Unsigned CRC-32 of the UTF-8 bytes, as PHP crc32()
+  const crc32 = (text) => {
+    let crc = 0xFFFFFFFF;
+    for (const byte of new TextEncoder().encode(text)) {
+      crc ^= byte;
+      for (let i = 0; i < 8; i++) {
+        crc = (crc >>> 1) ^ (0xEDB88320 & -(crc & 1));
+      }
+    }
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  };
+
+  const createTagChip = (text) => {
+    const chip = document.createElement('span');
+    chip.className = `ui:inline-flex ui:items-center ui:gap-1 ui:rounded-md ui:px-2 ui:py-0.5 ui:text-xs ui:font-medium ${TAG_HUES[crc32(text.trim()) % TAG_HUES.length]}`;
+
+    const label = document.createElement('span');
+    label.textContent = text;
+    chip.appendChild(label);
+
+    return chip;
+  };
+
+  // Rebuild the row preview from the panel list, e.g. [prod] [web] +2
+  const renderRowTags = (assetId) => {
+    const elRow = document.getElementById(`row-tags-${assetId}`);
+    const elTags = document.getElementById(`tags-${assetId}`);
+    if (!elRow || !elTags) {
+      return;
+    }
+
+    const labels = Array.from(elTags.children).map(el => el.firstElementChild.textContent.trim());
+
+    // All tags stay searchable (x-ui.search), not only the previewed ones
+    document.getElementById(`aid-${assetId}`).dataset.search = labels.join(' ');
+    elRow.replaceChildren(...labels.slice(0, MAX_ROW_TAGS).map(createTagChip));
+
+    if (labels.length <= MAX_ROW_TAGS) {
+      return;
+    }
+
+    const more = document.createElement('span');
+    more.className = 'ui:text-xs ui:font-medium ui:text-slate-500';
+    more.textContent = `+${labels.length - MAX_ROW_TAGS}`;
+    elRow.appendChild(more);
+  };
 
   const toggleTagInput = (assetId) => {
     const elTags = document.getElementById(`tags-${assetId}`);
     const elAddTag = document.getElementById(`add-tag-${assetId}`);
-    if (elTags && elAddTag && elTags.childElementCount <= 5) {
+    if (elTags && elAddTag && elTags.childElementCount <= MAX_ASSET_TAGS) {
       elAddTag.classList.remove('d-none');
     } else {
       elAddTag.classList.add('d-none');
@@ -259,12 +437,16 @@
     }
 
     const data = rulesDetails[ruleName];
-    elCard.style.display = 'flex';
+    elCard.style.display = '';
 
     // Title
     const elTitle = elCard.querySelector('#rule-title');
     if (data.can_edit) {
-      elTitle.innerHTML = `<a href="${data.editor_url}">${data.display_name}</a>`;
+      const elLink = document.createElement('a');
+      elLink.href = data.editor_url;
+      elLink.className = 'ui:text-ink! ui:hover:text-brand-600!';
+      elLink.textContent = data.display_name;
+      elTitle.replaceChildren(elLink);
     } else {
       elTitle.textContent = data.display_name;
     }
@@ -272,12 +454,23 @@
     // Tactics
     const elTactics = elCard.querySelector('#rule-tactics');
     elTactics.innerHTML = '';
+
+    // Same markup as x-ui.tag / x-ui.badge in pages/events
+    const tagClass = 'ui:inline-flex ui:items-center ui:gap-1 ui:rounded-md ui:bg-slate-100 ui:px-2 ui:py-0.5 ui:text-xs ui:font-medium ui:text-slate-700';
+    const badgeClass = 'ui:inline-flex ui:items-center ui:rounded-md ui:px-2 ui:py-0.5 ui:text-xs ui:font-medium ui:ring-1 ui:ring-inset ui:whitespace-nowrap';
+    const badgeTone = {
+      high: 'ui:bg-high-soft ui:text-red-600 ui:ring-red-200',
+      medium: 'ui:bg-medium-soft ui:text-amber-700 ui:ring-amber-200',
+      low: 'ui:bg-low-soft ui:text-emerald-700 ui:ring-emerald-200',
+      info: 'ui:bg-info-soft ui:text-blue-700 ui:ring-blue-200',
+      neutral: 'ui:bg-slate-100 ui:text-slate-600 ui:ring-slate-200',
+    };
+
     (data.tactics || []).forEach(tactic => {
       const span = document.createElement('span');
-      span.className = 'lozenge new';
+      span.className = tagClass;
       span.textContent = tactic;
       elTactics.appendChild(span);
-      elTactics.appendChild(document.createTextNode('\u00A0'));
     });
 
     // Description
@@ -292,22 +485,22 @@
     let iocHtml = '';
 
     if (data.is_ioc) {
-      iocHtml += `<span class="lozenge error">{{ __('yes') }}</span>&nbsp;`;
+      iocHtml += `<span class="${badgeClass} ${badgeTone.high}">{{ __('yes') }}</span>`;
     } else {
-      iocHtml += `<span class="lozenge success">{{ __('no') }}</span>&nbsp;`;
+      iocHtml += `<span class="${badgeClass} ${badgeTone.low}">{{ __('no') }}</span>`;
     }
 
-    let scoreClass = 'neutral';
+    let scoreTone = badgeTone.neutral;
 
     if (data.score >= 75) {
-      scoreClass = 'error';
+      scoreTone = badgeTone.high;
     } else if (data.score >= 50) {
-      scoreClass = 'warning';
+      scoreTone = badgeTone.medium;
     } else if (data.score >= 25) {
-      scoreClass = 'information';
+      scoreTone = badgeTone.info;
     }
 
-    iocHtml += `<span class="lozenge ${scoreClass}">${data.score}&nbsp;/&nbsp;100</span>`;
+    iocHtml += `<span class="${badgeClass} ${scoreTone}">${data.score}&nbsp;/&nbsp;100</span>`;
     elIocInfo.innerHTML = iocHtml;
 
     // Mitre
@@ -315,7 +508,7 @@
     const elMitreLinks = elCard.querySelector('#rule-mitre-links');
 
     if (data.mitre && data.mitre.length > 0) {
-      elMitreRow.style.display = 'flex';
+      elMitreRow.style.display = '';
       elMitreLinks.innerHTML = '';
       data.mitre.forEach(m => {
         const a = document.createElement('a');

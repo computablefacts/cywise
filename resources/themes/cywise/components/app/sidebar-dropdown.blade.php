@@ -1,26 +1,18 @@
-<div x-data="{ {{ $id }}: {{ $open ?? false }} }"
-    :class="{ 'bg-light border rounded' : {{ $id }} == true }"
-    class="position-relative w-100 select-none">
-    <div
-        @click="{{ $id }}=!{{ $id }}"
-        class="@if($active){{ 'text-dark bg-white border shadow-sm fw-medium' }}@endif transition-colors d-flex rounded w-100 px-3 py-2 cursor-pointer small border justify-content-start align-items-center overflow-hidden"
-        :class="{ 'text-dark bg-white border shadow-sm fw-medium' : {{ $id }} == true, 'hover-bg-light border-transparent' : ({{ $id }} == false && {{ !$active }}) }"
-    >
-        <div class="d-flex position-relative align-items-center w-100">
-            <x-dynamic-component :component="$icon" class="flex-shrink-0 me-2" style="width: 1.25rem; height: 1.25rem;" />
-            <span>{{ $text }}</span>
-            <span :class="{ 'rotate-180' : {{ $id }} == true }" class="ms-auto transition-transform" style="width: 1rem; height: 1rem;">
-                <x-phosphor-caret-down class="w-100 h-100" />
-            </span>
+<div x-data="{ {{ $id }}: {{ $open ?? false }} }" class="ui:w-full ui:select-none">
+    <button type="button"
+            @click="{{ $id }}=!{{ $id }}"
+            :aria-expanded="{{ $id }}"
+            class="ui:flex ui:w-full ui:items-center ui:gap-3 ui:rounded-lg ui:border-0 ui:bg-transparent ui:px-3 ui:py-2 ui:text-sm ui:text-slate-600 ui:hover:bg-slate-100 ui:hover:text-ink ui:cursor-pointer ui:transition-colors">
+        <x-dynamic-component :component="$icon" class="ui:size-5 ui:shrink-0"/>
+        <span class="ui:flex-1 ui:truncate ui:text-left">{{ $text }}</span>
+        <x-phosphor-caret-down class="ui:size-4 ui:shrink-0 ui:text-slate-400 ui:transition-transform"
+                               ::class="{ 'ui:rotate-180' : {{ $id }} }"/>
+    </button>
+
+    {{-- Children: indented under a guide line --}}
+    <div x-show="{{ $id }}" x-collapse x-cloak>
+        <div class="ui:ml-5 ui:mt-1 ui:flex ui:flex-col ui:gap-0.5 ui:border-0 ui:border-l ui:border-solid ui:border-line ui:pl-2">
+            {{ $slot }}
         </div>
-
-        <template x-teleport="#{{ $id }}">
-            <div class="position-relative p-1 d-grid gap-1" x-show="{{ $id }}" x-collapse x-cloak>
-                {{ $slot }}
-            </div>
-        </template>
     </div>
-
-    <div id="{{ $id }}"></div>
-
 </div>

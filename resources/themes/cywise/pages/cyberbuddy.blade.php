@@ -14,184 +14,15 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
-
-  @php
-
-  $conversationId = request()->query('conversation_id');
-  $userId = Auth::user()?->id;
-
-  if ($conversationId) {
-  $conversation = \App\Models\Conversation::where('id', $conversationId)
-  ->where('format', \App\Models\Conversation::FORMAT_V1)
-  ->where('created_by', $userId)
-  ->first();
-  }
-
-  $conversation = $conversation ?? \App\Models\Conversation::create([
-  'thread_id' => \Illuminate\Support\Str::random(10),
-  'dom' => json_encode([]),
-  'autosaved' => true,
-  'created_by' => $userId,
-  'format' => \App\Models\Conversation::FORMAT_V1,
-  ]);
-
-  @endphp
+  {{-- $conversation: resumed (?conversation_id=) or created by CyberBuddyController --}}
 
   @push('styles')
   <style>
 
-    .tw-wrapper1 {
-      color: rgb(2, 8, 23);
-      flex-direction: column;
-      flex-grow: 1;
-      display: flex;
-      overflow: hidden;
-      height: 100vh;
-    }
-
-    .tw-wrapper2 {
-      flex-grow: 1;
-      overflow-x: hidden;
-      overflow-y: auto
-    }
-
-    .tw-chat {
-      background-color: rgb(255, 255, 255);
-      flex-direction: column;
-      display: flex;
-      width: 100%;
-      height: 100%;
-      border-width: 2px;
-      border-color: rgb(226, 232, 240);
-      border-style: solid;
-      border-radius: 8px
-    }
-
-    .tw-chat-header {
-      flex-direction: column;
-      padding: 1rem;
-      display: flex;
-      font-size: 24px;
-      font-weight: 600
-    }
-
-    .tw-chat-disclaimer {
-      color: rgb(100, 116, 139);
-      font-size: 10px;
-      display: flex;
-      flex-direction: column;
-      margin: 0.5rem;
-    }
-
-    .tw-chat-wrapper {
-      align-items: center;
-      padding: 1rem;
-      padding-top: 0;
-      display: flex;
-      width: 80%;
-      margin: auto;
-    }
-
-    .tw-chat-footer {
-      flex-direction: column;
-      display: flex;
-      width: 100%
-    }
-
-    .tw-chat-footer-input {
-      cursor: text;
-      flex-grow: 1;
-      font-size: 14px;
-      padding-bottom: 0.5rem;
-      padding-left: 0.75rem;
-      padding-right: 0.75rem;
-      padding-top: 0.5rem;
-      display: flex;
-      width: 100%;
-      height: 2.5rem;
-      border-width: 2px;
-      border-color: rgb(226, 232, 240);
-      border-style: solid;
-      border-radius: 6px
-    }
-
-    .tw-chat-footer-input:focus {
-      outline: 2px solid black;
-      outline-offset: 2px;
-    }
-
-    .tw-chat-footer-wrapper {
-      display: flex;
-      margin-top: .5rem;
-      margin-bottom: 0
-    }
-
-    .tw-chat-footer-upload {
-      color: black;
-      align-items: center;
-      cursor: pointer;
-      justify-content: center;
-      display: inline-flex;
-      width: 2.5rem;
-      height: 2.5rem;
-      border-width: 0;
-      border-radius: 6px;
-    }
-
-    .tw-chat-footer-upload:hover {
-      color: rgb(250, 250, 250);
-      background-color: var(--c-blue);
-    }
-
-    .tw-chat-footer-upload-svg {
-      width: 1rem;
-      height: 1rem
-    }
-
-    .tw-chat-footer-upload-svg-rect {
-      width: 18px;
-      height: 18px
-    }
-
-    .tw-chat-footer-send {
-      color: rgb(250, 250, 250);
-      background-color: var(--c-blue);
-      align-items: center;
-      font-size: 14px;
-      font-weight: 500;
-      justify-content: center;
-      opacity: 0.5;
-      padding-bottom: 0.5rem;
-      padding-left: 1rem;
-      padding-right: 1rem;
-      padding-top: 0.5rem;
-      text-align: center;
-      display: inline-flex;
-      width: 100%;
-      height: 2.5rem;
-      margin-left: .5rem;
-      border-radius: 6px;
-      border: unset;
-    }
-
-    .tw-chat-footer-send.bactive {
-      opacity: 1;
-    }
-
-    .tw-chat-footer-send.bactive:hover {
-      background-color: hsl(238 83% 60% / .9);
-    }
-
-    .tw-chat-footer-send-svg {
-      width: 1rem;
-      height: 1rem;
-      margin-right: 0.5rem
-    }
-
-    .tw-chat-header-title {
-      margin-bottom: 0;
-      color: var(--c-orange-light);
-    }
+    /*
+     * Chat bubbles are built by the JS below (addUserDirective, addBotAnswer, addThinkingDots).
+     * They keep their tw-* classes and are styled here with the design tokens.
+     */
 
     .tw-disabled {
       opacity: 0.5 !important;
@@ -272,125 +103,98 @@ render(function (Request $request) {
       }
     }
 
-    @media (min-width: 640px) {
-
-      .tw-chat-footer {
-        flex-direction: row !important;
-      }
-
-      .tw-chat-footer-wrapper {
-        margin-right: 0 !important;
-        margin-left: .5rem !important;
-        margin-top: 0px !important;
-        margin-bottom: 0 !important;
-      }
-
-      .tw-chat-footer-send {
-        width: auto !important;
-      }
-    }
+    /* QUESTION (user, right) */
 
     .tw-question-wrapper {
-      flex-direction: column;
       display: flex;
-      margin-bottom: 1rem
+      flex-direction: column;
+      margin-bottom: 1.25rem;
     }
 
     .tw-question {
-      align-items: flex-start;
+      display: flex;
       flex-direction: row-reverse;
-      display: flex
-    }
-
-    .tw-question-avatar-wrapper {
-      margin-left: 0.5rem
+      align-items: flex-start;
+      gap: .75rem;
     }
 
     .tw-question-avatar {
-      background-color: rgb(224, 231, 255);
-      border-radius: 10000px;
-      padding: 0.5rem
-    }
-
-    .tw-question-avatar span {
       display: flex;
-      width: 1.5rem;
-      height: 1.5rem;
-      border-radius: 10000px;
-      overflow: hidden
+      padding: .5rem;
+      border-radius: 9999px;
+      background-color: #f1f5f9;
     }
 
-    .tw-question-avatar img {
-      aspect-ratio: 1 / 1;
-      width: 100%;
-      height: 100%;
-      max-width: 100%
+    .tw-question-avatar .tw-avatar-color {
+      color: #475569;
     }
 
     .tw-question-directive {
-      color: rgb(0, 0, 0);
-      background-color: rgb(224, 231, 255);
-      display: inline-block;
-      /* max-width: 85%; */
-      margin-left: .5rem;
-      border-radius: 8px;
-      padding: 0.75rem
+      max-width: 75%;
+      padding: .75rem 1rem;
+      border-radius: 1rem 1rem .25rem 1rem;
+      background-color: var(--ui-color-ink);
+      color: #fff;
+      font-size: .875rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
     }
 
     .tw-question-timestamp {
-      color: rgb(107, 114, 128);
-      font-size: 12px;
-      padding-right: 48px;
-      padding-top: 0.5rem;
+      padding-top: .375rem;
+      padding-right: 3.25rem;
       text-align: right;
+      font-size: .75rem;
+      color: #94a3b8;
     }
 
+    /* ANSWER (bot, left). Clicking the avatar opens the chain of thought. */
+
     .tw-answer-wrapper {
-      flex-direction: column;
       display: flex;
-      margin-bottom: 1rem
+      flex-direction: column;
+      margin-bottom: 1.25rem;
     }
 
     .tw-answer {
+      display: flex;
       align-items: flex-start;
-      display: flex
-    }
-
-    .tw-avatar-color {
-      color: var(--c-blue);
+      gap: .75rem;
     }
 
     .tw-answer-avatar-wrapper {
-      margin-right: 0.5rem;
-      color: var(--c-blue);
+      cursor: pointer;
     }
 
     .tw-answer-avatar {
-      background-color: rgba(68, 74, 238, 0.1);
-      border-radius: 10000px;
-      padding: 0.5rem;
+      display: flex;
+      padding: .5rem;
+      border-radius: 9999px;
+      background-color: var(--ui-color-brand-50);
+    }
+
+    .tw-avatar-color {
+      color: var(--ui-color-brand-500);
     }
 
     .tw-answer-message {
-      color: rgb(0, 0, 0);
-      background-color: rgba(68, 74, 238, 0.1);
-      display: inline-block;
+      min-width: 0;
       max-width: 85%;
-      margin-left: .5rem;
-      border-radius: 8px;
-      padding: 0.75rem;
+      padding: .75rem 1rem;
+      border: 1px solid var(--ui-color-line);
+      border-radius: 1rem 1rem 1rem .25rem;
+      background-color: #fff;
+      color: var(--ui-color-ink);
+      font-size: .875rem;
+      line-height: 1.6;
     }
 
     .tw-answer-message-paragraph {
-      margin-bottom: 0.5rem
+      margin-bottom: .5rem;
     }
 
     .tw-answer-message-html {
-      /* background-color: rgb(255, 255, 255); */
-      /* margin-top: 1rem; */
-      border-radius: 8px;
-      /* padding: 1rem */
-      --font-size: 16px;
+      --font-size: 14px;
     }
 
     .tw-answer-message-html h1 {
@@ -406,15 +210,38 @@ render(function (Request $request) {
     }
 
     .tw-answer-message-html p {
-      color: rgb(0, 0, 0);
+      color: inherit;
+      margin-bottom: .5rem;
+    }
+
+    /* Lists: restore markers removed by the CSS reset */
+    .tw-answer-message-html ul,
+    .tw-answer-message-html ol {
+      margin: .25rem 0 .5rem;
+      padding-left: 1.25rem;
+    }
+
+    .tw-answer-message-html ul {
+      list-style: disc;
+    }
+
+    .tw-answer-message-html ol {
+      list-style: decimal;
+    }
+
+    .tw-answer-message-html p:last-child {
       margin-bottom: 0;
     }
 
     .tw-answer-timestamp {
-      color: rgb(107, 114, 128);
-      font-size: 12px;
-      padding-left: calc(48px + 0.75rem);
-      padding-top: 0.5rem;
+      padding-top: .375rem;
+      padding-left: 3.25rem;
+      font-size: .75rem;
+      color: #94a3b8;
+    }
+
+    .tw-save-memo-btn:hover {
+      color: var(--ui-color-brand-500);
     }
 
     /* COMMANDS */
@@ -714,76 +541,97 @@ render(function (Request $request) {
   </style>
   @endpush
 
-  <div class="container-fluid">
-    <div class="tw-wrapper1 pt-3 pb-3">
-      <div class="tw-wrapper2">
-        <div class="tw-chat">
+  {{--
+    ┌─────────────────────────────────────┬───────────────┐
+    │ header           [New conversation] │ recent        │
+    ├─────────────────────────────────────┤ conversations │
+    │ conversation (JS) / suggestions     │ (xl+)         │
+    ├─────────────────────────────────────┤               │
+    │ input  [image] [send]               │               │
+    └─────────────────────────────────────┴───────────────┘
+    Full height: dynamic viewport (mobile address bar aware) minus the app topbar (4rem).
+  --}}
+  <div class="ui:flex ui:h-[calc(100dvh-4rem)] ui:gap-6 ui:p-4 ui:lg:p-6">
 
-          <!-- HEADER -->
-          <div class="tw-chat-header">
-            <h3 class="tw-chat-header-title">
-              <!-- <img alt="Bear" fetchpriority="high" width="250" height="250" decoding="async" data-nimg="1"
-                   style="color:transparent;width:50px;height:50px" src="https://www.svgrepo.com/show/10913/bear.svg"> -->
-              {{ tenant_custom_text('CyberBuddy') }}
-            </h3>
-          </div>
+    {{-- Chat. JS hooks: .tw-conversation, .tw-chat-footer-input, .tw-chat-footer-upload, .tw-chat-footer-send --}}
+    <section class="ui:flex ui:min-w-0 ui:flex-1 ui:flex-col ui:overflow-hidden ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:shadow-xs">
 
-          <!-- CONVERSATION -->
-          <div class="tw-conversation-wrapper">
-            <div class="tw-conversation">
-              <!-- DYNAMICALLY FILLED -->
-              @include('theme::iframes.cyberbuddy._actions')
-            </div>
-          </div>
+      <header class="ui:flex ui:items-center ui:gap-3 ui:border-0 ui:border-b ui:border-solid ui:border-line ui:px-5 ui:py-4">
+        <span class="ui:flex ui:size-10 ui:shrink-0 ui:items-center ui:justify-center ui:rounded-xl ui:bg-brand-500 ui:text-white">
+          <x-phosphor-robot-bold class="ui:size-5"/>
+        </span>
+        <div class="ui:min-w-0 ui:flex-1">
+          <h1 class="ui:m-0 ui:text-lg ui:font-semibold ui:leading-6 ui:text-ink">{{ tenant_custom_text('CyberBuddy') }}</h1>
+          <p class="ui:m-0 ui:truncate ui:text-sm ui:text-slate-500">{{ __('Your AI cybersecurity assistant') }}</p>
+        </div>
+        <x-ui.button variant="secondary" size="sm" :href="route('cyberbuddy')">
+          <x-phosphor-plus class="ui:size-4"/>
+          <span class="ui:hidden ui:sm:inline">{{ __('New conversation') }}</span>
+        </x-ui.button>
+      </header>
 
-          <!-- INPUT FIELD -->
-          <p class="tw-chat-disclaimer text-center">
-            {{ __('Please ensure that you do not enter any sensitive or confidential information in your requests.') }}
-          </p>
-          <div class="tw-chat-wrapper">
-            <div class="tw-chat-footer">
-              <input value="" type="text" placeholder="{{ __('Ask me anything!') }}" class="tw-chat-footer-input"/>
-              <div class="tw-chat-footer-wrapper">
-                <button class="tw-chat-footer-upload">
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24" viewbox="0 0 24 24" fill="none"
-                       stroke="currentColor"
-                       stroke-linecap="round" stroke-linejoin="round" class="tw-chat-footer-upload-svg">
-                    <rect height="18" x="3" y="3" rx="2" ry="2" fill="none" stroke="currentColor"
-                          class="tw-chat-footer-upload-svg-rect"></rect>
-                    <circle cx="9" cy="9" r="2" fill="none" stroke="currentColor"></circle>
-                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" fill="none" stroke="currentColor"></path>
-                  </svg>
-                </button>
-                <button class="tw-chat-footer-send bactive">
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24" viewbox="0 0 24 24" fill="none"
-                       stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                       class="tw-chat-footer-send-svg">
-                    <path
-                        d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
-                        fill="none" stroke="currentColor"></path>
-                    <path d="m21.854 2.147-10.94 10.939" fill="none" stroke="currentColor"></path>
-                  </svg>
-                  {{ __('Send') }}
-                </button>
-              </div>
-            </div>
-          </div>
+      <div class="tw-conversation-wrapper">
+        <div class="tw-conversation">
+          <!-- DYNAMICALLY FILLED -->
+          @include('theme::iframes.cyberbuddy._actions')
         </div>
       </div>
-    </div>
-    <div class="modal fade" tabindex="-1" id="" aria-labelledby="" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Modal title</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" style="max-height:60vh;overflow-y:auto;overflow-x:hidden"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-              {{ __('Close') }}
-            </button>
-          </div>
+
+      <footer class="ui:border-0 ui:border-t ui:border-solid ui:border-line ui:px-5 ui:py-4">
+        <div class="ui:flex ui:items-center ui:gap-2">
+          <input value="" type="text" placeholder="{{ __('Ask me anything!') }}"
+                 class="tw-chat-footer-input ui:h-10 ui:min-w-0 ui:flex-1 ui:rounded-lg ui:border ui:border-solid ui:border-line ui:bg-slate-50 ui:px-4 ui:text-sm ui:text-ink ui:placeholder:text-slate-400 ui:focus:border-brand-500 ui:focus:bg-white ui:focus:outline-none ui:focus:ring-2 ui:focus:ring-brand-100 ui:disabled:opacity-60"/>
+          <button type="button"
+                  class="tw-chat-footer-upload ui:flex ui:size-10 ui:shrink-0 ui:items-center ui:justify-center ui:rounded-lg ui:border-0 ui:bg-transparent ui:text-slate-500 ui:hover:bg-slate-100">
+            <x-phosphor-image class="ui:size-5"/>
+          </button>
+          <x-ui.button class="tw-chat-footer-send" icon="paper-plane-right">{{ __('Send') }}</x-ui.button>
+        </div>
+        <p class="ui:m-0 ui:mt-2 ui:text-center ui:text-xs ui:text-slate-400">
+          {{ __('Please ensure that you do not enter any sensitive or confidential information in your requests.') }}
+        </p>
+      </footer>
+    </section>
+
+    {{-- Recent conversations --}}
+    <aside class="ui:hidden ui:w-80 ui:shrink-0 ui:flex-col ui:overflow-y-auto ui:xl:flex">
+      <x-ui.card flush :title="__('Recent conversations')"
+                 :href="Auth::user()->canView('iframes.conversations') ? route('conversations') : null">
+        @if($recentConversations->isEmpty())
+          <x-ui.empty icon="chats">{{ __('No conversation yet.') }}</x-ui.empty>
+        @else
+          <ul class="ui:m-0 ui:list-none ui:p-0">
+            @foreach($recentConversations as $recent)
+              <li class="ui:border-0 ui:border-t ui:border-solid ui:border-line">
+                <a href="{{ route('cyberbuddy', ['conversation_id' => $recent->id]) }}"
+                   class="ui:flex ui:items-start ui:gap-3 ui:px-5 ui:py-3 ui:no-underline! ui:hover:bg-slate-50">
+                  <x-phosphor-chat-circle class="ui:mt-0.5 ui:size-4 ui:shrink-0 ui:text-brand-500"/>
+                  <span class="ui:flex ui:min-w-0 ui:flex-col">
+                    <span class="ui:line-clamp-2 ui:text-sm ui:text-ink!">{{ $recent->description }}</span>
+                    <span class="ui:text-xs ui:text-slate-400!">{{ $recent->created_at->diffForHumans() }}</span>
+                  </span>
+                </a>
+              </li>
+            @endforeach
+          </ul>
+        @endif
+      </x-ui.card>
+    </aside>
+  </div>
+
+  {{-- Chain of thought (Bootstrap modal, opened from the bot avatar) --}}
+  <div class="modal fade" tabindex="-1" id="" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="max-height:60vh;overflow-y:auto;overflow-x:hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+            {{ __('Close') }}
+          </button>
         </div>
       </div>
     </div>

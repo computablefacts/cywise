@@ -1,17 +1,23 @@
 @props([
     'href' => '',
-    'icon' => 'phosphor-house-duotone',
+    'icon' => 'phosphor-house',
     'active' => false,
-    'hideUntilGroupHover' => true,
     'target' => '_self',
     'ajax' => true
 ])
 
 @php
     $isActive = filter_var($active, FILTER_VALIDATE_BOOLEAN);
+
+    // Colors use "!" to beat BlueprintJS' global "a:hover" rule.
+    $state = $isActive
+        ? 'ui:bg-brand-50 ui:text-brand-600! ui:hover:text-brand-600! ui:font-medium'
+        : 'ui:text-slate-600! ui:hover:text-ink! ui:hover:bg-slate-100';
 @endphp
 
-<a {{ $attributes }} href="{{ $href }}" @if((($href ?? false) && $target == '_self') && $ajax) @else @if($ajax) target="_blank" @endif @endif class="@if($isActive){{ 'text-dark border-secondary shadow-sm bg-white fw-medium' }}@else{{ 'border-transparent' }}@endif transition-colors px-3 py-2 d-flex rounded w-100 small hover-bg-light justify-content-start align-items-center hover-text-dark gap-2 overflow-hidden">
-    <x-dynamic-component :component="$icon" class="flex-shrink-0" style="width: 1.25rem; height: 1.25rem;" />
-    <span class="flex-shrink-0 transition-all">{{ $slot }}</span>
+<a {{ $attributes }} href="{{ $href }}" @if((($href ?? false) && $target == '_self') && $ajax) @else @if($ajax) target="_blank" @endif @endif
+   @if($isActive) aria-current="page" @endif
+   class="{{ $state }} ui:flex ui:w-full ui:items-center ui:gap-3 ui:rounded-lg ui:px-3 ui:py-2 ui:text-sm ui:no-underline! ui:transition-colors">
+    <x-dynamic-component :component="$icon" class="ui:size-5 ui:shrink-0"/>
+    <span class="ui:truncate">{{ $slot }}</span>
 </a>

@@ -12,6 +12,8 @@ use Illuminate\View\View;
 
 class CyberBuddyController extends Controller
 {
+    private const RECENT_CONVERSATIONS = 5;
+
     public function __invoke(Request $request): View
     {
         $params = $request->validate([
@@ -38,6 +40,17 @@ class CyberBuddyController extends Controller
             'format' => Conversation::FORMAT_V1,
         ]);
 
-        return view('theme::pages.cyberbuddy', ['threadId' => $conversation->thread_id]);
+        // Side panel: resume a past conversation. Untitled ones (no message yet) are skipped.
+        $recentConversations = Conversation::where('created_by', $user?->id)
+            ->where('format', Conversation::FORMAT_V1)
+            ->whereNotNull('description')
+            ->latest()
+            ->limit(self::RECENT_CONVERSATIONS)
+            ->get();
+
+        return view('theme::pages.cyberbuddy', [
+            'conversation' => $conversation,
+            'recentConversations' => $recentConversations,
+        ]);
     }
 }

@@ -10,9 +10,7 @@ use App\Http\Procedures\VulnerabilitiesProcedure;
 use App\Http\Requests\JsonRpcRequest;
 use App\Models\Alert;
 use App\Models\Asset;
-use App\Models\AssetTag;
 use App\Models\Conversation;
-use App\Models\PortTag;
 use App\Models\TimelineItem;
 use App\Models\User;
 use App\Models\YnhOsquery;
@@ -27,6 +25,13 @@ use Illuminate\View\View;
 
 abstract class AbstractTimelineController extends Controller
 {
+    // Vulnerability severity ranks: lower is more critical
+    private const SEVERITY_CRITICAL = 0;
+    private const SEVERITY_HIGH = 1;
+    private const SEVERITY_MEDIUM = 2;
+    private const SEVERITY_LOW = 3;
+    private const SEVERITY_UNKNOWN = 4;
+
     protected abstract function objects(): string;
 
     protected abstract function viewname(): string;
@@ -203,25 +208,6 @@ abstract class AbstractTimelineController extends Controller
             'rules_details' => $rulesDetails ?? [],
             'selected_rule' => $params['rule_name'] ?? null ? YnhOsqueryRule::where('name', $params['rule_name'])->first() : null,
             'servers_with_active_events' => $serversWithActiveEvents ?? [],
-            'tags' => AssetTag::query()
-                ->select('tag')
-                ->distinct()
-                ->orderBy('tag')
-                ->get()
-                ->map(fn(AssetTag $tag) => Str::lower($tag->tag))
-                ->unique()
-                ->values(),
-            'port_tags' => PortTag::query()
-                ->select('tag')
-                ->join('am_ports', 'am_ports.id', '=', 'am_ports_tags.port_id')
-                ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
-                ->whereIn('am_scans.asset_id', Asset::query()->pluck('id'))
-                ->distinct()
-                ->orderBy('tag')
-                ->get()
-                ->map(fn(PortTag $tag) => Str::lower($tag->tag))
-                ->unique()
-                ->values(),
         ]);
     }
 
@@ -280,15 +266,7 @@ abstract class AbstractTimelineController extends Controller
                 });
         };
 
-        $items = $filter(Asset::query())
-            ->when($status, function ($query, $status) {
-                if ($status === 'monitorable') {
-                    $query->where('is_monitored', false);
-                } else if ($status === 'monitored') {
-                    $query->where('is_monitored', true);
-                }
-            })
-            ->get();
+        $items = $filter(Asset::query())->get();
 
         if ($monitoringType) {
             $items = $items->filter(function (Asset $asset) use ($monitoringType) {
@@ -296,9 +274,19 @@ abstract class AbstractTimelineController extends Controller
                 return $monitoringType === 'internal' ? $hasAgent : !$hasAgent;
             });
         }
+
+        // Counted before the status filter: the KPI tiles double as status filters
+        $nbMonitored = $items->where('is_monitored', true)->count();
+        $nbMonitorable = $items->where('is_monitored', false)->count();
+
+        if ($status === 'monitorable') {
+            $items = $items->where('is_monitored', false);
+        } else if ($status === 'monitored') {
+            $items = $items->where('is_monitored', true);
+        }
         return [
-            'nb_monitored' => $items->where('is_monitored', true)->count(),
-            'nb_monitorable' => $items->where('is_monitored', false)->count(),
+            'nb_monitored' => $nbMonitored,
+            'nb_monitorable' => $nbMonitorable,
             'items' => $items->map(function (Asset $asset) {
 
                 $timestamp = $asset->created_at->utc()->format('Y-m-d H:i:s');
@@ -308,19 +296,7 @@ abstract class AbstractTimelineController extends Controller
                 $alerts = $asset->is_monitored ?
                     $asset->alerts()->get()->filter(fn(Alert $alert) => $alert->is_hidden === 0) :
                     collect();
-                $hasHigh = $alerts->contains(fn(Alert $alert) => $alert->isHigh());
-                $hasMedium = $alerts->contains(fn(Alert $alert) => $alert->isMedium());
-                $hasLow = $alerts->contains(fn(Alert $alert) => $alert->isLow());
 
-                if ($hasHigh) {
-                    $bgColor = 'var(--c-red)';
-                } elseif ($hasMedium) {
-                    $bgColor = 'var(--c-orange-light)';
-                } elseif ($hasLow) {
-                    $bgColor = 'var(--c-green)';
-                } else {
-                    $bgColor = 'var(--c-blue)';
-                }
                 return [
                     'timestamp' => $timestamp,
                     'date' => $date,
@@ -329,10 +305,10 @@ abstract class AbstractTimelineController extends Controller
                         'date' => $date,
                         'time' => $time,
                         'asset' => $asset,
-                        'bgColor' => $bgColor,
                         'alerts' => $alerts,
                     ])->render(),
                     '_asset' => $asset,
+                    '_alerts' => $alerts,
                 ];
             }),
         ];
@@ -531,40 +507,6 @@ abstract class AbstractTimelineController extends Controller
                     'in_between' => $group->count(),
                 ];
 
-                if ($ioc['first']['ioc']->score >= 75) {
-                    $ioc['first']['txtColor'] = "white";
-                    $ioc['first']['bgColor'] = "#ff4d4d";
-                    $ioc['first']['level'] = "(criticité haute)";
-                } else if ($ioc['first']['ioc']->score >= 50) {
-                    $ioc['first']['txtColor'] = "white";
-                    $ioc['first']['bgColor'] = "#ffaa00";
-                    $ioc['first']['level'] = "(criticité moyenne)";
-                } else if ($ioc['first']['ioc']->score >= 25) {
-                    $ioc['first']['txtColor'] = "white";
-                    $ioc['first']['bgColor'] = "#4bd28f";
-                    $ioc['first']['level'] = "(criticité basse)";
-                } else {
-                    $ioc['first']['txtColor'] = "var(--c-grey-400)";
-                    $ioc['first']['bgColor'] = "var(--c-grey-100)";
-                    $ioc['first']['level'] = "(suspect)";
-                }
-                if ($ioc['last']['ioc']->score >= 75) {
-                    $ioc['last']['txtColor'] = "white";
-                    $ioc['last']['bgColor'] = "#ff4d4d";
-                    $ioc['last']['level'] = "(criticité haute)";
-                } else if ($ioc['last']['ioc']->score >= 50) {
-                    $ioc['last']['txtColor'] = "white";
-                    $ioc['last']['bgColor'] = "#ffaa00";
-                    $ioc['last']['level'] = "(criticité moyenne)";
-                } else if ($ioc['last']['ioc']->score >= 25) {
-                    $ioc['last']['txtColor'] = "white";
-                    $ioc['last']['bgColor'] = "#4bd28f";
-                    $ioc['last']['level'] = "(criticité basse)";
-                } else {
-                    $ioc['last']['txtColor'] = "var(--c-grey-400)";
-                    $ioc['last']['bgColor'] = "var(--c-grey-100)";
-                    $ioc['last']['level'] = "(suspect)";
-                }
                 return [
                     'timestamp' => $timestampFirst,
                     'date' => $dateFirst,
@@ -662,12 +604,14 @@ abstract class AbstractTimelineController extends Controller
                 return false;
             });
         }
+        $userTags = [];
+
         return [
             'nb_high' => $nbHigh,
             'nb_medium' => $nbMedium,
             'nb_low' => $nbLow,
             'nb_suspect' => $nbSuspect,
-            'items' => $alerts->map(function (Alert $alert) {
+            'items' => $alerts->map(function (Alert $alert) use (&$userTags) {
 
                 $timestamp = $alert->updated_at->utc()->format('Y-m-d H:i:s');
                 $date = Str::before($timestamp, ' ');
@@ -675,29 +619,17 @@ abstract class AbstractTimelineController extends Controller
                 $asset = $alert->asset();
                 $port = $alert->port;
 
-                if ($alert->isHigh()) {
-                    $txtColor = "white";
-                    $bgColor = "var(--c-red)";
-                    $level = "(" . __("high") . ")";
-                } else if ($alert->isMedium()) {
-                    $txtColor = "white";
-                    $bgColor = "var(--c-orange-light)";
-                    $level = "(" . __("medium") . ")";
-                } else if ($alert->isLow()) {
-                    $txtColor = "white";
-                    $bgColor = "var(--c-green)";
-                    $level = "(" . __("low") . ")";
-                } else {
-                    $txtColor = "var(--c-grey-400)";
-                    $bgColor = "var(--c-grey-100)";
-                    $level = "(" . __("inconnue") . ")";
-                }
+                // Severity rank, used by the page to list the most critical first
+                $severity = match (true) {
+                    $alert->isCritical() => self::SEVERITY_CRITICAL,
+                    $alert->isHigh() => self::SEVERITY_HIGH,
+                    $alert->isMedium() => self::SEVERITY_MEDIUM,
+                    $alert->isLow() => self::SEVERITY_LOW,
+                    default => self::SEVERITY_UNKNOWN,
+                };
 
-                $tags = "<div><span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>" . $port
-                        ->tags()
-                        ->get()
-                        ->map(fn(PortTag $tag) => Str::lower($tag->tag))
-                        ->join("</span>&nbsp;<span class='lozenge new' style='font-size: 0.8rem;margin-top: 3px;'>") . "</span></div>";
+                // Searchable asset user tags, queried once per asset (many alerts share one asset)
+                $userTags[$asset->id] ??= $asset->tags()->pluck('tag')->implode(' ');
 
                 return [
                     'timestamp' => $timestamp,
@@ -706,15 +638,13 @@ abstract class AbstractTimelineController extends Controller
                     'html' => \Illuminate\Support\Facades\View::make('theme::iframes.timeline._vulnerability', [
                         'date' => $date,
                         'time' => $time,
-                        'txtColor' => $txtColor,
-                        'bgColor' => $bgColor,
-                        'level' => $level,
-                        'tags' => $tags,
                         'alert' => $alert,
+                        'userTags' => $userTags[$asset->id],
                         'asset' => $asset,
                         'port' => $port,
                     ])->render(),
                     '_asset' => $asset,
+                    '_severity' => $severity,
                 ];
             }),
         ];
