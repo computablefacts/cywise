@@ -1,110 +1,93 @@
-<p class="mb-2">
-  Pour utiliser Cywise depuis Telegram, vous devez créer un bot Telegram et configurer son webhook.
-</p>
-<p>
-  <b>1. Créer un bot</b>
-</p>
-<p>
-  Sur Telegram, ouvrez la conversation avec <code>@BotFather</code>, puis envoyez la commande <code>/newbot</code>.
-</p>
-<p>
-  Suivez les instructions (nom, identifiant se terminant par "bot"). À la fin, BotFather vous donne un "token
-  d'API".
-</p>
-<p>
-  <b>2. Enregistrer le token auprès de Cywise</b>
-</p>
-<p>
-  Collez ci-dessous le token retourné par <code>@BotFather</code>, puis cliquez sur "Enregistrer".
-</p>
-<div class="row g-2 align-items-center mb-2">
-  <div class="col-9 col-md-6">
-    <input id="tg-bot-token" type="text" class="form-control" placeholder="1234567890:ABCDEF..."
-           value="{{ Auth::user()->telegram_bot_token ?? '' }}">
+{{--
+  Telegram bot setup: the user creates a bot, saves its token, then declares the Cywise webhook to Telegram.
+  The curl commands use the saved token (not the one being typed).
+--}}
+@php
+  $code = 'ui:rounded ui:bg-slate-100 ui:px-1.5 ui:py-0.5 ui:font-mono ui:text-xs ui:text-ink';
+@endphp
+
+<div x-data="telegramSetup(@js(Auth::user()->telegram_bot_token ?? ''))" class="ui:flex ui:flex-col ui:gap-5">
+
+  <div class="ui:flex ui:items-center ui:justify-between ui:gap-3">
+    <p class="ui:m-0 ui:text-sm ui:text-slate-600">{{ __('Create your own Telegram bot, then link it to Cywise.') }}</p>
+    <x-ui.badge level="low" x-show="webhook" x-cloak>{{ __('Token saved') }}</x-ui.badge>
   </div>
-  <div class="col-auto">
-    <button id="tg-save-token" class="btn btn-primary">
-      <span class="bp4-icon bp4-icon-tick"></span>
-      Enregistrer
-    </button>
-  </div>
+
+  <x-ui.steps :steps="[__('Create a bot'), __('Save its token in Cywise'), __('Declare the webhook to Telegram'), __('Chat with your bot')]">
+    <x-slot:step1>
+      <p class="ui:m-0">
+        {!! __('In Telegram, open a conversation with :botfather and send :command.', ['botfather' => "<code class=\"{$code}\">@BotFather</code>", 'command' => "<code class=\"{$code}\">/newbot</code>"]) !!}
+      </p>
+      <p class="ui:m-0">{{ __('Follow the instructions (name, then an identifier ending with "bot"). BotFather then gives you an API token.') }}</p>
+    </x-slot:step1>
+
+    <x-slot:step2>
+      <form @submit.prevent="save()" class="ui:m-0 ui:flex ui:flex-col ui:gap-2 ui:sm:flex-row">
+        <x-ui.input x-model="token" placeholder="1234567890:ABCDEF…" aria-label="{{ __('Telegram bot token') }}"/>
+        <x-ui.button type="submit" x-bind:disabled="saving">{{ __('Save') }}</x-ui.button>
+      </form>
+    </x-slot:step2>
+
+    <x-slot:step3>
+      <p class="ui:m-0">{{ __('Run this command once to send Telegram messages to Cywise:') }}</p>
+      <x-ui.copy-field bind="setWebhookCommand" :placeholder="__('Save the token first.')"/>
+      <p class="ui:m-0 ui:text-xs ui:text-slate-500">{{ __('To check the configuration:') }}</p>
+      <x-ui.copy-field bind="webhookInfoCommand" :placeholder="__('Save the token first.')"/>
+    </x-slot:step3>
+
+    <x-slot:step4>
+      <p class="ui:m-0">
+        {{ __('Send a message to your bot: it answers with :name, in the context of your Cywise account.', ['name' => tenant_custom_text('CyberBuddy')]) }}
+      </p>
+    </x-slot:step4>
+  </x-ui.steps>
 </div>
-<p>
-  <b>3. Configurer le webhook côté Telegram</b>
-</p>
-<p>
-  Après avoir enregistré le token auprès de Cywise, vous obtiendrez l'URL d'un webhook. Utilisez la commande curl
-  ci-dessous pour déclarer ce webhook auprès de Telegram :
-</p>
-<div class="mb-2">
-  <div class="input-group">
-    <input type="text" id="tg-webhook-curl" class="form-control" readonly
-           placeholder="(en attente — enregistrez d'abord le token)">
-    <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('tg-webhook-curl')">Copier</button>
-  </div>
-</div>
-<p>
-  <b>Astuce :</b> vous pouvez ensuite vérifier la configuration de Telegram avec <code>getWebhookInfo</code> :
-</p>
-<div class="mb-2">
-  <div class="input-group">
-    <input type="text" id="tg-webhook-info" class="form-control" readonly
-           placeholder="curl -s https://api.telegram.org/bot<BOT_TOKEN>/getWebhookInfo | jq">
-    <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('tg-webhook-info')">Copier</button>
-  </div>
-</div>
-<p>
-  <b>4. C'est fini ! Vous pouvez maintenant interagir avec Cywise au moyen de Telegram</b>
-</p>
-<p>
-  Une fois le webhook actif, envoyez un message à votre bot Telegram : il répondra via <a
-      href="{{ route('cyberbuddy') }}">{{ tenant_custom_text('CyberBuddy') }}</a>, dans le contexte de votre compte Cywise.
-</p>
+
 <script>
-  function copyToClipboard(id) {
-    const el = document.getElementById(id);
-    el.select();
-    document.execCommand('copy');
-    window.toaster.toastSuccess("Copié dans le presse-papier");
-  }
+  // State of the Telegram setup (iframes/_telegram): token typed, token saved, webhook returned by Cywise
+  function telegramSetup(token) {
+    return {
+      token: token,
+      savedToken: '',
+      webhook: '',
+      saving: false,
 
-  (function () {
+      get setWebhookCommand() {
+        if (!this.savedToken || !this.webhook) {
+          return '';
+        }
+        return `curl -s "https://api.telegram.org/bot${this.savedToken}/setWebhook" -d url=${this.webhook}`;
+      },
 
-    const elBtn = document.getElementById('tg-save-token');
-    const elInput = document.getElementById('tg-bot-token');
-    const elWebhookCurl = document.getElementById('tg-webhook-curl');
-    const elWebhookInfo = document.getElementById('tg-webhook-info');
+      get webhookInfoCommand() {
+        if (!this.savedToken) {
+          return '';
+        }
+        return `curl -s https://api.telegram.org/bot${this.savedToken}/getWebhookInfo | jq`;
+      },
 
-    function updateWebhookOutputs(webhook, token) {
-      if (token && webhook && elWebhookCurl) {
-        elWebhookCurl.value = `curl -s "https://api.telegram.org/bot${token}/setWebhook" -d url=${webhook}`;
-      }
-      if (token && elWebhookInfo) {
-        elWebhookInfo.value = `curl -s https://api.telegram.org/bot${token}/getWebhookInfo | jq`;
-      }
-    }
+      init() {
+        getTelegramConfigurationApiCall(result => {
+          this.savedToken = result.bot_token ?? '';
+          this.webhook = result.webhook ?? '';
+        });
+      },
 
-    if (elBtn && elInput) {
-      elBtn.addEventListener('click', function () {
-        const token = (elInput.value || '').trim();
+      save() {
+        const token = this.token.trim();
+
         if (!token) {
-          window.toaster.toastError("Veuillez saisir un token de bot Telegram.");
+          window.toaster.toastError(@js(__('Enter the token given by BotFather.')));
           return;
         }
-        elBtn.setAttribute('disabled', 'disabled');
+
+        this.saving = true;
         setTelegramConfigurationApiCall(token, (result) => {
-          window.toaster.toastSuccess("Token enregistré. Configurez maintenant le webhook côté Telegram.");
-          updateWebhookOutputs(result.webhook, token);
-        }, () => elBtn.removeAttribute('disabled'));
-      });
-
-      const existingToken = (elInput.value || '').trim();
-
-      if (existingToken) {
-        elWebhookCurl.placeholder = "Cliquez sur \"Enregistrer\" pour afficher la commande curl du webhook.";
-      }
-
-      getTelegramConfigurationApiCall(result => updateWebhookOutputs(result['webhook'], result['bot_token']));
-    }
-  })();
+          this.savedToken = token;
+          this.webhook = result.webhook ?? '';
+          window.toaster.toastSuccess(@js(__('Token saved. Now declare the webhook to Telegram.')));
+        }, () => this.saving = false);
+      },
+    };
+  }
 </script>

@@ -1,4 +1,4 @@
-{{-- Messaging bots setup. Inner partials are still Bootstrap-styled (legacy). --}}
+{{-- Messaging bots setup: one guide per messenger (iframes/_telegram, iframes/_whatsapp). --}}
 <div x-data="{ bot: 'telegram' }" class="ui:flex ui:flex-col ui:gap-4">
   <div class="ui:inline-flex ui:self-start ui:rounded-lg ui:bg-slate-100 ui:p-1" role="tablist">
     @foreach(['telegram' => 'Telegram', 'whatsapp' => 'WhatsApp'] as $key => $label)
