@@ -12,7 +12,6 @@ use App\Models\Leak;
 use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\TimelineFact;
-use App\Models\TimelineItem;
 use App\Models\Trial;
 use App\Models\User;
 use App\Models\Vector;
@@ -230,8 +229,7 @@ class CleanupTenantDataTest extends TestCaseWithDb
 
         (new Cleanup())->handle();
 
-        $this->assertNull($tenant->fresh()->deletion_scheduled_at);
-
+        $this->assertDatabaseMissing('tenants', ['id' => $tenant->id]);
         $this->assertDatabaseMissing('am_assets', ['id' => $asset->id]);
         $this->assertDatabaseMissing('ynh_servers', ['id' => $server->id]);
         $this->assertDatabaseMissing('cb_conversations', ['id' => $conversation->id]);
