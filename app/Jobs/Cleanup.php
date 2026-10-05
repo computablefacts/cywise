@@ -272,6 +272,9 @@ class Cleanup implements ShouldQueue
 
                     Log::debug("Tenant {$tenant->id} has no paying user. Scheduling deletion in " . self::DELETION_DELAY_DAYS . " days.");
 
+                    $tenant->deletion_scheduled_at = now()->addDays(self::DELETION_DELAY_DAYS)->endOfDay();
+                    $tenant->save();
+
                     $users->each(function (User $user) use ($tenant) {
                         $terms = "https://www.cywise.io/terms";
                         $delay = self::DELETION_DELAY_DAYS;
@@ -283,9 +286,6 @@ class Cleanup implements ShouldQueue
                               <p>Bonne journée !</p>
                             ", "📢 Fin de votre période d'essai sur Cywise"));
                     });
-
-                    $tenant->deletion_scheduled_at = now()->addDays(self::DELETION_DELAY_DAYS)->endOfDay();
-                    $tenant->save();
 
                 } else if ($tenant->deletion_scheduled_at <= now()) {
 
