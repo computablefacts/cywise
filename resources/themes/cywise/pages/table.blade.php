@@ -14,364 +14,234 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
+  @php
+    // Wizard steps, in order. The JS below switches them by index (.step / .step-content).
+    $steps = [__('Type'), __('Source'), __('Files'), __('Columns'), __('Query'), __('Done')];
+    $radio = 'ui:m-0 ui:flex ui:cursor-pointer ui:items-center ui:gap-3 ui:rounded-lg ui:border ui:border-solid ui:border-line ui:bg-white ui:px-4 ui:py-3 ui:text-sm ui:font-medium ui:text-ink ui:hover:bg-slate-50 ui:has-checked:border-brand-500 ui:has-checked:bg-brand-50';
+    $check = 'ui:m-0 ui:flex ui:cursor-pointer ui:items-center ui:gap-2 ui:text-sm ui:text-ink';
+    $box = 'ui:m-0 ui:size-4 ui:accent-brand-500';
+  @endphp
 
-  @push('styles')
-  <style>
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-5xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
 
-    table {
-      table-layout: fixed;
-    }
+    <x-ui.page-header :title="__('New table')"
+                      :subtitle="__('Import files or write a SQL query to create a table.')">
+      <x-slot:actions>
+        <x-ui.button variant="secondary" :href="route('tables')">{{ __('Back to tables list') }}</x-ui.button>
+      </x-slot:actions>
+    </x-ui.page-header>
 
-    td {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+    {{-- Step indicator: the active step (.active, set by goToStep) gets a filled brand circle. --}}
+    <ol class="ui:m-0 ui:flex ui:list-none ui:items-start ui:gap-2 ui:p-0">
+      @foreach($steps as $i => $label)
+        <li class="step ui:group ui:flex ui:min-w-0 ui:flex-1 ui:flex-col ui:items-center ui:gap-1.5 {{ $i === 0 ? 'active' : '' }}"
+            data-step="{{ $i + 1 }}">
+          <span class="ui:flex ui:size-7 ui:items-center ui:justify-center ui:rounded-full ui:bg-brand-50 ui:text-xs ui:font-semibold ui:text-brand-700 ui:ring-1 ui:ring-brand-200 ui:group-[.active]:bg-brand-500 ui:group-[.active]:text-white ui:group-[.active]:ring-brand-500">
+            {{ $i + 1 }}
+          </span>
+          <span class="ui:max-w-full ui:truncate ui:text-xs ui:font-medium ui:text-slate-500 ui:group-[.active]:text-ink">{{ $label }}</span>
+        </li>
+      @endforeach
+    </ol>
 
-    .steps {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .step {
-      padding: 10px 15px;
-      color: var(--ds-background-brand-bold);
-      flex: 1;
-      text-align: center;
-    }
-
-    .step.active {
-      background: var(--ds-background-brand-bold);
-      color: white;
-      font-weight: bold;
-    }
-
-    .content {
-      background-color: white;
-    }
-
-    .step-content {
-      display: none;
-    }
-
-    .step-content.active {
-      display: block;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-  </style>
-  @endpush
-
-  <div class="container-fluid">
-    <div class="steps mt-3">
-      <div class="step active" data-step="1">
-        {{ __('Step 1') }}
-      </div>
-      <div class="step" data-step="2">
-        {{ __('Step 2') }}
-      </div>
-      <div class="step" data-step="3">
-        {{ __('Step 3') }}
-      </div>
-      <div class="step" data-step="4">
-        {{ __('Step 4') }}
-      </div>
-      <div class="step" data-step="5">
-        {{ __('Step 5') }}
-      </div>
-      <div class="step" data-step="6">
-        {{ __('Step 6') }}
-      </div>
+    {{-- Step 1: table kind --}}
+    <div class="step-content active">
+      <x-ui.card :title="__('1. What kind of table would you like to create?')">
+        <div id="table-kinds-container" class="ui:grid ui:gap-3 ui:sm:grid-cols-2">
+          <label class="{{ $radio }}">
+            <input type="radio" name="table-kind" value="physical" class="{{ $box }}" checked/>
+            {{ __('Physical') }}
+          </label>
+          <label class="{{ $radio }}">
+            <input type="radio" name="table-kind" value="virtual" class="{{ $box }}"/>
+            {{ __('Virtual') }}
+          </label>
+        </div>
+        <div class="ui:mt-6 ui:flex ui:justify-end ui:gap-2">
+          <x-ui.button class="next-button" data-next="2" icon="caret-right">{{ __('Next step') }}</x-ui.button>
+        </div>
+      </x-ui.card>
     </div>
-    <div class="content my-3">
-      <div class="card step-content active">
-        <div class="card-body">
-          <h5 class="card-title">
-            {{ __('1. What kind of table would you like to create?') }}
-          </h5>
-          <div class="row mt-2">
-            <div class="col">
-              <div id="table-kinds-container"></div>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col text-center">
-              <button class="btn btn-primary next-button" data-next="2">{{ __('Next step >') }}</button>
-            </div>
+
+    {{-- Step 2: storage and its credentials (one settings block shown at a time) --}}
+    <div class="step-content ui:hidden">
+      <x-ui.card :title="__('2.1 Where are the files you want to import?')">
+        <div id="storage-kinds-container" class="ui:grid ui:gap-3 ui:sm:grid-cols-3">
+          <label class="{{ $radio }}">
+            <input type="radio" name="storage-kind" value="s3" class="{{ $box }}" checked/>
+            {{ __('AWS S3 Bucket') }}
+          </label>
+          <label class="{{ $radio }}">
+            <input type="radio" name="storage-kind" value="azure" class="{{ $box }}"/>
+            {{ __('Azure Blob Storage') }}
+          </label>
+          <label class="{{ $radio }}">
+            <input type="radio" name="storage-kind" value="local" class="{{ $box }}"/>
+            {{ __('This computer (upload)') }}
+          </label>
+        </div>
+        <div id="aws-settings" class="ui:mt-6">
+          <h3 class="ui:m-0 ui:mb-3 ui:text-sm ui:font-semibold ui:text-ink">
+            {{ __('2.2 What are the credentials for your AWS S3 Bucket?') }}
+          </h3>
+          <div class="ui:grid ui:gap-4 ui:sm:grid-cols-2">
+            <x-ui.field :label="__('Region')" for="aws-region">
+              <x-ui.input id="aws-region" placeholder="ex. eu-west-3"/>
+            </x-ui.field>
+            <x-ui.field :label="__('Access Key Id')" for="aws-access-key-id">
+              <x-ui.input id="aws-access-key-id" placeholder="ex. AKIAIOSFODNN7EXAMPLE"/>
+            </x-ui.field>
+            <x-ui.field :label="__('Secret Access Key')" for="aws-secret-access-key" class="ui:sm:col-span-2">
+              <x-ui.input id="aws-secret-access-key" placeholder="ex. wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY"/>
+            </x-ui.field>
+            <x-ui.field :label="__('Input Folder')" for="aws-input-folder">
+              <x-ui.input id="aws-input-folder" placeholder="ex. my_s3_bucket/in/"/>
+            </x-ui.field>
+            <x-ui.field :label="__('Output Folder')" for="aws-output-folder">
+              <x-ui.input id="aws-output-folder" placeholder="ex. my_s3_bucket/out/"/>
+            </x-ui.field>
           </div>
         </div>
-      </div>
-      <div class="card step-content">
-        <div class="card-body">
-          <h5 class="card-title">
-            {{ __('2.1 Where are the files you want to import?') }}
-          </h5>
-          <div class="row mt-2">
-            <div class="col">
-              <div id="storage-kinds-container"></div>
-            </div>
-          </div>
-          <div id="aws-settings">
-            <div class="row mt-2">
-              <div class="col">
-                <h5>
-                  {{ __('2.2 What are the credentials for your AWS S3 Bucket?') }}
-                </h5>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col col-2 align-content-center text-end">
-                <b>{{ __('Region') }}</b>
-              </div>
-              <div class="col">
-                <div id="aws-region"></div>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col col-2 align-content-center text-end">
-                <b>{{ __('Access Key Id') }}</b>
-              </div>
-              <div class="col">
-                <div id="aws-access-key-id"></div>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col col-2 align-content-center text-end">
-                <b>{{ __('Secret Access Key') }}</b>
-              </div>
-              <div class="col">
-                <div id="aws-secret-access-key"></div>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col col-2 align-content-center text-end">
-                <b>{{ __('Input Folder') }}</b>
-              </div>
-              <div class="col">
-                <div id="aws-input-folder"></div>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col col-2 align-content-center text-end">
-                <b>{{ __('Output Folder') }}</b>
-              </div>
-              <div class="col">
-                <div id="aws-output-folder"></div>
-              </div>
-            </div>
-          </div>
-          <div id="azure-settings" class="hidden">
-            <div class="row mt-2">
-              <div class="col">
-                <h5 class="card-title">
-                  {{ __('2.2 What are the credentials for your Azure Blob Storage?') }}
-                </h5>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col col-2 align-content-center text-end">
-                <b>{{ __('Connection String') }}</b>
-              </div>
-              <div class="col">
-                <div id="azure-connection-string"></div>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col col-2 align-content-center text-end">
-                <b>{{ __('Input Folder') }}</b>
-              </div>
-              <div class="col">
-                <div id="azure-input-folder"></div>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col col-2 align-content-center text-end">
-                <b>{{ __('Output Folder') }}</b>
-              </div>
-              <div class="col">
-                <div id="azure-output-folder"></div>
-              </div>
-            </div>
-          </div>
-          <div id="upload-settings" class="hidden">
-            <div class="row mt-2">
-              <div class="col">
-                <h5 class="card-title">
-                  {{ __('2.2 Upload from this computer') }}
-                </h5>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col">
-                <div id="upload-dropzone" class="p-4 border border-2 border-dashed text-center" style="cursor:pointer;">
-                  {{ __('Drag & drop TSV files here or click to browse') }}
-                </div>
-                <input id="upload-input" type="file" accept=".tsv,text/tab-separated-values" multiple class="d-none"/>
-              </div>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col text-center">
-              <button class="btn btn-primary prev-button" data-prev="1">{{ __('< Previous step') }}</button>
-              <button id="upload-table" class="btn btn-primary next-button" data-next="3">{{ __('Next step >') }}
-              </button>
-            </div>
+        <div id="azure-settings" class="ui:mt-6 ui:hidden">
+          <h3 class="ui:m-0 ui:mb-3 ui:text-sm ui:font-semibold ui:text-ink">
+            {{ __('2.2 What are the credentials for your Azure Blob Storage?') }}
+          </h3>
+          <div class="ui:grid ui:gap-4 ui:sm:grid-cols-2">
+            <x-ui.field :label="__('Connection String')" for="azure-connection-string" class="ui:sm:col-span-2">
+              <x-ui.input id="azure-connection-string"
+                          placeholder="ex. DefaultEndpointsProtocol=https;AccountName=my_storage_account;AccountKey=my_account_key;EndpointSuffix=core.windows.net"/>
+            </x-ui.field>
+            <x-ui.field :label="__('Input Folder')" for="azure-input-folder">
+              <x-ui.input id="azure-input-folder" placeholder="ex. my_container/in/"/>
+            </x-ui.field>
+            <x-ui.field :label="__('Output Folder')" for="azure-output-folder">
+              <x-ui.input id="azure-output-folder" placeholder="ex. my_container/out/"/>
+            </x-ui.field>
           </div>
         </div>
-      </div>
-      <div class="card step-content">
-        <div class="card-body">
-          <h5 class="card-title">
-            {{ __('3. Which table would you like to import?') }}
-          </h5>
-          <div class="row mt-2">
-            <div class="col">
-              <table class="table">
-                <thead>
-                <tr>
-                  <th style="width:30px"></th>
-                  <th>{{ __('Filename') }}</th>
-                  <th class="text-end">{{ __('File Size') }}</th>
-                  <th class="text-end">{{ __('Last Modified') }}</th>
-                </tr>
-                </thead>
-                <tbody id="list-tables">
-                <!-- FILLED DYNAMICALLY -->
-                </tbody>
-              </table>
-            </div>
+        <div id="upload-settings" class="ui:mt-6 ui:hidden">
+          <h3 class="ui:m-0 ui:mb-3 ui:text-sm ui:font-semibold ui:text-ink">
+            {{ __('2.2 Upload from this computer') }}
+          </h3>
+          <div id="upload-dropzone"
+               class="ui:cursor-pointer ui:rounded-lg ui:border-2 ui:border-dashed ui:border-line ui:p-8 ui:text-center ui:text-sm ui:text-slate-500 ui:hover:border-brand-500">
+            {{ __('Drag & drop TSV files here or click to browse') }}
           </div>
-          <div class="row mt-2">
-            <div class="col text-center">
-              <button class="btn btn-primary prev-button" data-prev="2">{{ __('< Previous step') }}</button>
-              <button id="get-columns" class="btn btn-primary next-button" data-next="4">{{ __('Next step >') }}
-              </button>
-            </div>
+          <input id="upload-input" type="file" accept=".tsv,text/tab-separated-values" multiple class="ui:hidden"/>
+        </div>
+        <div class="ui:mt-6 ui:flex ui:justify-between ui:gap-2">
+          <x-ui.button variant="secondary" class="prev-button" data-prev="1">{{ __('Previous step') }}</x-ui.button>
+          <x-ui.button id="upload-table" class="next-button" data-next="3" icon="caret-right">{{ __('Next step') }}</x-ui.button>
+        </div>
+      </x-ui.card>
+    </div>
+
+    {{-- Step 3: files to import (rows filled by listTables) --}}
+    <div class="step-content ui:hidden">
+      <x-ui.card :title="__('3. Which table would you like to import?')" flush>
+        <x-ui.table class="ui:table-fixed ui:[&_td]:truncate">
+          <thead>
+          <tr>
+            <th class="ui:w-12"></th>
+            <th>{{ __('Filename') }}</th>
+            <th class="ui:text-right!">{{ __('File Size') }}</th>
+            <th class="ui:text-right!">{{ __('Last Modified') }}</th>
+          </tr>
+          </thead>
+          <tbody id="list-tables">
+          <!-- FILLED DYNAMICALLY -->
+          </tbody>
+        </x-ui.table>
+        <div class="ui:flex ui:justify-between ui:gap-2 ui:border-0 ui:border-t ui:border-solid ui:border-line ui:p-5">
+          <x-ui.button variant="secondary" class="prev-button" data-prev="2">{{ __('Previous step') }}</x-ui.button>
+          <x-ui.button id="get-columns" class="next-button" data-next="4" icon="caret-right">{{ __('Next step') }}</x-ui.button>
+        </div>
+      </x-ui.card>
+    </div>
+
+    {{-- Step 4: description, import options and columns (rows filled by getTablesColumns) --}}
+    <div class="step-content ui:hidden">
+      <x-ui.card :title="__('4. Which columns would you like to retain?')" flush>
+        <div class="ui:flex ui:flex-col ui:gap-4 ui:px-5 ui:pb-5">
+          <x-ui.field :label="__('Description')" for="table-description">
+            <x-ui.textarea id="table-description"
+                           placeholder="{{ __('Please provide a detailed description of the table and explain the significance of the key columns. The more information you include, the better.') }}"/>
+          </x-ui.field>
+          <div class="ui:flex ui:flex-wrap ui:gap-x-6 ui:gap-y-2">
+            <label for="toggle-columns-selection" class="{{ $check }}">
+              <input type="checkbox" id="toggle-columns-selection" class="{{ $box }}"/>
+              {{ __('Toggle selection') }}
+            </label>
+            <label for="toggle-deduplicate" class="{{ $check }}">
+              <input type="checkbox" id="toggle-deduplicate" class="{{ $box }}" checked/>
+              {{ __('Deduplicate rows') }}
+            </label>
+            <label for="toggle-copy" class="{{ $check }}">
+              <input type="checkbox" id="toggle-copy" class="{{ $box }}"/>
+              {{ __('Copy') }}
+            </label>
+            <label for="toggle-updatable" class="{{ $check }}">
+              <input type="checkbox" id="toggle-updatable" class="{{ $box }}"/>
+              {{ __('Update Automatically') }}
+            </label>
           </div>
         </div>
-      </div>
-      <div class="card step-content">
-        <div class="card-body">
-          <h5 class="card-title">
-            {{ __('4. Which columns would you like to retain?') }}
-          </h5>
-          <div class="row mt-2">
-            <div class="col">
-          <textarea id="table-description"
-                    class="form-control mt-2"
-                    rows="4"
-                    placeholder="{{ __('Please provide a detailed description of the table and explain the significance of the key columns. The more information you include, the better.') }}"></textarea>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col">
-              <input type="checkbox" id="toggle-columns-selection"/>
-              <label for="toggle-columns-selection">{{ __('Toggle selection') }}</label>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col">
-              <input type="checkbox" id="toggle-deduplicate" checked/>
-              <label for="toggle-deduplicate">{{ __('Deduplicate rows') }}</label>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col">
-              <input type="checkbox" id="toggle-copy"/>
-              <label for="toggle-copy">{{ __('Copy') }}</label>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col">
-              <input type="checkbox" id="toggle-updatable"/>
-              <label for="toggle-updatable">{{ __('Update Automatically') }}</label>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col">
-              <table class="table">
-                <thead>
-                <tr>
-                  <th style="width:30px"></th>
-                  <th>{{ __('Filename') }}</th>
-                  <th>{{ __('Old Column Name') }}</th>
-                  <th>{{ __('New Column Name') }}</th>
-                  <th>{{ __('Column Type') }}</th>
-                </tr>
-                </thead>
-                <tbody id="tables-columns">
-                <!-- FILLED DYNAMICALLY -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col text-center">
-              <button class="btn btn-primary prev-button" data-prev="3">{{ __('< Previous step') }}</button>
-              <button id="import-tables" class="btn btn-primary next-button" data-next="6">{{ __('Next step >') }}
-              </button>
-            </div>
+        <x-ui.table class="ui:table-fixed ui:[&_td]:truncate">
+          <thead>
+          <tr>
+            <th class="ui:w-12"></th>
+            <th>{{ __('Filename') }}</th>
+            <th>{{ __('Old Column Name') }}</th>
+            <th>{{ __('New Column Name') }}</th>
+            <th>{{ __('Column Type') }}</th>
+          </tr>
+          </thead>
+          <tbody id="tables-columns">
+          <!-- FILLED DYNAMICALLY -->
+          </tbody>
+        </x-ui.table>
+        <div class="ui:flex ui:justify-between ui:gap-2 ui:border-0 ui:border-t ui:border-solid ui:border-line ui:p-5">
+          <x-ui.button variant="secondary" class="prev-button" data-prev="3">{{ __('Previous step') }}</x-ui.button>
+          <x-ui.button id="import-tables" class="next-button" data-next="6" icon="caret-right">{{ __('Next step') }}</x-ui.button>
+        </div>
+      </x-ui.card>
+    </div>
+
+    {{-- Step 5: virtual table from a SQL query --}}
+    <div class="step-content ui:hidden">
+      <x-ui.card :title="__('5. Input the SQL query to generate a new virtual table.')">
+        <div class="ui:flex ui:flex-col ui:gap-4">
+          <x-ui.field :label="__('Name')" for="vtable-name">
+            <x-ui.input id="vtable-name" placeholder="{{ __('The virtual table name such as active_users') }}"/>
+          </x-ui.field>
+          <x-ui.field :label="__('Description')" for="vtable-description">
+            <x-ui.textarea id="vtable-description"
+                           placeholder="{{ __('Please provide a detailed description of the table and explain the significance of the key columns. The more information you include, the better.') }}"/>
+          </x-ui.field>
+          <label for="toggle-materialize" class="{{ $check }}">
+            <input type="checkbox" id="toggle-materialize" class="{{ $box }}"/>
+            {{ __('Materialize') }}
+          </label>
+          <div>
+            <x-sql-editor/>
           </div>
         </div>
-      </div>
-      <div class="card step-content">
-        <div class="card-body">
-          <h5 class="card-title">
-            {{ __('5. Input the SQL query to generate a new virtual table.') }}
-          </h5>
-          <div class="row mt-2">
-            <div class="col">
-              <div id="vtable-name"></div>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col">
-          <textarea id="vtable-description"
-                    class="form-control mt-2"
-                    rows="4"
-                    placeholder="{{ __('Please provide a detailed description of the table and explain the significance of the key columns. The more information you include, the better.') }}"></textarea>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col">
-              <input type="checkbox" id="toggle-materialize"/>
-              <label for="toggle-materialize">{{ __('Materialize') }}</label>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col">
-              <x-sql-editor/>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col text-center">
-              <button class="btn btn-primary prev-button" data-prev="1">{{ __('< Previous step') }}</button>
-              <button id="create-vtable" class="btn btn-primary next-button" data-next="6">{{ __('Next step >') }}
-              </button>
-            </div>
-          </div>
+        <div class="ui:mt-6 ui:flex ui:justify-between ui:gap-2">
+          <x-ui.button variant="secondary" class="prev-button" data-prev="1">{{ __('Previous step') }}</x-ui.button>
+          <x-ui.button id="create-vtable" class="next-button" data-next="6" icon="caret-right">{{ __('Next step') }}</x-ui.button>
         </div>
-      </div>
-      <div class="card step-content">
-        <div class="card-body">
-          <h5 class="card-title">
-            {{ __('6. Your data will be accessible shortly!') }}
-          </h5>
-          <div class="row mt-2">
-            <div class="col text-center">
-              <!-- TODO : ADD IMAGE HERE -->
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col text-center">
-              <a class="btn btn-primary" href="{{ route('tables') }}">{{ __('Back to tables list') }}</a>
-            </div>
-          </div>
+      </x-ui.card>
+    </div>
+
+    {{-- Step 6: done --}}
+    <div class="step-content ui:hidden">
+      <x-ui.card>
+        <x-ui.empty icon="check-circle">{{ __('6. Your data will be accessible shortly!') }}</x-ui.empty>
+        <!-- TODO : ADD IMAGE HERE -->
+        <div class="ui:flex ui:justify-center">
+          <x-ui.button :href="route('tables')">{{ __('Back to tables list') }}</x-ui.button>
         </div>
-      </div>
+      </x-ui.card>
     </div>
   </div>
   <script>
@@ -391,21 +261,21 @@ render(function (Request $request) {
       button.addEventListener('click', (event) => {
         const currentStep = parseInt(button.getAttribute('data-next')) - 1;
         let moveToNextStep = true;
-        if (event.target && event.target.id === 'upload-table') {
+        if (button.id === 'upload-table') {
           event.preventDefault();
           event.stopPropagation();
           if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
             moveToNextStep = uploadTables();
           }
-        } else if (event.target && event.target.id === 'get-columns') {
+        } else if (button.id === 'get-columns') {
           event.preventDefault();
           event.stopPropagation();
           moveToNextStep = getTablesColumns();
-        } else if (event.target && event.target.id === 'import-tables') {
+        } else if (button.id === 'import-tables') {
           event.preventDefault();
           event.stopPropagation();
           moveToNextStep = importTables();
-        } else if (event.target && event.target.id === 'create-vtable') {
+        } else if (button.id === 'create-vtable') {
           event.preventDefault();
           event.stopPropagation();
           moveToNextStep = createVirtualTables();
@@ -429,44 +299,34 @@ render(function (Request $request) {
         stepIndex = 4; // 0-based, when next is clicked bypass steps 2, 3 and 4
       }
       steps.forEach((step, index) => step.classList.toggle('active', index === stepIndex));
-      stepContents.forEach((content, index) => content.classList.toggle('active', index === stepIndex));
+      stepContents.forEach((content, index) => {
+        content.classList.toggle('active', index === stepIndex);
+        content.classList.toggle('ui:hidden', index !== stepIndex);
+      });
       if (stepIndex === 2 /* 0-based */) {
         listTables();
       }
     };
 
-    const PHYSICAL_TABLE = {
-      label: "{{ __('Physical') }}", value: 'physical'
-    };
-    const VIRTUAL_TABLE = {
-      label: "{{ __('Virtual') }}", value: 'virtual'
-    };
+    const PHYSICAL_TABLE = {value: 'physical'};
+    const VIRTUAL_TABLE = {value: 'virtual'};
 
-    const elTableType = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'RadioGroup',
-      container: 'table-kinds-container',
-      inline: false,
-      items: [PHYSICAL_TABLE, VIRTUAL_TABLE],
-      selected_item: PHYSICAL_TABLE.value,
+    // Native radio group behind the BlueprintJS-like "el.selectedItem" read below, e.g. 'physical'.
+    const radioGroup = (name) => ({
+      el: {
+        get selectedItem() {
+          return document.querySelector(`input[name="${name}"]:checked`)?.value;
+        }
+      }
     });
 
-    const AWS_STORAGE = {
-      label: "{{ __('AWS S3 Bucket') }}", value: 's3'
-    };
-    const AZURE_STORAGE = {
-      label: "{{ __('Azure Blob Storage') }}", value: 'azure'
-    };
-    const LOCAL_STORAGE = {
-      label: "{{ __('This computer (upload)') }}", value: 'local'
-    };
+    const elTableType = radioGroup('table-kind');
 
-    const elStorageType = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'RadioGroup',
-      container: 'storage-kinds-container',
-      inline: false,
-      items: [AWS_STORAGE, AZURE_STORAGE, LOCAL_STORAGE],
-      selected_item: AWS_STORAGE.value,
-    });
+    const AWS_STORAGE = {value: 's3'};
+    const AZURE_STORAGE = {value: 'azure'};
+    const LOCAL_STORAGE = {value: 'local'};
+
+    const elStorageType = radioGroup('storage-kind');
 
     const storageTypeButtons = document.querySelectorAll('#storage-kinds-container input');
     const awsSettings = document.getElementById('aws-settings');
@@ -477,58 +337,36 @@ render(function (Request $request) {
       button.addEventListener('change', () => {
         if (elStorageType.el.selectedItem === AWS_STORAGE.value) {
           console.log('AWS_STORAGE selected')
-          azureSettings.classList.add('hidden')
-          uploadSettings.classList.add('hidden')
-          awsSettings.classList.remove('hidden')
+          azureSettings.classList.add('ui:hidden')
+          uploadSettings.classList.add('ui:hidden')
+          awsSettings.classList.remove('ui:hidden')
         }
         if (elStorageType.el.selectedItem === AZURE_STORAGE.value) {
           console.log('AZURE_STORAGE selected')
-          awsSettings.classList.add('hidden')
-          uploadSettings.classList.add('hidden')
-          azureSettings.classList.remove('hidden')
+          awsSettings.classList.add('ui:hidden')
+          uploadSettings.classList.add('ui:hidden')
+          azureSettings.classList.remove('ui:hidden')
         }
         if (elStorageType.el.selectedItem === LOCAL_STORAGE.value) {
           console.log('LOCAL_STORAGE selected')
-          awsSettings.classList.add('hidden')
-          azureSettings.classList.add('hidden')
-          uploadSettings.classList.remove('hidden')
+          awsSettings.classList.add('ui:hidden')
+          azureSettings.classList.add('ui:hidden')
+          uploadSettings.classList.remove('ui:hidden')
         }
       });
     });
 
-    const elAwsRegion = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'TextInput', container: 'aws-region', placeholder: 'ex. eu-west-3'
-    });
+    // Native inputs behind the BlueprintJS-like "el.value" read below.
+    const textInput = (id) => ({el: document.getElementById(id)});
 
-    const elAwsAccessKeyId = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'TextInput', container: 'aws-access-key-id', placeholder: 'ex. AKIAIOSFODNN7EXAMPLE',
-    });
-
-    const elAwsSecretAccessKey = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'TextInput', container: 'aws-secret-access-key', placeholder: 'ex. wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-    });
-
-    const elAwsInputFolder = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'TextInput', container: 'aws-input-folder', placeholder: 'ex. my_s3_bucket/in/',
-    });
-
-    const elAwsOutputFolder = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'TextInput', container: 'aws-output-folder', placeholder: 'ex. my_s3_bucket/out/',
-    });
-
-    const elAzureConnectionString = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'TextInput',
-      container: 'azure-connection-string',
-      placeholder: 'ex. DefaultEndpointsProtocol=https;AccountName=my_storage_account;AccountKey=my_account_key;EndpointSuffix=core.windows.net',
-    });
-
-    const elAzureInputFolder = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'TextInput', container: 'azure-input-folder', placeholder: 'ex. my_container/in/',
-    });
-
-    const elAzureOutputFolder = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'TextInput', container: 'azure-output-folder', placeholder: 'ex. my_container/out/',
-    });
+    const elAwsRegion = textInput('aws-region');
+    const elAwsAccessKeyId = textInput('aws-access-key-id');
+    const elAwsSecretAccessKey = textInput('aws-secret-access-key');
+    const elAwsInputFolder = textInput('aws-input-folder');
+    const elAwsOutputFolder = textInput('aws-output-folder');
+    const elAzureConnectionString = textInput('azure-connection-string');
+    const elAzureInputFolder = textInput('azure-input-folder');
+    const elAzureOutputFolder = textInput('azure-output-folder');
 
     // Upload & Drag & Drop handlers
     const uploadDropzone = document.getElementById('upload-dropzone');
@@ -549,12 +387,12 @@ render(function (Request $request) {
     uploadDropzone.addEventListener('click', (e) => uploadInput.click());
     uploadDropzone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      uploadDropzone.classList.add('bg-light');
+      uploadDropzone.classList.add('ui:bg-brand-50');
     });
-    uploadDropzone.addEventListener('dragleave', () => uploadDropzone.classList.remove('bg-light'));
+    uploadDropzone.addEventListener('dragleave', () => uploadDropzone.classList.remove('ui:bg-brand-50'));
     uploadDropzone.addEventListener('drop', (e) => {
       e.preventDefault();
-      uploadDropzone.classList.remove('bg-light');
+      uploadDropzone.classList.remove('ui:bg-brand-50');
       const files = Array.from(e.dataTransfer.files || []);
       uploadSelectedFiles = uploadSelectedFiles.concat(files.filter(f => f.name.endsWith('.tsv')));
       refreshUploadList();
@@ -565,9 +403,7 @@ render(function (Request $request) {
       refreshUploadList();
     });
 
-    const elVirtualTableName = com.computablefacts.blueprintjs.Blueprintjs.component(document, {
-      type: 'TextInput', container: 'vtable-name', placeholder: "{{ __('The virtual table name such as active_users') }}"
-    });
+    const elVirtualTableName = textInput('vtable-name');
 
     const uploadTables = () => {
       if (uploadSelectedFiles.length === 0) {
@@ -603,21 +439,21 @@ render(function (Request $request) {
       }
 
       const elListTables = document.getElementById('list-tables');
-      elListTables.innerHTML = "<tr><td colspan=\"4\" class=\"text-center\">{{ __('Loading...') }}</td></tr>";
+      elListTables.innerHTML = "<tr><td colspan=\"4\" class=\"ui:text-center ui:text-slate-500\">{{ __('Loading...') }}</td></tr>";
 
       if (elTableType.el.selectedItem === PHYSICAL_TABLE.value) {
 
         const onSuccess = response => {
           if (!response.files || response.files.length === 0) {
-            elListTables.innerHTML = "<tr><td colspan=\"4\" class=\"text-center\">{{ __('No files found.') }}</td></tr>";
+            elListTables.innerHTML = "<tr><td colspan=\"4\" class=\"ui:text-center ui:text-slate-500\">{{ __('No files found.') }}</td></tr>";
           } else {
             const rows = response.files.map(table => {
               return `
               <tr>
-                <td><input type="checkbox" value="${table.object}" data-file="${table.object}"/></td>
+                <td><input type="checkbox" class="ui:m-0 ui:size-4 ui:accent-brand-500" value="${table.object}" data-file="${table.object}"/></td>
                 <td>${table.object}</td>
-                <td class="text-end">${table.size}</td>
-                <td class="text-end">${table.last_modified}</td>
+                <td class="ui:text-right">${table.size}</td>
+                <td class="ui:text-right">${table.last_modified}</td>
               </tr>
             `;
             });
@@ -655,18 +491,18 @@ render(function (Request $request) {
       }
 
       const elTablesColumns = document.getElementById('tables-columns');
-      elTablesColumns.innerHTML = "<tr><td colspan=\"5\" class=\"text-center\">{{ __('Loading...') }}</td></tr>";
+      elTablesColumns.innerHTML = "<tr><td colspan=\"5\" class=\"ui:text-center ui:text-slate-500\">{{ __('Loading...') }}</td></tr>";
 
       const onSuccess = response => {
         if (!response.tables || response.tables.length === 0) {
-          elTablesColumns.innerHTML = "<tr><td colspan=\"5\" class=\"text-center\">{{ __('No columns found.') }}</td></tr>";
+          elTablesColumns.innerHTML = "<tr><td colspan=\"5\" class=\"ui:text-center ui:text-slate-500\">{{ __('No columns found.') }}</td></tr>";
         } else {
           const rows = response.tables.flatMap(table => {
             return table.columns.map(column => {
               column.table = table.table;
               return `
               <tr>
-                <td><input type="checkbox" data-file="${com.computablefacts.helpers.toBase64(JSON.stringify(column))}" checked/></td>
+                <td><input type="checkbox" class="ui:m-0 ui:size-4 ui:accent-brand-500" data-file="${com.computablefacts.helpers.toBase64(JSON.stringify(column))}" checked/></td>
                 <td>${table.table}</td>
                 <td>${column.old_name}</td>
                 <td>${column.new_name}</td>

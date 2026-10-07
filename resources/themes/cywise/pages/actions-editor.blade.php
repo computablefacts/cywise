@@ -14,55 +14,53 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
-  <div class="container-fluid">
-    <div class="card mt-3 mb-3">
-      <div class="card-body">
-        <h6 class="card-title text-truncate">{{ __('Edit action') }}</h6>
-        <div class="form-group">
-          <div class="mb-3">
-            <label for="name" class="form-label">{{ __('Name') }}</label>
-            <input id="name" class="form-control" value="{{ $action->name }}">
-          </div>
-          <div class="mb-3">
-            <label for="description" class="form-label">{{ __('Description') }}</label>
-            <textarea id="description" class="form-control" rows="3">{{ $action->description }}</textarea>
-          </div>
-          <div class="mb-3">
-            <label for="url" class="form-label">{{ __('URL') }}</label>
-            <input id="url" class="form-control" value="{{ $action->url }}">
-          </div>
-          <div class="mb-3">
-            <label for="headers" class="form-label">{{ __('Headers (JSON)') }}</label>
-            <div id="editor-headers" style="height:100px;width:100%;"></div>
-          </div>
-          <div class="mb-3">
-            <label for="schema" class="form-label">{{ __('Schema (JSON)') }}</label>
-            <div id="editor-schema" style="height:150px;width:100%;"></div>
-          </div>
-          <div class="mb-3">
-            <label for="payload_template" class="form-label">{{ __('Payload Template (JSON)') }}</label>
-            <div id="editor-payload" style="height:150px;width:100%;"></div>
-          </div>
-          <div class="mb-3">
-            <label for="response_template" class="form-label">{{ __('Response Template') }}</label>
-            <textarea id="response_template" class="form-control" rows="3">{{ $action->response_template }}</textarea>
-          </div>
-          <div class="mb-3">
-            <label for="examples" class="form-label">{{ __('Examples (JSON)') }}</label>
-            <div id="editor-examples" style="height:150px;width:100%;"></div>
-          </div>
-          <div class="mb-3">
-            <div class="col text-center">
-              <button id="delete-action" class="btn btn-danger {{ isset($action->id) ? '' : 'd-none' }}">
-                {{ __('Delete') }}
-              </button>
-              <button id="save-action" class="btn btn-primary">
-                {{ __('Save') }}
-              </button>
-            </div>
-          </div>
-        </div>
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-4xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
+
+    <x-ui.page-header :title="__('Edit action')"
+                      :subtitle="__('Remote action: an HTTP endpoint CyberBuddy may call.')">
+      <x-slot:actions>
+        <x-ui.button variant="secondary" :href="route('actions')">{{ __('Back to actions') }}</x-ui.button>
+      </x-slot:actions>
+    </x-ui.page-header>
+
+    {{-- Fields read by the script below (ids), JSON fields are Ace editors --}}
+    <x-ui.card>
+      <div class="ui:flex ui:flex-col ui:gap-5">
+        <x-ui.field :label="__('Name')" for="name">
+          <x-ui.input id="name" value="{{ $action->name }}"/>
+        </x-ui.field>
+        <x-ui.field :label="__('Description')" for="description">
+          <x-ui.textarea id="description" rows="3">{{ $action->description }}</x-ui.textarea>
+        </x-ui.field>
+        <x-ui.field :label="__('URL')" for="url">
+          <x-ui.input id="url" value="{{ $action->url }}"/>
+        </x-ui.field>
+        <x-ui.field :label="__('Headers (JSON)')">
+          <div id="editor-headers" class="ui:overflow-hidden ui:rounded-lg" style="height:100px;width:100%;"></div>
+        </x-ui.field>
+        <x-ui.field :label="__('Schema (JSON)')">
+          <div id="editor-schema" class="ui:overflow-hidden ui:rounded-lg" style="height:150px;width:100%;"></div>
+        </x-ui.field>
+        <x-ui.field :label="__('Payload Template (JSON)')">
+          <div id="editor-payload" class="ui:overflow-hidden ui:rounded-lg" style="height:150px;width:100%;"></div>
+        </x-ui.field>
+        <x-ui.field :label="__('Response Template')" for="response_template">
+          <x-ui.textarea id="response_template" rows="3">{{ $action->response_template }}</x-ui.textarea>
+        </x-ui.field>
+        <x-ui.field :label="__('Examples (JSON)')">
+          <div id="editor-examples" class="ui:overflow-hidden ui:rounded-lg" style="height:150px;width:100%;"></div>
+        </x-ui.field>
       </div>
+    </x-ui.card>
+
+    {{-- Delete hidden on a new action (no id yet) --}}
+    <div class="ui:flex ui:justify-end ui:gap-2">
+      <x-ui.button id="delete-action" variant="secondary" :style="isset($action->id) ? null : 'display: none;'">
+        {{ __('Delete') }}
+      </x-ui.button>
+      <x-ui.button id="save-action">
+        {{ __('Save') }}
+      </x-ui.button>
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.6.0/ace.js"></script>

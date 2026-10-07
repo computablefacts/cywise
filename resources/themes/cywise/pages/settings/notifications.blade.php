@@ -89,18 +89,16 @@
     @volt('settings.notifications') 
         <div class="">
             <x-app.settings-layout
-                title="Notification Preferences"
-                description="Manage how you receive notifications and updates."
+                :title="__('Notification Preferences')"
+                :description="__('Manage how you receive notifications and updates.')"
             >
-                <form wire:submit="save" class="w-100 max-w-lg">
-                    <div class="row g-4">
-                        <div class="col-12">
-                            {{ $this->form }}
+                <form wire:submit="save" class="ui:max-w-2xl">
+                    <x-ui.card>
+                        {{ $this->form }}
+                        <div class="ui:flex ui:justify-end ui:pt-6">
+                            <x-ui.button type="submit">{{ __('Save Preferences') }}</x-ui.button>
                         </div>
-                    </div>
-                    <div class="w-100 pt-4 text-end">
-                        <x-button type="submit">Save Preferences</x-button>
-                    </div>
+                    </x-ui.card>
                 </form>
 
             </x-app.settings-layout>

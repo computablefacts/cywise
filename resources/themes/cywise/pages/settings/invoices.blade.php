@@ -11,38 +11,35 @@
 <x-layouts.app>
         <div class="">
             <x-app.settings-layout
-                title="Invoices"
-                description="Your past plan invoices"
+                :title="__('Invoices')"
+                :description="__('Your past plan invoices')"
             >
-                @empty($invoices)
-                    <x-app.alert id="dashboard_alert">No invoices available.</x-app.alert>
-                    <p class="mt-3">You do not have any past invoices. When you subscribe to a plan you'll see your past invoices here.</p>
-                @else
-                    <div class="table-responsive border rounded">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
+                <x-ui.card flush>
+                    @empty($invoices)
+                        <x-ui.empty icon="invoice">{{ __("You do not have any past invoices. When you subscribe to a plan you'll see your past invoices here.") }}</x-ui.empty>
+                    @else
+                        <x-ui.table>
+                            <thead>
                                 <tr>
-                                    <th class="small fw-bold text-uppercase text-muted">Price</th>
-                                    <th class="small fw-bold text-uppercase text-muted">Date of Invoice</th>
-                                    <th class="small fw-bold text-uppercase text-muted text-end">PDF Download</th>
+                                    <th>{{ __('Price') }}</th>
+                                    <th>{{ __('Date of Invoice') }}</th>
+                                    <th class="ui:text-right">{{ __('PDF Download') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($invoices as $invoice)
                                     <tr wire:key="invoice-{{ $invoice->id }}">
-                                        <td class="small fw-medium">€{{ $invoice->total }}</td>
-                                        <td class="small fw-medium">{{ $invoice->created }}</td>
-                                        <td class="small text-end">
-                                            <a href="{{ $invoice->download }}" @if(config("wave.billing_provider") == 'stripe') target="_blank" @endif class="text-primary text-decoration-none fw-medium">Download</a>
+                                        <td class="ui:font-medium ui:tabular-nums">€{{ $invoice->total }}</td>
+                                        <td class="ui:tabular-nums">{{ $invoice->created }}</td>
+                                        <td class="ui:text-right">
+                                            <x-ui.button variant="ghost" size="sm" icon="download-simple" :href="$invoice->download" :target="config('wave.billing_provider') == 'stripe' ? '_blank' : null">{{ __('Download') }}</x-ui.button>
                                         </td>
-
                                     </tr>
                                 @endforeach
                             </tbody>
-                        </table>
-                    </div>
-                @endempty
-
+                        </x-ui.table>
+                    @endempty
+                </x-ui.card>
             </x-app.settings-layout>
         </div>
 </x-layouts.app>

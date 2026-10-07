@@ -14,87 +14,57 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
-  <div class="container-fluid">
-    <div class="card mt-3 mb-3">
-      <div class="card-body">
-        <h6 class="card-title text-truncate">{{ __('Edit rule') }}</h6>
-        <div class="form-group">
-          <div class="row mb-3">
-            <div class="col">
-              <label for="name" class="form-label">{{ __('Name') }}</label>
-              <input id="name" class="form-control"
-                     value="{{ isset($check->id) ? $check->title : '' }}" {{ isset($check->id) ? 'disabled' : '' }}>
-            </div>
-            <div class="col-4">
-              <label for="platform" class="form-label">{{ __('Platform') }}</label>
-              <select id="platform" class="form-select">
-                <!--
-                <option value="{{ \App\Enums\OsqueryPlatformEnum::ALL->value }}"
-                        {{ $check->policy?->platform() === \App\Enums\OsqueryPlatformEnum::ALL ? 'selected' : '' }}>
-                  {{ \App\Enums\OsqueryPlatformEnum::ALL->value }}
-                </option>
-                -->
-                <option value="{{ \App\Enums\OsqueryPlatformEnum::CENTOS->value }}"
-                        {{ $check->policy?->platform() === \App\Enums\OsqueryPlatformEnum::CENTOS ? 'selected' : '' }}>
-                  {{ \App\Enums\OsqueryPlatformEnum::CENTOS->value }}
-                </option>
-                <option value="{{ \App\Enums\OsqueryPlatformEnum::DARWIN->value }}"
-                        {{ $check->policy?->platform() === \App\Enums\OsqueryPlatformEnum::DARWIN ? 'selected' : '' }}>
-                  {{ \App\Enums\OsqueryPlatformEnum::DARWIN->value }}
-                </option>
-                <option value="{{ \App\Enums\OsqueryPlatformEnum::GENTOO->value }}"
-                        {{ $check->policy?->platform() === \App\Enums\OsqueryPlatformEnum::GENTOO ? 'selected' : '' }}>
-                  {{ \App\Enums\OsqueryPlatformEnum::GENTOO->value }}
-                </option>
-                <option value="{{ \App\Enums\OsqueryPlatformEnum::LINUX->value }}"
-                        {{ $check->policy?->platform() === \App\Enums\OsqueryPlatformEnum::LINUX ? 'selected' : '' }}>
-                  {{ \App\Enums\OsqueryPlatformEnum::LINUX->value }}
-                </option>
-                <!--
-                <option value="{{ \App\Enums\OsqueryPlatformEnum::POSIX->value }}"
-                        {{ $check->policy?->platform() === \App\Enums\OsqueryPlatformEnum::POSIX ? 'selected' : '' }}>
-                  {{ \App\Enums\OsqueryPlatformEnum::POSIX->value }}
-                </option>
-                -->
-                <option value="{{ \App\Enums\OsqueryPlatformEnum::UBUNTU->value }}"
-                        {{ $check->policy?->platform() === \App\Enums\OsqueryPlatformEnum::UBUNTU ? 'selected' : '' }}>
-                  {{ \App\Enums\OsqueryPlatformEnum::UBUNTU->value }}
-                </option>
-                <option value="{{ \App\Enums\OsqueryPlatformEnum::WINDOWS->value }}"
-                        {{ $check->policy?->platform() === \App\Enums\OsqueryPlatformEnum::WINDOWS ? 'selected' : '' }}>
-                  {{ \App\Enums\OsqueryPlatformEnum::WINDOWS->value }}
-                </option>
-              </select>
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="description" class="form-label">{{ __('Description') }}</label>
-            <textarea id="description" class="form-control" rows="3">{{ $check->description }}</textarea>
-          </div>
-          <div class="mb-3">
-            <label for="rationale" class="form-label">{{ __('Rationale') }}</label>
-            <textarea id="rationale" class="form-control" rows="3">{{ $check->rationale }}</textarea>
-          </div>
-          <div class="mb-3">
-            <label for="remediation" class="form-label">{{ __('Remediation') }}</label>
-            <textarea id="remediation" class="form-control" rows="3">{{ $check->remediation }}</textarea>
-          </div>
-          <div class="mb-3">
-            <div id="editor" style="height:200px;width:100%;"></div>
-          </div>
-          <div class="mb-3">
-            <div class="col text-center">
-              <button id="delete-rule" class="btn btn-danger {{ isset($check->id) ? '' : 'd-none' }}">
-                {{ __('Delete') }}
-              </button>
-              <button id="create-rule" class="btn btn-primary">
-                {{ __('Save') }}
-              </button>
-            </div>
-          </div>
+  @php
+    // Alphabetical, as in the legacy form (ALL and POSIX are not offered)
+    $enum = \App\Enums\OsqueryPlatformEnum::class;
+    $platforms = [$enum::CENTOS, $enum::DARWIN, $enum::GENTOO, $enum::LINUX, $enum::UBUNTU, $enum::WINDOWS];
+  @endphp
+
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-5xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
+
+    <x-ui.page-header :title="__('Edit rule')">
+      <x-slot:actions>
+        <x-ui.button variant="ghost" :href="route('sca')">{{ __('Cancel') }}</x-ui.button>
+      </x-slot:actions>
+    </x-ui.page-header>
+
+    <x-ui.card>
+      <div class="ui:flex ui:flex-col ui:gap-4">
+        <div class="ui:grid ui:gap-4 ui:sm:grid-cols-[2fr_1fr]">
+          <x-ui.field :label="__('Name')" for="name">
+            <x-ui.input id="name" value="{{ isset($check->id) ? $check->title : '' }}" :disabled="isset($check->id)"/>
+          </x-ui.field>
+          <x-ui.field :label="__('Platform')" for="platform">
+            <x-ui.select id="platform">
+              @foreach($platforms as $platform)
+                <option value="{{ $platform->value }}" @selected($check->policy?->platform() === $platform)>{{ $platform->value }}</option>
+              @endforeach
+            </x-ui.select>
+          </x-ui.field>
+        </div>
+        <x-ui.field :label="__('Description')" for="description">
+          <x-ui.textarea id="description" rows="3">{{ $check->description }}</x-ui.textarea>
+        </x-ui.field>
+        <x-ui.field :label="__('Rationale')" for="rationale">
+          <x-ui.textarea id="rationale" rows="3">{{ $check->rationale }}</x-ui.textarea>
+        </x-ui.field>
+        <x-ui.field :label="__('Remediation')" for="remediation">
+          <x-ui.textarea id="remediation" rows="3">{{ $check->remediation }}</x-ui.textarea>
+        </x-ui.field>
+        <div class="ui:overflow-hidden ui:rounded-lg">
+          <div id="editor" style="height:200px;width:100%;"></div>
+        </div>
+        <div class="ui:flex ui:justify-end ui:gap-2">
+          @if(isset($check->id))
+            <x-ui.button id="delete-rule" variant="secondary">
+              <x-phosphor-trash class="ui:size-4 ui:text-red-600"/>
+              {{ __('Delete') }}
+            </x-ui.button>
+          @endif
+          <x-ui.button id="create-rule" icon="floppy-disk">{{ __('Save') }}</x-ui.button>
         </div>
       </div>
-    </div>
+    </x-ui.card>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.6.0/ace.js"></script>
   <script>
@@ -112,7 +82,7 @@ render(function (Request $request) {
     const elRemediation = document.querySelector('#remediation');
     const elPlatform = document.querySelector('#platform');
 
-    btnDelete.addEventListener('click', () => {
+    btnDelete?.addEventListener('click', () => {
       const response = confirm("{{ __('Are you sure you want to delete this rule?') }}");
       if (response) {
         deleteOssecRuleApiCall('{{ isset($check->id) ? $check->id : 0 }}');

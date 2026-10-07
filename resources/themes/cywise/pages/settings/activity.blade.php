@@ -65,10 +65,10 @@ new class extends Component
     public function getActivityColor($action)
     {
         return match(true) {
-            str_contains($action, 'delete') => 'text-danger',
-            str_contains($action, 'password') || str_contains($action, 'security') => 'text-warning',
-            str_contains($action, 'login') => 'text-success',
-            default => 'text-primary',
+            str_contains($action, 'delete') => 'ui:bg-high-soft ui:text-high',
+            str_contains($action, 'password') || str_contains($action, 'security') => 'ui:bg-medium-soft ui:text-medium',
+            str_contains($action, 'login') => 'ui:bg-low-soft ui:text-low',
+            default => 'ui:bg-brand-50 ui:text-brand-500',
         };
     }
 };
@@ -79,146 +79,82 @@ new class extends Component
     @volt('settings.activity')
         <div class="">
             <x-app.settings-layout
-                title="Activity Log"
-                description="View your account activity history and security events.">
-                
-                <div class="w-100 max-w-4xl">
-                    
-                    <!-- Filters -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-5">
-                                    <label for="search" class="form-label small fw-bold">Search</label>
-                                    <input 
-                                        wire:model.live.debounce.300ms="search"
-                                        type="text" 
-                                        id="search"
-                                        placeholder="Search activities..."
-                                        class="form-control form-control-sm"
-                                    >
-                                </div>
+                :title="__('Activity Log')"
+                :description="__('View your account activity history and security events.')">
 
-                                <div class="col-md-5">
-                                    <label for="filterAction" class="form-label small fw-bold">Filter by Action</label>
-                                    <select 
-                                        wire:model.live="filterAction"
-                                        id="filterAction"
-                                        class="form-select form-select-sm"
-                                    >
-                                        <option value="">All Actions</option>
-                                        @foreach($actionTypes as $type)
-                                            <option value="{{ $type }}">{{ ucwords(str_replace('_', ' ', $type)) }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                @if($filterAction || $search)
-                                    <div class="col-md-2 d-flex align-items-end">
-                                        <button 
-                                            wire:click="clearFilters"
-                                            class="btn btn-link btn-sm text-decoration-none"
-                                        >
-                                            Clear
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
+                {{-- Filters: server-side, live --}}
+                <x-ui.card>
+                    <div class="ui:flex ui:flex-col ui:gap-4 ui:sm:flex-row ui:sm:items-end">
+                        <x-ui.field :label="__('Search')" for="search" class="ui:flex-1">
+                            <x-ui.input wire:model.live.debounce.300ms="search" id="search" :placeholder="__('Search activities...')"/>
+                        </x-ui.field>
+                        <x-ui.field :label="__('Filter by Action')" for="filterAction" class="ui:flex-1">
+                            <x-ui.select wire:model.live="filterAction" id="filterAction">
+                                <option value="">{{ __('All Actions') }}</option>
+                                @foreach($actionTypes as $type)
+                                    <option value="{{ $type }}">{{ ucwords(str_replace('_', ' ', $type)) }}</option>
+                                @endforeach
+                            </x-ui.select>
+                        </x-ui.field>
+                        @if($filterAction || $search)
+                            <x-ui.button variant="ghost" wire:click="clearFilters">{{ __('Clear') }}</x-ui.button>
+                        @endif
                     </div>
+                </x-ui.card>
 
-                    <!-- Activity List -->
-                    <div class="card">
-                        <div class="card-body">
-                            @if($activities->isEmpty())
-                                <div class="py-5 text-center">
-                                    <svg class="mb-3 text-muted" style="width: 64px; height: 64px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <h5 class="fw-bold">No activity found</h5>
-                                    <p class="text-muted small">
-                                        @if($filterAction || $search)
-                                            Try adjusting your filters to find what you're looking for.
-                                        @else
-                                            Your account activity will appear here.
-                                        @endif
-                                    </p>
-                                </div>
+                {{-- Activity list --}}
+                <x-ui.card flush>
+                    @if($activities->isEmpty())
+                        <x-ui.empty icon="clock-counter-clockwise">
+                            @if($filterAction || $search)
+                                {{ __('No activity found. Try adjusting your filters.') }}
                             @else
-                                <div class="list-group list-group-flush">
-                                    @foreach($activities as $activity)
-                                        <div class="list-group-item px-0 py-3">
-                                            <div class="d-flex align-items-start">
-                                                <div class="flex-shrink-0 me-3">
-                                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                        <x-dynamic-component 
-                                                            :component="$this->getActivityIcon($activity->action)" 
-                                                            class="{{ $this->getActivityColor($activity->action) }}"
-                                                            style="width: 20px; height: 20px;"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1 min-w-0">
-                                                    <div class="d-flex justify-content-between">
-                                                        <div>
-                                                            <p class="mb-0 fw-bold small">
-                                                                {{ ucwords(str_replace('_', ' ', $activity->action)) }}
-                                                            </p>
-                                                            @if($activity->description)
-                                                                <p class="mb-0 text-muted small">
-                                                                    {{ $activity->description }}
-                                                                </p>
-                                                            @endif
-                                                            <div class="d-flex flex-wrap mt-1">
-                                                                <span class="text-muted small me-3">
-                                                                    <svg class="me-1" style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                                    </svg>
-                                                                    {{ $activity->created_at->diffForHumans() }}
-                                                                </span>
-                                                                @if($activity->ip_address)
-                                                                    <span class="text-muted small">
-                                                                        <svg class="me-1" style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                                                                        </svg>
-                                                                        {{ $activity->ip_address }}
-                                                                    </span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                        <span class="text-muted small">
-                                                            {{ $activity->created_at->format('M j, Y g:i A') }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-
-                                <!-- Pagination -->
-                                <div class="mt-4">
-                                    {{ $activities->links() }}
-                                </div>
+                                {{ __('Your account activity will appear here.') }}
                             @endif
-                        </div>
-                    </div>
+                        </x-ui.empty>
+                    @else
+                        <ul class="ui:m-0 ui:list-none ui:p-0">
+                            @foreach($activities as $activity)
+                                <li class="ui:flex ui:items-start ui:gap-4 ui:px-5 ui:py-4 @if(!$loop->first) ui:border-0 ui:border-t ui:border-solid ui:border-line @endif">
+                                    <span class="ui:flex ui:size-10 ui:shrink-0 ui:items-center ui:justify-center ui:rounded-full {{ $this->getActivityColor($activity->action) }}">
+                                        <x-dynamic-component :component="$this->getActivityIcon($activity->action)" class="ui:size-5"/>
+                                    </span>
+                                    <div class="ui:flex ui:min-w-0 ui:flex-1 ui:flex-col ui:gap-0.5">
+                                        <span class="ui:text-sm ui:font-semibold ui:text-ink">{{ ucwords(str_replace('_', ' ', $activity->action)) }}</span>
+                                        @if($activity->description)
+                                            <span class="ui:text-sm ui:text-slate-600">{{ $activity->description }}</span>
+                                        @endif
+                                        <span class="ui:flex ui:flex-wrap ui:gap-x-4 ui:gap-y-1 ui:text-xs ui:text-slate-400">
+                                            <span class="ui:flex ui:items-center ui:gap-1">
+                                                <x-phosphor-clock class="ui:size-3.5"/>
+                                                {{ $activity->created_at->diffForHumans() }}
+                                            </span>
+                                            @if($activity->ip_address)
+                                                <span class="ui:flex ui:items-center ui:gap-1">
+                                                    <x-phosphor-globe class="ui:size-3.5"/>
+                                                    {{ $activity->ip_address }}
+                                                </span>
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <time class="ui:shrink-0 ui:text-xs ui:tabular-nums ui:text-slate-500">{{ $activity->created_at->format('M j, Y g:i A') }}</time>
+                                </li>
+                            @endforeach
+                        </ul>
 
-                    <!-- Security Notice -->
-                    <div class="alert alert-info mt-4" role="alert">
-                        <div class="d-flex">
-                            <svg class="flex-shrink-0 me-3 mt-1" style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                            </svg>
-                            <div>
-                                <h6 class="alert-heading fw-bold mb-1">Security Tip</h6>
-                                <p class="mb-0 small">
-                                    Review your activity log regularly to ensure all actions were performed by you. If you notice any suspicious activity, change your password immediately and contact support.
-                                </p>
-                            </div>
+                        <div class="ui:border-0 ui:border-t ui:border-solid ui:border-line ui:px-5 ui:py-3">
+                            {{ $activities->links() }}
                         </div>
-                    </div>
+                    @endif
+                </x-ui.card>
 
+                {{-- Security tip --}}
+                <div class="ui:flex ui:items-start ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-blue-200 ui:bg-info-soft ui:p-4">
+                    <x-phosphor-info class="ui:size-5 ui:shrink-0 ui:text-info"/>
+                    <div class="ui:flex ui:flex-col ui:gap-1 ui:text-sm ui:text-blue-900">
+                        <span class="ui:font-semibold">{{ __('Security Tip') }}</span>
+                        <p class="ui:m-0">{{ __('Review your activity log regularly to ensure all actions were performed by you. If you notice any suspicious activity, change your password immediately and contact support.') }}</p>
+                    </div>
                 </div>
             </x-app.settings-layout>
         </div>

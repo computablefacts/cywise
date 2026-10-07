@@ -98,34 +98,24 @@
     @volt('settings.privacy') 
         <div class="">
             <x-app.settings-layout
-                title="Privacy Settings"
-                description="Control your privacy and what information is visible to others."
+                :title="__('Privacy Settings')"
+                :description="__('Control your privacy and what information is visible to others.')"
             >
-                <form wire:submit="save" class="w-100 max-w-lg">
-                    <div class="row g-4">
-                        <div class="col-12">
-                            {{ $this->form }}
+                <form wire:submit="save" class="ui:max-w-2xl">
+                    <x-ui.card>
+                        {{ $this->form }}
+                        <div class="ui:flex ui:justify-end ui:pt-6">
+                            <x-ui.button type="submit">{{ __('Save Settings') }}</x-ui.button>
                         </div>
-                    </div>
-                    <div class="w-100 pt-4 text-end">
-                        <x-button type="submit">Save Settings</x-button>
-                    </div>
+                    </x-ui.card>
                 </form>
 
-                <!-- Privacy Information -->
-                <div class="mt-5 max-w-lg">
-                    <div class="alert alert-info" role="alert">
-                        <div class="d-flex">
-                            <svg class="flex-shrink-0 me-3 mt-1" style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                            </svg>
-                            <div>
-                                <h6 class="alert-heading fw-bold small">Your Privacy Matters</h6>
-                                <p class="mb-0 small">
-                                    These settings help you control your privacy and data. Changes take effect immediately and you can update them at any time.
-                                </p>
-                            </div>
-                        </div>
+                {{-- Privacy information --}}
+                <div class="ui:flex ui:max-w-2xl ui:items-start ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-blue-200 ui:bg-info-soft ui:p-4">
+                    <x-phosphor-info class="ui:size-5 ui:shrink-0 ui:text-info"/>
+                    <div class="ui:flex ui:flex-col ui:gap-1 ui:text-sm ui:text-blue-900">
+                        <span class="ui:font-semibold">{{ __('Your Privacy Matters') }}</span>
+                        <p class="ui:m-0">{{ __('These settings help you control your privacy and data. Changes take effect immediately and you can update them at any time.') }}</p>
                     </div>
                 </div>
 

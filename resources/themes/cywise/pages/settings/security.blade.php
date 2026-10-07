@@ -81,14 +81,16 @@
     @volt('settings.security')
         <div class="">
             <x-app.settings-layout
-                title="Security"
-                description="Update and change your current account password."
+                :title="__('Security')"
+                :description="__('Update and change your current account password.')"
             >
-                <form wire:submit="save" class="w-100 max-w-lg">
-                    {{ $this->form }}
-                    <div class="w-100 pt-4 text-end">
-                        <x-button type="submit">Save</x-button>
-                    </div>
+                <form wire:submit="save" class="ui:max-w-2xl">
+                    <x-ui.card>
+                        {{ $this->form }}
+                        <div class="ui:flex ui:justify-end ui:pt-6">
+                            <x-ui.button type="submit">{{ __('Save') }}</x-ui.button>
+                        </div>
+                    </x-ui.card>
                 </form>
 
             </x-app.settings-layout>

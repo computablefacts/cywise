@@ -113,81 +113,47 @@
     @volt('settings.export') 
         <div class="">
             <x-app.settings-layout
-                title="Export Data"
-                description="Download a copy of all your data stored in our system."
+                :title="__('Export Data')"
+                :description="__('Download a copy of all your data stored in our system.')"
             >
-                <div class="w-100 max-w-lg">
-                    <!-- Export Card -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start">
-                                <div class="flex-shrink-0 me-3">
-                                    <svg class="text-primary" style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                                    </svg>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h5 class="fw-bold mb-2">Download Your Data</h5>
-                                    <p class="small text-muted mb-3">
-                                        Export a complete copy of your account data including:
-                                    </p>
-                                    <ul class="mb-3 small text-muted">
-                                        <li>Profile information and settings</li>
-                                        <li>Activity logs and account history</li>
-                                        <li>Blog posts you've authored</li>
-                                        <li>API keys (partially masked)</li>
-                                        <li>Privacy and notification preferences</li>
-                                        <li>Subscription information</li>
-                                        <li>Roles and permissions</li>
-                                    </ul>
-                                    <p class="small text-muted">
-                                        Your data will be exported in JSON format for easy processing and portability.
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-4">
-                                <button 
-                                    wire:click="exportData"
-                                    type="button"
-                                    class="btn btn-primary btn-sm"
-                                >
-                                    <svg class="me-2" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                    </svg>
-                                    Export My Data
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="ui:flex ui:max-w-2xl ui:flex-col ui:gap-6">
 
-                    <!-- GDPR Info -->
-                    <div class="alert alert-info mb-4" role="alert">
-                        <div class="d-flex">
-                            <div class="flex-shrink-0 me-3">
-                                <svg class="text-info" style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
+                    {{-- Export: streams a JSON file --}}
+                    <x-ui.card :title="__('Download Your Data')" :subtitle="__('Export a complete copy of your account data including:')">
+                        <div class="ui:flex ui:flex-col ui:gap-4 ui:text-sm ui:text-slate-600">
+                            <ul class="ui:m-0 ui:flex ui:flex-col ui:gap-1 ui:pl-5">
+                                <li>{{ __('Profile information and settings') }}</li>
+                                <li>{{ __('Activity logs and account history') }}</li>
+                                <li>{{ __("Blog posts you've authored") }}</li>
+                                <li>{{ __('API keys (partially masked)') }}</li>
+                                <li>{{ __('Privacy and notification preferences') }}</li>
+                                <li>{{ __('Subscription information') }}</li>
+                                <li>{{ __('Roles and permissions') }}</li>
+                            </ul>
+                            <p class="ui:m-0">{{ __('Your data will be exported in JSON format for easy processing and portability.') }}</p>
                             <div>
-                                <h6 class="alert-heading fw-bold small">Data Privacy</h6>
-                                <p class="mb-0 small">
-                                    This feature complies with GDPR data portability requirements. Your data export will be logged in your activity history for security purposes.
-                                </p>
+                                <x-ui.button wire:click="exportData" icon="download-simple">{{ __('Export My Data') }}</x-ui.button>
                             </div>
+                        </div>
+                    </x-ui.card>
+
+                    {{-- GDPR info --}}
+                    <div class="ui:flex ui:items-start ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-blue-200 ui:bg-info-soft ui:p-4">
+                        <x-phosphor-info class="ui:size-5 ui:shrink-0 ui:text-info"/>
+                        <div class="ui:flex ui:flex-col ui:gap-1 ui:text-sm ui:text-blue-900">
+                            <span class="ui:font-semibold">{{ __('Data Privacy') }}</span>
+                            <p class="ui:m-0">{{ __('This feature complies with GDPR data portability requirements. Your data export will be logged in your activity history for security purposes.') }}</p>
                         </div>
                     </div>
 
-                    <!-- Additional Actions -->
-                    <div class="card">
-                        <div class="card-body">
-                            <h6 class="fw-bold small mb-2">Need to delete your account?</h6>
-                            <p class="mb-0 small text-muted">
-                                If you'd like to permanently delete your account and all associated data, visit the 
-                                <a href="{{ route('settings.deletion') }}" class="text-primary text-decoration-none fw-medium">Account Security</a> page.
-                            </p>
-                        </div>
-                    </div>
+                    {{-- Link to account deletion --}}
+                    <x-ui.card :title="__('Need to delete your account?')">
+                        <p class="ui:m-0 ui:text-sm ui:text-slate-600">
+                            {!! __("If you'd like to permanently delete your account and all associated data, visit the :link page.", [
+                                'link' => '<a href="' . e(route('settings.deletion')) . '" class="ui:font-medium ui:text-brand-600! ui:no-underline! ui:hover:text-brand-700!">' . e(__('Account Deletion')) . '</a>',
+                            ]) !!}
+                        </p>
+                    </x-ui.card>
                 </div>
             </x-app.settings-layout>
         </div>

@@ -24,87 +24,55 @@ name('analyze');
       cursor: pointer;
     }
 
-    /* Ensure only the charts area is scrollable on this page */
-
-    #parameters {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    #charts {
-      flex: 1 1 auto;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-
   </style>
   @endpush
 
-  <div class="container-fluid">
-    <div id="parameters">
-      <div class="d-grid gap-3 mb-3" style="grid-template-columns: 1fr 1fr;">
-        <div class="card mt-3">
-          <div class="card-body">
-            <div class="row">
-              <div class="col">
-                <b>{{ __('Explore (bêta)') }}</b>
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-7xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
+
+    <x-ui.page-header :title="__('Explore (bêta)')"
+                      :subtitle="__('Find the rules that explain an output from a CSV file.')"/>
+
+    <div id="parameters" class="ui:flex ui:flex-col ui:gap-6">
+
+      {{-- Upload + rules (left), output distribution (right) --}}
+      <div class="ui:grid ui:grid-cols-1 ui:gap-6 ui:lg:grid-cols-2">
+        <x-ui.card>
+          <div class="ui:flex ui:flex-col ui:gap-4">
+            <x-ui.field :label="__('Upload a CSV file')" for="csvFile">
+              <input id="csvFile" type="file" accept=".csv"
+                     class="ui:block ui:w-full ui:text-sm ui:text-slate-600 ui:file:mr-3 ui:file:h-8 ui:file:cursor-pointer ui:file:rounded-lg ui:file:border ui:file:border-solid ui:file:border-line ui:file:bg-white ui:file:px-3 ui:file:text-xs ui:file:font-medium ui:file:text-ink">
+            </x-ui.field>
+
+            <p class="ui:m-0 ui:text-sm ui:text-slate-500">
+              {!! __('The file must contain only columns with <strong>numerical</strong>, <strong>categorical</strong> and <strong>timestamp</strong> data. The file must contain one special column named <strong>output</strong> with up to 5 categories. The <strong>output</strong> column is the target variable to optimize.') !!}
+            </p>
+
+            {{-- Shown by JS once a valid CSV is loaded --}}
+            <div class="optimize-actions ui:hidden">
+              <div class="ui:flex ui:gap-2">
+                <x-ui.button id="optimize-button" size="sm" class="ui:flex-1">
+                  {{ __('Optimize!') }}
+                </x-ui.button>
+                <x-ui.button id="reset-optimize-button" variant="secondary" size="sm">
+                  {{ __('Reset') }}
+                </x-ui.button>
               </div>
             </div>
-            <div class="row mt-3">
-              <div class="col">
-                <label class="block mb-2 font-medium">
-                  {{ __('Upload a CSV file') }}
-                </label>
-                <input id="csvFile" type="file" accept=".csv" class="block w-full">
-              </div>
-            </div>
-            <div class="row mt-3">
-              <div class="col">
-                The file must contain only columns with <strong>numerical</strong>, <strong>categorical</strong> and
-                <strong>timestamp</strong> data. The file must contain one special column named <strong>output</strong>
-                with up to 5 categories. The <strong>output</strong> column is the target variable to optimize.
-              </div>
-            </div>
-            <div class="row mt-3 d-none">
-              <div class="col">
-                <div class="d-flex gap-2">
-                  <button id="optimize-button" type="button" class="btn btn-sm btn-primary w-100">
-                    {{ __('Optimize!') }}
-                  </button>
-                  <button id="reset-optimize-button" type="button" class="btn btn-sm btn-secondary">
-                    {{ __('Reset') }}
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="row mt-3">
-              <div class="col">
-                <div id="results"></div>
-              </div>
-            </div>
+
+            <div id="results"></div>
           </div>
-        </div>
-        <div id="output-card" class="card mt-3 d-none">
-          <div class="card-body">
-            <div class="row">
-              <div class="col">
-                <b>{{ __('Output') }}</b>
-              </div>
-            </div>
-            <div class="row mt-3">
-              <div class="col">
-                <div id="output-chart"></div>
-              </div>
-            </div>
-          </div>
+        </x-ui.card>
+
+        {{-- Shown by JS on first explainer render --}}
+        <div id="output-card" class="ui:hidden">
+          <x-ui.card :title="__('Output')" class="ui:h-full">
+            <div id="output-chart" class="ui:h-64"></div>
+          </x-ui.card>
         </div>
       </div>
-      <div id="charts" class="d-grid gap-3 mb-3" style="grid-template-columns: 1fr 1fr;">
-        <!-- Charts will be inserted here -->
-      </div>
+
+      {{-- One card per CSV column, built by JS --}}
+      <div id="charts" class="ui:grid ui:grid-cols-1 ui:gap-6 ui:lg:grid-cols-2"></div>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
@@ -122,9 +90,9 @@ name('analyze');
         resultsDiv.innerHTML = '';
       }
       if (elOptimizeBtn) {
-        const row = elOptimizeBtn.closest('.row');
+        const row = elOptimizeBtn.closest('.optimize-actions');
         if (row) {
-          row.classList.add('d-none');
+          row.classList.add('ui:hidden');
         }
       }
       const reader = new FileReader();
@@ -200,7 +168,7 @@ name('analyze');
       outputChart = null;
 
       if (elOutputCard) {
-        elOutputCard.classList.add('d-none');
+        elOutputCard.classList.add('ui:hidden');
         if (elOutputChart) {
           elOutputChart.innerHTML = '';
         }
@@ -227,9 +195,9 @@ name('analyze');
         return;
       }
       if (elOptimizeBtn) {
-        const row = elOptimizeBtn.closest('.row');
+        const row = elOptimizeBtn.closest('.optimize-actions');
         if (row) {
-          row.classList.remove('d-none');
+          row.classList.remove('ui:hidden');
         }
       }
       if (elOptimizeBtn) {
@@ -545,8 +513,8 @@ name('analyze');
 
           unused.forEach(col => {
             const card = elCharts && elCharts.querySelector(`.feature-card[data-col="${CSS.escape(col)}"]`);
-            if (card && !card.classList.contains('d-none')) {
-              card.classList.add('d-none');
+            if (card && !card.classList.contains('ui:hidden')) {
+              card.classList.add('ui:hidden');
               hiddenFeatureCards.add(col);
             }
           });
@@ -596,16 +564,22 @@ name('analyze');
 
           const elResults = document.getElementById("results");
 
+          // Toggle labels: textContent, so raw (unescaped) strings
+          const lblShowRules = @json(__('Show rules'));
+          const lblHideRules = @json(__('Hide rules'));
+
           if (!resultsByCategory.length || resultsByCategory.every(rc => rc.sortedRules.length === 0)) {
-            elResults.innerHTML = `${droppedHtml}<div><b>No rule found!</b></div>`;
+            elResults.innerHTML = `<p class="ui:m-0 ui:text-sm ui:font-semibold ui:text-ink">{{ __('No rule found!') }}</p>`;
           } else {
 
             const headerDropped = `
-            <div class="mb-3">
-              <div class="mb-2"><b>{{ __('Dropped features') }}</b></div>
+            <div class="ui:mb-4">
+              <div class="ui:mb-2 ui:text-sm ui:font-semibold ui:text-ink">{{ __('Dropped features') }}</div>
+              <div class="ui:flex ui:flex-wrap ui:gap-1">
               ${(unused && unused.length) ? unused.map(
-                name => `<span class="lozenge new me-1">${name}</span>`).join('')
-              : '<span class="text-muted">None.</span>'}
+                name => `<span class="ui:inline-flex ui:items-center ui:rounded-md ui:px-2 ui:py-0.5 ui:text-xs ui:font-medium ui:bg-slate-100 ui:text-slate-700">${name}</span>`).join('')
+              : '<span class="ui:text-sm ui:text-slate-500">{{ __('None.') }}</span>'}
+              </div>
             </div>`;
 
             const htmlRules = resultsByCategory.map((rc, idx) => {
@@ -619,13 +593,13 @@ name('analyze');
               const preId = `rules-${idx}`;
 
               return `
-              <div class="mb-3">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                  <div><b>Category "${String(rc.cat)}" — ${rc.sortedRules.length} rule(s)</b></div>
-                  <a href="#" id="${toggleId}">(${show ? 'hide' : 'show'} rules)</a>
+              <div class="ui:mb-4">
+                <div class="ui:mb-2 ui:flex ui:items-center ui:gap-2 ui:text-sm">
+                  <div class="ui:font-semibold ui:text-ink">{{ __('Category') }} "${String(rc.cat)}" — ${rc.sortedRules.length} {{ __('rule(s)') }}</div>
+                  <a href="#" id="${toggleId}" class="ui:text-xs ui:font-medium ui:text-brand-600! ui:hover:text-brand-700!">${show ? lblHideRules : lblShowRules}</a>
                 </div>
-                <pre id="${preId}" class="mb-0 ${show ? ''
-                : 'd-none'}" style="max-height: 200px; overflow-y: auto">${rulesHtml}</pre>
+                <pre id="${preId}" class="ui:m-0 ui:max-h-52 ui:overflow-y-auto ui:rounded-lg ui:border ui:border-solid ui:border-line ui:bg-slate-50 ui:p-3 ui:text-xs ui:text-ink ${show ? ''
+                : 'ui:hidden'}">${rulesHtml}</pre>
               </div>
             `;
             }).join('');
@@ -640,11 +614,11 @@ name('analyze');
                   e.preventDefault();
                   show = !show;
                   if (show) {
-                    elPre.classList.remove('d-none');
+                    elPre.classList.remove('ui:hidden');
                   } else {
-                    elPre.classList.add('d-none');
+                    elPre.classList.add('ui:hidden');
                   }
-                  elToggle.textContent = `(${show ? 'hide' : 'show'} rules)`;
+                  elToggle.textContent = show ? lblHideRules : lblShowRules;
                 });
               }
             });
@@ -663,7 +637,7 @@ name('analyze');
       if (elResetOptimizeBtn) {
         elResetOptimizeBtn.onclick = () => {
           if (elCharts) {
-            elCharts.querySelectorAll('.feature-card.d-none').forEach(card => card.classList.remove('d-none'));
+            elCharts.querySelectorAll('.feature-card').forEach(card => card.classList.remove('ui:hidden'));
           }
           hiddenFeatureCards.clear();
           scheduleRecomputeExplainer();
@@ -742,7 +716,7 @@ name('analyze');
           bounds = ext;
         }
         const [min, max] = bounds;
-        el.textContent = 'Range: ' + formatNumber(min) + ' – ' + formatNumber(max);
+        el.textContent = @json(__('Range:')) + ' ' + formatNumber(min) + ' – ' + formatNumber(max);
         el.style.display = '';
       }
 
@@ -783,7 +757,7 @@ name('analyze');
         const canvas = document.createElement('canvas');
         elOutputChart.innerHTML = '';
         elOutputChart.appendChild(canvas);
-        elOutputCard.classList.remove('d-none');
+        elOutputCard.classList.remove('ui:hidden');
 
         const features = Array.from(new Set(data.map(d => d['output']))).filter(v => v !== '');
         const dataGlobal = features.map(cat => all.filter(d => d['output'] === cat).length);
@@ -863,32 +837,33 @@ name('analyze');
         const type = findColumnType(values);
         const chartId = 'chart_' + colName.replace(/[^a-zA-Z0-9_]/g, '_');
         const elCard = document.createElement('div');
-        elCard.className = 'card p-0 feature-card';
+        elCard.className = 'feature-card';
         elCard.setAttribute('data-col', colName);
+
+        // Same look as x-ui.card; reset/exclude handled by the delegated click listener below
+        const btnClass = 'ui:inline-flex ui:h-8 ui:items-center ui:rounded-lg ui:border-0 ui:bg-transparent ui:px-3 ui:text-xs ui:font-medium ui:text-slate-600 ui:cursor-pointer ui:transition-colors ui:hover:bg-slate-100 ui:hover:text-ink';
         elCard.innerHTML = `
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col">
-              <b>${colName}</b>
-              <div class="text-muted small">
+        <section class="ui:flex ui:h-full ui:flex-col ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:shadow-xs ui:min-w-0 ui:p-5">
+          <div class="ui:flex ui:items-start ui:justify-between ui:gap-4">
+            <div class="ui:min-w-0">
+              <h2 class="ui:m-0 ui:truncate ui:text-base ui:font-semibold ui:text-ink ui:leading-6">${colName}</h2>
+              <div class="ui:mt-0.5 ui:text-xs ui:text-slate-500">
                 <span id="range_${chartId}" style="display:none"></span>
               </div>
             </div>
-            <div class="col-auto">
-              <a data-action="reset" data-col="${colName}">
+            <div class="ui:flex ui:shrink-0 ui:items-center ui:gap-1">
+              <button type="button" class="${btnClass}" data-action="reset" data-col="${colName}">
                 {{ __('reset') }}
-              </a>&nbsp;
-              <a data-action="exclude" data-col="${colName}">
+              </button>
+              <button type="button" class="${btnClass}" data-action="exclude" data-col="${colName}">
                 {{ __('exclude') }}
-              </a>
+              </button>
             </div>
           </div>
-          <div class="row mt-3">
-            <div class="col">
-              <div id="${chartId}"></div>
-            </div>
+          <div class="ui:mt-3 ui:min-w-0">
+            <div id="${chartId}"></div>
           </div>
-        </div>`;
+        </section>`;
 
         elCharts.appendChild(elCard);
 
@@ -955,7 +930,7 @@ name('analyze');
       // Deal with toolbar buttons inside cards
       elCharts.addEventListener('click', function (e) {
 
-        const elLink = e.target.closest('a[data-action]');
+        const elLink = e.target.closest('[data-action]');
         if (!elLink) {
           return;
         }
@@ -980,7 +955,7 @@ name('analyze');
           delete charts[colName];
 
           // Remove the card containing the chart
-          chart.root().node().closest('.card').remove();
+          chart.root().node().closest('.feature-card').remove();
 
           // Update the other charts
           dc.redrawAll();

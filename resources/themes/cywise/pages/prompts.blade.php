@@ -14,124 +14,63 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-7xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
 
-  @push('styles')
-  <style>
+    <x-ui.page-header :title="__('Prompts')"
+                      :subtitle="__('Templates of the instructions sent to the AI. Click a template to edit it.')"/>
 
-    .pre-light {
-      color: #565656;
-    }
-
-  </style>
-  @endpush
-
-  <div class="container-fluid">
-    <div class="card mt-3 mb-3">
+    <x-ui.card flush>
       @if($prompts->isEmpty())
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            {{ __('None.') }}
-          </div>
-        </div>
-      </div>
+        <x-ui.empty icon="notepad">{{ __('No prompt.') }}</x-ui.empty>
       @else
-      <div class="card-body p-0">
-        <table class="table no-bottom-margin">
+        <x-ui.table>
           <thead>
           <tr>
             <th>{{ __('Name') }}</th>
-            <th class="text-end">{{ __('Length') }}</th>
+            <th class="ui:text-right!">{{ __('Length') }}</th>
             <th>{{ __('Created At') }}</th>
             <th>{{ __('Created By') }}</th>
             <th></th>
           </tr>
           </thead>
           @foreach($prompts as $prompt)
-          <tbody x-data="{ isExpanded: false }">
-          <tr>
-            <td>{{ $prompt->name }}</td>
-            <td class="text-end">
-              {{ Illuminate\Support\Number::format(\Illuminate\Support\Str::length($prompt->template), locale:'sv') }}
-            </td>
-            <td>{{ $prompt->created_at->format('Y-m-d H:i') }}</td>
-            <td>{{ $prompt->createdBy->name }}</td>
-            <td class="text-end">
-              <div class="d-flex justify-content-end align-items-center">
-                <a href="#" onclick="deletePrompt({{ $prompt->id }})" class="text-decoration-none me-3" style="color:red">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                       stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M4 7l16 0"/>
-                    <path d="M10 11l0 6"/>
-                    <path d="M14 11l0 6"/>
-                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
-                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-                  </svg>
-                </a>
-                <button class="btn btn-link p-0 text-decoration-none" type="button" @click="isExpanded = !isExpanded">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                       stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-                       :style="isExpanded ? 'transform: rotate(90deg); transition: transform 0.2s;' : 'transition: transform 0.2s;'">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M9 6l6 6l-6 6"/>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr x-show="isExpanded" x-cloak>
-            <td colspan="5" style="background-color:#fff3cd;">
-              <div style="display:grid;">
-                <div class="overflow-auto">
-              <pre class="mb-0 w-100 pre-light"
-                   onclick="editPrompt(this, {{ $prompt->id }})">{{ $prompt->template }}</pre>
+            {{-- One tbody per prompt: the row and its expandable template share the Alpine state --}}
+            <tbody x-data="{ isExpanded: false }">
+            <tr>
+              <td class="ui:font-medium">{{ $prompt->name }}</td>
+              <td class="ui:text-right ui:tabular-nums">
+                {{ Illuminate\Support\Number::format(\Illuminate\Support\Str::length($prompt->template), locale:'sv') }}
+              </td>
+              <td class="ui:whitespace-nowrap ui:text-slate-500">{{ $prompt->created_at->format('Y-m-d H:i') }}</td>
+              <td class="ui:text-slate-500">{{ $prompt->createdBy->name }}</td>
+              <td>
+                <div class="ui:flex ui:items-center ui:justify-end ui:gap-1.5">
+                  <x-ui.icon-button icon="trash" :title="__('Delete')" onclick="deletePrompt({{ $prompt->id }})"/>
+                  <x-ui.icon-button icon="caret-right" :title="__('Show the text')" @click="isExpanded = !isExpanded"
+                                    ::aria-expanded="isExpanded" ::class="isExpanded && 'ui:rotate-90'"/>
                 </div>
-              </div>
-            </td>
-          </tr>
-          </tbody>
+              </td>
+            </tr>
+            <tr x-show="isExpanded" x-cloak>
+              <td colspan="5" class="ui:bg-slate-50">
+                <pre class="ui:m-0 ui:max-h-96 ui:overflow-auto ui:whitespace-pre-wrap ui:wrap-anywhere ui:rounded-lg ui:border ui:border-solid ui:border-line ui:bg-white ui:p-3 ui:font-mono ui:text-xs ui:cursor-text ui:text-slate-500"
+                     title="{{ __('Click to edit') }}"
+                     onclick="editPrompt(this, {{ $prompt->id }})">{{ $prompt->template }}</pre>
+              </td>
+            </tr>
+            </tbody>
           @endforeach
-        </table>
-        <div class="row">
-          <div class="col">
-            <ul class="pagination justify-content-center mt-3 mb-3">
-              <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ route('prompts', ['page' => 1]) }}">
-                  <span>&laquo;&nbsp;{{ __('First') }}</span>
-                </a>
-              </li>
-              <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
-                <a class="page-link"
-                   href="{{ route('prompts', ['page' => $currentPage <= 1 ? 1 : $currentPage - 1]) }}">
-                  <span>&lt;&nbsp;{{ __('Previous') }}</span>
-                </a>
-              </li>
-              <li class="page-item">
-                <a class="page-link active"
-                   href="{{ route('prompts', ['page' => $currentPage]) }}">
-                  {{ $currentPage }}
-                </a>
-              </li>
-              <li class="page-item {{ $currentPage >= $nbPages ? 'disabled' : '' }}">
-                <a class="page-link"
-                   href="{{ route('prompts', ['page' => $currentPage >= $nbPages ? $nbPages : $currentPage + 1])}}">
-                  <span>{{ __('Next') }}&nbsp;&gt;</span>
-                </a>
-              </li>
-              <li class="page-item {{ $currentPage >= $nbPages ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ route('prompts', ['page' => $nbPages]) }}">
-                  <span>{{ __('Last') }}&nbsp;&raquo;</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+        </x-ui.table>
+        <x-ui.pagination :page="$currentPage" :pages="$nbPages"
+                         :url="fn($page) => route('prompts', ['page' => $page])"
+                         class="ui:border-0 ui:border-t ui:border-solid ui:border-line"/>
       @endif
-    </div>
+    </x-ui.card>
   </div>
   <script>
+
+    // Read-only templates are greyed out; the class is removed while editing
+    const READ_ONLY_CLASS = 'ui:text-slate-500';
 
     function deletePrompt(promptId) {
 
@@ -150,12 +89,12 @@ render(function (Request $request) {
 
       const originalText = pre.innerText;
 
-      pre.classList.toggle('pre-light');
+      pre.classList.toggle(READ_ONLY_CLASS);
       pre.setAttribute('contenteditable', 'true');
       pre.focus();
       pre.onblur = () => {
         pre.removeAttribute('contenteditable');
-        pre.classList.toggle('pre-light');
+        pre.classList.toggle(READ_ONLY_CLASS);
         savePrompt(pre, promptId, originalText, pre.innerText);
       }
     }
@@ -175,4 +114,3 @@ render(function (Request $request) {
 
   </script>
 </x-layouts.app>
-

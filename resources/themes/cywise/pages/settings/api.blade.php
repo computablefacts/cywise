@@ -124,22 +124,22 @@
     @volt('settings.api') 
         <div class="">
             <x-app.settings-layout
-                title="API Keys"
-                description="Manage your API Keys"
+                :title="__('API Keys')"
+                :description="__('Manage your API Keys')"
             >
-                <div class="d-flex flex-column">
-                    <form wire:submit="add" class="w-100 max-w-lg">
+                <form wire:submit="add" class="ui:max-w-2xl">
+                    <x-ui.card>
                         {{ $this->form }}
-                        <div class="w-100 pt-4 text-end">
-                            <x-button type="submit">Create New Key</x-button>
+                        <div class="ui:flex ui:justify-end ui:pt-6">
+                            <x-ui.button type="submit" icon="plus">{{ __('Create New Key') }}</x-ui.button>
                         </div>
-                    </form>
-                    <hr class="my-5">
-                    <label class="d-block small fw-bold mb-3">Current API Keys</label>
-                    <div class="pt-2">
-                        {{ $this->table }}
-                    </div>
-                </div>
+                    </x-ui.card>
+                </form>
+
+                {{-- Filament table: keeps its own styling --}}
+                <x-ui.card :title="__('Current API Keys')">
+                    {{ $this->table }}
+                </x-ui.card>
             </x-app.settings-layout>
         </div>
     @endvolt

@@ -14,379 +14,177 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
+  @php
+    $script = \App\Helpers\OssecCheckScript::class;
 
-  @push('styles')
-  <style>
+    // Remediation scripts of a check (or of all the listed checks), one download per OS:
+    //   [['label' => 'Windows', 'href' => 'data:text/plain;…', 'name' => 'xxx.ps1'], …]
+    $scripts = fn($subject) => collect([$script::OS_WINDOWS => 'Windows', $script::OS_DEBIAN => 'Debian', $script::OS_UBUNTU => 'Ubuntu', $script::OS_CENTOS => 'CentOS'])
+      ->filter(fn($label, $os) => $script::hasScript($subject, $os))
+      ->map(fn($label, $os) => [
+        'label' => $label,
+        'href' => 'data:text/plain;charset=utf-8,' . rawurlencode($script::generateScript($subject, $os)),
+        'name' => $script::scriptName($subject, $os),
+      ]);
 
-    .pre-light {
-      color: #565656;
-      padding: 0.5rem;
-      background-color: #fff3cd;
-    }
+    $allScripts = $scripts($checks);
+    $dt = 'ui:text-xs ui:font-semibold ui:uppercase ui:tracking-wide ui:text-slate-400';
+  @endphp
 
-    /* Style the tooltip */
-    a[tooltip]:hover:after {
-      content: attr(tooltip);
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #333;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      white-space: nowrap;
-    }
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-7xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
 
-  </style>
-  @endpush
+    <x-ui.page-header :title="__('Security Checks Automation')"
+                      :subtitle="__('Configuration checks run by the agent on your servers, by security policy.')">
+      <x-slot:actions>
+        <x-ui.button icon="plus" :href="route('sca-editor')">{{ __('New rule') }}</x-ui.button>
+      </x-slot:actions>
+    </x-ui.page-header>
 
-  <div class="container-fluid">
-    @include('theme::iframes._agent')
-    <div class="px-3 pt-3" style="text-align: right;">
-      <a href="{{ route('sca-editor') }}">
-        {{ __('+ new') }}
-      </a>
-    </div>
-    <div class="card mt-3">
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            <div id="policies"></div>
-          </div>
-        </div>
-        <div class="row mt-3">
-          <div class="col">
-            <div id="frameworks"></div>
-          </div>
-        </div>
-        <div class="row mt-3">
-          <div class="col">
-            <div id="search"></div>
-          </div>
-          <div class="col col-auto">
-            <div id="submit"></div>
-          </div>
-        </div>
+    <x-ui.disclosure icon="terminal-window" :title="__('Would you like to protect a new server?')">
+      @include('theme::iframes.dashboard._server-install')
+    </x-ui.disclosure>
+
+    {{-- Filters. Changing the policy resets the framework and the keywords; changing the framework resets the keywords. --}}
+    <form method="get" action="{{ route('sca') }}"
+          class="ui:m-0 ui:grid ui:items-end ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-4 ui:shadow-xs ui:sm:grid-cols-2 ui:lg:grid-cols-[1fr_1fr_2fr_auto]">
+      <x-ui.field :label="__('Policy')" for="policy">
+        <x-ui.select id="policy" name="policy"
+                     onchange="this.form.framework.value = ''; this.form.search.value = ''; this.form.submit()">
+          <option value="">{{ __('Select policy...') }}</option>
+          @foreach($policies as $p)
+            <option value="{{ $p->uid }}" @selected($policy === $p->uid)>{{ $p->name }}</option>
+          @endforeach
+        </x-ui.select>
+      </x-ui.field>
+      <x-ui.field :label="__('Framework')" for="framework">
+        <x-ui.select id="framework" name="framework" :disabled="!$policy"
+                     onchange="this.form.search.value = ''; this.form.submit()">
+          <option value="">{{ __('Select framework...') }}</option>
+          @foreach($frameworks as $f)
+            <option value="{{ $f }}" @selected($framework === $f)>{{ $f }}</option>
+          @endforeach
+        </x-ui.select>
+      </x-ui.field>
+      <x-ui.field :label="__('Keywords')" for="search">
+        <x-ui.input id="search" name="search" value="{{ $search }}" :disabled="!$policy"
+                    :placeholder="__('Enter one or more keywords...')"/>
+      </x-ui.field>
+      <x-ui.button type="submit" icon="magnifying-glass" :disabled="!$policy">{{ __('Search') }}</x-ui.button>
+    </form>
+
+    {{-- Remediation scripts of all the listed checks --}}
+    @if($allScripts->isNotEmpty())
+      <div class="ui:flex ui:flex-wrap ui:items-center ui:justify-end ui:gap-2">
+        <span class="ui:text-sm ui:font-medium ui:text-slate-600">{{ __('Script') }}</span>
+        @foreach($allScripts as $s)
+          <x-ui.button variant="secondary" size="sm" icon="download-simple" :href="$s['href']" download="{{ $s['name'] }}">
+            {{ $s['label'] }}
+          </x-ui.button>
+        @endforeach
       </div>
-    </div>
-    @if(\App\Helpers\OssecCheckScript::hasScript($checks))
-    <div class="row mt-3">
-      <div class="col d-flex justify-content-end">
-        <b class="align-content-center mr-2">{{ __('Script') }}</b>
-        @if(\App\Helpers\OssecCheckScript::hasScript($checks, \App\Helpers\OssecCheckScript::OS_WINDOWS))
-        <a
-            href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($checks, \App\Helpers\OssecCheckScript::OS_WINDOWS)) }}"
-            download="{{\App\Helpers\OssecCheckScript::scriptName($checks, \App\Helpers\OssecCheckScript::OS_WINDOWS)}}"
-            tooltip="Windows">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <path
-                d="M17.8 20l-12 -1.5c-1 -.1 -1.8 -.9 -1.8 -1.9v-9.2c0 -1 .8 -1.8 1.8 -1.9l12 -1.5c1.2 -.1 2.2 .8 2.2 1.9v12.1c0 1.2 -1.1 2.1 -2.2 1.9z"/>
-            <path d="M12 5l0 14"/>
-            <path d="M4 12l16 0"/>
-          </svg>
-        </a>
-        @endif
-        @if(\App\Helpers\OssecCheckScript::hasScript($checks, \App\Helpers\OssecCheckScript::OS_DEBIAN))
-        <a
-            href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($checks, \App\Helpers\OssecCheckScript::OS_DEBIAN)) }}"
-            download="{{\App\Helpers\OssecCheckScript::scriptName($checks, \App\Helpers\OssecCheckScript::OS_DEBIAN)}}"
-            tooltip="Debian">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-               class="icon icon-tabler icons-tabler-outline icon-tabler-brand-debian">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <path
-                d="M12 17c-2.397 -.943 -4 -3.153 -4 -5.635c0 -2.19 1.039 -3.14 1.604 -3.595c2.646 -2.133 6.396 -.27 6.396 3.23c0 2.5 -2.905 2.121 -3.5 1.5c-.595 -.621 -1 -1.5 -.5 -2.5"/>
-            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
-          </svg>
-        </a>
-        @endif
-        @if(\App\Helpers\OssecCheckScript::hasScript($checks, \App\Helpers\OssecCheckScript::OS_UBUNTU))
-        <a
-            href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($checks, \App\Helpers\OssecCheckScript::OS_UBUNTU)) }}"
-            download="{{\App\Helpers\OssecCheckScript::scriptName($checks, \App\Helpers\OssecCheckScript::OS_UBUNTU)}}"
-            tooltip="Debian">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-               class="icon icon-tabler icons-tabler-outline icon-tabler-brand-ubuntu">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <path d="M12 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-            <path
-                d="M17.723 7.41a7.992 7.992 0 0 0 -3.74 -2.162m-3.971 0a7.993 7.993 0 0 0 -3.789 2.216m-1.881 3.215a8 8 0 0 0 -.342 2.32c0 .738 .1 1.453 .287 2.132m1.96 3.428a7.993 7.993 0 0 0 3.759 2.19m4 0a7.993 7.993 0 0 0 3.747 -2.186m1.962 -3.43a8.008 8.008 0 0 0 .287 -2.131c0 -.764 -.107 -1.503 -.307 -2.203"/>
-            <path d="M5 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-            <path d="M19 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-          </svg>
-        </a>
-        @endif
-        @if(\App\Helpers\OssecCheckScript::hasScript($checks, \App\Helpers\OssecCheckScript::OS_CENTOS))
-        <a
-            href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($checks, \App\Helpers\OssecCheckScript::OS_CENTOS)) }}"
-            download="{{\App\Helpers\OssecCheckScript::scriptName($checks, \App\Helpers\OssecCheckScript::OS_CENTOS)}}"
-            tooltip="Debian">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-               class="icon icon-tabler icons-tabler-outline icon-tabler-script">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <path
-                d="M17 20h-11a3 3 0 0 1 0 -6h11a3 3 0 0 0 0 6h1a3 3 0 0 0 3 -3v-11a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v8"/>
-          </svg>
-        </a>
-        @endif
-      </div>
-    </div>
     @endif
+
+    @if($checks->isEmpty())
+      <x-ui.card>
+        <x-ui.empty icon="list-checks">{{ $policy ? __('None.') : __('Select a policy to see its checks.') }}</x-ui.empty>
+      </x-ui.card>
+    @endif
+
+    {{-- One card per check --}}
     @foreach($checks as $check)
-    <div class="card mt-3 mb-3">
-      <div class="card-header pb-0">
-        <div class="row mt-2">
-          <div class="col">
-            <h6>
+      @php
+        $checkScripts = $scripts($check);
+      @endphp
+      <x-ui.card>
+        <div class="ui:flex ui:flex-col ui:gap-4">
+          <div class="ui:flex ui:flex-wrap ui:items-start ui:justify-between ui:gap-3">
+            <h2 class="ui:m-0 ui:text-base ui:font-semibold ui:text-ink">
               @if(isset($check->created_by) || \Auth::user()?->isCywiseAdmin())
-              <a href="{{ route('sca-editor', ['check_id' => $check->id]) }}">
+                <a href="{{ route('sca-editor', ['check_id' => $check->id]) }}" class="ui:text-ink! ui:hover:text-brand-600!">{{ $check->title }}</a>
+              @else
                 {{ $check->title }}
-              </a>
-              @else
-              {{ $check->title }}
               @endif
-            </h6>
-          </div>
-          <div class="col col-auto">
-            @foreach($check->frameworks() as $f)
-            <span class="lozenge information">{{ $f }}</span>&nbsp;
-            @endforeach
-          </div>
-        </div>
-      </div>
-      <div class="card-body pt-0">
-        <div class="row mt-2">
-          <div class="col col-2 text-end">
-            <b>{{ __('Description') }}</b>
-          </div>
-          <div class="col">
-            {{ $check->description }}
-          </div>
-        </div>
-        @if($check->rationale)
-        <div class="row mt-2">
-          <div class="col col-2 text-end">
-            <b>{{ __('Rationale') }}</b>
-          </div>
-          <div class="col">
-            {{ $check->rationale }}
-          </div>
-        </div>
-        @endif
-        @if($check->remediation)
-        <div class="row mt-2">
-          <div class="col col-2 text-end">
-            <b>{{ __('Remediation') }}</b>
-          </div>
-          <div class="col">
-            {{ $check->remediation }}
-          </div>
-        </div>
-        @endif
-        @if($check->references)
-        <div class="row mt-2">
-          <div class="col col-2 text-end">
-            <b>{{ __('References') }}</b>
-          </div>
-          <div class="col">
-            <ul class="mb-0" style="padding-left: 1rem;">
-              @foreach($check->references as $reference)
-              @if(\Illuminate\Support\Str::startsWith($reference, ['http://', 'https://']))
-              <li><a href="{{ $reference }}" target="_blank">{{ $reference }}</a></li>
-              @else
-              <li>{{ $reference }}</li>
-              @endif
+            </h2>
+            <div class="ui:flex ui:flex-wrap ui:gap-1.5">
+              @foreach($check->frameworks() as $f)
+                <x-ui.badge level="info">{{ $f }}</x-ui.badge>
               @endforeach
-            </ul>
-          </div>
-        </div>
-        @endif
-        @if($check->hasMitreTactics())
-        <div class="row mt-2">
-          <div class="col col-2 text-end">
-            <b>{{ __('Mitre Tactics') }}</b>
-          </div>
-          <div class="col">
-            <ul class="mb-0" style="padding-left: 1rem;">
-              @foreach($check->mitreTactics() as $tactic)
-              <li><a href="https://attack.mitre.org/tactics/{{ $tactic }}/" target="_blank">{{ $tactic }}</a></li>
-              @endforeach
-            </ul>
-          </div>
-        </div>
-        @endif
-        @if($check->hasMitreTechniques())
-        <div class="row mt-2">
-          <div class="col col-2 text-end">
-            <b>{{ __('Mitre Techniques') }}</b>
-          </div>
-          <div class="col">
-            <ul class="mb-0" style="padding-left: 1rem;">
-              @foreach($check->mitreTechniques() as $technique)
-              <li><a href="https://attack.mitre.org/techniques/{{ $technique }}/" target="_blank">{{ $technique }}</a></li>
-              @endforeach
-            </ul>
-          </div>
-        </div>
-        @endif
-        @if($check->hasMitreMitigations())
-        <div class="row mt-2">
-          <div class="col col-2 text-end">
-            <b>{{ __('Mitre Mitigations') }}</b>
-          </div>
-          <div class="col">
-            <ul class="mb-0" style="padding-left: 1rem;">
-              @foreach($check->mitreMitigations() as $mitigation)
-              <li><a href="https://attack.mitre.org/mitigations/{{ $mitigation }}/" target="_blank">{{ $mitigation }}</a>
-              </li>
-              @endforeach
-            </ul>
-          </div>
-        </div>
-        @endif
-        <div class="row mt-2">
-          <div class="col col-2 text-end">
-            <b>{{ __('Rule') }}</b>
-          </div>
-          <div class="col">
-            <div style="display:grid;">
-              <div class="overflow-auto">
-                <pre class="mb-0 w-100 pre-light">{{ $check->rule }}</pre>
-              </div>
             </div>
           </div>
+          <p class="ui:m-0 ui:text-sm ui:text-slate-600">{{ $check->description }}</p>
+          <dl class="ui:m-0 ui:grid ui:gap-4 ui:text-sm ui:text-slate-700 ui:md:grid-cols-2">
+            @if($check->rationale)
+              <div>
+                <dt class="{{ $dt }}">{{ __('Rationale') }}</dt>
+                <dd class="ui:m-0 ui:mt-1">{{ $check->rationale }}</dd>
+              </div>
+            @endif
+            @if($check->remediation)
+              <div>
+                <dt class="{{ $dt }}">{{ __('Remediation') }}</dt>
+                <dd class="ui:m-0 ui:mt-1">{{ $check->remediation }}</dd>
+              </div>
+            @endif
+            @if($check->references)
+              <div>
+                <dt class="{{ $dt }}">{{ __('References') }}</dt>
+                <dd class="ui:m-0 ui:mt-1">
+                  <ul class="ui:m-0 ui:pl-4">
+                    @foreach($check->references as $reference)
+                      @if(\Illuminate\Support\Str::startsWith($reference, ['http://', 'https://']))
+                        <li class="ui:break-all"><a href="{{ $reference }}" target="_blank">{{ $reference }}</a></li>
+                      @else
+                        <li>{{ $reference }}</li>
+                      @endif
+                    @endforeach
+                  </ul>
+                </dd>
+              </div>
+            @endif
+            @if($check->hasMitreTactics())
+              <div>
+                <dt class="{{ $dt }}">{{ __('Mitre Tactics') }}</dt>
+                <dd class="ui:m-0 ui:mt-1 ui:flex ui:flex-wrap ui:gap-2">
+                  @foreach($check->mitreTactics() as $tactic)
+                    <a href="https://attack.mitre.org/tactics/{{ $tactic }}/" target="_blank">{{ $tactic }}</a>
+                  @endforeach
+                </dd>
+              </div>
+            @endif
+            @if($check->hasMitreTechniques())
+              <div>
+                <dt class="{{ $dt }}">{{ __('Mitre Techniques') }}</dt>
+                <dd class="ui:m-0 ui:mt-1 ui:flex ui:flex-wrap ui:gap-2">
+                  @foreach($check->mitreTechniques() as $technique)
+                    <a href="https://attack.mitre.org/techniques/{{ $technique }}/" target="_blank">{{ $technique }}</a>
+                  @endforeach
+                </dd>
+              </div>
+            @endif
+            @if($check->hasMitreMitigations())
+              <div>
+                <dt class="{{ $dt }}">{{ __('Mitre Mitigations') }}</dt>
+                <dd class="ui:m-0 ui:mt-1 ui:flex ui:flex-wrap ui:gap-2">
+                  @foreach($check->mitreMitigations() as $mitigation)
+                    <a href="https://attack.mitre.org/mitigations/{{ $mitigation }}/" target="_blank">{{ $mitigation }}</a>
+                  @endforeach
+                </dd>
+              </div>
+            @endif
+          </dl>
+          <pre class="ui:m-0 ui:overflow-auto ui:rounded-lg ui:bg-slate-50 ui:p-3 ui:text-xs ui:text-slate-700">{{ $check->rule }}</pre>
+          @if($checkScripts->isNotEmpty())
+            <div class="ui:flex ui:flex-wrap ui:items-center ui:gap-2">
+              <span class="ui:text-sm ui:font-medium ui:text-slate-600">{{ __('Script') }}</span>
+              @foreach($checkScripts as $s)
+                <x-ui.button variant="secondary" size="sm" icon="download-simple" :href="$s['href']" download="{{ $s['name'] }}">
+                  {{ $s['label'] }}
+                </x-ui.button>
+              @endforeach
+            </div>
+          @endif
         </div>
-        @if(\App\Helpers\OssecCheckScript::hasScript($check))
-        <div class="row mt-2">
-          <div class="col col-2 text-end">
-            <b>{{ __('Script') }}</b>
-          </div>
-          <div class="col d-flex justify-content-start">
-            @if(\App\Helpers\OssecCheckScript::hasScript($check, \App\Helpers\OssecCheckScript::OS_WINDOWS))
-            <a
-                href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($check, \App\Helpers\OssecCheckScript::OS_WINDOWS)) }}"
-                download="{{\App\Helpers\OssecCheckScript::scriptName($check, \App\Helpers\OssecCheckScript::OS_WINDOWS)}}"
-                tooltip="Windows">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path
-                    d="M17.8 20l-12 -1.5c-1 -.1 -1.8 -.9 -1.8 -1.9v-9.2c0 -1 .8 -1.8 1.8 -1.9l12 -1.5c1.2 -.1 2.2 .8 2.2 1.9v12.1c0 1.2 -1.1 2.1 -2.2 1.9z"/>
-                <path d="M12 5l0 14"/>
-                <path d="M4 12l16 0"/>
-              </svg>
-            </a>
-            @endif
-            @if(\App\Helpers\OssecCheckScript::hasScript($check, \App\Helpers\OssecCheckScript::OS_DEBIAN))
-            <a
-                href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($check, \App\Helpers\OssecCheckScript::OS_DEBIAN)) }}"
-                download="{{\App\Helpers\OssecCheckScript::scriptName($check, \App\Helpers\OssecCheckScript::OS_DEBIAN)}}"
-                tooltip="Debian">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-                   class="icon icon-tabler icons-tabler-outline icon-tabler-brand-debian">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path
-                    d="M12 17c-2.397 -.943 -4 -3.153 -4 -5.635c0 -2.19 1.039 -3.14 1.604 -3.595c2.646 -2.133 6.396 -.27 6.396 3.23c0 2.5 -2.905 2.121 -3.5 1.5c-.595 -.621 -1 -1.5 -.5 -2.5"/>
-                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
-              </svg>
-            </a>
-            @endif
-            @if(\App\Helpers\OssecCheckScript::hasScript($check, \App\Helpers\OssecCheckScript::OS_UBUNTU))
-            <a
-                href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($check, \App\Helpers\OssecCheckScript::OS_UBUNTU)) }}"
-                download="{{\App\Helpers\OssecCheckScript::scriptName($check, \App\Helpers\OssecCheckScript::OS_UBUNTU)}}"
-                tooltip="Ubuntu">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-                   class="icon icon-tabler icons-tabler-outline icon-tabler-brand-ubuntu">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M12 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                <path
-                    d="M17.723 7.41a7.992 7.992 0 0 0 -3.74 -2.162m-3.971 0a7.993 7.993 0 0 0 -3.789 2.216m-1.881 3.215a8 8 0 0 0 -.342 2.32c0 .738 .1 1.453 .287 2.132m1.96 3.428a7.993 7.993 0 0 0 3.759 2.19m4 0a7.993 7.993 0 0 0 3.747 -2.186m1.962 -3.43a8.008 8.008 0 0 0 .287 -2.131c0 -.764 -.107 -1.503 -.307 -2.203"/>
-                <path d="M5 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                <path d="M19 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-              </svg>
-            </a>
-            @endif
-            @if(\App\Helpers\OssecCheckScript::hasScript($check, \App\Helpers\OssecCheckScript::OS_CENTOS))
-            <a
-                href="data:text/plain;charset=utf-8,{{ rawurlencode(\App\Helpers\OssecCheckScript::generateScript($check, \App\Helpers\OssecCheckScript::OS_CENTOS)) }}"
-                download="{{\App\Helpers\OssecCheckScript::scriptName($check, \App\Helpers\OssecCheckScript::OS_CENTOS)}}"
-                tooltip="CentOS">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-                   class="icon icon-tabler icons-tabler-outline icon-tabler-script">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path
-                    d="M17 20h-11a3 3 0 0 1 0 -6h11a3 3 0 0 0 0 6h1a3 3 0 0 0 3 -3v-11a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v8"/>
-              </svg>
-            </a>
-            @endif
-          </div>
-        </div>
-        @endif
-      </div>
-    </div>
+      </x-ui.card>
     @endforeach
   </div>
-  <script>
-
-    let selectedPolicy = null;
-    let selectedFramework = null;
-    let searchText = null;
-
-    const queryString = () => '?' + (selectedPolicy ? '&policy=' + selectedPolicy.uid : '') + (selectedFramework
-      ? '&framework=' + selectedFramework : '') + (searchText ? '&search=' + searchText : '');
-
-    const elPolicies = new com.computablefacts.blueprintjs.MinimalSelect(document.getElementById('policies'),
-      item => item.name);
-    elPolicies.defaultText = "{{ __('Select policy...') }}";
-    elPolicies.items = @json($policies);
-    selectedPolicy = elPolicies.items.find(policy => policy.uid === "{{ $policy }}")
-    elPolicies.selectedItem = selectedPolicy;
-    elPolicies.onSelectionChange(item => {
-      selectedPolicy = item;
-      selectedFramework = null;
-      searchText = null;
-      elFrameworks.disabled = !selectedPolicy;
-      elSearch.disabled = !selectedPolicy;
-      window.location = window.location.href.split('?')[0] + queryString();
-    });
-
-    const elFrameworks = new com.computablefacts.blueprintjs.MinimalSelect(document.getElementById('frameworks'));
-    elFrameworks.defaultText = "{{ __('Select framework...') }}";
-    elFrameworks.items = @json($frameworks);
-    selectedFramework = elFrameworks.items.find(framework => framework === "{{ $framework }}");
-    elFrameworks.selectedItem = selectedFramework;
-    elFrameworks.onSelectionChange(item => {
-      selectedFramework = item;
-      searchText = null;
-      window.location = window.location.href.split('?')[0] + queryString();
-    });
-    elFrameworks.disabled = !selectedPolicy;
-
-    const elSearch = new com.computablefacts.blueprintjs.MinimalTextInput(document.getElementById('search'),
-      "{{ $search }}");
-    elSearch.icon = 'filter';
-    elSearch.placeholder = "{{ __('Enter one or more keywords...') }}";
-    elSearch.disabled = !selectedPolicy;
-
-    const elSubmit = new com.computablefacts.blueprintjs.MinimalButton(document.getElementById('submit'),
-      "{{ __('Search') }}");
-    elSubmit.rightIcon = 'chevron-right';
-    elSubmit.disabled = !selectedPolicy;
-    elSubmit.onClick(() => {
-      searchText = elSearch.value;
-      window.location = window.location.href.split('?')[0] + queryString();
-    });
-
-  </script>
 </x-layouts.app>
-

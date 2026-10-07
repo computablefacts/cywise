@@ -14,26 +14,23 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
-  <div class="container-fluid">
-    <div class="card mt-3 mb-3">
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-7xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
+
+    <x-ui.page-header :title="__('Collections')"
+                      :subtitle="__('Groups of documents used by CyberBuddy. Click a priority to edit it.')"/>
+
+    <x-ui.card flush>
       @if($collections->isEmpty())
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            {{ __('None.') }}
-          </div>
-        </div>
-      </div>
+        <x-ui.empty icon="folders">{{ __('No collection.') }}</x-ui.empty>
       @else
-      <div class="card-body p-0">
-        <table class="table table-hover no-bottom-margin">
+        <x-ui.table>
           <thead>
           <tr>
-            <th class="text-end">{{ __('Priority') }}</th>
+            <th class="ui:text-right!">{{ __('Priority') }}</th>
             <th>{{ __('Name') }}</th>
-            <th style="text-align:right">{{ __('Number of Documents') }}</th>
-            <th style="text-align:right">{{ __('Number of Chunks') }}</th>
-            <th style="text-align:right">{{ __('Number of Vectors') }}</th>
+            <th class="ui:text-right!">{{ __('Number of Documents') }}</th>
+            <th class="ui:text-right!">{{ __('Number of Chunks') }}</th>
+            <th class="ui:text-right!">{{ __('Number of Vectors') }}</th>
             <th>{{ __('Created At') }}</th>
             <th>{{ __('Created By') }}</th>
             <th></th>
@@ -41,82 +38,42 @@ render(function (Request $request) {
           </thead>
           <tbody>
           @foreach($collections as $collection)
-          <tr style="border-bottom-color:white">
-            <td class="text-end" onclick="editCollection(this, {{ $collection->id }})">{{
-              $collection->priority }}
-            </td>
-            <td><span class="lozenge new">{{ $collection->name }}</span></td>
-            <td style="text-align:right">
-              <a href="{{ route('documents', ['page' => 1, 'collection' => $collection->name]) }}">
-                {{ Illuminate\Support\Number::format($collection->files->count(), locale:'sv') }}
-              </a>
-            </td>
-            <td style="text-align:right">
-              <a href="{{ route('chunks', ['page' => 1, 'collection' => $collection->name]) }}">
-                {{ Illuminate\Support\Number::format($collection->chunks->count(), locale:'sv') }}
-              </a>
-            </td>
-            <td style="text-align:right">
-              {{ Illuminate\Support\Number::format($collection->chunks->where('is_embedded', true)->count(),
-              locale:'sv') }}
-            </td>
-            <td>{{ $collection->created_at->format('Y-m-d H:i') }}</td>
-            <td>{{ $collection->createdBy?->name }}</td>
-            <td class="text-end">
-              <a href="#" onclick="deleteCollection({{ $collection->id }})" class="text-decoration-none"
-                 style="color:red">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M4 7l16 0"/>
-                  <path d="M10 11l0 6"/>
-                  <path d="M14 11l0 6"/>
-                  <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
-                  <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-                </svg>
-              </a>
-            </td>
-          </tr>
+            <tr>
+              {{-- Editable in place: editCollection() parses the cell text, keep it the bare number --}}
+              <td class="ui:text-right ui:tabular-nums ui:cursor-text" title="{{ __('Click to edit') }}"
+                  onclick="editCollection(this, {{ $collection->id }})">{{ $collection->priority }}</td>
+              <td><x-ui.tag tone="auto">{{ $collection->name }}</x-ui.tag></td>
+              <td class="ui:text-right ui:tabular-nums">
+                <a href="{{ route('documents', ['page' => 1, 'collection' => $collection->name]) }}"
+                   class="ui:text-brand-600! ui:hover:text-brand-700!">
+                  {{ Illuminate\Support\Number::format($collection->files->count(), locale:'sv') }}
+                </a>
+              </td>
+              <td class="ui:text-right ui:tabular-nums">
+                <a href="{{ route('chunks', ['page' => 1, 'collection' => $collection->name]) }}"
+                   class="ui:text-brand-600! ui:hover:text-brand-700!">
+                  {{ Illuminate\Support\Number::format($collection->chunks->count(), locale:'sv') }}
+                </a>
+              </td>
+              <td class="ui:text-right ui:tabular-nums">
+                {{ Illuminate\Support\Number::format($collection->chunks->where('is_embedded', true)->count(), locale:'sv') }}
+              </td>
+              <td class="ui:whitespace-nowrap ui:text-slate-500">{{ $collection->created_at->format('Y-m-d H:i') }}</td>
+              <td class="ui:text-slate-500">{{ $collection->createdBy?->name }}</td>
+              <td>
+                <div class="ui:flex ui:justify-end">
+                  <x-ui.icon-button icon="trash" :title="__('Delete')" onclick="deleteCollection({{ $collection->id }})"/>
+                </div>
+              </td>
+            </tr>
           @endforeach
           </tbody>
-        </table>
-        <div class="row">
-          <div class="col">
-            <ul class="pagination justify-content-center mt-3 mb-3">
-              <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ route('collections', ['page' => 1]) }}">
-                  <span>&laquo;&nbsp;{{ __('First') }}</span>
-                </a>
-              </li>
-              <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
-                <a class="page-link"
-                   href="{{ route('collections', ['page' => $currentPage <= 1 ? 1 : $currentPage - 1]) }}">
-                  <span>&lt;&nbsp;{{ __('Previous') }}</span>
-                </a>
-              </li>
-              <li class="page-item">
-                <a class="page-link active"
-                   href="{{ route('collections', ['page' => $currentPage]) }}">
-                  {{ $currentPage }}
-                </a>
-              </li>
-              <li class="page-item {{ $currentPage >= $nbPages ? 'disabled' : '' }}">
-                <a class="page-link"
-                   href="{{ route('collections', ['page' => $currentPage >= $nbPages ? $nbPages : $currentPage + 1])}}">
-                  <span>{{ __('Next') }}&nbsp;&gt;</span>
-                </a>
-              </li>
-              <li class="page-item {{ $currentPage >= $nbPages ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ route('collections', ['page' => $nbPages]) }}">
-                  <span>{{ __('Last') }}&nbsp;&raquo;</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+        </x-ui.table>
+        <x-ui.pagination :page="$currentPage" :pages="$nbPages"
+                         :url="fn($page) => route('collections', ['page' => $page])"
+                         class="ui:border-0 ui:border-t ui:border-solid ui:border-line"/>
       @endif
-    </div>
+    </x-ui.card>
   </div>
   <script>
 
@@ -161,4 +118,3 @@ render(function (Request $request) {
 
   </script>
 </x-layouts.app>
-

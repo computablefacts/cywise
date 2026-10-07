@@ -120,11 +120,11 @@
 <x-layouts.app>
 
     <x-app.settings-layout
-        title="Settings"
-        description="Manage your account avatar, name, email, and more.">
+        :title="__('Settings')"
+        :description="__('Manage your account avatar, name, email, and more.')">
 
 		@volt('settings.profile')
-		<div x-data="{
+		<div class="ui:w-full" x-data="{
 				uploadCropEl: null,
 				uploadLoading: null,
 				fileTypes: null,
@@ -194,55 +194,50 @@
 					}, 800);
 				});
 			}
-		"
-		<div class="w-100">
-			<form wire:submit="save" class="w-100">
-				<div class="d-flex flex-column mt-3">
-					<div class="position-relative flex-shrink-0" style="width: 128px; height: 128px; cursor: pointer;">
-						<img id="preview" src="{{ auth()->user()->avatar() . '?' . time() }}" class="rounded-circle" style="width: 128px; height: 128px;">
+		">
+			<form wire:submit="save">
+				<x-ui.card>
+					<div class="ui:flex ui:flex-col ui:gap-6">
 
-						<div class="position-absolute top-0 start-0 w-100 h-100">
-							<input type="file" id="upload" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" style="z-index: 20;">
-							<button type="button" class="position-absolute bottom-0 start-50 translate-middle-x mb-2 btn btn-dark btn-sm rounded-circle opacity-75" style="z-index: 10; width: 40px; height: 40px;">
-								<svg class="text-light" style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-							</button>
+						{{-- Avatar: the transparent file input covers the picture; a change opens the crop modal --}}
+						<div class="ui:flex ui:flex-col ui:gap-2">
+							<div class="ui:relative ui:size-32 ui:shrink-0 ui:cursor-pointer">
+								<img id="preview" src="{{ auth()->user()->avatar() . '?' . time() }}" class="ui:size-32 ui:rounded-full ui:object-cover ui:ring-1 ui:ring-line" alt="">
+								<input type="file" id="upload" class="ui:absolute ui:inset-0 ui:z-20 ui:size-full ui:cursor-pointer ui:opacity-0" aria-label="{{ __('Change avatar') }}">
+								<span class="ui:absolute ui:bottom-2 ui:left-1/2 ui:z-10 ui:flex ui:size-10 ui:-translate-x-1/2 ui:items-center ui:justify-center ui:rounded-full ui:bg-ink/75 ui:text-white">
+									<x-phosphor-camera class="ui:size-5"/>
+								</span>
+							</div>
+							@error('avatar')
+								<p class="ui:m-0 ui:text-sm ui:text-critical">{{ __('The avatar must be a valid image type.') }}</p>
+							@enderror
+						</div>
+
+						{{ $this->form }}
+
+						<div class="ui:flex ui:justify-end">
+							<x-ui.button type="submit">{{ __('Save') }}</x-ui.button>
 						</div>
 					</div>
-					@error('avatar')
-						<p class="mt-2 small text-danger">The avatar must be a valid image type.</p>
-					@enderror
-					<div class="w-100 mt-4">
-						{{ $this->form }}
-					</div>
-					<div class="w-100 pt-4 text-end">
-						<x-button type="submit">Save</x-button>
-					</div>
-				</div>
-
+				</x-ui.card>
 			</form>
 
 			<div style="z-index: 1050;">
 				<x-filament::modal id="profile-avatar-crop">
-					<div>
-						<div class="mt-3 text-center">
-							<h5 class="fw-bold mb-3" id="modal-headline">
-								Position and resize your photo
-							</h5>
-							<div class="mt-2">
-								<div id="upload-crop-container" class="position-relative d-flex align-items-center justify-content-center mt-3" style="height: 224px;">
-									<div id="uploadLoading" class="d-flex align-items-center justify-content-center w-100 h-100">
-										<div class="spinner-border text-primary" role="status">
-											<span class="visually-hidden">Loading...</span>
-										</div>
-									</div>
-									<div id="upload-crop"></div>
-								</div>
+					<div class="ui:flex ui:flex-col ui:items-center ui:gap-3">
+						<h2 class="ui:m-0 ui:text-base ui:font-semibold ui:text-ink" id="modal-headline">
+							{{ __('Position and resize your photo') }}
+						</h2>
+						<div id="upload-crop-container" class="ui:relative ui:flex ui:h-56 ui:w-full ui:items-center ui:justify-center">
+							<div id="uploadLoading" class="ui:flex ui:size-full ui:items-center ui:justify-center">
+								<x-phosphor-circle-notch class="ui:size-8 ui:animate-spin ui:text-brand-500" role="status" aria-label="{{ __('Loading...') }}"/>
 							</div>
+							<div id="upload-crop"></div>
 						</div>
 					</div>
-					<div class="mt-4 d-flex justify-content-end">
-						<button @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'profile-avatar-crop' }}));" class="btn btn-outline-secondary me-2" type="button">Cancel</button>
-						<button @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'profile-avatar-crop' }})); applyImageCrop()" class="btn btn-primary" id="apply-crop" type="button">Apply</button>
+					<div class="ui:mt-4 ui:flex ui:justify-end ui:gap-2">
+						<x-ui.button variant="secondary" @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'profile-avatar-crop' }}));">{{ __('Cancel') }}</x-ui.button>
+						<x-ui.button id="apply-crop" @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'profile-avatar-crop' }})); applyImageCrop()">{{ __('Apply') }}</x-ui.button>
 					</div>
 				</x-filament::modal>
 			</div>

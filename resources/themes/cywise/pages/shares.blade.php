@@ -14,61 +14,51 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
-  <div class="container-fluid">
-    <div class="card mt-3 mb-3">
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-7xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
+
+    <x-ui.page-header :title="__('Shares')" :subtitle="__('Assets shared with other teams, grouped by tags.')"/>
+
+    <x-ui.card flush>
       @if($shares->isEmpty())
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            {{ __('None.') }}
-          </div>
-        </div>
-      </div>
+        <x-ui.empty icon="share-network">{{ __('None.') }}</x-ui.empty>
       @else
-      <div class="card-body p-0">
-        <table class="table mb-0">
+        <x-ui.table>
           <thead>
           <tr>
             <th>{{ __('Shared to') }}</th>
             <th>{{ __('Tags') }}</th>
-            <th class="text-end">{{ __('Number of Assets') }}</th>
-            <th class="text-end">{{ __('Number of Vulnerabilities') }}</th>
+            <th class="ui:text-right!">{{ __('Number of Assets') }}</th>
+            <th class="ui:text-right!">{{ __('Number of Vulnerabilities') }}</th>
             <th>{{ __('Shared by') }}</th>
-            <th class="text-end">{{ __('Actions') }}</th>
+            <th class="ui:text-right!">{{ __('Actions') }}</th>
           </tr>
           </thead>
           <tbody>
           @foreach($shares as $share)
-          <tr>
-            <td><span class="lozenge new">{{ $share['group'] }}</span></td>
-            <td>
-              @foreach($share['tags'] as $tag)
-              <span class="lozenge information">{{ $tag }}</span>&nbsp;
-              @endforeach
-            </td>
-            <td class="text-end">{{ $share['nb_assets'] }}</td>
-            <td class="text-end">{{ $share['nb_vulnerabilities'] }}</td>
-            <td>{{ $share['target'] }}</td>
-            <td class="text-end">
-              <a href="#" onclick="degroup('{{ $share['group'] }}')" class="text-decoration-none" style="color:red">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M4 7l16 0"/>
-                  <path d="M10 11l0 6"/>
-                  <path d="M14 11l0 6"/>
-                  <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
-                  <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-                </svg>
-              </a>
-            </td>
-          </tr>
+            <tr>
+              <td><x-ui.badge level="info">{{ $share['group'] }}</x-ui.badge></td>
+              <td>
+                <div class="ui:flex ui:flex-wrap ui:gap-1">
+                  @foreach($share['tags'] as $tag)
+                    <x-ui.tag tone="auto">{{ $tag }}</x-ui.tag>
+                  @endforeach
+                </div>
+              </td>
+              <td class="ui:text-right ui:tabular-nums">{{ $share['nb_assets'] }}</td>
+              <td class="ui:text-right ui:tabular-nums">{{ $share['nb_vulnerabilities'] }}</td>
+              <td class="ui:text-slate-600">{{ $share['target'] }}</td>
+              <td>
+                <div class="ui:flex ui:justify-end">
+                  <x-ui.icon-button icon="trash" :title="__('Delete')" class="ui:hover:text-red-600!"
+                                    onclick="degroup(@js($share['group']))"/>
+                </div>
+              </td>
+            </tr>
           @endforeach
           </tbody>
-        </table>
-      </div>
+        </x-ui.table>
       @endif
-    </div>
+    </x-ui.card>
   </div>
 
   @push('scripts')

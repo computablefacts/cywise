@@ -14,24 +14,23 @@ render(function (Request $request) {
 ?>
 
 <x-layouts.app>
-  <div class="container-fluid">
-    <div class="card mt-3 mb-3">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table mb-0" id="roles-permissions-table">
-            <thead>
-            <tr id="rnp-header">
-              <th style="min-width:260px;">{{ __('Permission') }}</th>
-              <!-- Roles will be injected here -->
-            </tr>
-            </thead>
-            <tbody id="rnp-body">
-            <!-- Rows will be injected here -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+  <div class="ui:mx-auto ui:flex ui:w-full ui:max-w-7xl ui:flex-col ui:gap-6 ui:px-4 ui:py-8 ui:lg:px-8">
+
+    <x-ui.page-header :title="__('Roles & Permissions')" :subtitle="__('Permissions granted to each role.')"/>
+
+    <x-ui.card flush>
+      <x-ui.table id="roles-permissions-table">
+        <thead>
+        <tr id="rnp-header">
+          <th class="ui:min-w-64">{{ __('Permission') }}</th>
+          <!-- Roles will be injected here -->
+        </tr>
+        </thead>
+        <tbody id="rnp-body">
+        <!-- Rows will be injected here -->
+        </tbody>
+      </x-ui.table>
+    </x-ui.card>
   </div>
   <script>
 
@@ -47,7 +46,7 @@ render(function (Request $request) {
       theadRow.querySelectorAll('th.role-col').forEach(el => el.remove());
       roles.forEach(r => {
         const th = document.createElement('th');
-        th.className = 'role-col';
+        th.className = 'role-col ui:text-center!';
         th.textContent = r.name;
         theadRow.appendChild(th);
       });
@@ -60,6 +59,7 @@ render(function (Request $request) {
 
         const tr = document.createElement('tr');
         const tdPerm = document.createElement('td');
+        tdPerm.className = 'ui:font-mono ui:text-xs';
         tdPerm.textContent = p;
         tr.appendChild(tdPerm);
 
@@ -68,6 +68,7 @@ render(function (Request $request) {
           td.style.textAlign = 'center';
           const input = document.createElement('input');
           input.type = 'checkbox';
+          input.className = 'ui:size-4 ui:cursor-pointer ui:accent-brand-500 ui:disabled:cursor-not-allowed';
           input.dataset.role = r.name; // use name for RPC simplicity
           input.dataset.permission = p;
           input.checked = r.permissions.includes(p);

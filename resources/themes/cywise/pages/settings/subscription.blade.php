@@ -25,44 +25,40 @@
     @volt('settings.subscription') 
         <div class="">
             <x-app.settings-layout
-                title="Subscriptions"
-                description="Your subscription details"
+                :title="__('Subscriptions')"
+                :description="__('Your subscription details')"
             >
                 @role('admin')
-                    <x-app.alert id="no_subscriptions" :dismissable="false" type="info">
-                        You are logged in as an admin and have full access. Authenticate with a different user and visit this page to see the subscription checkout process.
-                    </x-app.alert>
+                    <div id="no_subscriptions" class="ui:flex ui:items-start ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-blue-200 ui:bg-info-soft ui:p-4">
+                        <x-phosphor-info class="ui:size-5 ui:shrink-0 ui:text-info"/>
+                        <p class="ui:m-0 ui:text-sm ui:text-blue-900">{{ __('You are logged in as an admin and have full access. Authenticate with a different user and visit this page to see the subscription checkout process.') }}</p>
+                    </div>
                 @else
                     @subscriber
-                        
-                        <div class="w-100">                            
-                            <x-app.alert id="no_subscriptions" :dismissable="false" type="success">
-                                <div class="d-flex align-items-center w-100">
-                                    <x-phosphor-seal-check-duotone class="flex-shrink-0 me-2" style="width: 24px; height: 24px;" /> 
-                                    <span>You are currently subscribed to the {{ auth()->user()->plan()->name }} {{ auth()->user()->planInterval() }} Plan.</span>
-                                </div>
-                            </x-app.alert>
-                            <p class="my-4">Manage your subscription by clicking below.</p>
+                        <div id="no_subscriptions" class="ui:flex ui:items-start ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-emerald-200 ui:bg-low-soft ui:p-4">
+                            <x-phosphor-seal-check class="ui:size-5 ui:shrink-0 ui:text-low"/>
+                            <p class="ui:m-0 ui:text-sm ui:text-emerald-900">{{ __('You are currently subscribed to the :plan :interval Plan.', ['plan' => auth()->user()->plan()->name, 'interval' => auth()->user()->planInterval()]) }}</p>
+                        </div>
+
+                        <x-ui.card :title="__('Manage your subscription by clicking below.')">
                             @if (session('update'))
-                                <div class="my-4 small text-success">Successfully updated your subscription</div>
+                                <p class="ui:m-0 ui:mb-4 ui:text-sm ui:text-low">{{ __('Successfully updated your subscription') }}</p>
                             @endif
                             <livewire:billing.update />
-                        </div>
+                        </x-ui.card>
                     @endsubscriber
 
                     @notsubscriber
-                        <div class="mb-4">
-                            <x-app.alert id="no_subscriptions" :dismissable="false" type="info">
-                                <div class="d-flex align-items-center">
-                                    <x-phosphor-shopping-bag-open-duotone class="flex-shrink-0 me-2" style="width: 24px; height: 24px;" />
-                                    <span>No active subscriptions found. Please select a plan below.</span>
-                                </div>
-                            </x-app.alert>
+                        <div id="no_subscriptions" class="ui:flex ui:items-start ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-blue-200 ui:bg-info-soft ui:p-4">
+                            <x-phosphor-shopping-bag-open class="ui:size-5 ui:shrink-0 ui:text-info"/>
+                            <p class="ui:m-0 ui:text-sm ui:text-blue-900">{{ __('No active subscriptions found. Please select a plan below.') }}</p>
                         </div>
+
                         <livewire:billing.checkout />
-                        <p class="d-flex align-items-center mt-3 mb-4">
-                            <x-phosphor-shield-check-duotone class="me-1" style="width: 16px; height: 16px;" />
-                            <span class="me-1">Billing is securely managed via </span><strong>{{ ucfirst(config('wave.billing_provider')) }} Payment Platform</strong>.
+
+                        <p class="ui:m-0 ui:flex ui:items-center ui:gap-1.5 ui:text-sm ui:text-slate-500">
+                            <x-phosphor-shield-check class="ui:size-4 ui:shrink-0"/>
+                            <span>{!! __('Billing is securely managed via <strong>:provider Payment Platform</strong>.', ['provider' => e(ucfirst(config('wave.billing_provider')))]) !!}</span>
                         </p>
                     @endnotsubscriber
                 @endrole

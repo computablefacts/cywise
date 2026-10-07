@@ -20,8 +20,9 @@ render(function (Request $request) {
   <style>
 
     /*
-     * Chat bubbles are built by the JS below (addUserDirective, addBotAnswer, addThinkingDots).
-     * They keep their tw-* classes and are styled here with the design tokens.
+     * Chat bubbles are built by the JS below (addUserDirective, addBotAnswer, addThinkingDots)
+     * and styled with ui: utilities. The rules left here style what utilities cannot reach:
+     * JS state (.tw-disabled) and the answer HTML returned by the backend.
      */
 
     .tw-disabled {
@@ -29,169 +30,7 @@ render(function (Request $request) {
       pointer-events: none;
     }
 
-    .tw-conversation-wrapper {
-      flex-grow: 1;
-      overflow: hidden
-    }
-
-    .tw-conversation {
-      padding: 1rem;
-      height: 100%;
-      overflow: hidden;
-      overflow-y: auto;
-    }
-
-    .typing-wrapper {
-      height: 25px;
-      display: flex;
-      align-items: center;
-    }
-
-    .typing {
-      position: relative;
-      margin-left: .5rem;
-    }
-
-    .typing span {
-      content: "";
-      -webkit-animation: blink 1.5s infinite;
-      animation: blink 1.5s infinite;
-      -webkit-animation-fill-mode: both;
-      animation-fill-mode: both;
-      height: 10px;
-      width: 10px;
-      background: hsl(238 83% 60% / .9);
-      position: absolute;
-      left: 0;
-      top: 0;
-      border-radius: 50%;
-    }
-
-    .typing span:nth-child(2) {
-      -webkit-animation-delay: 0.2s;
-      animation-delay: 0.2s;
-      margin-left: 15px;
-    }
-
-    .typing span:nth-child(3) {
-      -webkit-animation-delay: 0.4s;
-      animation-delay: 0.4s;
-      margin-left: 30px;
-    }
-
-    @-webkit-keyframes blink {
-      0% {
-        opacity: 0.1;
-      }
-      20% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0.1;
-      }
-    }
-
-    @keyframes blink {
-      0% {
-        opacity: 0.1;
-      }
-      20% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0.1;
-      }
-    }
-
-    /* QUESTION (user, right) */
-
-    .tw-question-wrapper {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 1.25rem;
-    }
-
-    .tw-question {
-      display: flex;
-      flex-direction: row-reverse;
-      align-items: flex-start;
-      gap: .75rem;
-    }
-
-    .tw-question-avatar {
-      display: flex;
-      padding: .5rem;
-      border-radius: 9999px;
-      background-color: #f1f5f9;
-    }
-
-    .tw-question-avatar .tw-avatar-color {
-      color: #475569;
-    }
-
-    .tw-question-directive {
-      max-width: 75%;
-      padding: .75rem 1rem;
-      border-radius: 1rem 1rem .25rem 1rem;
-      background-color: var(--ui-color-ink);
-      color: #fff;
-      font-size: .875rem;
-      line-height: 1.5;
-      white-space: pre-wrap;
-    }
-
-    .tw-question-timestamp {
-      padding-top: .375rem;
-      padding-right: 3.25rem;
-      text-align: right;
-      font-size: .75rem;
-      color: #94a3b8;
-    }
-
-    /* ANSWER (bot, left). Clicking the avatar opens the chain of thought. */
-
-    .tw-answer-wrapper {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 1.25rem;
-    }
-
-    .tw-answer {
-      display: flex;
-      align-items: flex-start;
-      gap: .75rem;
-    }
-
-    .tw-answer-avatar-wrapper {
-      cursor: pointer;
-    }
-
-    .tw-answer-avatar {
-      display: flex;
-      padding: .5rem;
-      border-radius: 9999px;
-      background-color: var(--ui-color-brand-50);
-    }
-
-    .tw-avatar-color {
-      color: var(--ui-color-brand-500);
-    }
-
-    .tw-answer-message {
-      min-width: 0;
-      max-width: 85%;
-      padding: .75rem 1rem;
-      border: 1px solid var(--ui-color-line);
-      border-radius: 1rem 1rem 1rem .25rem;
-      background-color: #fff;
-      color: var(--ui-color-ink);
-      font-size: .875rem;
-      line-height: 1.6;
-    }
-
-    .tw-answer-message-paragraph {
-      margin-bottom: .5rem;
-    }
+    /* ANSWER HTML (headings, paragraphs, lists) */
 
     .tw-answer-message-html {
       --font-size: 14px;
@@ -233,16 +72,7 @@ render(function (Request $request) {
       margin-bottom: 0;
     }
 
-    .tw-answer-timestamp {
-      padding-top: .375rem;
-      padding-left: 3.25rem;
-      font-size: .75rem;
-      color: #94a3b8;
-    }
-
-    .tw-save-memo-btn:hover {
-      color: var(--ui-color-brand-500);
-    }
+    /* LEGACY ANSWER HTML: stored conversations may still contain these blocks */
 
     /* COMMANDS */
 
@@ -570,8 +400,8 @@ render(function (Request $request) {
         </x-ui.button>
       </header>
 
-      <div class="tw-conversation-wrapper">
-        <div class="tw-conversation">
+      <div class="tw-conversation-wrapper ui:min-h-0 ui:flex-1 ui:overflow-hidden">
+        <div class="tw-conversation ui:h-full ui:overflow-y-auto ui:p-4">
           <!-- DYNAMICALLY FILLED -->
           @include('theme::iframes.cyberbuddy._actions')
         </div>
@@ -619,24 +449,26 @@ render(function (Request $request) {
     </aside>
   </div>
 
-  {{-- Chain of thought (Bootstrap modal, opened from the bot avatar) --}}
-  <div class="modal fade" tabindex="-1" id="" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Modal title</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" style="max-height:60vh;overflow-y:auto;overflow-x:hidden"></div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-            {{ __('Close') }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  {{-- Chain of thought (native dialog, opened from the bot avatar by chainOfThought; .cot-body filled by JS) --}}
+  <dialog id="cot-dialog" aria-labelledby="cot-dialog-title"
+          class="ui:w-[calc(100%-2rem)] ui:max-w-lg ui:overflow-hidden ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-0 ui:text-ink ui:shadow-xl ui:backdrop:bg-slate-900/40">
+    <header class="ui:flex ui:items-center ui:justify-between ui:gap-4 ui:border-0 ui:border-b ui:border-solid ui:border-line ui:px-5 ui:py-4">
+      <h2 id="cot-dialog-title" class="ui:m-0 ui:text-base ui:font-semibold ui:text-ink">{{ __('Chain of Thought') }}</h2>
+      <x-ui.icon-button icon="x" :title="__('Close')" onclick="this.closest('dialog').close()"/>
+    </header>
+    <div class="cot-body ui:max-h-[60vh] ui:overflow-y-auto ui:overflow-x-hidden ui:px-5 ui:py-4 ui:text-sm ui:leading-relaxed ui:text-slate-700"></div>
+    <footer class="ui:flex ui:justify-end ui:border-0 ui:border-t ui:border-solid ui:border-line ui:px-5 ui:py-3">
+      <x-ui.button onclick="this.closest('dialog').close()">{{ __('Close') }}</x-ui.button>
+    </footer>
+  </dialog>
   <script>
+
+    // Bubble avatars, rendered server side (phosphor) and reused by the templates below
+    const BOT_ICON = `<x-phosphor-robot class="ui:size-6"/>`;
+    const USER_ICON = `<x-phosphor-user class="ui:size-6"/>`;
+    const BOT_AVATAR_CLASSES = 'tw-answer-avatar ui:flex ui:rounded-full ui:bg-brand-50 ui:p-2 ui:text-brand-500';
+    const ANSWER_CLASSES = ['tw-answer-wrapper', 'ui:mb-5', 'ui:flex', 'ui:flex-col'];
+    const MESSAGE_CLASSES = 'tw-answer-message ui:min-w-0 ui:max-w-[85%] ui:rounded-2xl ui:rounded-bl-sm ui:border ui:border-solid ui:border-line ui:bg-white ui:px-4 ui:py-3 ui:text-sm ui:leading-relaxed ui:text-ink';
 
     let run = 0;
     let elThinkingDots = null;
@@ -672,9 +504,15 @@ render(function (Request $request) {
       elUploadButton.classList.add('tw-disabled');
     };
 
-    const actions = ["Chargement du contexte...", "Analyse de votre demande...", "Recherche d'informations...",
-      "Assemblage des informations recueillies...", "Génération de la réponse...",
-      "Un instant, nous y sommes presque..."];
+    @php
+      // Blade can't parse a multi-line @json([...]): build the array first.
+      $loadingMessages = [
+        __('Loading context...'), __('Analyzing your request...'), __('Searching for information...'),
+        __('Assembling the collected information...'), __('Generating the answer...'),
+        __('One moment, almost there...'),
+      ];
+    @endphp
+    const actions = @json($loadingMessages);
     let actionIndex = 0;
     let loadingInterval = null;
 
@@ -686,35 +524,14 @@ render(function (Request $request) {
         if (run > 0) {
 
           elThinkingDots = document.createElement('div');
-          elThinkingDots.classList.add('tw-answer-wrapper');
+          elThinkingDots.classList.add(...ANSWER_CLASSES);
           elThinkingDots.innerHTML = `
-          <div class="tw-answer">
+          <div class="tw-answer ui:flex ui:items-start ui:gap-3">
             <div class="tw-answer-avatar-wrapper">
-              <div class="tw-answer-avatar">
-                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"
-                      stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round" class="tw-avatar-color">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M6 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
-                  <path d="M12 2v2" />
-                  <path d="M9 12v9" />
-                  <path d="M15 12v9" />
-                  <path d="M5 16l4 -2" />
-                  <path d="M15 14l4 2" />
-                  <path d="M9 18h6" />
-                  <path d="M10 8v.01" />
-                  <path d="M14 8v.01" />
-                </svg>
-              </div>
+              <div class="${BOT_AVATAR_CLASSES}">${BOT_ICON}</div>
             </div>
-            <!-- <div class="typing-wrapper">
-              <div class="typing">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div> -->
-            <div class="tw-answer-message">
-              <div class="tw-answer-message-html" style="color: var(--bs-gray);">
+            <div class="${MESSAGE_CLASSES}">
+              <div class="tw-answer-message-html ui:text-slate-500">
                 ${actions[actionIndex++]}
               </div>
             </div>
@@ -782,22 +599,15 @@ render(function (Request $request) {
       }
 
       const elDirective = document.createElement('div');
-      elDirective.classList.add('tw-question-wrapper');
+      elDirective.classList.add('tw-question-wrapper', 'ui:mb-5', 'ui:flex', 'ui:flex-col');
       elDirective.innerHTML = `
-      <div class="tw-question">
+      <div class="tw-question ui:flex ui:flex-row-reverse ui:items-start ui:gap-3">
         <div class="tw-question-avatar-wrapper">
-          <div class="tw-question-avatar">
-              <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"
-                    stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round" class="tw-avatar-color">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/>
-                <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
-              </svg>
-          </div>
+          <div class="tw-question-avatar ui:flex ui:rounded-full ui:bg-slate-100 ui:p-2 ui:text-slate-600">${USER_ICON}</div>
         </div>
-        <div class="tw-question-directive">${htmlEscape(directive)}</div>
+        <div class="tw-question-directive ui:max-w-[75%] ui:whitespace-pre-wrap ui:rounded-2xl ui:rounded-br-sm ui:bg-ink ui:px-4 ui:py-3 ui:text-sm ui:leading-normal ui:text-white">${htmlEscape(directive)}</div>
       </div>
-      <div class="tw-question-timestamp">${formatTimestamp(ts)}</div>
+      <div class="tw-question-timestamp ui:pr-13 ui:pt-1.5 ui:text-right ui:text-xs ui:text-slate-400">${formatTimestamp(ts)}</div>
     `;
 
       const elConversation = document.querySelector('.tw-conversation');
@@ -817,42 +627,29 @@ render(function (Request $request) {
         return `${year}-${month}-${day} ${hours}:${minutes}`;
       };
 
-      const paragraphs = answer.response.map(line => `<p class="tw-answer-message-paragraph">${line}</p>`).join('');
+      const paragraphs = answer.response.map(line => `<p class="tw-answer-message-paragraph ui:mb-2">${line}</p>`).join('');
       const html = answer.html.trim() !== '' ? `<div class="tw-answer-message-html">${answer.html}</div>` : '';
       const uid = com.computablefacts.helpers.goodFastHash(answer.chain_of_thought);
 
       const elDirective = document.createElement('div');
-      elDirective.classList.add('tw-answer-wrapper');
+      elDirective.classList.add(...ANSWER_CLASSES);
       elDirective.innerHTML = `
-      <div class="tw-answer">
+      <div class="tw-answer ui:flex ui:items-start ui:gap-3">
         <div id="cot-${uid}" style="display:none">${JSON.stringify(answer.chain_of_thought)}</div>
-        <div class="tw-answer-avatar-wrapper" onclick="chainOfThought('cot-${uid}')">
-          <div class="tw-answer-avatar">
-            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"
-                  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round" class="tw-avatar-color">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M6 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
-              <path d="M12 2v2" />
-              <path d="M9 12v9" />
-              <path d="M15 12v9" />
-              <path d="M5 16l4 -2" />
-              <path d="M15 14l4 2" />
-              <path d="M9 18h6" />
-              <path d="M10 8v.01" />
-              <path d="M14 8v.01" />
-            </svg>
-          </div>
+        <div class="tw-answer-avatar-wrapper ui:cursor-pointer" onclick="chainOfThought('cot-${uid}')">
+          <div class="${BOT_AVATAR_CLASSES}">${BOT_ICON}</div>
         </div>
-        <div class="tw-answer-message">
+        <div class="${MESSAGE_CLASSES}">
           ${paragraphs}
           ${html}
         </div>
       </div>
-      <div class="tw-answer-timestamp" style="display:flex;gap:0.5rem;">
+      <div class="tw-answer-timestamp ui:flex ui:items-center ui:gap-2 ui:pl-13 ui:pt-1.5 ui:text-xs ui:text-slate-400">
         ${formatTimestamp(ts)}
-        <div class="tw-save-memo-btn" style="cursor:pointer;" title="{{ __('Save as note') }}">
-          <span class="bp4-icon bp4-icon-manually-entered-data"></span>
-        </div>
+        <button type="button" class="tw-save-memo-btn ui:flex ui:cursor-pointer ui:border-0 ui:bg-transparent ui:p-0 ui:text-slate-400 ui:hover:text-brand-500 ui:disabled:opacity-50"
+                title="{{ __('Save as note') }}" aria-label="{{ __('Save as note') }}">
+          <x-phosphor-note-pencil class="ui:size-4"/>
+        </button>
       </div>
     `;
 
@@ -967,18 +764,19 @@ render(function (Request $request) {
       if (content !== 'undefined') {
 
         const cot = JSON.parse(content);
-        const modal = new bootstrap.Modal(document.querySelector('.modal'));
-        const modalTitle = document.querySelector('.modal-title');
-        const modalBody = document.querySelector('.modal-body');
+        const elDialog = document.getElementById('cot-dialog');
+        const elBody = elDialog.querySelector('.cot-body');
 
-        modalTitle.textContent = "{{ __('Chain of Thought') }}";
-        modalBody.innerHTML = cot.map(c => `
-        <p><b>Thought.</b> ${c.thought}</p>
-        <p><b>Action.</b> ${c.action}</p>
-        <p><b>Observation.</b> ${c.observation}</p>
+        // One block per step: thought, action, observation
+        elBody.innerHTML = cot.map(c => `
+        <div class="ui:mb-4 ui:flex ui:flex-col ui:gap-1 ui:last:mb-0">
+          <p class="ui:m-0"><b>{{ __('Thought.') }}</b> ${c.thought}</p>
+          <p class="ui:m-0"><b>{{ __('Action.') }}</b> ${c.action}</p>
+          <p class="ui:m-0"><b>{{ __('Observation.') }}</b> ${c.observation}</p>
+        </div>
       `).join('');
 
-        modal.show();
+        elDialog.showModal();
       }
     };
 

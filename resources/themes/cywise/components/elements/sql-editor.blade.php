@@ -1,40 +1,24 @@
-<div class="row mt-2">
-    <div class="col">
-    <textarea id="prompt"
-              class="form-control mt-2"
-              rows="4"
-              placeholder="{{ __('Please provide a detailed prompt to generate a draft SQL query.') }}"></textarea>
+{{-- Prompt → SQL draft (ace editor) → execution result, then the list of existing tables. --}}
+<div class="ui:flex ui:flex-col ui:gap-4">
+    <x-ui.textarea id="prompt" placeholder="{{ __('Please provide a detailed prompt to generate a draft SQL query.') }}"/>
+    <div>
+        <x-ui.button id="prompt-to-query" variant="secondary" icon="sparkle">{{ __('Generate!') }}</x-ui.button>
     </div>
-</div>
-<div class="row mt-2">
-    <div class="col text-center">
-        <button id="prompt-to-query" class="btn btn-primary">{{ __('Generate!') }}</button>
+    <div id="editor" class="ui:overflow-hidden ui:rounded-lg" style="height:300px;width:100%;"></div>
+    <div>
+        <x-ui.button id="execute-sql-query" icon="play">{{ __('Execute!') }}</x-ui.button>
     </div>
-</div>
-<div class="row mt-2">
-    <div class="col">
-        <div id="editor" style="height:300px;width:100%;"></div>
-    </div>
-</div>
-<div class="row mt-2">
-    <div class="col text-center">
-        <button id="execute-sql-query" class="btn btn-primary">{{ __('Execute!') }}</button>
-    </div>
-</div>
-<div class="row mt-2">
-    <div class="col">
-        <table id="query-result" class="table">
+    <div class="ui:overflow-hidden ui:rounded-lg ui:border ui:border-solid ui:border-line">
+        <x-ui.table id="query-result">
             <thead>
             <!-- FILLED DYNAMICALLY -->
             </thead>
             <tbody>
             <!-- FILLED DYNAMICALLY -->
             </tbody>
-        </table>
+        </x-ui.table>
     </div>
-</div>
-<div class="row mt-2">
-    <div class="col">
+    <div class="ui:overflow-hidden ui:rounded-lg ui:border ui:border-solid ui:border-line">
         <x-tables-list/>
     </div>
 </div>
