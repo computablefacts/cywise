@@ -19,6 +19,7 @@
 
 @source '../../**/*.blade.php';
 @source '../../../../js/**/*.jsx';
+@source '../../../../views/vendor/auth/**/*.blade.php';
 
 /* static: tokens are also read by legacy CSS through var(--ui-color-*) */
 @theme static {

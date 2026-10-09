@@ -195,8 +195,8 @@ new class extends Component {
         <x-auth::elements.session-message/>
 
         @if($hasInvitation)
-            <div class="mb-6 p-4 text-sm rounded-lg bg-green-100 text-green-700" role="alert">
-                {{ config('devdojo.auth.language.register.registrations_valid', 'Create your account to accept the invitation.') }}
+            <div class="ui:mb-6 ui:rounded-xl ui:border ui:border-solid ui:border-emerald-200 ui:bg-low-soft ui:p-4 ui:text-sm ui:text-emerald-800" role="alert">
+                {{ __(config('devdojo.auth.language.register.registrations_valid', 'Create your account to accept the invitation.')) }}
             </div>
         @endif
 
@@ -205,7 +205,7 @@ new class extends Component {
         @endif
 
         @if($showEmailRegistration)
-            <form wire:submit="register" class="space-y-5">
+            <form wire:submit="register" class="ui:m-0 ui:flex ui:flex-col ui:gap-5">
 
                 @if($showNameField)
                     <x-auth::elements.input :label="config('devdojo.auth.language.register.name')" type="text"
@@ -249,9 +249,8 @@ new class extends Component {
         @endif
 
         <div
-            class="@if(config('devdojo.auth.settings.social_providers_location') != 'top' && $showEmailRegistration){{ 'mt-3' }}@endif space-x-0.5 text-sm leading-5 @if(config('devdojo.auth.settings.center_align_text')){{ 'text-center' }}@else{{ 'text-left' }}@endif"
-            style="color:{{ config('devdojo.auth.appearance.color.text') }}">
-            <span class="opacity-[47%]">{{config('devdojo.auth.language.register.already_have_an_account')}}</span>
+            class="ui:mt-6 ui:text-sm ui:text-slate-600">
+            <span>{{ __(config('devdojo.auth.language.register.already_have_an_account')) }}</span>
             <x-auth::elements.text-link data-auth="login-link"
                                         href="{{ route('auth.login') }}">{{config('devdojo.auth.language.register.sign_in')}}</x-auth::elements.text-link>
         </div>
