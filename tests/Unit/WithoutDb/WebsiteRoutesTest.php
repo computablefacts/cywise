@@ -33,16 +33,16 @@ it('renders website SEO metadata', function () {
         ->assertSee('name="robots"', false)
         ->assertSee('property="og:title"', false)
         ->assertSee('property="og:description"', false)
-        ->assertSee('styles.css?v=', false)
-        ->assertSee('app.js?v=', false);
+        ->assertSee('build/assets/ui-', false)
+        ->assertDontSee('website-v2/styles.css', false);
 });
 
 it('keeps blog quotes readable', function () {
-    $styles = file_get_contents(public_path('cywise/website-v2/styles.css'));
+    $prose = file_get_contents(resource_path('themes/cywise/components/site/prose.blade.php'));
 
-    expect($styles)
-        ->toContain('.blogpost-article blockquote p{')
-        ->toContain('color:inherit');
+    expect($prose)
+        ->toContain('ui:[&_blockquote]:border-brand-500')
+        ->toContain('ui:[&_blockquote]:text-ink');
 });
 
 it('renders localized website copy', function () {
@@ -53,8 +53,8 @@ it('renders localized website copy', function () {
 
     $this->get('/use-cases')
         ->assertOk()
-        ->assertSee('CRÉER UNE PSSI', false)
-        ->assertDontSee('CREATE A PSSI', false);
+        ->assertSee('Créer une PSSI', false)
+        ->assertDontSee('Create a PSSI', false);
 });
 
 it('renders the login page', function () {
@@ -79,39 +79,32 @@ it('connects pricing plans to billing', function () {
         ->assertSee('€3,000+', false);
 });
 
-it('uses the supplied logo in the header and footer', function () {
+it('brands the header and footer with the wordmark and severity strip', function () {
     $header = file_get_contents(resource_path('themes/cywise/partials/website-v2/header.blade.php'));
     $footer = file_get_contents(resource_path('themes/cywise/partials/website-v2/footer.blade.php'));
 
     expect($header)
-        ->toContain('cywise-logo-riso.png')
-        ->toContain('filemtime(public_path($logoPath))')
-        ->toContain('cw-logo');
+        ->toContain('>CYWISE</a>')
+        ->toContain('<x-site.strip/>');
     expect($footer)
-        ->toContain('cywise-logo-riso.png')
-        ->toContain('filemtime(public_path($logoPath))')
-        ->toContain('footer-logo');
+        ->toContain('>CYWISE</a>')
+        ->toContain('<x-site.strip reverse/>');
 });
 
-it('keeps blog card visuals and spacing stable', function () {
+it('keeps blog cards visual without a cover image', function () {
     $posts = file_get_contents(resource_path('themes/cywise/partials/website-v2/posts-loop.blade.php'));
-    $styles = file_get_contents(public_path('cywise/website-v2/styles.css'));
 
     expect($posts)
-        ->toContain('$post->getKey() % count($visuals)')
-        ->toContain('class="article-card-content"')
-        ->not->toContain('$loop->index % count($visuals)');
-    expect($styles)
-        ->toContain('.article-card-content{')
-        ->toContain('padding:22px 24px 24px');
+        ->toContain('@if ($post->image())')
+        ->toContain('<x-site.strip/>');
 });
 
-it('keeps the yellow feature-card shadow visible', function () {
-    $styles = file_get_contents(public_path('cywise/website-v2/styles.css'));
+it('gives every solution tone a card edge colour', function () {
+    $card = file_get_contents(resource_path('themes/cywise/components/site/edge-card.blade.php'));
 
-    expect($styles)
-        ->toContain('.row > :nth-child(5n+1) > .solution-card{')
-        ->toContain('box-shadow:6px 6px 0 #16234A');
+    foreach (['critical', 'medium', 'low', 'info', 'ink', 'line'] as $tone) {
+        expect($card)->toContain("'{$tone}' => 'ui:bg-");
+    }
 });
 
 it('serves public changelogs with the website layout', function () {

@@ -2,7 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Listeners\EndVulnsScanListener;
+use App\Listeners\GenerateAiRemediationListener;
+use App\Models\Alert;
 use App\Models\Asset;
 use App\Models\Port;
 use App\Models\Scan;
@@ -11,7 +12,7 @@ use App\Models\YnhServer;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCaseWithDb;
 
-class EndVulnsScanListenerTest extends TestCaseWithDb
+class GenerateAiRemediationListenerTest extends TestCaseWithDb
 {
     public function test_ai_remediation_prompt_includes_asset_operating_system(): void
     {
@@ -44,6 +45,14 @@ class EndVulnsScanListenerTest extends TestCaseWithDb
             'ip' => $ip,
             'service' => 'nginx',
         ]);
+        $alert = Alert::factory()->create([
+            'port_id' => $port->id,
+            'type' => 'generic_alert',
+            'title' => 'Test vulnerability',
+            'vulnerability' => 'A test vulnerability',
+            'remediation' => 'Apply the test fix',
+            'cve_id' => null,
+        ]);
 
         Http::fake(function ($request) use (&$capturedPrompt) {
             $capturedPrompt = $request->data()['messages'][0]['content'] ?? null;
@@ -59,16 +68,11 @@ class EndVulnsScanListenerTest extends TestCaseWithDb
             ], 200);
         });
 
-        $listener = new EndVulnsScanListener();
+        $listener = new GenerateAiRemediationListener();
         $method = new \ReflectionMethod($listener, 'generateAiRemediation');
         $method->setAccessible(true);
 
-        $result = $method->invoke($listener, $port, [
-            'type' => 'generic_alert',
-            'title' => 'Test vulnerability',
-            'vulnerability' => 'A test vulnerability',
-            'remediation' => 'Apply the test fix',
-        ], 'explanation');
+        $result = $method->invoke($listener, $port, $alert, 'explanation');
 
         $this->assertSame('AI remediation response', $result['content']);
         $this->assertStringContainsString('<operating_system>debian bullseye 11.0.0</operating_system>', $capturedPrompt);
