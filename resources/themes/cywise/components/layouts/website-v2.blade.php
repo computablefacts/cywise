@@ -42,22 +42,24 @@
     @endif
 
     <link href="{{ asset('favicon.ico') }}" rel="icon">
-    <link
-        crossorigin="anonymous"
-        href="https://cdn.jsdelivr.net/npm/fastbootstrap@2.2.0/dist/css/fastbootstrap.min.css"
-        integrity="sha256-V6lu+OdYNKTKTsVFBuQsyIlDiRWiOmtC8VQ8Lzdm2i4="
-        rel="stylesheet"
-    >
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
     <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400;62..125,500;62..125,600;62..125,700;62..125,800;62..125,900&amp;family=DM+Mono:wght@400;500&amp;family=Inter:wght@400;500;600&amp;display=swap"
         rel="stylesheet"
     >
-    <link href="{{ asset('cywise/website-v2/styles.css') }}?v={{ filemtime(public_path('cywise/website-v2/styles.css')) }}" rel="stylesheet">
+    {{-- Same design system as the app: tokens and "ui:" utilities --}}
+    @vite(['resources/themes/cywise/assets/css/ui.css'])
+    {{-- ui.css has no preflight (the app relies on Bootstrap's reboot): minimal reset for the website --}}
+    <style>
+        *, ::before, ::after { box-sizing: border-box; }
+        img, svg { display: block; max-width: 100%; }
+        button, input { font: inherit; }
+        html { scroll-behavior: smooth; }
+    </style>
     @stack('website-v2-head')
 </head>
-<body>
+<body class="ui:m-0 ui:bg-white ui:font-display ui:text-ink ui:antialiased">
     @include('theme::partials.website-v2.header', [
         'languageUrl' => $languageUrl,
         'locale' => $locale,
@@ -67,12 +69,6 @@
 
     @include('theme::partials.website-v2.footer', ['locale' => $locale])
 
-    <script
-        crossorigin="anonymous"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-    ></script>
-    <script src="{{ asset('cywise/website-v2/app.js') }}?v={{ filemtime(public_path('cywise/website-v2/app.js')) }}"></script>
     @stack('website-v2-scripts')
 </body>
 </html>

@@ -14,29 +14,64 @@ name('website.solutions.pssi');
     ]"
 >
 <main>
-<section class="page-hero page-hero-acid"><div class="container-fluid shell">
-<span class="mono">SOLUTION / PSSI</span><h1>CRÉEZ VOTRE POLITIQUE DE SÉCURITÉ.</h1><p>Créez une politique de sécurité que les équipes comprennent et utilisent.</p>
-<div class="d-flex flex-wrap gap-3 mt-4">
-<a class="btn btn-dark-brutal btn-lg" href="{{ route('register') }}">COMMENCER →</a>
-<a class="btn btn-white-brutal btn-lg" href="{{ route('website.solutions.index') }}">DÉCOUVRIR CYWISE</a>
-</div></div></section>
-<section class="section-pad"><div class="container-fluid shell"><div class="section-heading">
-<span class="mono">CE QUE VOUS OBTENEZ</span><h2>UNE SÉCURITÉ QUI RESTE CLAIRE.</h2></div>
-<div class="row g-4 mt-3"><div class="col-md-6 col-xl-4"><article class="solution-card acid-card">
-<span class="mono">01 / FONCTIONNALITÉ</span><h3>POLITIQUE STRUCTURÉE</h3><p>Construisez une PSSI claire à partir de contrôles pratiques.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card">
-<span class="mono">02 / FONCTIONNALITÉ</span><h3>CONTEXTE ENTREPRISE</h3><p>Adaptez le contenu à votre organisation.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card blue-card">
-<span class="mono">03 / FONCTIONNALITÉ</span><h3>RESPONSABILITÉ</h3><p>Attribuez des responsabilités claires.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card pink-card">
-<span class="mono">04 / FONCTIONNALITÉ</span><h3>CYCLE DE REVUE</h3><p>Gardez les politiques à jour lorsque l’entreprise évolue.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card">
-<span class="mono">05 / FONCTIONNALITÉ</span><h3>CONSEILS LISIBLES</h3><p>Utilisez un langage que les équipes opérationnelles peuvent appliquer.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card dark-card">
-<span class="mono">06 / FONCTIONNALITÉ</span><h3>ASSISTANCE CYBERBUDDY</h3><p>Posez des questions sur chaque domaine de politique.</p></article></div></div></div></section>
-<section class="detail-band"><div class="container-fluid shell"><div class="row g-0">
-<div class="col-lg-4 detail-band-title"><span class="mono">COMMENT ÇA MARCHE</span><h2>VOYEZ.<br/>PRIORISEZ.<br/>AGISSEZ.</h2></div>
-<div class="col-lg-8 detail-steps">
-<div><b>01</b><h3>Définissez votre périmètre.</h3><p>Définissez ce que Cywise doit surveiller pour votre organisation.</p></div>
-<div><b>02</b><h3>Trouvez les risques importants.</h3><p>Cywise regroupe les signaux et met en évidence les constats qui nécessitent une action.</p></div>
-<div><b>03</b><h3>Corrigez avec des conseils clairs.</h3><p>Votre équipe reçoit des actions concrètes, sans complexité inutile.</p></div>
-</div></div></div></section>
-<section class="page-cta"><div class="container-fluid shell text-center"><span class="mono">PRÊT ?</span>
-<h2>RENDEZ VOTRE SÉCURITÉ VISIBLE.</h2><a class="btn btn-dark-brutal btn-xl mt-4" href="{{ route('register') }}">COMMENCER →</a>
-</div></section></main>
+    {{-- Hero: the accent is the solution's tone (PSSI → info) --}}
+    <section class="ui:mx-auto ui:grid ui:max-w-[1240px] ui:grid-cols-1 ui:items-end ui:gap-12 ui:px-4 ui:pb-22 ui:pt-16 ui:sm:px-6 ui:lg:grid-cols-2">
+        <div>
+            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Créez votre politique de <span class="ui:text-info">sécurité.</span></x-site.display>
+            <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Créez une politique de sécurité que les équipes comprennent et utilisent.</p>
+            <div class="ui:mt-8 ui:flex ui:flex-wrap ui:gap-3">
+                <x-site.button :href="route('register')">Commencer →</x-site.button>
+                <x-site.button variant="outline" :href="route('website.solutions.index')">Découvrir Cywise</x-site.button>
+            </div>
+        </div>
+
+        {{-- Policy chapters with owner and review state (example data) --}}
+        <div class="ui:overflow-hidden ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:font-sans ui:shadow-xs" aria-hidden="true">
+            <div class="ui:px-5 ui:py-3.5 ui:font-mono ui:text-xs ui:uppercase ui:tracking-wider ui:text-slate-500">PSSI — Acme</div>
+            <ul class="ui:m-0 ui:list-none ui:p-0">
+                @foreach([['low', 'Gestion des accès', 'RSSI', 'Validé'], ['low', 'Sauvegardes', 'IT', 'Validé'], ['medium', 'Postes de travail', 'IT', 'En revue'], ['info', 'Gestion des incidents', 'DG', 'Brouillon']] as [$level, $chapter, $owner, $state])
+                    <li data-severity="{{ $level }}" class="ui:flex ui:items-center ui:gap-3 ui:border-0 ui:border-t ui:border-solid ui:border-line ui:px-5 ui:py-3.5">
+                        <span class="ui:min-w-0 ui:flex-1 ui:text-[15px] ui:font-medium">{{ $chapter }}</span>
+                        <x-ui.tag>{{ $owner }}</x-ui.tag>
+                        <x-ui.badge :level="$level">{{ $state }}</x-ui.badge>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    </section>
+
+    {{-- What you get --}}
+    <section class="ui:border-0 ui:border-y ui:border-solid ui:border-line ui:bg-canvas">
+        <div class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:py-22 ui:sm:px-6">
+            <x-site.display>Une sécurité qui reste claire.</x-site.display>
+            <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:gap-3 ui:sm:grid-cols-2">
+                @foreach([
+                    ['Politique structurée', 'Construisez une PSSI claire à partir de contrôles pratiques.'],
+                    ['Responsabilité', 'Attribuez des responsabilités claires.'],
+                    ['Cycle de revue', 'Gardez les politiques à jour lorsque l’entreprise évolue.'],
+                    ['Assistance CyberBuddy', 'Posez des questions sur chaque domaine de politique.'],
+                ] as [$title, $text])
+                    <article class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6">
+                        <h3 class="ui:m-0 ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</h3>
+                        <p class="ui:m-0 ui:mt-3 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</p>
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <x-site.steps
+        :steps="[
+            ['title' => 'Définissez votre périmètre.', 'text' => 'Définissez ce que Cywise doit surveiller pour votre organisation.'],
+            ['title' => 'Trouvez les risques importants.', 'text' => 'Cywise regroupe les signaux et met en évidence les constats qui nécessitent une action.'],
+            ['title' => 'Corrigez avec des conseils clairs.', 'text' => 'Votre équipe reçoit des actions concrètes, sans complexité inutile.'],
+        ]"
+    >
+        <x-slot:title>Voyez.<br>Priorisez.<br><span class="ui:text-brand-500">Agissez.</span></x-slot:title>
+    </x-site.steps>
+
+    <x-site.cta :href="route('register')" label="Commencer →">
+        <x-slot:title>Rendez votre<br>sécurité visible.</x-slot:title>
+    </x-site.cta>
+</main>
 </x-layouts.website-v2>

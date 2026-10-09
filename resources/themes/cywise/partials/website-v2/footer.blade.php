@@ -2,56 +2,54 @@
     $isEnglish = $locale === 'en';
     $homeRoute = $isEnglish ? 'website.en.home' : 'home';
     $routePrefix = $isEnglish ? 'website.en.' : 'website.';
-    $logoPath = 'cywise/website-v2/assets/cywise-logo-riso.png';
+
+    $columns = [
+        'Solutions' => [
+            [$isEnglish ? 'Attack surface' : 'Surface d’attaque', route($routePrefix . 'solutions.attack-surface')],
+            [$isEnglish ? 'Vulnerabilities' : 'Vulnérabilités', route($routePrefix . 'solutions.vulnerability-management')],
+            ['CyberBuddy', route($routePrefix . 'solutions.cyberbuddy')],
+            ['Pentest', route($routePrefix . 'solutions.pentest')],
+        ],
+        ($isEnglish ? 'For whom' : 'Pour qui') => [
+            [$isEnglish ? 'SMBs' : 'PME', route($routePrefix . 'audiences.smbs')],
+            [$isEnglish ? 'IT teams' : 'Équipes IT', route($routePrefix . 'audiences.it-teams')],
+            [$isEnglish ? 'CISOs' : 'RSSI', route($routePrefix . 'audiences.cisos')],
+            ['MSP', route($routePrefix . 'audiences.msps')],
+        ],
+        ($isEnglish ? 'Resources' : 'Ressources') => [
+            ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
+            [$isEnglish ? 'Use cases' : 'Cas d’usage', route($routePrefix . 'use-cases.index')],
+            [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
+        ],
+        'Cywise' => [
+            [$isEnglish ? 'Home' : 'Accueil', route($homeRoute)],
+            ['Contact', route($homeRoute) . '#cta'],
+            [$isEnglish ? 'Privacy' : 'Confidentialité', route('privacy-policy')],
+        ],
+    ];
 @endphp
 
-<footer>
-    <div class="container-fluid shell">
-        <div class="footer-top">
-            <a class="site-brand-lockup footer-brand-lockup" href="{{ route($homeRoute) }}">
-                <span class="cw-logo-frame footer-logo-frame">
-                    <img
-                        alt="Cywise"
-                        class="cw-logo footer-logo"
-                        src="{{ asset($logoPath) }}?v={{ filemtime(public_path($logoPath)) }}"
-                    >
-                </span>
-            </a>
-            <div class="mono">{{ $isEnglish ? 'CYBERSECURITY FOR EVERYONE.' : 'LA CYBERSÉCURITÉ POUR TOUS.' }}</div>
+<footer class="ui:bg-ink ui:text-slate-200">
+    <div class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:pb-8 ui:pt-16 ui:sm:px-6">
+        <div class="ui:grid ui:grid-cols-2 ui:gap-10 ui:md:grid-cols-6">
+            <div class="ui:col-span-2">
+                <a href="{{ route($homeRoute) }}" class="ui:font-display ui:text-[40px] ui:font-black ui:tracking-tight ui:text-white! ui:no-underline! ui:font-stretch-125%">CYWISE</a>
+                <p class="ui:m-0 ui:mt-3 ui:font-display ui:text-xl ui:font-extrabold ui:uppercase ui:leading-tight ui:text-brand-500 ui:font-stretch-112%">
+                    {{ $isEnglish ? 'Cybersecurity for everyone.' : 'La cybersécurité pour tous.' }}
+                </p>
+            </div>
+            @foreach($columns as $title => $items)
+                <div class="ui:flex ui:flex-col ui:gap-2.5 ui:text-[15px]">
+                    <span class="ui:font-mono ui:text-xs ui:uppercase ui:tracking-widest ui:text-slate-500">{{ $title }}</span>
+                    @foreach($items as [$label, $url])
+                        <a href="{{ $url }}" class="ui:text-slate-300! ui:no-underline! ui:hover:text-white!">{{ $label }}</a>
+                    @endforeach
+                </div>
+            @endforeach
         </div>
-
-        <div class="footer-grid">
-            <div>
-                <strong>{{ $isEnglish ? 'SOLUTIONS' : 'SOLUTIONS' }}</strong>
-                <a href="{{ route($routePrefix . 'solutions.attack-surface') }}">{{ $isEnglish ? 'Attack surface' : 'Surface d’attaque' }}</a>
-                <a href="{{ route($routePrefix . 'solutions.vulnerability-management') }}">{{ $isEnglish ? 'Vulnerabilities' : 'Vulnérabilités' }}</a>
-                <a href="{{ route($routePrefix . 'solutions.cyberbuddy') }}">CyberBuddy</a>
-                <a href="{{ route($routePrefix . 'solutions.pentest') }}">Pentest</a>
-            </div>
-            <div>
-                <strong>{{ $isEnglish ? 'FOR WHOM' : 'POUR QUI' }}</strong>
-                <a href="{{ route($routePrefix . 'audiences.smbs') }}">{{ $isEnglish ? 'SMBs' : 'PME' }}</a>
-                <a href="{{ route($routePrefix . 'audiences.it-teams') }}">{{ $isEnglish ? 'IT teams' : 'Équipes IT' }}</a>
-                <a href="{{ route($routePrefix . 'audiences.cisos') }}">{{ $isEnglish ? 'CISOs' : 'RSSI' }}</a>
-                <a href="{{ route($routePrefix . 'audiences.msps') }}">MSP</a>
-            </div>
-            <div>
-                <strong>{{ $isEnglish ? 'RESOURCES' : 'RESSOURCES' }}</strong>
-                <a href="{{ route($isEnglish ? 'blog.en' : 'blog') }}">Blog</a>
-                <a href="{{ route($routePrefix . 'use-cases.index') }}">{{ $isEnglish ? 'Use cases' : 'Cas d’usage' }}</a>
-                <a href="{{ route($isEnglish ? 'website.en.pricing' : 'pricing') }}">{{ $isEnglish ? 'Pricing' : 'Tarifs' }}</a>
-            </div>
-            <div>
-                <strong>CYWISE</strong>
-                <a href="{{ route($homeRoute) }}">{{ $isEnglish ? 'Home' : 'Accueil' }}</a>
-                <a href="{{ route($homeRoute) }}#cta">Contact</a>
-                <a href="{{ route('privacy-policy') }}">{{ $isEnglish ? 'Privacy' : 'Confidentialité' }}</a>
-            </div>
-        </div>
-
-        <div class="footer-bottom mono">
-            <span>© {{ now()->year }} CYWISE</span>
-            <span>CYWISE / {{ $isEnglish ? 'CYBERSECURITY FOR EVERYONE' : 'LA CYBERSÉCURITÉ POUR TOUS' }}</span>
+        <div class="ui:mt-14 ui:border-0 ui:border-t ui:border-solid ui:border-slate-800 ui:pt-5 ui:font-mono ui:text-xs ui:tracking-wider ui:text-slate-500">
+            © {{ now()->year }} CYWISE
         </div>
     </div>
+    <x-site.strip reverse/>
 </footer>

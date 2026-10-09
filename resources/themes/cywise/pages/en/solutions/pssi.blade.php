@@ -14,29 +14,64 @@ name('website.en.solutions.pssi');
     ]"
 >
 <main>
-<section class="page-hero page-hero-acid"><div class="container-fluid shell">
-<span class="mono">SOLUTION / PSSI</span><h1>BUILD YOUR SECURITY POLICY.</h1><p>Create a security policy that teams can understand and use.</p>
-<div class="d-flex flex-wrap gap-3 mt-4">
-<a class="btn btn-dark-brutal btn-lg" href="{{ route('register') }}">START PROTECTING →</a>
-<a class="btn btn-white-brutal btn-lg" href="{{ route('website.en.solutions.index') }}">EXPLORE CYWISE</a>
-</div></div></section>
-<section class="section-pad"><div class="container-fluid shell"><div class="section-heading">
-<span class="mono">WHAT YOU GET</span><h2>SECURITY THAT STAYS CLEAR.</h2></div>
-<div class="row g-4 mt-3"><div class="col-md-6 col-xl-4"><article class="solution-card acid-card">
-<span class="mono">01 / FEATURE</span><h3>STRUCTURED POLICY</h3><p>Build a clear PSSI from practical security controls.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card">
-<span class="mono">02 / FEATURE</span><h3>COMPANY CONTEXT</h3><p>Adapt content to your organization.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card blue-card">
-<span class="mono">03 / FEATURE</span><h3>OWNERSHIP</h3><p>Assign clear responsibilities.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card pink-card">
-<span class="mono">04 / FEATURE</span><h3>REVIEW CYCLE</h3><p>Keep policies current as the company changes.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card">
-<span class="mono">05 / FEATURE</span><h3>READABLE GUIDANCE</h3><p>Use language that operational teams can apply.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card dark-card">
-<span class="mono">06 / FEATURE</span><h3>CYBERBUDDY SUPPORT</h3><p>Ask questions about each policy area.</p></article></div></div></div></section>
-<section class="detail-band"><div class="container-fluid shell"><div class="row g-0">
-<div class="col-lg-4 detail-band-title"><span class="mono">HOW IT WORKS</span><h2>SEE.<br/>PRIORITIZE.<br/>ACT.</h2></div>
-<div class="col-lg-8 detail-steps">
-<div><b>01</b><h3>Connect your scope.</h3><p>Define what Cywise must monitor for your organization.</p></div>
-<div><b>02</b><h3>Find the important risks.</h3><p>Cywise groups signals and highlights the findings that need action.</p></div>
-<div><b>03</b><h3>Fix with clear guidance.</h3><p>Your team gets direct actions without unnecessary security complexity.</p></div>
-</div></div></div></section>
-<section class="page-cta"><div class="container-fluid shell text-center"><span class="mono">READY?</span>
-<h2>MAKE YOUR SECURITY VISIBLE.</h2><a class="btn btn-dark-brutal btn-xl mt-4" href="{{ route('register') }}">START PROTECTING →</a>
-</div></section></main>
+    {{-- Hero: the accent is the solution's tone (PSSI → info) --}}
+    <section class="ui:mx-auto ui:grid ui:max-w-[1240px] ui:grid-cols-1 ui:items-end ui:gap-12 ui:px-4 ui:pb-22 ui:pt-16 ui:sm:px-6 ui:lg:grid-cols-2">
+        <div>
+            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Build your security <span class="ui:text-info">policy.</span></x-site.display>
+            <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Create a security policy that teams can understand and use.</p>
+            <div class="ui:mt-8 ui:flex ui:flex-wrap ui:gap-3">
+                <x-site.button :href="route('register')">Start protecting →</x-site.button>
+                <x-site.button variant="outline" :href="route('website.en.solutions.index')">Explore Cywise</x-site.button>
+            </div>
+        </div>
+
+        {{-- Policy chapters with owner and review state (example data) --}}
+        <div class="ui:overflow-hidden ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:font-sans ui:shadow-xs" aria-hidden="true">
+            <div class="ui:px-5 ui:py-3.5 ui:font-mono ui:text-xs ui:uppercase ui:tracking-wider ui:text-slate-500">PSSI — Acme</div>
+            <ul class="ui:m-0 ui:list-none ui:p-0">
+                @foreach([['low', 'Access management', 'CISO', 'Approved'], ['low', 'Backups', 'IT', 'Approved'], ['medium', 'Workstations', 'IT', 'In review'], ['info', 'Incident response', 'CEO', 'Draft']] as [$level, $chapter, $owner, $state])
+                    <li data-severity="{{ $level }}" class="ui:flex ui:items-center ui:gap-3 ui:border-0 ui:border-t ui:border-solid ui:border-line ui:px-5 ui:py-3.5">
+                        <span class="ui:min-w-0 ui:flex-1 ui:text-[15px] ui:font-medium">{{ $chapter }}</span>
+                        <x-ui.tag>{{ $owner }}</x-ui.tag>
+                        <x-ui.badge :level="$level">{{ $state }}</x-ui.badge>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    </section>
+
+    {{-- What you get --}}
+    <section class="ui:border-0 ui:border-y ui:border-solid ui:border-line ui:bg-canvas">
+        <div class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:py-22 ui:sm:px-6">
+            <x-site.display>Security that stays clear.</x-site.display>
+            <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:gap-3 ui:sm:grid-cols-2">
+                @foreach([
+                    ['Structured policy', 'Build a clear PSSI from practical security controls.'],
+                    ['Ownership', 'Assign clear responsibilities.'],
+                    ['Review cycle', 'Keep policies current as the company changes.'],
+                    ['CyberBuddy support', 'Ask questions about each policy area.'],
+                ] as [$title, $text])
+                    <article class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6">
+                        <h3 class="ui:m-0 ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</h3>
+                        <p class="ui:m-0 ui:mt-3 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</p>
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <x-site.steps
+        :steps="[
+            ['title' => 'Connect your scope.', 'text' => 'Define what Cywise must monitor for your organization.'],
+            ['title' => 'Find the important risks.', 'text' => 'Cywise groups signals and highlights the findings that need action.'],
+            ['title' => 'Fix with clear guidance.', 'text' => 'Your team gets direct actions without unnecessary security complexity.'],
+        ]"
+    >
+        <x-slot:title>See.<br>Prioritize.<br><span class="ui:text-brand-500">Act.</span></x-slot:title>
+    </x-site.steps>
+
+    <x-site.cta :href="route('register')" label="Start protecting →">
+        <x-slot:title>Make your<br>security visible.</x-slot:title>
+    </x-site.cta>
+</main>
 </x-layouts.website-v2>

@@ -14,29 +14,60 @@ name('website.solutions.credential-monitoring');
     ]"
 >
 <main>
-<section class="page-hero page-hero-blue"><div class="container-fluid shell">
-<span class="mono">SOLUTION / IDENTIFIANTS</span><h1>SACHEZ CE QUI A FUITÉ.</h1><p>Détectez les identifiants compromis avant que les attaquants ne les utilisent.</p>
-<div class="d-flex flex-wrap gap-3 mt-4">
-<a class="btn btn-dark-brutal btn-lg" href="{{ route('register') }}">COMMENCER →</a>
-<a class="btn btn-white-brutal btn-lg" href="{{ route('website.solutions.index') }}">DÉCOUVRIR CYWISE</a>
-</div></div></section>
-<section class="section-pad"><div class="container-fluid shell"><div class="section-heading">
-<span class="mono">CE QUE VOUS OBTENEZ</span><h2>UNE SÉCURITÉ QUI RESTE CLAIRE.</h2></div>
-<div class="row g-4 mt-3"><div class="col-md-6 col-xl-4"><article class="solution-card acid-card">
-<span class="mono">01 / FONCTIONNALITÉ</span><h3>DÉTECTION DES FUITES</h3><p>Trouvez les identifiants exposés liés aux comptes de l’entreprise.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card">
-<span class="mono">02 / FONCTIONNALITÉ</span><h3>COUVERTURE DES DOMAINES</h3><p>Surveillez les comptes liés à vos domaines.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card blue-card">
-<span class="mono">03 / FONCTIONNALITÉ</span><h3>CONSEILS D’ACTION</h3><p>Sachez quel mot de passe ou compte traiter en premier.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card pink-card">
-<span class="mono">04 / FONCTIONNALITÉ</span><h3>CONTRÔLES CONTINUS</h3><p>Continuez la surveillance après le premier nettoyage.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card">
-<span class="mono">05 / FONCTIONNALITÉ</span><h3>ALERTES ÉQUIPE</h3><p>Faites remonter rapidement les nouveaux constats critiques.</p></article></div><div class="col-md-6 col-xl-4"><article class="solution-card dark-card">
-<span class="mono">06 / FONCTIONNALITÉ</span><h3>VUE CENTRALE</h3><p>Regroupez l’exposition des identifiants avec vos autres risques de sécurité.</p></article></div></div></div></section>
-<section class="detail-band"><div class="container-fluid shell"><div class="row g-0">
-<div class="col-lg-4 detail-band-title"><span class="mono">COMMENT ÇA MARCHE</span><h2>VOYEZ.<br/>PRIORISEZ.<br/>AGISSEZ.</h2></div>
-<div class="col-lg-8 detail-steps">
-<div><b>01</b><h3>Définissez votre périmètre.</h3><p>Définissez ce que Cywise doit surveiller pour votre organisation.</p></div>
-<div><b>02</b><h3>Trouvez les risques importants.</h3><p>Cywise regroupe les signaux et met en évidence les constats qui nécessitent une action.</p></div>
-<div><b>03</b><h3>Corrigez avec des conseils clairs.</h3><p>Votre équipe reçoit des actions concrètes, sans complexité inutile.</p></div>
-</div></div></div></section>
-<section class="page-cta"><div class="container-fluid shell text-center"><span class="mono">PRÊT ?</span>
-<h2>RENDEZ VOTRE SÉCURITÉ VISIBLE.</h2><a class="btn btn-dark-brutal btn-xl mt-4" href="{{ route('register') }}">COMMENCER →</a>
-</div></section></main>
+    {{-- Hero: the accent is the solution's tone (credentials → low, marker for contrast) --}}
+    <section class="ui:mx-auto ui:grid ui:max-w-[1240px] ui:grid-cols-1 ui:items-end ui:gap-12 ui:px-4 ui:pb-22 ui:pt-16 ui:sm:px-6 ui:lg:grid-cols-2">
+        <div>
+            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Sachez ce qui a <span class="ui:bg-low ui:px-[0.06em] ui:box-decoration-clone">fuité.</span></x-site.display>
+            <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Détectez les identifiants compromis avant que les attaquants ne les utilisent.</p>
+            <div class="ui:mt-8 ui:flex ui:flex-wrap ui:gap-3">
+                <x-site.button :href="route('register')">Commencer →</x-site.button>
+                <x-site.button variant="outline" :href="route('website.solutions.index')">Découvrir Cywise</x-site.button>
+            </div>
+        </div>
+
+        {{-- Leaked accounts, as in the app (example data) --}}
+        <ul class="ui:m-0 ui:list-none ui:overflow-hidden ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-0 ui:font-sans ui:shadow-xs" aria-hidden="true">
+            @foreach([['critical', 'j.martin@acme.fr', 'Mot de passe exposé'], ['medium', 'compta@acme.fr', 'À vérifier'], ['low', 's.durand@acme.fr', 'Réinitialisé'], ['low', 'rh@acme.fr', 'Réinitialisé']] as [$level, $account, $state])
+                <li data-severity="{{ $level }}" class="ui:flex ui:items-center ui:gap-3 ui:px-5 ui:py-3.5 {{ $loop->first ? '' : 'ui:border-0 ui:border-t ui:border-solid ui:border-line' }}">
+                    <span class="ui:min-w-0 ui:flex-1 ui:truncate ui:font-mono ui:text-sm">{{ $account }}</span>
+                    <x-ui.badge :level="$level">{{ $state }}</x-ui.badge>
+                </li>
+            @endforeach
+        </ul>
+    </section>
+
+    {{-- What you get --}}
+    <section class="ui:border-0 ui:border-y ui:border-solid ui:border-line ui:bg-canvas">
+        <div class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:py-22 ui:sm:px-6">
+            <x-site.display>Une sécurité qui reste claire.</x-site.display>
+            <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:gap-3 ui:sm:grid-cols-2">
+                @foreach([
+                    ['Détection des fuites', 'Trouvez les identifiants exposés liés aux comptes de l’entreprise.'],
+                    ['Couverture des domaines', 'Surveillez les comptes liés à vos domaines.'],
+                    ['Conseils d’action', 'Sachez quel mot de passe ou compte traiter en premier.'],
+                    ['Alertes équipe', 'Faites remonter rapidement les nouveaux constats critiques.'],
+                ] as [$title, $text])
+                    <article class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6">
+                        <h3 class="ui:m-0 ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</h3>
+                        <p class="ui:m-0 ui:mt-3 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</p>
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <x-site.steps
+        :steps="[
+            ['title' => 'Définissez votre périmètre.', 'text' => 'Définissez ce que Cywise doit surveiller pour votre organisation.'],
+            ['title' => 'Trouvez les risques importants.', 'text' => 'Cywise regroupe les signaux et met en évidence les constats qui nécessitent une action.'],
+            ['title' => 'Corrigez avec des conseils clairs.', 'text' => 'Votre équipe reçoit des actions concrètes, sans complexité inutile.'],
+        ]"
+    >
+        <x-slot:title>Voyez.<br>Priorisez.<br><span class="ui:text-brand-500">Agissez.</span></x-slot:title>
+    </x-site.steps>
+
+    <x-site.cta :href="route('register')" label="Commencer →">
+        <x-slot:title>Rendez votre<br>sécurité visible.</x-slot:title>
+    </x-site.cta>
+</main>
 </x-layouts.website-v2>

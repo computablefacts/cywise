@@ -13,13 +13,31 @@ name('website.solutions.index');
         'description' => 'Choisissez la capacité de sécurité adaptée à votre besoin actuel.',
     ]"
 >
-<main><section class="page-hero page-hero-acid"><div class="container-fluid shell"><span class="mono">SOLUTIONS</span>
-<h1>UNE PLATEFORME. PLUSIEURS DÉFENSES.</h1><p>Choisissez la capacité de sécurité adaptée à votre besoin actuel.</p></div></section>
-<section class="section-pad"><div class="container-fluid shell"><div class="row g-4"><div class="col-md-6 col-xl-4"><a class="solution-card acid-card" href="{{ route('website.solutions.attack-surface') }}">
-<span class="mono">01</span><h3>SURFACE D’ATTAQUE</h3><p>Visualisez les domaines, services et actifs publics.</p><b>DÉCOUVRIR →</b></a></div><div class="col-md-6 col-xl-4"><a class="solution-card" href="{{ route('website.solutions.vulnerability-management') }}">
-<span class="mono">02</span><h3>GESTION DES VULNÉRABILITÉS</h3><p>Détectez et priorisez les faiblesses.</p><b>DÉCOUVRIR →</b></a></div><div class="col-md-6 col-xl-4"><a class="solution-card blue-card" href="{{ route('website.solutions.credential-monitoring') }}">
-<span class="mono">03</span><h3>SURVEILLANCE DES IDENTIFIANTS</h3><p>Détectez les identifiants compromis de l’entreprise.</p><b>DÉCOUVRIR →</b></a></div><div class="col-md-6 col-xl-4"><a class="solution-card pink-card" href="{{ route('website.solutions.cyberbuddy') }}">
-<span class="mono">04</span><h3>CYBERBUDDY</h3><p>Posez vos questions de sécurité dans le contexte de votre entreprise.</p><b>DÉCOUVRIR →</b></a></div><div class="col-md-6 col-xl-4"><a class="solution-card" href="{{ route('website.solutions.pssi') }}">
-<span class="mono">05</span><h3>PSSI</h3><p>Créez une politique de sécurité réellement applicable.</p><b>DÉCOUVRIR →</b></a></div><div class="col-md-6 col-xl-4"><a class="solution-card dark-card" href="{{ route('website.solutions.pentest') }}">
-<span class="mono">06</span><h3>PENTEST</h3><p>Faites tester les systèmes critiques par des experts.</p><b>DÉCOUVRIR →</b></a></div></div></div></section></main>
+<main>
+    {{-- Hero --}}
+    <section class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:pb-12 ui:pt-16 ui:sm:px-6">
+        <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Une plateforme.<br><span class="ui:text-slate-400">Plusieurs défenses.</span></x-site.display>
+        <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Choisissez la capacité de sécurité adaptée à votre besoin actuel.</p>
+    </section>
+
+    {{-- Solutions: each keeps its tone everywhere on the site (see site/edge-card) --}}
+    <section class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:pb-24 ui:sm:px-6">
+        <div class="ui:grid ui:grid-cols-1 ui:gap-3 ui:md:grid-cols-2 ui:xl:grid-cols-3">
+            @foreach([
+                ['critical', 'Surface d’attaque', 'Visualisez les domaines, services et actifs publics.', 'website.solutions.attack-surface'],
+                ['medium', 'Gestion des vulnérabilités', 'Détectez et priorisez les faiblesses.', 'website.solutions.vulnerability-management'],
+                ['low', 'Surveillance des identifiants', 'Détectez les identifiants compromis de l’entreprise.', 'website.solutions.credential-monitoring'],
+                ['brand', 'CyberBuddy', 'Posez vos questions de sécurité dans le contexte de votre entreprise.', 'website.solutions.cyberbuddy'],
+                ['info', 'PSSI', 'Créez une politique de sécurité réellement applicable.', 'website.solutions.pssi'],
+                ['ink', 'Pentest', 'Faites tester les systèmes critiques par des experts.', 'website.solutions.pentest'],
+            ] as [$tone, $title, $text, $route])
+                <x-site.edge-card :tone="$tone" :href="route($route)">
+                    <span class="ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</span>
+                    <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
+                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase ui:group-hover:text-brand-700">Découvrir →</span>
+                </x-site.edge-card>
+            @endforeach
+        </div>
+    </section>
+</main>
 </x-layouts.website-v2>

@@ -24,42 +24,41 @@ render(function (View $view, BlogContent $content, Category $category, Post $pos
     ]"
 >
     <main>
-        <section class="blogpost-hero">
-            <div class="container-fluid shell">
-                <a class="mono blog-back" href="{{ route('blog.en') }}">← BACK TO THE BLOG</a>
-                <div class="mono blogpost-kicker">{{ $category->name }} / {{ $readingMinutes }} MIN</div>
-                <h1>{{ $post->title }}</h1>
+        <article class="ui:mx-auto ui:max-w-[880px] ui:px-4 ui:pb-24 ui:pt-12 ui:sm:px-6">
+            <header>
+                <div class="ui:flex ui:flex-wrap ui:items-center ui:justify-between ui:gap-4 ui:font-mono ui:text-[13px] ui:uppercase">
+                    <a class="ui:text-slate-600! ui:no-underline! ui:hover:text-ink!" href="{{ route('blog.en') }}">← Back to the blog</a>
+                    <a class="ui:text-brand-700! ui:no-underline! ui:hover:text-ink!" href="{{ route('blog.en.category', ['category' => $category]) }}">{{ $category->name }}</a>
+                </div>
+
+                <x-site.display as="h1" class="ui:mt-8 ui:text-[clamp(28px,4.4vw,60px)]!">{{ $post->title }}</x-site.display>
 
                 @if ($post->excerpt)
-                    <p class="blogpost-lead">{{ $post->excerpt }}</p>
+                    <p class="ui:m-0 ui:mt-6 ui:max-w-[720px] ui:text-[22px] ui:leading-normal ui:text-slate-700">{{ $post->excerpt }}</p>
                 @endif
 
-                <div class="blogpost-meta mono">
+                {{-- Meta row on a thin ink rule: author · date · reading time --}}
+                <p class="ui:m-0 ui:mt-10 ui:flex ui:flex-wrap ui:gap-x-3 ui:gap-y-1 ui:border-0 ui:border-b ui:border-solid ui:border-ink ui:pb-4 ui:font-mono ui:text-[13px] ui:uppercase ui:text-slate-600">
                     <span>{{ $post->user->name }}</span>
+                    <span aria-hidden="true">·</span>
                     <span>{{ $post->created_at->format('Y.m.d') }}</span>
-                    <span>{{ $readingMinutes }} MIN</span>
-                </div>
-            </div>
-        </section>
+                    <span aria-hidden="true">·</span>
+                    <span>{{ $readingMinutes }} min</span>
+                </p>
+            </header>
 
-        <section class="blogpost-body section-pad">
-            <div class="container-fluid shell">
-                @if ($post->image())
-                    <img class="blogpost-image" src="{{ $post->image() }}" alt="{{ $post->title }}">
-                @endif
+            @if ($post->image())
+                <img class="ui:mt-10 ui:h-auto ui:w-full ui:rounded-3xl" src="{{ $post->image() }}" alt="{{ $post->title }}">
+            @endif
 
-                <article class="blogpost-article">
-                    {!! $post->body !!}
-                </article>
-            </div>
-        </section>
+            {{-- Body: HTML from the DB, styled through descendant selectors --}}
+            <x-site.prose class="ui:mt-12">
+                {!! $post->body !!}
+            </x-site.prose>
+        </article>
 
-        <section class="blogpost-cta">
-            <div class="container-fluid shell text-center">
-                <span class="mono">CYWISE / NEXT STEP</span>
-                <h2>SEE YOUR EXPOSURE BEFORE ATTACKERS DO.</h2>
-                <a class="btn btn-dark-brutal btn-xl mt-4" href="{{ route('register') }}">START FOR FREE →</a>
-            </div>
-        </section>
+        <x-site.cta tone="dark" :href="route('register')" label="Start for free →">
+            <x-slot:title>See your exposure before attackers do.</x-slot:title>
+        </x-site.cta>
     </main>
 </x-layouts.website-v2>

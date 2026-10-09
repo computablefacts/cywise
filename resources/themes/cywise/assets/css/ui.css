@@ -24,6 +24,10 @@
 @theme static {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
+  /* Website only: fonts loaded by layouts/website-v2 (the app falls back to the stack) */
+  --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
   /* Brand: action, accent */
   --color-brand-50: #fff7ed;
   --color-brand-100: #ffedd5;
