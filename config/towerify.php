@@ -27,6 +27,8 @@ return [
     'ossec' => [
         'pilot_policy_uid' => env('OSSEC_PILOT_POLICY_UID', 'cywise_ossec_unix'),
     ],
+    // See App\Enums\WebsiteUiEnum
+    'website_ui' => env('WEBSITE_UI', 'legacy'),
     'cyberbuddy' => [
         'api' => env('CB_API'),
         'api_username' => env('CB_API_USERNAME'),

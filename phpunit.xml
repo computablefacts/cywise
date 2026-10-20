@@ -32,6 +32,7 @@
         <env name="DROP_SCAN_EVENTS_AFTER_X_MINUTES" value="1"/>
         <env name="DROP_DISCOVERY_EVENTS_AFTER_X_MINUTES" value="1"/>
         <env name="DAYS_BETWEEN_SCANS" value="5"/>
+        <env name="WEBSITE_UI" value="redesign"/>
     </php>
     <source>
         <include>

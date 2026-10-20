@@ -12,6 +12,7 @@
 */
 
 use App\Enums\OsqueryPlatformEnum;
+use App\Enums\WebsiteUiEnum;
 use App\Events\RebuildLatestEventsCache;
 use App\Events\RebuildPackagesList;
 use App\Helpers\SshKeyPair;
@@ -489,7 +490,20 @@ Route::post('/files/one', '\App\Http\Controllers\CyberBuddyController@uploadOneF
 
 Route::post('/files/many', '\App\Http\Controllers\CyberBuddyController@uploadManyFiles')->middleware('auth:sanctum');
 
-// Backward compatibility for the former iframe-based landing page.
-Route::redirect('/website', '/')->name('iframes.website');
+if (WebsiteUiEnum::current() === WebsiteUiEnum::LEGACY) {
+
+    // Former public website: iframe-based landing page and changelog.
+    Route::view('/website', 'theme::iframes.website')->name('iframes.website');
+    Route::view('/changelog', 'theme::iframes.changelog');
+
+    // Redesign-only sections stay hidden, e.g. /solutions, /en/pricing.
+    Route::any('/{section}/{path?}', fn() => abort(404))
+        ->where('section', 'en|for-whom|solutions|use-cases')
+        ->where('path', '.*');
+} else {
+
+    // Backward compatibility for the former iframe-based landing page.
+    Route::redirect('/website', '/')->name('iframes.website');
+}
 
 Route::get('/changelog2', [ChangelogController2::class, '__invoke'])->name('iframes.changelog2');

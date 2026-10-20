@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\WebsiteUiEnum;
 use App\Listeners\LogSuccessfulLogin;
 use App\Listeners\LogSuccessfulLogout;
 use App\Listeners\SamlEventSubscriber;
@@ -51,6 +52,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Folio\Folio;
@@ -80,6 +82,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('cb_api_utils', function () {
             return new \App\Helpers\ApiUtils();
         });
+
+        $this->app->booting(fn() => $this->mountLegacyWebsite());
     }
 
     /**
@@ -169,6 +173,21 @@ class AppServiceProvider extends ServiceProvider
         $this->loadViewsFrom($themePath, 'theme');
         Blade::anonymousComponentPath($themePath . '/components');
         Folio::path($themePath . '/pages');
+    }
+
+    // Prod keeps the former public website until the redesign ships: its
+    // views and pages shadow the redesigned ones. The first Folio path wins,
+    // hence before any provider boots (devdojo/themes mounts theme pages).
+    private function mountLegacyWebsite(): void
+    {
+        if (WebsiteUiEnum::current() !== WebsiteUiEnum::LEGACY) {
+            return;
+        }
+
+        $legacyPath = resource_path('themes/cywise/legacy');
+
+        View::prependNamespace('theme', $legacyPath);
+        Folio::path($legacyPath . '/pages');
     }
 
     private function setSchemaDefaultLength(): void
