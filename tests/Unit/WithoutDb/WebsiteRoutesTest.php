@@ -139,4 +139,6 @@ it('renders public website pages', function (string $path) {
     '/en/use-cases',
     '/pricing',
     '/en/pricing',
+    '/la-societe',
+    '/en/company',
 ]);

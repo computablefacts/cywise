@@ -23,6 +23,7 @@
         ],
         'Cywise' => [
             [$isEnglish ? 'Home' : 'Accueil', route($homeRoute)],
+            [$isEnglish ? 'Company' : 'La société', route($routePrefix . 'company')],
             ['Contact', route($homeRoute) . '#cta'],
             [$isEnglish ? 'Privacy' : 'Confidentialité', route('privacy-policy')],
         ],

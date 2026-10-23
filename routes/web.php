@@ -498,7 +498,7 @@ if (WebsiteUiEnum::current() === WebsiteUiEnum::LEGACY) {
 
     // Redesign-only sections stay hidden, e.g. /solutions, /en/pricing.
     Route::any('/{section}/{path?}', fn() => abort(404))
-        ->where('section', 'en|for-whom|solutions|use-cases')
+        ->where('section', 'en|for-whom|la-societe|solutions|use-cases')
         ->where('path', '.*');
 } else {
 

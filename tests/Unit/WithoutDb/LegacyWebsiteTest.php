@@ -49,4 +49,5 @@ it('hides redesign-only sections', function (string $path) {
     '/solutions/pentest',
     '/for-whom',
     '/use-cases',
+    '/la-societe',
 ]);
