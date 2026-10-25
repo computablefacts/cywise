@@ -19,7 +19,7 @@
         ($isEnglish ? 'Use cases' : 'Cas d’usages') => [
             [$isEnglish ? 'Attack surface' : 'Surveiller votre surface d’attaque', route($routePrefix . 'use-cases.monitor-attack-surface')],
             [$isEnglish ? 'Vulnerabilities' : 'Détecter vos vulnérabilités', route($routePrefix . 'use-cases.find-vulnerabilities')],
-            [$isEnglish ? 'Credentials' : 'Vérifier vos identifiants', route($routePrefix . 'use-cases.check-leaked-credentials')],
+            [$isEnglish ? 'Credentials' : 'Rechercher vos identifiants compromis', route($routePrefix . 'use-cases.check-leaked-credentials')],
             [$isEnglish ? 'Audit' : 'Préparer votre audit', route($routePrefix . 'use-cases.prepare-audit')],
             [$isEnglish ? 'Pentest' : 'Lancer un pentest expert', route($routePrefix . 'use-cases.run-pentest')],
         ],

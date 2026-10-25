@@ -9,7 +9,7 @@
     $cases = [
         ['ui:bg-medium', $t('Trouver vos vulnérabilités', 'Find vulnerabilities'), $t('Détectez et priorisez vos failles de sécurité.', 'Discover and prioritize weaknesses.'), 'use-cases.find-vulnerabilities'],
         ['ui:bg-critical', $t('Surveiller votre surface d’attaque', 'Monitor attack surface'), $t('Maîtrisez votre exposition externe en continu.', 'Track public exposure over time.'), 'use-cases.monitor-attack-surface'],
-        ['ui:bg-low', $t('Vérifier vos identifiants compromis', 'Check leaked credentials'), $t('Identifiez vos données collaborateurs exposées.', 'Detect compromised company identities.'), 'use-cases.check-leaked-credentials'],
+        ['ui:bg-low', $t('Rechercher vos identifiants compromis', 'Check leaked credentials'), $t('Identifiez vos données collaborateurs exposées.', 'Detect compromised company identities.'), 'use-cases.check-leaked-credentials'],
         ['ui:bg-line', $t('Préparer votre audit', 'Prepare for an audit'), $t('Centralisez vos preuves de sécurité et corrigez vos écarts.', 'Organize security evidence and gaps.'), 'use-cases.prepare-audit'],
         ['ui:bg-ink', $t('Lancer un pentest expert', 'Run a pentest'), $t('Évaluez vos systèmes critiques avec nos experts.', 'Challenge critical systems with experts.'), 'use-cases.run-pentest'],
     ];
