@@ -20,3 +20,10 @@ Status: completed
 Requirement: Improve the discovery logic to handle environments where directory listing is disabled.
 Test: Verify items are loaded even if `fetch('items/')` returns a 404/403 but files exist.
 Commit: 9b2d8e4
+
+## ITEM-008-S04: Remove Items label
+
+Status: approved
+Requirement: Remove the "Items" label above the list in the sidebar.
+Test: Visual check that the label is no longer visible.
+Commit: -

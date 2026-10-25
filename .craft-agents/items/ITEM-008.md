@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: 1.x
 - Branch: item/ITEM-008
-- Status: in_progress
+- Status: ready_to_merge
 
 ## Description
 
@@ -13,5 +13,6 @@ The previous plan to add a refresh button and auto-refresh was rejected by the u
 ## Acceptance
 
 - [x] The items list is correctly populated from existing files in the items/ directory.
-- [ ] No manual refresh button is present.
-- [ ] No automatic refresh timer is active.
+- [x] No manual refresh button is present.
+- [x] No automatic refresh timer is active.
+- [ ] The "Items" label above the list is removed.

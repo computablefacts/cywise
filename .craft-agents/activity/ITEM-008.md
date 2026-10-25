@@ -29,3 +29,10 @@
 - 2026-10-25T20:35Z | Junie | I008-S01 | updated | completed → dropped
 - 2026-10-25T20:35Z | Junie | I008-S02 | updated | completed → dropped
 - 2026-10-25T20:35Z | Junie | I008 | updated | ready_to_merge → in_progress
+
+- 2026-10-25T20:38Z | Junie | I008 | updated | in_progress → review
+- 2026-10-25T20:38Z | Junie | git | commit | 3bbff57b: remove refresh UI and auto-refresh
+
+- 2026-10-25T20:42Z | User | decision | provided | Remove "Items" label above the list
+- 2026-10-25T20:42Z | Junie | I008-S04 | created | Remove Items label; approved
+- 2026-10-25T20:42Z | Junie | I008 | updated | ready_to_merge → in_progress
