@@ -21,7 +21,6 @@
             [$isEnglish ? 'Vulnerabilities' : 'Vulnérabilités', route($routePrefix . 'use-cases.find-vulnerabilities')],
             [$isEnglish ? 'Credentials' : 'Identifiants', route($routePrefix . 'use-cases.check-leaked-credentials')],
             ['Audit', route($routePrefix . 'use-cases.prepare-audit')],
-            ['PSSI', route($routePrefix . 'use-cases.create-pssi')],
             ['Pentest', route($routePrefix . 'use-cases.run-pentest')],
         ],
         'Cywise' => [

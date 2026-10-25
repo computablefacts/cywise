@@ -78,16 +78,6 @@
                                             </span>
                                         </a>
                                     </div>
-                                    <!-- <div class="w-auto divide-y divide-zinc-100">
-                                        <a href="{{ route('pssi') }}" class="block text-sm p-7 hover:bg-neutral-100">
-                                            <span class="block mb-1 font-medium text-black">
-                                              PSSI
-                                            </span>
-                                            <span class="block font-light leading-5 opacity-50">
-                                              Créez simplement une Politique de Sécurité des Systèmes d'Information.
-                                            </span>
-                                        </a>
-                                    </div> -->
                                     <div class="w-auto divide-y divide-zinc-100">
                                         <a href="{{ route('pentest') }}" class="block text-sm p-7 hover:bg-neutral-100">
                                             <span class="block mb-1 font-medium text-black">
