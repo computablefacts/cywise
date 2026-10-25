@@ -69,7 +69,7 @@ name('website.solutions.cyberbuddy');
                 @foreach([
                     ['Questions directes', 'Posez des questions de sécurité en langage simple.'],
                     ['Contexte entreprise', 'Utilisez vos politiques et données de sécurité pour obtenir des réponses pertinentes.'],
-                    ['Accompagnement des politiques', 'Obtenez de l’aide pour la documentation sécurité et la PSSI.'],
+                    ['Accompagnement des politiques', 'Obtenez de l’aide pour la documentation sécurité.'],
                     ['Explication du risque', 'Expliquez les constats techniques aux non-spécialistes.'],
                 ] as [$title, $text])
                     <article class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6">

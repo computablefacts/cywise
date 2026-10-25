@@ -89,28 +89,6 @@
             ],
             'steps' => $monitoring,
         ],
-        'create-pssi' => [
-            'accent' => 'ui:text-info',
-            'title' => [$t('Rédigez une politique que chacun peut', 'Write a policy people can'), $t('appliquer.', 'use.')],
-            'lede' => $t('Créez une politique de sécurité structurée adaptée à votre organisation.', 'Create a structured security policy that fits your organization.'),
-            'panel' => $t('PSSI · Acme', 'Security policy · Acme'),
-            'font' => $sans,
-            'rows' => [
-                ['low', $t('Gestion des accès', 'Access management'), $t('DSI', 'IT'), $t('Validé', 'Approved')],
-                ['low', $t('Sauvegardes', 'Backups'), 'Infra', $t('Validé', 'Approved')],
-                ['medium', $t('Télétravail', 'Remote work'), $t('RH', 'HR'), $t('À revoir', 'To review')],
-                ['info', $t('Gestion des incidents', 'Incident response'), $t('RSSI', 'CISO'), $t('Brouillon', 'Draft')],
-            ],
-            'features' => [
-                [$t('Cadre de politique', 'Policy framework'), $t('Partez de domaines de sécurité concrets.', 'Start from practical security areas.')],
-                [$t('Contexte', 'Context'), $t('Adaptez les contrôles à votre entreprise.', 'Adapt controls to your company.')],
-                [$t('Responsabilités', 'Responsibilities'), $t('Définissez les responsables et les attentes.', 'Define owners and expectations.')],
-                [$t('Langage clair', 'Readable language'), $t('Rendez les exigences claires pour les collaborateurs.', 'Make requirements clear to employees.')],
-                [$t('Révision', 'Review'), $t('Maintenez la PSSI à jour.', 'Keep the PSSI current.')],
-                [$t('Accompagnement', 'Support'), $t('Utilisez CyberBuddy pour clarifier les questions liées à la politique.', 'Use CyberBuddy to clarify policy questions.')],
-            ],
-            'steps' => null,
-        ],
         'prepare-audit' => [
             'accent' => 'ui:text-brand-500',
             'title' => [$t('Transformez le travail de sécurité en', 'Turn security work into'), $t('preuves.', 'evidence.')],
@@ -121,7 +99,6 @@
                 ['critical', $t('Sauvegardes hors ligne', 'Offline backups'), $t('Contrôle', 'Control'), $t('Manquant', 'Missing')],
                 ['medium', $t('Écarts ouverts', 'Open gaps'), '3', $t('En cours', 'In progress')],
                 ['low', $t('Actions de remédiation', 'Remediation actions'), '12', $t('Suivi', 'Tracked')],
-                ['low', $t('Politique de sécurité', 'Security policy'), 'PSSI', $t('Prêt', 'Ready')],
             ],
             'features' => [
                 [$t('Visibilité des écarts', 'Gap visibility'), $t('Identifiez les contrôles manquants et les risques ouverts.', 'See missing controls and open risks.')],

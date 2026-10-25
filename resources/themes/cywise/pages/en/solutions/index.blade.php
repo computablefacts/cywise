@@ -28,7 +28,6 @@ name('website.en.solutions.index');
                 ['medium', 'Vulnerability management', 'Find and prioritize weaknesses.', 'website.en.solutions.vulnerability-management'],
                 ['low', 'Credential monitoring', 'Detect compromised company credentials.', 'website.en.solutions.credential-monitoring'],
                 ['brand', 'CyberBuddy', 'Ask security questions from company context.', 'website.en.solutions.cyberbuddy'],
-                ['info', 'PSSI', 'Build a usable security policy.', 'website.en.solutions.pssi'],
                 ['ink', 'Pentest', 'Test critical systems with human experts.', 'website.en.solutions.pentest'],
             ] as [$tone, $title, $text, $route])
                 <x-site.edge-card :tone="$tone" :href="route($route)">

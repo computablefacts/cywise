@@ -34,7 +34,7 @@
 
     $actions = [
         $t('Lancer un audit express', 'Run an express audit'),
-        $t('Générer votre PSSI ou charte informatique', 'Generate your security policy or IT charter'),
+        $t('Générer votre charte informatique', 'Generate your IT charter'),
         $t('Déployer un honeypot en deux temps trois mouvements', 'Deploy a honeypot in no time'),
         $t('Être conforme à NIS2 sans complexité', 'Comply with NIS2 without the hassle'),
     ];

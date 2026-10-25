@@ -128,15 +128,6 @@ connaissances vérifiées et des bonnes pratiques reconnues. Une expertise acces
 > [!WARNING]
 > Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API [DeepInfra](https://deepinfra.com/).
 
-### CyberScribe
-
-:white_check_mark: auto-hébergé :white_check_mark: SaaS
-
-**Rédaction assistée de vos documents cyber.** Besoin de créer une Charte Informatique ? CyberScribe, notre éditeur intelligent, vous accompagne pas à pas pour rédiger des documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence artificielle.
-
-> [!WARNING]
-> Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API [DeepInfra](https://deepinfra.com/).
-
 ### Telegram & WhatsApp
 
 :white_check_mark: auto-hébergé :white_check_mark: SaaS
@@ -384,9 +375,9 @@ Vous pouvez supprimer l'intégralité de la stack y compris toutes les données 
 
 ## Activation de certaines fonctionnalités
 
-### CyberBuddy et CyberScribe
+### CyberBuddy
 
-Pour activer CyberBuddy et CyberScribe, vous devez avoir créé une clé d'API chez [DeepInfra](https://deepinfra.com/).
+Pour activer CyberBuddy, vous devez avoir créé une clé d'API chez [DeepInfra](https://deepinfra.com/).
 
 Vous devez ensuite mettre en place cette clé dans Cywise.
 

@@ -110,15 +110,6 @@ Cywise integrates all essential features for SMEs.
 > [!WARNING]
 > To enable this feature in the self-hosted version, you will need to provide your own [DeepInfra](https://deepinfra.com/) API key.
 
-### CyberScribe
-
-:white_check_mark: self-hosted :white_check_mark: SaaS
-
-**Assisted drafting of your cyber documents.** Need to create an IT Charter? CyberScribe, our intelligent editor, accompanies you step-by-step to write clear, compliant, and adapted documents, thanks to artificial intelligence.
-
-> [!WARNING]
-> To enable this feature in the self-hosted version, you will need to provide your own [DeepInfra](https://deepinfra.com/) API key.
-
 ### Telegram & WhatsApp
 
 :white_check_mark: self-hosted :white_check_mark: SaaS
@@ -343,9 +334,9 @@ You can delete the entire stack including all associated data with the command:
 
 ## Activating certain features
 
-### CyberBuddy and CyberScribe
+### CyberBuddy
 
-To activate CyberBuddy and CyberScribe, you must have created an API key at [DeepInfra](https://deepinfra.com/).
+To activate CyberBuddy, you must have created an API key at [DeepInfra](https://deepinfra.com/).
 
 You must then set up this key in Cywise.
 

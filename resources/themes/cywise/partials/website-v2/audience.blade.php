@@ -12,7 +12,6 @@
         'vulnerability-management' => ['medium', $t('Vulnérabilités', 'Vulnerabilities'), $t('Trouvez les points faibles.', 'Find the weak points.'), $t('Identifiez les vulnérabilités et concentrez-vous sur les risques les plus importants.', 'Identify vulnerabilities and focus on the most important risks.')],
         'credential-monitoring' => ['low', $t('Identifiants', 'Credentials'), $t('Sachez ce qui a fuité.', 'Know what leaked.'), $t('Détectez les identifiants compromis liés à votre entreprise.', 'Detect compromised credentials linked to your company.')],
         'cyberbuddy' => ['brand', 'CyberBuddy', $t('Demandez. Comprenez. Agissez.', 'Ask. Understand. Act.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance from your company context.')],
-        'pssi' => ['info', 'PSSI', $t('Créez votre politique de sécurité.', 'Build your security policy.'), $t('Créez une politique de sécurité pratique pour votre organisation.', 'Create a practical security policy for your organization.')],
         'pentest' => ['ink', 'Pentest', $t('Faites tester par des experts.', 'Put humans on the attack.'), $t('Faites tester vos applications critiques par des experts en sécurité.', 'Test critical applications with experienced security experts.')],
     ];
 
@@ -50,7 +49,7 @@
                 [$t('Risque identifiants', 'Credential risk'), $t('Détectez les comptes de startup compromis.', 'Detect leaked startup accounts.')],
                 [$t('Préparation aux audits', 'Audit readiness'), $t('Préparez des preuves pour les clients et partenaires.', 'Prepare evidence for customers and partners.')],
             ],
-            'solutions' => ['attack-surface', 'credential-monitoring', 'pssi'],
+            'solutions' => ['attack-surface', 'credential-monitoring', 'cyberbuddy'],
         ],
         'it-teams' => [
             'title' => [$t('Sachez quoi corriger en', 'Know what to fix'), $t('premier.', 'first.')],
@@ -76,15 +75,13 @@
             'rows' => [
                 ['critical', $t('Exposition externe', 'External exposure'), $t('2 critiques', '2 critical'), $t('À traiter', 'Open')],
                 ['medium', $t('Vulnérabilités', 'Vulnerabilities'), $t('7 moyennes', '7 medium'), $t('En cours', 'In progress')],
-                ['low', $t('Politique de sécurité', 'Security policy'), 'PSSI', $t('À jour', 'Up to date')],
             ],
             'features' => [
                 [$t('Visibilité direction', 'Executive visibility'), $t('Suivez la posture avec des indicateurs compréhensibles.', 'Track posture with understandable indicators.')],
                 [$t('Progrès du programme', 'Program progress'), $t('Montrez l’évolution de la remédiation.', 'Show remediation trends over time.')],
-                [$t('Accompagnement des politiques', 'Policy support'), $t('Maintenez une gouvernance sécurité pratique.', 'Maintain practical security governance.')],
                 [$t('Preuves', 'Evidence'), $t('Utilisez des données structurées pour les revues et audits.', 'Use structured data for reviews and audits.')],
             ],
-            'solutions' => ['vulnerability-management', 'pssi', 'pentest'],
+            'solutions' => ['vulnerability-management', 'cyberbuddy', 'pentest'],
         ],
         'msps' => [
             'title' => [$t('Protégez plus de clients, plus', 'Protect more customers with less'), $t('simplement.', 'friction.')],

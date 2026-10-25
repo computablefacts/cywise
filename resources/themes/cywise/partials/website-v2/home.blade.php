@@ -16,7 +16,6 @@
         ['medium', $t('Vulnérabilités', 'Vulnerabilities'), $t('Trouvez les points faibles.', 'Find the weak points.'), $t('Identifiez les vulnérabilités et concentrez-vous sur les risques les plus importants.', 'Identify vulnerabilities and focus on the most important risks.'), 'solutions.vulnerability-management'],
         ['low', $t('Identifiants', 'Credentials'), $t('Sachez ce qui a fuité.', 'Know what leaked.'), $t('Détectez les identifiants compromis liés à votre entreprise.', 'Detect compromised credentials linked to your company.'), 'solutions.credential-monitoring'],
         ['brand', 'CyberBuddy', $t('Demandez. Comprenez. Agissez.', 'Ask. Understand. Act.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance from your company context.'), 'solutions.cyberbuddy'],
-        ['info', 'PSSI', $t('Créez votre politique de sécurité.', 'Build your security policy.'), $t('Créez une politique de sécurité pratique pour votre organisation.', 'Create a practical security policy for your organization.'), 'solutions.pssi'],
         ['ink', 'Pentest', $t('Faites tester par des experts.', 'Put humans on the attack.'), $t('Faites tester vos applications critiques par des experts en sécurité.', 'Test critical applications with experienced security experts.'), 'solutions.pentest'],
     ];
 

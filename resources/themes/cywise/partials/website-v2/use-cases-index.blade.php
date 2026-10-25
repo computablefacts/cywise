@@ -10,7 +10,6 @@
         ['ui:bg-medium', $t('Trouver des vulnérabilités', 'Find vulnerabilities'), $t('Détectez et priorisez les faiblesses.', 'Discover and prioritize weaknesses.'), 'use-cases.find-vulnerabilities'],
         ['ui:bg-critical', $t('Surveiller la surface d’attaque', 'Monitor attack surface'), $t('Suivez l’exposition publique dans le temps.', 'Track public exposure over time.'), 'use-cases.monitor-attack-surface'],
         ['ui:bg-low', $t('Vérifier les identifiants compromis', 'Check leaked credentials'), $t('Détectez les identités compromises de l’entreprise.', 'Detect compromised company identities.'), 'use-cases.check-leaked-credentials'],
-        ['ui:bg-info', $t('Créer une PSSI', 'Create a PSSI'), $t('Créez une politique de sécurité pragmatique.', 'Build a practical security policy.'), 'use-cases.create-pssi'],
         ['ui:bg-line', $t('Préparer un audit', 'Prepare for an audit'), $t('Organisez les preuves de sécurité et les écarts.', 'Organize security evidence and gaps.'), 'use-cases.prepare-audit'],
         ['ui:bg-ink', $t('Lancer un pentest', 'Run a pentest'), $t('Éprouvez les systèmes critiques avec des experts.', 'Challenge critical systems with experts.'), 'use-cases.run-pentest'],
     ];

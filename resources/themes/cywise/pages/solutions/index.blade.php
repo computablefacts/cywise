@@ -28,7 +28,6 @@ name('website.solutions.index');
                 ['medium', 'Gestion des vulnérabilités', 'Détectez et priorisez les faiblesses.', 'website.solutions.vulnerability-management'],
                 ['low', 'Surveillance des identifiants', 'Détectez les identifiants compromis de l’entreprise.', 'website.solutions.credential-monitoring'],
                 ['brand', 'CyberBuddy', 'Posez vos questions de sécurité dans le contexte de votre entreprise.', 'website.solutions.cyberbuddy'],
-                ['info', 'PSSI', 'Créez une politique de sécurité réellement applicable.', 'website.solutions.pssi'],
                 ['ink', 'Pentest', 'Faites tester les systèmes critiques par des experts.', 'website.solutions.pentest'],
             ] as [$tone, $title, $text, $route])
                 <x-site.edge-card :tone="$tone" :href="route($route)">

@@ -55,7 +55,7 @@ it('renders localized website copy', function () {
 
     $this->get('/use-cases')
         ->assertOk()
-        ->assertSee('Créer une PSSI', false)
+        ->assertDontSee('Créer une PSSI', false)
         ->assertSee('Société', false)
         ->assertSee('Cas d’usages', false)
         ->assertDontSee('Create a PSSI', false);
