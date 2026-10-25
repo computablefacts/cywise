@@ -15,4 +15,4 @@ The previous plan to add a refresh button and auto-refresh was rejected by the u
 - [x] The items list is correctly populated from existing files in the items/ directory.
 - [x] No manual refresh button is present.
 - [x] No automatic refresh timer is active.
-- [ ] The "Items" label above the list is removed.
+- [x] The "Items" label above the list is removed.

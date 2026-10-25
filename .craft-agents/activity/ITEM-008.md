@@ -36,3 +36,9 @@
 - 2026-10-25T20:42Z | User | decision | provided | Remove "Items" label above the list
 - 2026-10-25T20:42Z | Junie | I008-S04 | created | Remove Items label; approved
 - 2026-10-25T20:42Z | Junie | I008 | updated | ready_to_merge → in_progress
+
+- 2026-10-25T20:44Z | Junie | I008-S04 | updated | approved → completed
+- 2026-10-25T20:45Z | Junie | I008 | updated | in_progress → review
+
+- 2026-10-25T20:46Z | Junie | I008 | updated | review → ready_to_merge
+- 2026-10-25T20:46Z | Junie | question | asked | Authorize merge of item/ITEM-008 into 1.x?

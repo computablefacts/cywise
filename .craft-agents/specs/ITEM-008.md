@@ -23,7 +23,7 @@ Commit: 9b2d8e4
 
 ## ITEM-008-S04: Remove Items label
 
-Status: approved
+Status: completed
 Requirement: Remove the "Items" label above the list in the sidebar.
 Test: Visual check that the label is no longer visible.
-Commit: -
+Commit: 9daa2ea5
