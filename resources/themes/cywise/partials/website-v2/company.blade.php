@@ -34,8 +34,6 @@
 
     $actions = [
         $t('Lancer votre audit express', 'Run an express audit'),
-        $t('Générer votre charte informatique', 'Generate your IT charter'),
-        $t('Déployer un honeypot instantanément', 'Deploy a honeypot in no time'),
         $t('Assurer votre conformité NIS2 simplement', 'Comply with NIS2 without the hassle'),
     ];
 @endphp
@@ -78,7 +76,7 @@
     <section class="{{ $wrap }} ui:grid ui:grid-cols-1 ui:gap-8 ui:py-24 ui:lg:grid-cols-2 ui:lg:gap-12">
         <x-site.display>{!! $t('La petite<br>histoire', 'Our<br>story') !!}</x-site.display>
         <div class="ui:text-lg ui:leading-relaxed ui:text-slate-700">
-            <p class="ui:m-0">{{ $t('Cyrille et Pierre se sont rencontrés il y a 15 ans, alors qu’ils étaient encore étudiants, unis par leur fascination pour la magie, où la maîtrise de l’illusion et de la dissimulation joue un rôle central. Des principes que l’on retrouve aujourd’hui dans les honeypots développés par Cywise, conçus pour tromper et piéger les cyberattaquants.', 'Cyrille and Pierre met 15 years ago as students, brought together by a fascination for magic, where mastering illusion and concealment is everything. The same principles drive the honeypots Cywise builds today, designed to deceive and trap attackers.') }}</p>
+            <p class="ui:m-0">{{ $t('Cyrille et Pierre se sont rencontrés il y a 15 ans, alors qu’ils étaient encore étudiants, unis par leur fascination pour la magie, où la maîtrise de l’illusion et de la dissimulation joue un rôle central.', 'Cyrille and Pierre met 15 years ago as students, brought together by a fascination for magic, where mastering illusion and concealment is everything.') }}</p>
             <p class="ui:m-0 ui:mt-5">{{ $t('Après des parcours distincts — Cyrille, diplômé du Master Parisien de Recherche en Informatique, a fait ses armes chez FactSet dans la gestion de données, tandis que Pierre, diplômé de l’EPITA, a œuvré au ministère de l’Intérieur comme spécialiste en cyber offensive — ils ont chacun fondé et dirigé leurs propres entreprises.', 'They then took separate paths — Cyrille, a graduate of the Parisian Master of Research in Computer Science, cut his teeth in data management at FactSet, while Pierre, an EPITA graduate, worked at the French Ministry of the Interior as an offensive cyber specialist — and each founded and ran his own company.') }}</p>
             <p class="ui:m-0 ui:mt-5">{{ $t('En 2018, ils unissent leurs forces pour créer ComputableFacts, aujourd’hui Cywise, avec une ambition claire : rendre la cybersécurité accessible à tous, y compris aux TPE et PME.', 'In 2018, they joined forces to create ComputableFacts, now Cywise, with a clear goal: make cybersecurity accessible to everyone, small businesses included.') }}</p>
             <p class="ui:m-0 ui:mt-5">{{ $t('Cywise est le fruit de quatre années de recherche et développement, où se mêlent expertise en données et cybersécurité.', 'Cywise is the result of four years of research and development, blending data and cybersecurity expertise.') }}</p>
