@@ -10,3 +10,18 @@
 - 2026-10-25T20:06Z | Junie | I006-S02 | updated | pending → approved
 - 2026-10-25T20:06Z | Junie | I006-S03 | updated | pending → approved
 - 2026-10-25T20:07Z | Junie | I006 | updated | specifying → ready
+- 2026-10-25T20:08Z | Junie | git | commit | 11004c2c: record approved Specs on main
+- 2026-10-25T20:08Z | Junie | git | checkout | Create branch item/ITEM-006 from main
+- 2026-10-25T20:09Z | Junie | I006 | updated | ready → in_progress
+- 2026-10-25T20:10Z | Junie | I006-S01 | updated | approved → in_progress
+- 2026-10-25T20:15Z | Junie | I006-S01 | updated | in_progress → completed
+- 2026-10-25T20:15Z | Junie | I006-S02 | updated | approved → completed
+- 2026-10-25T20:15Z | Junie | I006-S03 | updated | approved → completed
+- 2026-10-25T20:16Z | Junie | git | commit | 8bb364de: record Specs S01-S03 on item/ITEM-006
+- 2026-10-25T20:17Z | Junie | I006 | updated | in_progress → review
+- 2026-10-25T20:25Z | User | decision | provided | Le visuel me va bien mais ne devrait-il pas être sous "La cybersécurité ne devrait pas exiger une équipe de 50 personnes." ?
+- 2026-10-25T20:26Z | Junie | I006 | updated | review → in_progress
+- 2026-10-25T20:27Z | Junie | git | commit | 6b35a388: reposition testimonials section
+- 2028-10-25T20:28Z | Junie | I006 | updated | in_progress → review
+- 2026-10-25T20:30Z | User | decision | provided | oui (autorisation de fusion)
+- 2026-10-25T20:31Z | Junie | I006 | updated | review → ready_to_merge

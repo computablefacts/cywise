@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-006
-- Status: ready
+- Status: ready_to_merge
 
 ## Description
 
@@ -12,7 +12,7 @@ Cela inclut l'ajout d'une section dédiée avec les citations, les noms et les t
 
 ## Acceptance
 
-- [ ] Une nouvelle section "Témoignages" est ajoutée à la homepage.
-- [ ] Les 3 témoignages identifiés (Julien B., Augustin B., Sylvain M.) sont affichés.
-- [ ] Le design est cohérent avec le reste de la `website-v2`.
-- [ ] Les traductions (FR/EN) sont gérées.
+- [x] Une nouvelle section "Témoignages" est ajoutée à la homepage.
+- [x] Les 3 témoignages identifiés (Julien B., Augustin B., Sylvain M.) sont affichés.
+- [x] Le design est cohérent avec le reste de la `website-v2`.
+- [x] Les traductions (FR/EN) sont gérées.
