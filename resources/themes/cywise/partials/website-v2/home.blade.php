@@ -97,6 +97,31 @@
         </div>
     </section>
 
+    {{-- Testimonials --}}
+    <section class="ui:border-0 ui:border-b ui:border-solid ui:border-line ui:bg-canvas">
+        <div class="{{ $wrap }} ui:py-24">
+            <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
+                <x-site.display>{!! $t('Ce qu’ils en disent.<br><span class="ui:text-slate-400">Leurs retours d’expérience.</span>', 'What they say.<br><span class="ui:text-slate-400">Their feedback.</span>') !!}</x-site.display>
+                <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Découvrez comment Cywise transforme la cybersécurité de nos clients au quotidien.', 'Discover how Cywise transforms our customers\' cybersecurity every day.') }}</p>
+            </div>
+            <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
+                @foreach($testimonials as $testimonial)
+                    <div class="ui:flex ui:flex-col ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-8">
+                        <div class="ui:flex-1 ui:text-lg ui:italic ui:leading-relaxed ui:text-slate-700">
+                            "{{ $testimonial['quote'] }}"
+                        </div>
+                        <div class="ui:mt-8 ui:flex ui:items-center ui:gap-4">
+                            <div class="ui:flex ui:flex-col">
+                                <span class="ui:font-bold ui:text-ink">{{ $testimonial['author'] }}</span>
+                                <span class="ui:text-sm ui:text-slate-500">{{ $testimonial['title'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
     {{-- Solutions --}}
     <section id="solutions" class="{{ $wrap }} ui:py-24">
         <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
@@ -193,31 +218,6 @@
                     </div>
                 @endforeach
             </dl>
-        </div>
-    </section>
-
-    {{-- Testimonials --}}
-    <section class="ui:border-0 ui:border-y ui:border-solid ui:border-line ui:bg-canvas">
-        <div class="{{ $wrap }} ui:py-24">
-            <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
-                <x-site.display>{!! $t('Ce qu’ils en disent.<br><span class="ui:text-slate-400">Leurs retours d’expérience.</span>', 'What they say.<br><span class="ui:text-slate-400">Their feedback.</span>') !!}</x-site.display>
-                <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Découvrez comment Cywise transforme la cybersécurité de nos clients au quotidien.', 'Discover how Cywise transforms our customers\' cybersecurity every day.') }}</p>
-            </div>
-            <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
-                @foreach($testimonials as $testimonial)
-                    <div class="ui:flex ui:flex-col ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-8">
-                        <div class="ui:flex-1 ui:text-lg ui:italic ui:leading-relaxed ui:text-slate-700">
-                            "{{ $testimonial['quote'] }}"
-                        </div>
-                        <div class="ui:mt-8 ui:flex ui:items-center ui:gap-4">
-                            <div class="ui:flex ui:flex-col">
-                                <span class="ui:font-bold ui:text-ink">{{ $testimonial['author'] }}</span>
-                                <span class="ui:text-sm ui:text-slate-500">{{ $testimonial['title'] }}</span>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
         </div>
     </section>
 
