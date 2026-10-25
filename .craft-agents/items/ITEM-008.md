@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: 1.x
 - Branch: item/ITEM-008
-- Status: ready_to_merge
+- Status: done
 
 ## Description
 
