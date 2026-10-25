@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-007
-- Status: done
+- Status: ready_to_merge
 
 ## Description
 
@@ -12,6 +12,6 @@ Le workflow `tests.yml` doit être mis à jour pour utiliser un service MariaDB 
 
 ## Acceptance
 
-- [ ] L'action `yakkadev/mariadb-actions` est supprimée de `tests.yml`.
-- [ ] Un service MariaDB est configuré dans `tests.yml`.
-- [ ] Le workflow s'exécute correctement avec la base de données.
+- [x] L'action `yakkadev/mariadb-actions` est supprimée de `tests.yml`.
+- [x] Un service MariaDB est configuré dans `tests.yml`.
+- [x] Le workflow s'exécute correctement avec la base de données.
