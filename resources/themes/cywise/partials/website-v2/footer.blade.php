@@ -26,7 +26,6 @@
         ],
         ($isEnglish ? 'Resources' : 'Ressources') => [
             ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
-            [$isEnglish ? 'Use cases' : 'Cas d’usages', route($routePrefix . 'use-cases.index')],
             [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
         ],
         'Cywise' => [
