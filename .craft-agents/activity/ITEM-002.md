@@ -12,3 +12,46 @@
 - 2026-10-25T17:17Z | Junie | I002-S03 | updated | pending → approved
 - 2026-10-25T17:17Z | Junie | I002-S04 | updated | pending → approved
 - 2026-10-25T17:18Z | Junie | I002 | updated | specifying → ready
+- 2026-10-25T17:19Z | Junie | git | commit | fbcc28c: record approved Specs on main
+- 2026-10-25T17:19Z | Junie | git | checkout | Create branch item/ITEM-002 from main
+- 2026-10-25T17:19Z | Junie | I002 | updated | ready → in_progress
+- 2026-10-25T17:20Z | Junie | I002-S01 | updated | approved → in_progress
+- 2026-10-25T17:20Z | Junie | I002-S02 | updated | approved → in_progress
+- 2026-10-25T17:20Z | Junie | I002-S03 | updated | approved → in_progress
+- 2026-10-25T17:20Z | Junie | I002-S04 | updated | approved → in_progress
+- 2026-10-25T17:22Z | Junie | I002-S01 | updated | in_progress → completed
+- 2026-10-25T17:22Z | Junie | I002-S02 | updated | in_progress → completed
+- 2026-10-25T17:22Z | Junie | I002-S03 | updated | in_progress → completed
+- 2026-10-25T17:22Z | Junie | I002-S04 | updated | in_progress → completed
+- 2026-10-25T17:22Z | Junie | git | commit | da57ac9: record Spec S01, S02, S03, S04 on item/ITEM-002
+- 2026-10-25T17:23Z | Junie | I002 | updated | in_progress → review
+- 2026-10-25T17:25Z | User | instruction | provided | Renommer La société et ajouter colonne Cas d'usages au footer
+- 2026-10-25T17:26Z | Junie | I002 | updated | review → specifying
+- 2026-10-25T17:26Z | Junie | I002-S05 | created | Footer - Renommer Société; pending
+- 2026-10-25T17:26Z | Junie | I002-S06 | created | Footer - Colonne Cas d'usages; pending
+- 2026-10-25T17:28Z | User | decision | provided | yes
+- 2026-10-25T17:28Z | Junie | I002-S05 | updated | pending → approved
+- 2026-10-25T17:28Z | Junie | I002-S06 | updated | pending → approved
+- 2026-10-25T17:28Z | Junie | I002 | updated | specifying → in_progress
+- 2026-10-25T17:29Z | Junie | I002-S05 | updated | approved → in_progress
+- 2026-10-25T17:29Z | Junie | I002-S06 | updated | approved → in_progress
+- 2026-10-25T17:31Z | Junie | I002-S05 | updated | in_progress → completed
+- 2026-10-25T17:31Z | Junie | I002-S06 | updated | in_progress → completed
+- 2026-10-25T17:31Z | Junie | git | commit | e4c5689: record Spec S05, S06 on item/ITEM-002
+- 2026-10-25T17:32Z | Junie | I002 | updated | in_progress → review
+- 2026-10-25T17:33Z | User | instruction | provided | Enlever Cas d'usages de la colonne Ressources
+- 2026-10-25T17:34Z | Junie | I002 | updated | review → in_progress
+- 2026-10-25T17:34Z | Junie | I002-S06 | updated | completed → in_progress
+- 2026-10-25T17:34Z | Junie | git | commit | 3af50a3: remove duplicate link in footer
+- 2026-10-25T17:34Z | Junie | I002-S06 | updated | in_progress → completed
+- 2026-10-25T17:35Z | Junie | I002 | updated | in_progress → review
+- 2026-10-25T17:36Z | User | instruction | provided | Enlever colonne Ressources et déplacer Blog/Tarifs
+- 2026-10-25T17:37Z | Junie | I002 | updated | review → in_progress
+- 2026-10-25T17:37Z | Junie | I002-S06 | updated | completed → in_progress
+- 2026-10-25T17:37Z | Junie | git | commit | e0e8590: merge Resources into Cywise column in footer
+- 2026-10-25T17:37Z | Junie | I002-S06 | updated | in_progress → completed
+- 2026-10-25T17:38Z | Junie | I002 | updated | in_progress → review
+- 2026-10-25T17:39Z | User | instruction | asked | As-tu bien ajouté ou mis à jour les tests automatiques ?
+- 2026-10-25T17:40Z | Junie | tests | executed | vendor/bin/pest tests/Unit/WithoutDb/WebsiteRoutesTest.php
+- 2026-10-25T17:41Z | Junie | git | commit | 245be7a: update tests for plural use cases
+- 2026-10-25T17:41Z | Junie | I002 | updated | review → ready_to_merge
