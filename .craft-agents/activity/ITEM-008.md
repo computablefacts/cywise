@@ -10,3 +10,15 @@
 - 2026-10-25T20:25Z | Junie | I008-S02 | updated | pending → approved
 - 2026-10-25T20:25Z | Junie | I008-S03 | updated | pending → approved
 - 2026-10-25T20:26Z | Junie | I008 | updated | specifying → ready
+
+- 2026-10-25T20:26Z | Junie | git | commit | a356cd1a: record approved Specs on 1.x
+- 2026-10-25T20:26Z | Junie | git | checkout | Create branch item/ITEM-008 from 1.x
+- 2026-10-25T20:26Z | Junie | I008 | updated | ready → in_progress
+
+- 2026-10-25T20:28Z | Junie | I008-S01 | updated | approved → in_progress
+- 2026-10-25T20:28Z | Junie | I008-S02 | updated | approved → in_progress
+- 2026-10-25T20:28Z | Junie | I008-S03 | updated | approved → in_progress
+- 2026-10-25T20:29Z | Junie | I008-S01 | updated | in_progress → completed
+- 2026-10-25T20:29Z | Junie | I008-S02 | updated | in_progress → completed
+- 2026-10-25T20:29Z | Junie | I008-S03 | updated | in_progress → completed
+- 2026-10-25T20:30Z | Junie | git | commit | 9b2d8e4: implement auto-refresh and manual refresh in index.html
