@@ -32,6 +32,7 @@
     ];
     $links = [
         [$isEnglish ? 'Use cases' : 'Cas d’usage', route($routePrefix . 'use-cases.index')],
+        [$isEnglish ? 'Company' : 'Société', route($routePrefix . 'company')],
         ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
         [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
     ];
