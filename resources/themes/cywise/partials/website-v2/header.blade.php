@@ -32,11 +32,11 @@
             'label' => $isEnglish ? 'Use cases' : 'Cas d’usages',
             'all' => [$isEnglish ? 'All use cases' : 'Tous les cas d’usages', route($routePrefix . 'use-cases.index')],
             'items' => [
-                ['critical', $isEnglish ? 'Monitor attack surface' : 'Surveiller votre surface d’attaque', route($routePrefix . 'use-cases.monitor-attack-surface')],
-                ['medium', $isEnglish ? 'Find vulnerabilities' : 'Détecter vos vulnérabilités', route($routePrefix . 'use-cases.find-vulnerabilities')],
-                ['low', $isEnglish ? 'Check leaked credentials' : 'Rechercher vos identifiants compromis', route($routePrefix . 'use-cases.check-leaked-credentials')],
-                ['info', $isEnglish ? 'Prepare an audit' : 'Préparer votre audit', route($routePrefix . 'use-cases.prepare-audit')],
-                ['ink', $isEnglish ? 'Run a pentest' : 'Lancer un Pentest expert', route($routePrefix . 'use-cases.run-pentest')],
+                ['critical', $isEnglish ? 'Monitor your attack surface' : 'Surveiller votre surface d’attaque', route($routePrefix . 'use-cases.monitor-attack-surface')],
+                ['medium', $isEnglish ? 'Detect your vulnerabilities' : 'Détecter vos vulnérabilités', route($routePrefix . 'use-cases.find-vulnerabilities')],
+                ['low', $isEnglish ? 'Search for compromised credentials' : 'Rechercher vos identifiants compromis', route($routePrefix . 'use-cases.check-leaked-credentials')],
+                ['info', $isEnglish ? 'Prepare your audit' : 'Préparer votre audit', route($routePrefix . 'use-cases.prepare-audit')],
+                ['ink', $isEnglish ? 'Launch an expert pentest' : 'Lancer un Pentest expert', route($routePrefix . 'use-cases.run-pentest')],
             ],
         ],
     ];
