@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-005
-- Status: ready
+- Status: review
 
 ## Description
 
@@ -12,6 +12,6 @@ Une attention particulière sera portée à l'allocation mémoire nécessaire po
 
 ## Acceptance
 
-- [ ] Tous les tests automatiques passent avec succès.
-- [ ] La limite de mémoire est ajustée si nécessaire dans la configuration.
-- [ ] Les tests ignorés (skipped) sont analysés et réactivés si possible.
+- [x] Tous les tests automatiques passent avec succès.
+- [x] La limite de mémoire est ajustée si nécessaire dans la configuration.
+- [x] Les tests ignorés (skipped) sont analysés et réactivés si possible.
