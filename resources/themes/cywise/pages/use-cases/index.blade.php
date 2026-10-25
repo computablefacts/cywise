@@ -10,7 +10,7 @@ name('website.use-cases.index');
     :language-url="route('website.en.use-cases.index')"
     :seo="[
         'title' => 'Cas d’usage — Cywise',
-        'description' => 'Partez du problème. Cywise le transforme en flux de sécurité clair.',
+        'description' => 'Découvrez comment Cywise répond à vos enjeux concrets de cybersécurité.',
     ]"
 >
 @include('theme::partials.website-v2.use-cases-index', ['locale' => 'fr'])

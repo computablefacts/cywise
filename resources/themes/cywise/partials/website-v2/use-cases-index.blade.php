@@ -7,18 +7,18 @@
 
     // Edge = the matching solution's tone (see site/edge-card); an audit spans all solutions → neutral line
     $cases = [
-        ['ui:bg-medium', $t('Trouver des vulnérabilités', 'Find vulnerabilities'), $t('Détectez et priorisez les faiblesses.', 'Discover and prioritize weaknesses.'), 'use-cases.find-vulnerabilities'],
-        ['ui:bg-critical', $t('Surveiller la surface d’attaque', 'Monitor attack surface'), $t('Suivez l’exposition publique dans le temps.', 'Track public exposure over time.'), 'use-cases.monitor-attack-surface'],
-        ['ui:bg-low', $t('Vérifier les identifiants compromis', 'Check leaked credentials'), $t('Détectez les identités compromises de l’entreprise.', 'Detect compromised company identities.'), 'use-cases.check-leaked-credentials'],
-        ['ui:bg-line', $t('Préparer un audit', 'Prepare for an audit'), $t('Organisez les preuves de sécurité et les écarts.', 'Organize security evidence and gaps.'), 'use-cases.prepare-audit'],
-        ['ui:bg-ink', $t('Lancer un pentest', 'Run a pentest'), $t('Éprouvez les systèmes critiques avec des experts.', 'Challenge critical systems with experts.'), 'use-cases.run-pentest'],
+        ['ui:bg-medium', $t('Trouver vos vulnérabilités', 'Find vulnerabilities'), $t('Détectez et priorisez vos failles de sécurité.', 'Discover and prioritize weaknesses.'), 'use-cases.find-vulnerabilities'],
+        ['ui:bg-critical', $t('Surveiller votre surface d’attaque', 'Monitor attack surface'), $t('Maîtrisez votre exposition externe en continu.', 'Track public exposure over time.'), 'use-cases.monitor-attack-surface'],
+        ['ui:bg-low', $t('Vérifier vos identifiants compromis', 'Check leaked credentials'), $t('Identifiez vos données collaborateurs exposées.', 'Detect compromised company identities.'), 'use-cases.check-leaked-credentials'],
+        ['ui:bg-line', $t('Préparer votre audit', 'Prepare for an audit'), $t('Centralisez vos preuves de sécurité et corrigez vos écarts.', 'Organize security evidence and gaps.'), 'use-cases.prepare-audit'],
+        ['ui:bg-ink', $t('Lancer un pentest expert', 'Run a pentest'), $t('Évaluez vos systèmes critiques avec nos experts.', 'Challenge critical systems with experts.'), 'use-cases.run-pentest'],
     ];
 @endphp
 
 <main>
     <section class="{{ $wrap }} ui:pb-16 ui:pt-16">
-        <x-site.display as="h1" size="xl">{{ $t('Qu’avez-vous besoin de faire ?', 'What do you need to do?') }}</x-site.display>
-        <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ $t('Partez du problème. Cywise le transforme en flux de sécurité clair.', 'Start with the problem. Cywise maps it to a clear security workflow.') }}</p>
+        <x-site.display as="h1" size="xl">{{ $t('Quel est votre objectif prioritaire ?', 'What do you need to do?') }}</x-site.display>
+        <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ $t('Sélectionnez votre enjeu sécurité. Cywise vous guide avec un flux de travail clair et des actions concrètes.', 'Start with the problem. Cywise maps it to a clear security workflow.') }}</p>
     </section>
 
     {{-- Signage list: one row per use case, colour edge thickens on hover --}}
