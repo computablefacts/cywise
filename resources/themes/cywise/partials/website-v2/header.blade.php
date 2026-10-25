@@ -29,9 +29,20 @@
                 [null, 'MSP', route($routePrefix . 'audiences.msps')],
             ],
         ],
+        [
+            'label' => $isEnglish ? 'Use cases' : 'Cas d’usages',
+            'all' => [$isEnglish ? 'All use cases' : 'Tous les cas d’usages', route($routePrefix . 'use-cases.index')],
+            'items' => [
+                ['critical', $isEnglish ? 'Monitor attack surface' : 'Surveiller la surface d’attaque', route($routePrefix . 'use-cases.monitor-attack-surface')],
+                ['medium', $isEnglish ? 'Find vulnerabilities' : 'Trouver les vulnérabilités', route($routePrefix . 'use-cases.find-vulnerabilities')],
+                ['low', $isEnglish ? 'Check leaked credentials' : 'Surveiller les identifiants', route($routePrefix . 'use-cases.check-leaked-credentials')],
+                ['info', $isEnglish ? 'Prepare an audit' : 'Préparer un audit', route($routePrefix . 'use-cases.prepare-audit')],
+                ['brand', $isEnglish ? 'Create a security policy' : 'Créer une PSSI', route($routePrefix . 'use-cases.create-pssi')],
+                ['ink', $isEnglish ? 'Run a pentest' : 'Lancer un Pentest', route($routePrefix . 'use-cases.run-pentest')],
+            ],
+        ],
     ];
     $links = [
-        [$isEnglish ? 'Use cases' : 'Cas d’usage', route($routePrefix . 'use-cases.index')],
         [$isEnglish ? 'Company' : 'Société', route($routePrefix . 'company')],
         ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
         [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
