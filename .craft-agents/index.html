@@ -210,26 +210,19 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #4ade80; /* Green */
+            background: #4ade80; /* Light Blue */
             margin-left: -3px;
             border: 2px solid var(--bg-color);
         }
 
-        .timeline-v2-item.asked::after {
-            background: #f97316 !important; /* Orange */
-        }
-
-        .timeline-v2-item.user-asked::after {
-            background: #f97316 !important; /* Orange */
-        }
-
-        .timeline-v2-item.provided::after,
-        .timeline-v2-item.updated::after {
-            background: #7dd3fc !important; /* Light Blue */
-        }
-
-        .timeline-v2-item.user-provided::after {
+        .timeline-v2-item.git-history::after {
             background: #4ade80 !important; /* Green */
+        }
+
+        .timeline-v2-item.question::after,
+        .timeline-v2-item.instruction::after,
+        .timeline-v2-item.decision::after {
+            background: #f97316 !important; /* Orange */
         }
 
         .timeline-v2-date {
@@ -354,7 +347,8 @@
                 // Fallback : On pourrait essayer de charger ITEM-001, 002... ou utiliser une liste injectée
                 // Pour Junie, on va injecter la liste actuelle pour garantir que ça marche hors-serveur
                 items = [
-                    { id: 'ITEM-001', name: 'Ajout du lien Société dans le menu', date: 1792940445 }
+                    { id: 'ITEM-002', name: 'Retravail du menu Cas d\'usages', date: 1729878180 },
+                    { id: 'ITEM-001', name: 'Ajout du lien Société dans le menu', date: 1729846800 }
                 ];
                 updateSidebar();
                 if (items.length > 0 && !currentItem) selectItem(items[0].id);
@@ -516,53 +510,48 @@
 
             let html = `<h2 class="mb-4 text-white">Activity</h2><div class="timeline-v2">`;
             
-        activities.forEach(act => {
-            let itemClass = ''; // Default blue via CSS
-            let whoStyle = 'color: var(--text-primary)';
-            let actionStyle = 'color: var(--text-primary)';
-            let dotStyle = 'color: var(--text-secondary)';
-            
-            if (act.who === 'Junie') {
-                whoStyle = 'color: #ffffff';
-            } else if (act.who === 'User') {
-                whoStyle = 'color: #ffffff';
-            }
+            activities.forEach(act => {
+                let itemClass = ''; // Default blue via CSS
+                let actionStyle = 'color: var(--text-primary)';
+                let dotStyle = 'color: #4ade80';
+                
+                // Normalisation de l'affichage : On ne garde que ce qui suit le "-" si c'est une spécification (Sxx)
+                let displayWhat = act.what;
+                if (displayWhat.includes('-')) {
+                    const parts = displayWhat.split('-');
+                    const lastPart = parts[parts.length - 1];
+                    if (/^S\d+/.test(lastPart)) {
+                        displayWhat = lastPart;
+                    }
+                }
 
-            if (act.who === 'Junie' && act.action === 'asked') {
-                itemClass = 'asked';
-                actionStyle = 'color: #ffffff';
-                dotStyle = 'color: #f97316';
-            } else if (act.who === 'Junie' && act.action === 'created') {
-                itemClass = 'updated';
-                actionStyle = 'color: #ffffff';
-                dotStyle = 'color: #7dd3fc';
-            } else if (act.who === 'User' && act.action === 'asked') {
-                itemClass = 'user-asked';
-                actionStyle = 'color: #ffffff';
-                dotStyle = 'color: #f97316';
-            } else if (act.who === 'User' && act.action === 'provided') {
-                itemClass = 'user-provided';
-                actionStyle = 'color: #ffffff';
-                dotStyle = 'color: #4ade80';
-            } else if (act.who === 'Junie' && act.action === 'updated') {
-                itemClass = 'updated';
-                actionStyle = 'color: #ffffff';
-                dotStyle = 'color: #7dd3fc';
-            } else {
-                dotStyle = 'color: #3b82f6';
-            }
+                const isOrange = act.what.trim().toUpperCase() === 'INSTRUCTION' || 
+                                 act.what.trim().toUpperCase() === 'DECISION' || 
+                                 act.what.trim().toUpperCase() === 'QUESTION';
 
-            html += `
-                <div class="timeline-v2-item ${itemClass}">
-                    <div class="timeline-v2-date">${new Date(act.date).toLocaleString()}</div>
-                    <div class="timeline-v2-content">
-                        <span class="fw-bold" style="${whoStyle}">${act.who}</span>
-                        <span class="mx-1" style="${dotStyle}">•</span>
-                        <span style="${actionStyle}">${act.action}</span>
-                        <div class="text-secondary small mt-1">${act.details}</div>
-                    </div>
-                </div>`;
-        });
+                if (isOrange) {
+                    const normalizedWhat = act.what.trim().toUpperCase();
+                    if (normalizedWhat === 'INSTRUCTION') itemClass = 'instruction';
+                    else if (normalizedWhat === 'DECISION') itemClass = 'decision';
+                    else if (normalizedWhat === 'QUESTION') itemClass = 'question';
+
+                    dotStyle = 'color: #f97316';
+                }
+
+                html += `
+                    <div class="timeline-v2-item ${itemClass}">
+                        <div class="timeline-v2-date">
+                            <span style="${dotStyle}; margin-right: 5px; text-transform: uppercase;">${displayWhat}</span>
+                            ${new Date(act.date).toLocaleString()}
+                        </div>
+                        <div class="timeline-v2-content">
+                            <span class="fw-bold">${act.who}</span>
+                            <span class="mx-1">•</span>
+                            <span style="${actionStyle}">${act.action}</span>
+                            <div class="text-secondary small mt-1">${act.details}</div>
+                        </div>
+                    </div>`;
+            });
             
             html += `</div>`;
             container.innerHTML = html;
@@ -607,7 +596,7 @@
 
                 miniActivity.innerHTML = gitActions.map(act => {
                     return `
-                        <div class="timeline-v2-item">
+                        <div class="timeline-v2-item git-history">
                             <div class="timeline-v2-content small text-white">
                                 <div class="d-flex align-items-center gap-2 mb-1">
                                     <span class="fw-bold" style="color: var(--accent-color); font-size: 0.75rem; text-transform: uppercase;">${act.action}</span>
