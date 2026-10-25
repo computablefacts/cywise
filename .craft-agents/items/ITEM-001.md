@@ -1,9 +1,9 @@
 # ITEM-001: Ajout du lien Société dans le menu
 
-Owner: Junie
-Base: main
-Branch: item/ITEM-001
-Status: done
+- Owner: Junie
+- Base: main
+- Branch: item/ITEM-001
+- Status: done
 
 ## Description
 

@@ -15,10 +15,10 @@ The Item file defines a development task, its scope, acceptance criteria, owners
 ```markdown
 # ITEM-001: User login
 
-Owner: Claude
-Base: main
-Branch: item/ITEM-001
-Status: done
+- Owner: Claude
+- Base: main
+- Branch: item/ITEM-001
+- Status: done
 
 ## Description
 
