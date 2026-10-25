@@ -10,3 +10,19 @@
 - 2026-10-25T16:04Z | User | decision | provided | oui
 - 2026-10-25T16:04Z | Junie | I001-S01 | updated | pending → approved
 - 2026-10-25T16:04Z | Junie | I001 | updated | specifying → ready
+- 2026-10-25T16:04Z | Junie | git | commit | 6145235: record approved Specs on main
+- 2026-10-25T16:04Z | Junie | git | checkout | Create branch item/ITEM-001 from main
+- 2026-10-25T16:05Z | Junie | I001 | updated | ready → in_progress
+- 2026-10-25T16:05Z | Junie | I001-S01 | updated | approved → in_progress
+- 2026-10-25T16:06Z | Junie | I001-S01 | updated | in_progress → completed
+- 2026-10-25T16:06Z | Junie | git | commit | cee0bba: record Spec S01 on item/ITEM-001
+- 2026-10-25T16:06Z | Junie | I001 | updated | in_progress → review
+- 2026-10-25T16:07Z | Junie | question | asked | Autorisez-vous le merge de item/ITEM-001 dans main ?
+- 2026-10-25T16:08Z | User | question | asked | As-tu écris un test automatique pour vérifier ça ?
+- 2026-10-25T16:09Z | Junie | I001-S01 | updated | Ajout de tests unitaires dans WebsiteRoutesTest.php
+- 2026-10-25T16:10Z | Junie | git | commit | 0233aa6: record test for Spec S01 on item/ITEM-001
+- 2026-10-25T16:10Z | Junie | question | asked | Les tests unitaires ont été ajoutés et sont passés. Autorisez-vous le merge ?
+- 2026-10-25T16:11Z | User | decision | provided | oui
+- 2026-10-25T16:11Z | Junie | I001 | updated | review → ready_to_merge
+- 2026-10-25T16:12Z | Junie | I001 | updated | ready_to_merge → done
+- 2026-10-25T16:12Z | Junie | git | merge | Merge branch item/ITEM-001 into main
