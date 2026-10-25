@@ -24,13 +24,11 @@
             ['PSSI', route($routePrefix . 'use-cases.create-pssi')],
             ['Pentest', route($routePrefix . 'use-cases.run-pentest')],
         ],
-        ($isEnglish ? 'Resources' : 'Ressources') => [
-            ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
-            [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
-        ],
         'Cywise' => [
             [$isEnglish ? 'Home' : 'Accueil', route($homeRoute)],
             [$isEnglish ? 'Company' : 'Société', route($routePrefix . 'company')],
+            ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
+            [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
             ['Contact', route($homeRoute) . '#cta'],
             [$isEnglish ? 'Privacy' : 'Confidentialité', route('privacy-policy')],
         ],
