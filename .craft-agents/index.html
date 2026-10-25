@@ -259,7 +259,6 @@
             <div class="project-header">
                 <div class="fs-5 fw-bold text-white mb-0">Craft Agents</div>
             </div>
-            <div class="mb-2 text-secondary small fw-bold text-uppercase px-2" style="font-size: 0.7rem;">Items</div>
             <div class="item-list" id="items-list">
                 <!-- Populated by JS -->
             </div>
@@ -309,49 +308,64 @@
         let items = [];
 
         async function fetchItems() {
+            const status = document.getElementById('loading-status');
+            status?.classList.remove('d-none');
+            
             try {
                 // Tentative de lecture du répertoire (marche sur les serveurs de dev qui listent les fichiers)
                 const response = await fetch('items/');
-                if (!response.ok) throw new Error('Cannot list directory');
-                
-                const html = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const links = Array.from(doc.querySelectorAll('a'));
-                
-                const itemFiles = links
-                    .map(a => a.getAttribute('href'))
-                    .filter(href => href && href.endsWith('.md') && href.startsWith('ITEM-'))
-                    .map(href => href.replace('.md', ''));
-                
-                const discoveredItems = [];
-                for (const id of itemFiles) {
-                    const content = await loadFile(`items/${id}.md`);
-                    if (content) {
-                        const nameMatch = content.match(/^# ([^:\n]+): (.*)$/m) || content.match(/^# (.*)$/m);
-                        const name = nameMatch ? (nameMatch[2] || nameMatch[1]) : id;
-                        // On récupère la date via les headers si possible, sinon on met 0
-                        discoveredItems.push({ id, name, date: Date.now() / 1000 });
+                let discoveredItems = [];
+
+                if (response.ok) {
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const links = Array.from(doc.querySelectorAll('a'));
+                    
+                    const itemFiles = links
+                        .map(a => a.getAttribute('href'))
+                        .filter(href => href && href.endsWith('.md') && href.startsWith('ITEM-'))
+                        .map(href => href.replace('.md', ''));
+                    
+                    for (const id of itemFiles) {
+                        const content = await loadFile(`items/${id}.md`);
+                        if (content) {
+                            const nameMatch = content.match(/^# ([^:\n]+): (.*)$/m) || content.match(/^# (.*)$/m);
+                            const name = nameMatch ? (nameMatch[2] || nameMatch[1]) : id;
+                            discoveredItems.push({ id, name, date: Date.now() / 1000 });
+                        }
+                    }
+                }
+
+                // Fallback / Complément : Recherche séquentielle si la liste est vide ou incomplète
+                // On essaie de charger les items de ITEM-001 à ITEM-020 (ou plus si nécessaire)
+                if (discoveredItems.length < 5) {
+                    for (let i = 1; i <= 20; i++) {
+                        const id = `ITEM-${String(i).padStart(3, '0')}`;
+                        if (discoveredItems.find(item => item.id === id)) continue;
+                        
+                        const content = await loadFile(`items/${id}.md`);
+                        if (content) {
+                            const nameMatch = content.match(/^# ([^:\n]+): (.*)$/m) || content.match(/^# (.*)$/m);
+                            const name = nameMatch ? (nameMatch[2] || nameMatch[1]) : id;
+                            discoveredItems.push({ id, name, date: Date.now() / 1000 });
+                        }
                     }
                 }
                 
-                // Tri par ID décroissant par défaut (ordre chronologique inverse supposé)
-                items = discoveredItems.sort((a, b) => b.id.localeCompare(a.id));
-                updateSidebar();
-                
-                if (items.length > 0 && !currentItem) {
-                    selectItem(items[0].id);
+                if (discoveredItems.length > 0) {
+                    // Tri par ID décroissant par défaut (ordre chronologique inverse supposé)
+                    items = discoveredItems.sort((a, b) => b.id.localeCompare(a.id));
+                    updateSidebar();
+                    
+                    if (items.length > 0 && !currentItem) {
+                        selectItem(items[0].id);
+                    }
                 }
             } catch (e) {
-                console.warn('Dynamic listing failed, falling back to manual discovery', e);
-                // Fallback : On pourrait essayer de charger ITEM-001, 002... ou utiliser une liste injectée
-                // Pour Junie, on va injecter la liste actuelle pour garantir que ça marche hors-serveur
-                items = [
-                    { id: 'ITEM-002', name: 'Retravail du menu Cas d\'usages', date: 1729878180 },
-                    { id: 'ITEM-001', name: 'Ajout du lien Société dans le menu', date: 1729846800 }
-                ];
-                updateSidebar();
-                if (items.length > 0 && !currentItem) selectItem(items[0].id);
+                console.warn('Listing failed', e);
+            } finally {
+                status?.classList.add('d-none');
             }
         }
 

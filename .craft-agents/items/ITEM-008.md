@@ -3,15 +3,16 @@
 - Owner: Junie
 - Base: 1.x
 - Branch: item/ITEM-008
-- Status: ready
+- Status: ready_to_merge
 
 ## Description
 
-Make the items list in index.html refresh automatically and provide a manual refresh button.
-The current implementation relies on directory listing which might fail and uses a stale fallback.
+Improve the discovery logic in index.html to correctly populate the items list even when directory listing is disabled.
+The previous plan to add a refresh button and auto-refresh was rejected by the user.
 
 ## Acceptance
 
-- [ ] A refresh button is available in the sidebar.
-- [ ] The list refreshes automatically every 60 seconds.
-- [ ] The list is correctly populated from existing files in the items/ directory.
+- [x] The items list is correctly populated from existing files in the items/ directory.
+- [x] No manual refresh button is present.
+- [x] No automatic refresh timer is active.
+- [x] The "Items" label above the list is removed.
