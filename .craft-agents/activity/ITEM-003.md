@@ -13,3 +13,27 @@
 - 2026-10-25T18:15Z | Junie | I003-S02 | updated | pending → approved
 - 2026-10-25T18:15Z | Junie | I003-S04 | updated | pending → approved
 - 2026-10-25T18:16Z | Junie | I003 | updated | specifying → ready
+- 2026-10-25T18:18Z | Junie | git | commit | 695e3f97: record approved Specs on main
+- 2026-10-25T18:19Z | Junie | git | checkout | Create branch item/ITEM-003 from main
+- 2026-10-25T18:19Z | Junie | I003 | updated | ready → in_progress
+- 2026-10-25T18:20Z | Junie | I003-S01 | updated | approved → in_progress
+- 2026-10-25T18:21Z | Junie | I003-S01 | updated | in_progress → completed
+- 2026-10-25T18:21Z | Junie | git | commit | 06e3627d: record Spec S01 on item/ITEM-003
+- 2026-10-25T18:22Z | Junie | I003-S02 | updated | approved → in_progress
+- 2026-10-25T18:28Z | Junie | I003-S02 | updated | in_progress → completed
+- 2026-10-25T18:28Z | Junie | git | commit | ce7bddb9: record Spec S02 on item/ITEM-003
+- 2026-10-25T18:29Z | Junie | I003-S04 | updated | approved → in_progress
+- 2026-10-25T18:35Z | Junie | I003-S04 | updated | in_progress → completed
+- 2026-10-25T18:35Z | Junie | git | commit | 42368579: record Spec S04 on item/ITEM-003
+- 2026-10-25T18:36Z | Junie | I003 | updated | in_progress → review
+- 2026-10-25T18:45Z | Junie | I003 | updated | review → in_progress
+- 2026-10-25T18:45Z | Junie | I003-S02 | updated | completed → in_progress
+- 2026-10-25T18:55Z | Junie | I003-S02 | updated | in_progress → completed
+- 2026-10-25T18:55Z | Junie | git | commit | ce7bddb9: record additional menu cleanups on item/ITEM-003
+- 2026-10-25T18:56Z | Junie | I003 | updated | in_progress → review
+- 2026-10-25T18:58Z | Junie | I003 | updated | review → ready_to_merge
+- 2026-10-25T18:59Z | Junie | question | asked | Autoriser le merge de item/ITEM-003 vers main ?
+
+- 2026-10-25T17:08:UTC | Junie | I003 | updated | ready_to_merge → done
+- 2026-10-25T17:09:UTC | Junie | git | commit | Record approved merge on item/ITEM-003
+- 2026-10-25T17:10:UTC | Junie | git | merge | Merge branch item/ITEM-003 into main

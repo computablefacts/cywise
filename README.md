@@ -132,9 +132,7 @@ connaissances vérifiées et des bonnes pratiques reconnues. Une expertise acces
 
 :white_check_mark: auto-hébergé :white_check_mark: SaaS
 
-**Rédaction assistée de vos documents cyber.** Besoin de créer une Charte Informatique ou une Politique de Sécurité des
-Systèmes d'Information (PSSI) ? CyberScribe, notre éditeur intelligent, vous accompagne pas à pas pour rédiger des
-documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence artificielle.
+**Rédaction assistée de vos documents cyber.** Besoin de créer une Charte Informatique ? CyberScribe, notre éditeur intelligent, vous accompagne pas à pas pour rédiger des documents clairs, conformes et adaptés à vos besoins, grâce à l'intelligence artificielle.
 
 > [!WARNING]
 > Pour activer cette fonctionnalité dans la version auto-hébergée, vous devrez fournir votre propre clé d'API [DeepInfra](https://deepinfra.com/).
@@ -155,11 +153,7 @@ des messageries [Telegram](https://telegram.org) et [WhatsApp](https://www.whats
 
 :white_check_mark: auto-hébergé :white_check_mark: SaaS
 
-**Intégrez votre fond documentaire (Charte Informatique, PSSI, etc.) à CyberBuddy.** Offrez à vos équipes un accès
-instantané et intuitif à l'information. Il leur suffit de poser une question en langage naturel, comme « CyberBuddy,
-quelles sont les règles de télétravail dans notre PSSI ? », pour obtenir une réponse précise, extraite directement de
-vos ressources internes. Une manière simple et efficace de diffuser vos bonnes pratiques et de faciliter l'accès à
-l'information au quotidien.
+**Intégrez votre fond documentaire (Charte Informatique, etc.) à CyberBuddy.** Offrez à vos équipes un accès instantané et intuitif à l'information. Il leur suffit de poser une question en langage naturel, comme « CyberBuddy, quelles sont les règles de télétravail dans notre Charte Informatique ? », pour obtenir une réponse précise, extraite directement de vos ressources internes. Une manière simple et efficace de diffuser vos bonnes pratiques et de faciliter l'accès à l'information au quotidien.
 
 ### Single Sign-On (SSO)
 
@@ -219,9 +213,7 @@ Les composants clefs de cette architecture sont :
 - **Données structurées.** Utilise ClickHouse pour effectuer des analyses complexes et des calculs statistiques sur de
   grands volumes de données techniques (fuites de données ou imports de vos données tabulaires). Par exemple :
     - « Quels sont mes identifiants fuités ? »
-- **Base de connaissance.** Système de RAG (Retrieval Augmented Generation) qui fouille dans vos documents (Chartes
-  informatiques, PSSI, PDF) et vos notes personnelles (mémos) par recherche sémantique pour vous renvoyer des réponses
-  factuelles et sourcées. Par exemple :
+- **Base de connaissance.** Système de RAG (Retrieval Augmented Generation) qui fouille dans vos documents (Chartes informatiques, PDF) et vos notes personnelles (mémos) par recherche sémantique pour vous renvoyer des réponses factuelles et sourcées. Par exemple :
     - « Comment isoler un serveur compromis d'après nos procédures ? »
 - **Actions locales.** Permettent de piloter directement les fonctionnalités de Cywise via ses API JSON-RPC. Par
   exemple :
