@@ -12,18 +12,18 @@
     ];
 
     $solutions = [
-        ['critical', $t('Surface d’attaque', 'Attack surface'), $t('Voyez ce que les attaquants voient.', 'See what attackers see.'), $t('Surveillez les domaines publics, serveurs, ports et services exposés.', 'Monitor public domains, servers, ports and exposed services.'), 'solutions.attack-surface'],
-        ['medium', $t('Vulnérabilités', 'Vulnerabilities'), $t('Trouvez les points faibles.', 'Find the weak points.'), $t('Identifiez les vulnérabilités et concentrez-vous sur les risques les plus importants.', 'Identify vulnerabilities and focus on the most important risks.'), 'solutions.vulnerability-management'],
-        ['low', $t('Identifiants', 'Credentials'), $t('Sachez ce qui a fuité.', 'Know what leaked.'), $t('Détectez les identifiants compromis liés à votre entreprise.', 'Detect compromised credentials linked to your company.'), 'solutions.credential-monitoring'],
-        ['brand', 'CyberBuddy', $t('Demandez. Comprenez. Agissez.', 'Ask. Understand. Act.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance from your company context.'), 'solutions.cyberbuddy'],
-        ['ink', 'Pentest', $t('Faites tester par des experts.', 'Put humans on the attack.'), $t('Faites tester vos applications critiques par des experts en sécurité.', 'Test critical applications with experienced security experts.'), 'solutions.pentest'],
+        ['critical', $t('Surface d’attaque', 'Attack surface'), $t('Visualisez ce que les attaquants voient.', 'See what attackers see.'), $t('Surveillez vos domaines, serveurs et services exposés en temps réel.', 'Monitor public domains, servers, ports and exposed services.'), 'solutions.attack-surface'],
+        ['medium', $t('Vulnérabilités', 'Vulnerabilities'), $t('Détectez vos points faibles.', 'Find the weak points.'), $t('Identifiez vos vulnérabilités et concentrez-vous sur les risques les plus critiques.', 'Identify vulnerabilities and focus on the most important risks.'), 'solutions.vulnerability-management'],
+        ['low', $t('Identifiants', 'Credentials'), $t('Découvrez vos données exposées.', 'Know what leaked.'), $t('Détectez les identifiants compromis liés à votre entreprise sur le web.', 'Detect compromised credentials linked to your company.'), 'solutions.credential-monitoring'],
+        ['brand', 'CyberBuddy', $t('Interrogez. Comprenez. Agissez.', 'Ask. Understand. Act.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance from your company context.'), 'solutions.cyberbuddy'],
+        ['ink', 'Pentest', $t('Faites tester vos systèmes par nos experts.', 'Put humans on the attack.'), $t('Faites tester vos applications critiques par nos experts en sécurité offensive.', 'Test critical applications with experienced security experts.'), 'solutions.pentest'],
     ];
 
     $audiences = [
-        [$t('PME', 'SMBs'), $t('Protégez l’entreprise sans opérations de sécurité lourdes.', 'Protect the business without heavy security operations.'), 'audiences.smbs'],
-        [$t('Équipes IT', 'IT teams'), $t('Voyez clairement les risques et sachez quoi corriger en premier.', 'See risks clearly and know what to fix first.'), 'audiences.it-teams'],
-        [$t('RSSI', 'CISOs'), $t('Centralisez la visibilité et facilitez les décisions de sécurité.', 'Centralize visibility and support security decisions.'), 'audiences.cisos'],
-        ['MSP', $t('Gérez la visibilité sécurité sur plusieurs environnements clients.', 'Manage security visibility across customer environments.'), 'audiences.msps'],
+        [$t('PME', 'SMBs'), $t('Sécurisez votre entreprise sans infrastructure complexe.', 'Protect the business without heavy security operations.'), 'audiences.smbs'],
+        [$t('Équipes IT', 'IT teams'), $t('Visualisez vos risques et sachez exactement quoi corriger en priorité.', 'See risks clearly and know what to fix first.'), 'audiences.it-teams'],
+        [$t('RSSI', 'CISOs'), $t('Centralisez votre visibilité pour des décisions de sécurité éclairées.', 'Centralize visibility and support security decisions.'), 'audiences.cisos'],
+        ['MSP', $t('Gérez la sécurité de vos clients depuis une interface unique.', 'Manage security visibility across customer environments.'), 'audiences.msps'],
     ];
 
     $pentest = [
@@ -63,7 +63,7 @@
         <div class="{{ $wrap }} ui:py-22">
             <x-site.display class="ui:max-w-[980px]">{{ $t('La cybersécurité ne devrait pas exiger une équipe de 50 personnes.', 'Security should not need a 50-person team.') }}</x-site.display>
             <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
-                @foreach([$t('Sachez ce qui est exposé.', 'Know what is exposed.'), $t('Sachez ce qui compte.', 'Know what matters.'), $t('Sachez quoi corriger.', 'Know what to fix.')] as $line)
+                @foreach([$t('Découvrez ce qui est exposé.', 'Know what is exposed.'), $t('Priorisez ce qui compte.', 'Know what matters.'), $t('Maîtrisez quoi corriger.', 'Know what to fix.')] as $line)
                     <div class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6 ui:text-[26px] ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $line }}</div>
                 @endforeach
             </div>
