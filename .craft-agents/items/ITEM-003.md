@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-003
-- Status: ready
+- Status: done
 
 ## Description
 
@@ -12,7 +12,7 @@ Cela inclut les pages de présentation, les entrées de menu, les sections du fo
 
 ## Acceptance
 
-- [ ] La page dédiée à la PSSI n'est plus accessible.
-- [ ] Les liens vers la PSSI dans le header et le footer ont été supprimés.
-- [ ] Les références à la PSSI dans le README et autres documents de documentation sont retirées.
-- [ ] Les traductions liées à la PSSI sont nettoyées.
+- [x] La page dédiée à la PSSI n'est plus accessible.
+- [x] Les liens vers la PSSI dans le header et le footer ont été supprimés.
+- [x] Les références à la PSSI dans le README et autres documents de documentation sont retirées.
+- [x] Les traductions liées à la PSSI sont nettoyées.
