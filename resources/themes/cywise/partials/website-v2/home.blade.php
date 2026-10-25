@@ -31,6 +31,33 @@
         [$t('Livrable', 'Deliverable'), $t('1 rapport', '1 report')],
         [$t('À partir de', 'Starting at'), $t('3 000 €', '€3,000')],
     ];
+
+    $testimonials = [
+        [
+            'quote' => $t(
+                'Cywise est le meilleur produit que j\'ai vu en matière de détection de vulnérabilités de qualité, sans faux positifs.',
+                'Cywise is the best product I\'ve seen for quality vulnerability detection, with no false positives.'
+            ),
+            'author' => 'Julien B.',
+            'title' => $t('CISO d\'un groupe du CAC40', 'CISO of a CAC40 group')
+        ],
+        [
+            'quote' => $t(
+                'Avec Cywise, nous avons vu produire une PSSI claire et complète pour notre client en quelques jours au lieu de plusieurs semaines. Un vrai game changer aussi bien en terme de temps qu\'en terme de qualité et de suivi.',
+                'With Cywise, we saw a clear and complete security policy produced for our client in a few days instead of several weeks. A real game changer in terms of time, quality and follow-up.'
+            ),
+            'author' => 'Augustin B.',
+            'title' => $t('Co-fondateur d\'Ackero', 'Co-founder of Ackero')
+        ],
+        [
+            'quote' => $t(
+                'La solution a amélioré notre visibilité des périmètres exposés et internes. Nous avons été notifiés automatiquement des vulnérabilités à corriger. Rien de critique, heureusement. Depuis, nous sommes alertés dès qu\'un changement important est détecté. En somme l\'idéal pour une PME comme la nôtre.',
+                'The solution improved our visibility of exposed and internal perimeters. We were automatically notified of vulnerabilities to fix. Nothing critical, fortunately. Since then, we are alerted as soon as a significant change is detected. In short, ideal for an SMB like ours.'
+            ),
+            'author' => 'Sylvain M.',
+            'title' => $t('RSSI d\'Oppscience', 'CISO of Oppscience')
+        ],
+    ];
 @endphp
 
 <main>
@@ -65,6 +92,31 @@
             <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
                 @foreach([$t('Découvrez ce qui est exposé.', 'Discover what is exposed.'), $t('Priorisez ce qui compte.', 'Prioritize what matters.'), $t('Maîtrisez quoi corriger.', 'Master what to fix.')] as $line)
                     <div class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6 ui:text-[26px] ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $line }}</div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    {{-- Testimonials --}}
+    <section class="ui:border-0 ui:border-b ui:border-solid ui:border-line ui:bg-canvas">
+        <div class="{{ $wrap }} ui:py-24">
+            <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
+                <x-site.display>{!! $t('Ce qu’ils en disent.<br><span class="ui:text-slate-400">Leurs retours d’expérience.</span>', 'What they say.<br><span class="ui:text-slate-400">Their feedback.</span>') !!}</x-site.display>
+                <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Découvrez comment Cywise transforme la cybersécurité de nos clients au quotidien.', 'Discover how Cywise transforms our customers\' cybersecurity every day.') }}</p>
+            </div>
+            <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
+                @foreach($testimonials as $testimonial)
+                    <div class="ui:flex ui:flex-col ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-8">
+                        <div class="ui:flex-1 ui:text-lg ui:italic ui:leading-relaxed ui:text-slate-700">
+                            "{{ $testimonial['quote'] }}"
+                        </div>
+                        <div class="ui:mt-8 ui:flex ui:items-center ui:gap-4">
+                            <div class="ui:flex ui:flex-col">
+                                <span class="ui:font-bold ui:text-ink">{{ $testimonial['author'] }}</span>
+                                <span class="ui:text-sm ui:text-slate-500">{{ $testimonial['title'] }}</span>
+                            </div>
+                        </div>
+                    </div>
                 @endforeach
             </div>
         </div>
