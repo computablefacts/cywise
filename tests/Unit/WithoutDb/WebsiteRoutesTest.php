@@ -49,11 +49,13 @@ it('renders localized website copy', function () {
     $this->get('/en')
         ->assertOk()
         ->assertSee('Cywise helps companies identify exposed assets', false)
+        ->assertSee('Company', false)
         ->assertDontSee('Redesign conceptuel', false);
 
     $this->get('/use-cases')
         ->assertOk()
         ->assertSee('Créer une PSSI', false)
+        ->assertSee('Société', false)
         ->assertDontSee('Create a PSSI', false);
 });
 
