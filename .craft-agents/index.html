@@ -259,12 +259,7 @@
             <div class="project-header">
                 <div class="fs-5 fw-bold text-white mb-0">Craft Agents</div>
             </div>
-            <div class="mb-2 text-secondary small fw-bold text-uppercase px-2 d-flex justify-content-between align-items-center" style="font-size: 0.7rem;">
-                <span>Items</span>
-                <button class="btn btn-link p-0 text-secondary" onclick="fetchItems()" title="Refresh list">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
-                </button>
-            </div>
+            <div class="mb-2 text-secondary small fw-bold text-uppercase px-2" style="font-size: 0.7rem;">Items</div>
             <div class="item-list" id="items-list">
                 <!-- Populated by JS -->
             </div>
@@ -632,8 +627,6 @@
 
         // Initialisation
         fetchItems();
-        // Rafraîchissement automatique toutes les 60 secondes
-        setInterval(fetchItems, 60000);
     </script>
 </body>
 </html>

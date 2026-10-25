@@ -22,3 +22,10 @@
 - 2026-10-25T20:29Z | Junie | I008-S02 | updated | in_progress → completed
 - 2026-10-25T20:29Z | Junie | I008-S03 | updated | in_progress → completed
 - 2026-10-25T20:30Z | Junie | git | commit | 9b2d8e4: implement auto-refresh and manual refresh in index.html
+
+- 2026-10-25T20:31Z | Junie | I008 | updated | in_progress → review
+
+- 2026-10-25T20:35Z | User | decision | provided | Remove refresh button and auto-refresh; only keep discovery improvement
+- 2026-10-25T20:35Z | Junie | I008-S01 | updated | completed → dropped
+- 2026-10-25T20:35Z | Junie | I008-S02 | updated | completed → dropped
+- 2026-10-25T20:35Z | Junie | I008 | updated | ready_to_merge → in_progress
