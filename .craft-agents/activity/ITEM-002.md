@@ -55,3 +55,6 @@
 - 2026-10-25T17:40Z | Junie | tests | executed | vendor/bin/pest tests/Unit/WithoutDb/WebsiteRoutesTest.php
 - 2026-10-25T17:41Z | Junie | git | commit | 245be7a: update tests for plural use cases
 - 2026-10-25T17:41Z | Junie | I002 | updated | review → ready_to_merge
+- 2026-10-25T17:42Z | User | decision | provided | oui
+- 2026-10-25T17:43Z | Junie | I002 | updated | ready_to_merge → done
+- 2026-10-25T17:43Z | Junie | git | merge | Merge branch item/ITEM-002 into main
