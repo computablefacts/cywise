@@ -17,11 +17,11 @@
             ['MSP', route($routePrefix . 'audiences.msps')],
         ],
         ($isEnglish ? 'Use cases' : 'Cas d’usages') => [
-            [$isEnglish ? 'Attack surface' : 'Surface d’attaque', route($routePrefix . 'use-cases.monitor-attack-surface')],
-            [$isEnglish ? 'Vulnerabilities' : 'Vulnérabilités', route($routePrefix . 'use-cases.find-vulnerabilities')],
-            [$isEnglish ? 'Credentials' : 'Identifiants', route($routePrefix . 'use-cases.check-leaked-credentials')],
-            ['Audit', route($routePrefix . 'use-cases.prepare-audit')],
-            ['Pentest', route($routePrefix . 'use-cases.run-pentest')],
+            [$isEnglish ? 'Monitor your attack surface' : 'Surveiller votre surface d’attaque', route($routePrefix . 'use-cases.monitor-attack-surface')],
+            [$isEnglish ? 'Detect your vulnerabilities' : 'Détecter vos vulnérabilités', route($routePrefix . 'use-cases.find-vulnerabilities')],
+            [$isEnglish ? 'Search for compromised credentials' : 'Rechercher vos identifiants compromis', route($routePrefix . 'use-cases.check-leaked-credentials')],
+            [$isEnglish ? 'Prepare your audit' : 'Préparer votre audit', route($routePrefix . 'use-cases.prepare-audit')],
+            [$isEnglish ? 'Launch an expert pentest' : 'Lancer un pentest expert', route($routePrefix . 'use-cases.run-pentest')],
         ],
         'Cywise' => [
             [$isEnglish ? 'Home' : 'Accueil', route($homeRoute)],

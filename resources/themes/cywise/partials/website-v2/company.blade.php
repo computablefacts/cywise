@@ -6,20 +6,20 @@
     $cardTitle = 'ui:m-0 ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%';
 
     $pillars = [
-        [$t('Visibilité complète', 'Full visibility'), $t('Sur votre état de sécurité, en continu.', 'On your security posture, continuously.')],
-        [$t('Automatisation', 'Automation'), $t('Des tâches techniques, pour compenser le manque de ressources internes.', 'Of technical tasks, to make up for limited in-house resources.')],
-        [$t('Chatbot pédagogique', 'Teaching chatbot'), $t('Pour répondre à vos questions et vous former en même temps.', 'To answer your questions and train you at the same time.')],
-        [$t('Accompagnement humain', 'Human support'), $t('Quand c’est nécessaire : ticket, support, hotline.', 'When needed: ticket, support, hotline.')],
-        [$t('Tarification TPE/PME', 'SMB pricing'), $t('Claire, transparente, sans surprise.', 'Clear, transparent, no surprises.')],
-        [$t('Modulaire et évolutive', 'Modular and scalable'), $t('Vous commencez petit, vous adaptez au fur et à mesure.', 'Start small, adapt as you go.')],
+        [$t('Visibilité totale', 'Full visibility'), $t('Maîtrisez votre posture de sécurité en temps réel et en continu.', 'Master your security posture in real-time and continuously.')],
+        [$t('Automatisation intelligente', 'Smart automation'), $t('Libérez vos ressources internes grâce à l’automatisation des tâches techniques complexes.', 'Free up your internal resources through the automation of complex technical tasks.')],
+        [$t('Accompagnement pédagogique', 'Educational support'), $t('Progressez avec votre assistant CyberBuddy qui répond à vos questions et vous forme.', 'Progress with your CyberBuddy assistant who answers your questions and trains you.')],
+        [$t('Expertise humaine', 'Human expertise'), $t('Bénéficiez de notre support et de nos experts quand vous en avez besoin.', 'Benefit from our support and our experts when you need them.')],
+        [$t('Transparence tarifaire', 'Transparent pricing'), $t('Profitez d’une offre claire et adaptée aux TPE/PME, sans frais cachés.', 'Take advantage of a clear offer adapted to small businesses, without hidden fees.')],
+        [$t('Évolutivité garantie', 'Guaranteed scalability'), $t('Adaptez vos capacités de défense à mesure que votre entreprise grandit.', 'Adapt your defense capabilities as your company grows.')],
     ];
 
     $values = [
-        [$t('Honnêteté & Intégrité', 'Honesty & Integrity'), $t('« On dit ce qu’on fait. On fait ce qu’on dit. » Et on ne vend pas des promesses vides. Ni à nos clients, ni entre nous.', '“We say what we do. We do what we say.” And we don’t sell empty promises. Not to our customers, not to each other.')],
-        [$t('Partage & Transmission', 'Sharing & Teaching'), $t('La cybersécurité, on ne la garde pas pour nous. On la simplifie, on la vulgarise, on la transmet. Avec pédagogie. Et quand on peut, avec humour.', 'We don’t keep cybersecurity to ourselves. We simplify it, explain it, pass it on. Patiently. And with humour when we can.')],
-        [$t('Curiosité & Persévérance', 'Curiosity & Perseverance'), $t('Notre IA est curieuse par nature. Et nous aussi. On gratte, on teste, on creuse, on ajuste. Jusqu’à ce que ça fonctionne !', 'Our AI is curious by nature. So are we. We scratch, test, dig and adjust. Until it works!')],
-        [$t('Fiabilité', 'Reliability'), $t('On déteste les bugs (et les tickets !). Alors on développe proprement, on vérifie, et on livre un produit sérieux.', 'We hate bugs (and tickets!). So we build cleanly, we check, and we ship a serious product.')],
-        [$t('Accessibilité & Inclusion', 'Accessibility & Inclusion'), $t('Pas besoin d’un doctorat en cybersécurité pour utiliser Cywise. Notre solution est pensée pour les TPE/PME. Elle est accessible techniquement et financièrement !', 'No PhD in cybersecurity needed to use Cywise. It is built for SMBs, and affordable both technically and financially!')],
+        [$t('Transparence & Intégrité', 'Transparency & Integrity'), $t('Nous agissons avec honnêteté : nous tenons nos engagements et délivrons une valeur réelle, sans promesses superflues.', 'We act with honesty: we keep our commitments and deliver real value, without superfluous promises.')],
+        [$t('Transmission & Partage', 'Transmission & Sharing'), $t('Nous simplifions la cybersécurité pour la rendre accessible à tous. Nous partageons notre savoir avec pédagogie et clarté.', 'We simplify cybersecurity to make it accessible to everyone. We share our knowledge with pedagogy and clarity.')],
+        [$t('Innovation & Persévérance', 'Innovation & Perseverance'), $t('Nous explorons sans cesse de nouvelles solutions techniques pour devancer les menaces et protéger efficacement votre activité.', 'We constantly explore new technical solutions to stay ahead of threats and effectively protect your activity.')],
+        [$t('Fiabilité & Rigueur', 'Reliability & Rigor'), $t('Nous concevons des outils robustes et performants sur lesquels vous pouvez compter au quotidien.', 'We design robust and high-performance tools that you can count on every day.')],
+        [$t('Accessibilité & Engagement', 'Accessibility & Engagement'), $t('Nous rendons la haute sécurité accessible aux TPE et PME, tant sur le plan technique que financier.', 'We make high security accessible to small businesses, both technically and financially.')],
     ];
 
     // [photo, name, role, bio]
@@ -33,10 +33,8 @@
     ];
 
     $actions = [
-        $t('Lancer un audit express', 'Run an express audit'),
-        $t('Générer votre charte informatique', 'Generate your IT charter'),
-        $t('Déployer un honeypot en deux temps trois mouvements', 'Deploy a honeypot in no time'),
-        $t('Être conforme à NIS2 sans complexité', 'Comply with NIS2 without the hassle'),
+        $t('Lancer votre audit express', 'Run an express audit'),
+        $t('Assurer votre conformité NIS2 simplement', 'Comply with NIS2 without the hassle'),
     ];
 @endphp
 
@@ -78,7 +76,7 @@
     <section class="{{ $wrap }} ui:grid ui:grid-cols-1 ui:gap-8 ui:py-24 ui:lg:grid-cols-2 ui:lg:gap-12">
         <x-site.display>{!! $t('La petite<br>histoire', 'Our<br>story') !!}</x-site.display>
         <div class="ui:text-lg ui:leading-relaxed ui:text-slate-700">
-            <p class="ui:m-0">{{ $t('Cyrille et Pierre se sont rencontrés il y a 15 ans, alors qu’ils étaient encore étudiants, unis par leur fascination pour la magie, où la maîtrise de l’illusion et de la dissimulation joue un rôle central. Des principes que l’on retrouve aujourd’hui dans les honeypots développés par Cywise, conçus pour tromper et piéger les cyberattaquants.', 'Cyrille and Pierre met 15 years ago as students, brought together by a fascination for magic, where mastering illusion and concealment is everything. The same principles drive the honeypots Cywise builds today, designed to deceive and trap attackers.') }}</p>
+            <p class="ui:m-0">{{ $t('Cyrille et Pierre se sont rencontrés il y a 15 ans, alors qu’ils étaient encore étudiants, unis par leur fascination pour la magie, où la maîtrise de l’illusion et de la dissimulation joue un rôle central.', 'Cyrille and Pierre met 15 years ago as students, brought together by a fascination for magic, where mastering illusion and concealment is everything.') }}</p>
             <p class="ui:m-0 ui:mt-5">{{ $t('Après des parcours distincts — Cyrille, diplômé du Master Parisien de Recherche en Informatique, a fait ses armes chez FactSet dans la gestion de données, tandis que Pierre, diplômé de l’EPITA, a œuvré au ministère de l’Intérieur comme spécialiste en cyber offensive — ils ont chacun fondé et dirigé leurs propres entreprises.', 'They then took separate paths — Cyrille, a graduate of the Parisian Master of Research in Computer Science, cut his teeth in data management at FactSet, while Pierre, an EPITA graduate, worked at the French Ministry of the Interior as an offensive cyber specialist — and each founded and ran his own company.') }}</p>
             <p class="ui:m-0 ui:mt-5">{{ $t('En 2018, ils unissent leurs forces pour créer ComputableFacts, aujourd’hui Cywise, avec une ambition claire : rendre la cybersécurité accessible à tous, y compris aux TPE et PME.', 'In 2018, they joined forces to create ComputableFacts, now Cywise, with a clear goal: make cybersecurity accessible to everyone, small businesses included.') }}</p>
             <p class="ui:m-0 ui:mt-5">{{ $t('Cywise est le fruit de quatre années de recherche et développement, où se mêlent expertise en données et cybersécurité.', 'Cywise is the result of four years of research and development, blending data and cybersecurity expertise.') }}</p>
@@ -130,7 +128,7 @@
         </ul>
     </section>
 
-    <x-site.cta :href="route('tools.cybercheck.init')" :label="$t('Démarrer mon audit gratuit →', 'Start my free audit →')">
-        <x-slot:title>{!! $t('Prêt à sécuriser<br>votre activité ?', 'Ready to secure<br>your business?') !!}</x-slot:title>
+    <x-site.cta :href="route('tools.cybercheck.init')" :label="$t('Lancer mon audit gratuit →', 'Start my free audit →')">
+        <x-slot:title>{!! $t('Démystifiez votre<br>cybersécurité.', 'Demystify your<br>cybersecurity.') !!}</x-slot:title>
     </x-site.cta>
 </main>

@@ -10,17 +10,17 @@ name('website.en.solutions.credential-monitoring');
     :language-url="route('website.solutions.credential-monitoring')"
     :seo="[
         'title' => 'Credential Monitoring — Cywise',
-        'description' => 'Detect compromised company credentials before attackers use them.',
+        'description' => 'Detect your compromised credentials on the web and protect your critical access.',
     ]"
 >
 <main>
     {{-- Hero: the accent is the solution's tone (credentials → low, marker for contrast) --}}
     <section class="ui:mx-auto ui:grid ui:max-w-[1240px] ui:grid-cols-1 ui:items-end ui:gap-12 ui:px-4 ui:pb-22 ui:pt-16 ui:sm:px-6 ui:lg:grid-cols-2">
         <div>
-            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Know what <span class="ui:bg-low ui:px-[0.06em] ui:box-decoration-clone">leaked.</span></x-site.display>
-            <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Detect compromised company credentials before attackers use them.</p>
+            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Discover your <span class="ui:bg-low ui:px-[0.06em] ui:box-decoration-clone">leaked data.</span></x-site.display>
+            <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Detect your compromised credentials on the web before they are exploited by cyberattackers.</p>
             <div class="ui:mt-8 ui:flex ui:flex-wrap ui:gap-3">
-                <x-site.button :href="route('register')">Start protecting →</x-site.button>
+                <x-site.button :href="route('register')">Monitor my credentials →</x-site.button>
                 <x-site.button variant="outline" :href="route('website.en.solutions.index')">Explore Cywise</x-site.button>
             </div>
         </div>
@@ -39,13 +39,13 @@ name('website.en.solutions.credential-monitoring');
     {{-- What you get --}}
     <section class="ui:border-0 ui:border-y ui:border-solid ui:border-line ui:bg-canvas">
         <div class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:py-22 ui:sm:px-6">
-            <x-site.display>Security that stays clear.</x-site.display>
+            <x-site.display>Protect your employees’ access.</x-site.display>
             <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:gap-3 ui:sm:grid-cols-2">
                 @foreach([
-                    ['Leak detection', 'Find exposed credentials linked to company identities.'],
-                    ['Domain coverage', 'Monitor accounts connected to your domains.'],
-                    ['Action guidance', 'Know which password or account action comes first.'],
-                    ['Team alerts', 'Surface new critical findings quickly.'],
+                    ['Leak detection', 'Identify your credentials exposed during third-party site breaches.'],
+                    ['Domain monitoring', 'Continuously scan accounts linked to your company domains.'],
+                    ['Action plans', 'Receive precise instructions to secure compromised accounts as a priority.'],
+                    ['Real-time alerts', 'Be notified immediately as soon as a new leak impacts your organization.'],
                 ] as [$title, $text])
                     <article class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6">
                         <h3 class="ui:m-0 ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</h3>
@@ -58,16 +58,16 @@ name('website.en.solutions.credential-monitoring');
 
     <x-site.steps
         :steps="[
-            ['title' => 'Connect your scope.', 'text' => 'Define what Cywise must monitor for your organization.'],
-            ['title' => 'Find the important risks.', 'text' => 'Cywise groups signals and highlights the findings that need action.'],
-            ['title' => 'Fix with clear guidance.', 'text' => 'Your team gets direct actions without unnecessary security complexity.'],
+            ['title' => 'Target your domains.', 'text' => 'Indicate the domains and key accounts that Cywise should monitor.'],
+            ['title' => 'Identify leaks.', 'text' => 'We scan data breach databases to find your exposed access.'],
+            ['title' => 'Secure your access.', 'text' => 'Apply our recommendations to reset high-risk accounts and strengthen your security.'],
         ]"
     >
-        <x-slot:title>See.<br>Prioritize.<br><span class="ui:text-brand-500">Act.</span></x-slot:title>
+        <x-slot:title>Monitor.<br>Detect.<br><span class="ui:text-brand-500">Secure.</span></x-slot:title>
     </x-site.steps>
 
-    <x-site.cta :href="route('register')" label="Start protecting →">
-        <x-slot:title>Make your<br>security visible.</x-slot:title>
+    <x-site.cta :href="route('register')" label="Monitor my credentials →">
+        <x-slot:title>Don’t leave your compromised<br>credentials unprotected.</x-slot:title>
     </x-site.cta>
 </main>
 </x-layouts.website-v2>

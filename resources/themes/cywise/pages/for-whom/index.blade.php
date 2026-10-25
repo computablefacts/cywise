@@ -10,7 +10,7 @@ name('website.audiences.index');
     :language-url="route('website.en.audiences.index')"
     :seo="[
         'title' => 'Pour qui — Cywise',
-        'description' => 'Choisissez l’expérience adaptée à votre organisation ou votre rôle.',
+        'description' => 'Découvrez l’expérience Cywise adaptée à votre organisation et à vos enjeux de sécurité.',
     ]"
 >
 @include('theme::partials.website-v2.audiences', ['locale' => 'fr'])

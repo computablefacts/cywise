@@ -6,19 +6,19 @@
     $wrap = 'ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:sm:px-6';
 
     $audiences = [
-        [$t('PME', 'SMBs'), $t('La sécurité pensée pour les petites et moyennes entreprises.', 'Security for small and medium businesses.'), 'audiences.smbs'],
-        ['Startups', $t('Des bases de sécurité solides pour les équipes en forte croissance.', 'Security foundations for fast-growing teams.'), 'audiences.startups'],
-        [$t('Équipes IT', 'IT teams'), $t('Des actions de sécurité priorisées pour les équipes IT.', 'Prioritized security work for IT operations.'), 'audiences.it-teams'],
-        [$t('RSSI', 'CISOs'), $t('Une visibilité claire pour les responsables de la sécurité.', 'Clear visibility for security leadership.'), 'audiences.cisos'],
-        [$t('MSP', 'MSPs'), $t('Une visibilité sécurité reproductible pour chaque client.', 'Repeatable security visibility for customers.'), 'audiences.msps'],
+        [$t('PME', 'SMBs'), $t('Sécurisez votre activité avec une solution simple et efficace sans infrastructure complexe.', 'Secure your activity with a simple and effective solution without complex infrastructure.'), 'audiences.smbs'],
+        ['Startups', $t('Bâtissez des fondations de sécurité solides pour accompagner votre forte croissance.', 'Build solid security foundations to support your strong growth.'), 'audiences.startups'],
+        [$t('Équipes IT', 'IT teams'), $t('Automatisez votre surveillance et visualisez exactement les actions à mener.', 'Automate your monitoring and visualize exactly the actions to be taken.'), 'audiences.it-teams'],
+        [$t('RSSI', 'CISOs'), $t('Centralisez votre visibilité et facilitez vos prises de décisions stratégiques.', 'Centralize your visibility and facilitate your strategic decision-making.'), 'audiences.cisos'],
+        [$t('MSP', 'MSPs'), $t('Gérez la posture de sécurité de tous vos clients depuis une plateforme unique.', 'Manage the security posture of all your customers from a single platform.'), 'audiences.msps'],
     ];
 @endphp
 
 <main>
     {{-- Hero --}}
     <section class="{{ $wrap }} ui:pb-16 ui:pt-16">
-        <x-site.display as="h1" size="xl" class="ui:max-w-[1100px] ui:text-[clamp(26px,5.6vw,92px)]!">{!! $t('Conçu pour les équipes qui veulent de la <span class="ui:text-brand-500">clarté.</span>', 'Built for teams that need <span class="ui:text-brand-500">clarity.</span>') !!}</x-site.display>
-        <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ $t('Choisissez l’expérience adaptée à votre organisation ou votre rôle.', 'Choose the experience that matches your organization or role.') }}</p>
+        <x-site.display as="h1" size="xl" class="ui:max-w-[1100px] ui:text-[clamp(26px,5.6vw,92px)]!">{!! $t('Conçu pour les équipes qui exigent de la <span class="ui:text-brand-500">clarté.</span>', 'Designed for teams that demand <span class="ui:text-brand-500">clarity.</span>') !!}</x-site.display>
+        <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ $t('Sélectionnez le profil qui correspond à votre organisation pour découvrir votre expérience personnalisée.', 'Select the profile that matches your organization to discover your personalized experience.') }}</p>
     </section>
 
     {{-- Audience cards, same style as the home page's "for whom" section --}}
@@ -34,7 +34,7 @@
         </div>
     </section>
 
-    <x-site.cta :href="route('register')" :label="$t('Commencer →', 'Start protecting →')">
-        <x-slot:title>{!! $t('Rendez votre<br>sécurité visible.', 'Make your<br>security visible.') !!}</x-slot:title>
+    <x-site.cta :href="route('register')" :label="$t('Démarrer maintenant →', 'Start now →')">
+        <x-slot:title>{!! $t('Démystifiez votre<br>cybersécurité.', 'Demystify your<br>cybersecurity.') !!}</x-slot:title>
     </x-site.cta>
 </main>
