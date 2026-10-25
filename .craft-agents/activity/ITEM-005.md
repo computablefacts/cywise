@@ -22,3 +22,5 @@
 - 2026-10-25T19:25Z | Junie | I005-S03 | updated | in_progress → completed
 - 2026-10-25T19:26Z | Junie | git | commit | 8d7c2a1b: improve RouteTestSkip and re-enable HomeTestSkip
 - 2026-10-25T19:27Z | Junie | I005 | updated | in_progress → review
+- 2026-10-25T19:30Z | Junie | I005 | updated | review → ready_to_merge
+- 2026-10-25T19:31Z | Junie | question | asked | Authorize merge of item/ITEM-005 into main?
