@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-007
-- Status: ready
+- Status: done
 
 ## Description
 
