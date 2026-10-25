@@ -18,17 +18,17 @@
 
     // Generic "see, prioritize, act" flow: only fits the monitoring use cases
     $monitoring = [
-        ['title' => $t('Définissez votre périmètre.', 'Connect your scope.'), 'text' => $t('Définissez ce que Cywise doit surveiller pour votre organisation.', 'Define what Cywise must monitor for your organization.')],
-        ['title' => $t('Trouvez les risques importants.', 'Find the important risks.'), 'text' => $t('Cywise regroupe les signaux et met en évidence les constats qui nécessitent une action.', 'Cywise groups signals and highlights the findings that need action.')],
-        ['title' => $t('Corrigez avec des conseils clairs.', 'Fix with clear guidance.'), 'text' => $t('Votre équipe reçoit des actions concrètes, sans complexité inutile.', 'Your team gets direct actions without unnecessary security complexity.')],
+        ['title' => $t('Analysez votre périmètre.', 'Connect your scope.'), 'text' => $t('Identifiez les actifs que Cywise doit surveiller pour votre organisation.', 'Define what Cywise must monitor for your organization.')],
+        ['title' => $t('Ciblez les priorités.', 'Find the important risks.'), 'text' => $t('Cywise isole les risques critiques qui nécessitent votre attention immédiate.', 'Cywise groups signals and highlights the findings that need action.')],
+        ['title' => $t('Sécurisez vos systèmes.', 'Fix with clear guidance.'), 'text' => $t('Votre équipe applique nos recommandations concrètes pour éliminer les risques.', 'Your team gets direct actions without unnecessary security complexity.')],
     ];
 
     // Hero accent = the matching solution's tone (see site/edge-card); rows = example data (acme.fr)
     $cases = [
         'find-vulnerabilities' => [
             'accent' => 'ui:text-medium',
-            'title' => [$t('Trouvez ce qui peut', 'Find what can'), $t('céder.', 'break.')],
-            'lede' => $t('Détectez les faiblesses et transformez-les en liste de correction priorisée.', 'Discover weaknesses and turn them into a prioritized remediation list.'),
+            'title' => [$t('Trouvez vos failles avant', 'Find what can'), $t('les attaquants.', 'break.')],
+            'lede' => $t('Détectez vos vulnérabilités et transformez-les en un plan d’action priorisé pour vos équipes.', 'Discover weaknesses and turn them into a prioritized remediation list.'),
             'panel' => $t('Vulnérabilités · acme.fr', 'Vulnerabilities · acme.fr'),
             'font' => $sans,
             'rows' => [
@@ -38,19 +38,19 @@
                 ['low', $t('En-tête de sécurité manquant', 'Missing security header'), 'blog.acme.fr', $levels['low']],
             ],
             'features' => [
-                [$t('Analyse de l’exposition', 'Scan exposure'), $t('Analysez les systèmes exposés sur Internet.', 'Review internet-facing systems.')],
-                [$t('Identification des faiblesses', 'Identify weaknesses'), $t('Détectez les composants et configurations vulnérables connus.', 'Find known vulnerable components and configurations.')],
-                [$t('Priorisation', 'Prioritize'), $t('Distinguez les urgences des constats à faible impact.', 'Separate urgent issues from low-impact findings.')],
-                [$t('Explication du risque', 'Explain risk'), $t('Comprenez pourquoi chaque problème compte.', 'Understand why each issue matters.')],
-                [$t('Attribution des actions', 'Assign action'), $t('Attribuez la bonne correction au bon responsable.', 'Give the right fix to the right owner.')],
-                [$t('Suivi de la résolution', 'Track closure'), $t('Confirmez les progrès dans le temps.', 'Confirm progress over time.')],
+                [$t('Scan d’exposition', 'Scan exposure'), $t('Analysez vos systèmes accessibles depuis Internet en continu.', 'Review internet-facing systems.')],
+                [$t('Détection des failles', 'Identify weaknesses'), $t('Identifiez les composants et les configurations vulnérables de votre infrastructure.', 'Find known vulnerable components and configurations.')],
+                [$t('Ciblage des urgences', 'Prioritize'), $t('Concentrez vos efforts sur les constats à fort impact pour votre entreprise.', 'Separate urgent issues from low-impact findings.')],
+                [$t('Maîtrise du risque', 'Explain risk'), $t('Comprenez précisément pourquoi chaque vulnérabilité doit être traitée.', 'Understand why each issue matters.')],
+                [$t('Pilotage des actions', 'Assign action'), $t('Attribuez chaque correction au responsable adéquat dans votre organisation.', 'Give the right fix to the right owner.')],
+                [$t('Validation des progrès', 'Track closure'), $t('Mesurez l’amélioration de votre posture de sécurité dans le temps.', 'Confirm progress over time.')],
             ],
             'steps' => $monitoring,
         ],
         'monitor-attack-surface' => [
             'accent' => 'ui:text-critical',
-            'title' => [$t('Visualisez votre', 'See your'), $t('empreinte externe.', 'external footprint.')],
-            'lede' => $t('Suivez les actifs publics et les services exposés lorsqu’ils évoluent.', 'Keep track of public assets and exposed services as they change.'),
+            'title' => [$t('Maîtrisez votre', 'See your'), $t('empreinte externe.', 'external footprint.')],
+            'lede' => $t('Gardez le contrôle sur vos actifs publics et vos services exposés en temps réel.', 'Keep track of public assets and exposed services as they change.'),
             'panel' => $t('Changements · acme.fr', 'Changes · acme.fr'),
             'font' => $mono,
             'rows' => [
@@ -60,18 +60,18 @@
                 ['info', 'old.acme.fr', '443', $t('Retiré', 'Removed')],
             ],
             'features' => [
-                [$t('Découverte des actifs', 'Discover assets'), $t('Identifiez les domaines, hôtes et services publics.', 'Find domains, hosts and public services.')],
-                [$t('Détection des changements', 'Detect changes'), $t('Détectez l’apparition de nouvelles expositions.', 'See when new exposure appears.')],
-                [$t('Réduction des inconnues', 'Reduce unknowns'), $t('Retrouvez les actifs oubliés ou non gérés.', 'Find forgotten or unmanaged assets.')],
-                [$t('Priorisation de l’exposition', 'Prioritize exposure'), $t('Concentrez-vous sur les services publics à risque.', 'Focus on risky public services.')],
-                [$t('Conservation de l’historique', 'Keep history'), $t('Suivez l’évolution de votre empreinte.', 'Track how your footprint evolves.')],
+                [$t('Inventaire automatique', 'Discover assets'), $t('Référencez vos domaines, hôtes et services publics en continu.', 'Find domains, hosts and public services.')],
+                [$t('Alerte de changement', 'Detect changes'), $t('Soyez notifié immédiatement dès l’apparition d’une nouvelle exposition.', 'See when new exposure appears.')],
+                [$t('Contrôle de l’ombre', 'Reduce unknowns'), $t('Repérez vos actifs oubliés, obsolètes ou non gérés.', 'Find forgotten or unmanaged assets.')],
+                [$t('Vigilance accrue', 'Prioritize exposure'), $t('Concentrez votre attention sur les nouveaux services exposés à risque.', 'Focus on risky public services.')],
+                [$t('Historique d’évolution', 'Keep history'), $t('Visualisez comment votre surface d’attaque évolue au fil du temps.', 'Track how your footprint evolves.')],
             ],
             'steps' => $monitoring,
         ],
         'check-leaked-credentials' => [
             'accent' => 'ui:text-low',
-            'title' => [$t('Détectez les', 'Find'), $t('comptes compromis.', 'compromised accounts.')],
-            'lede' => $t('Détectez les identifiants exposés et réduisez le risque de prise de contrôle de compte.', 'Detect exposed credentials and reduce account takeover risk.'),
+            'title' => [$t('Protégez vos', 'Find'), $t('comptes compromis.', 'compromised accounts.')],
+            'lede' => $t('Identifiez vos identifiants exposés et prévenez les risques de prise de contrôle de compte.', 'Detect exposed credentials and reduce account takeover risk.'),
             'panel' => $t('Identifiants · acme.fr', 'Credentials · acme.fr'),
             'font' => $mono,
             'rows' => [
@@ -81,18 +81,18 @@
                 ['low', 'l.bernard@acme.fr', $t('Utilisateur', 'User'), $t('Réinitialisé', 'Reset')],
             ],
             'features' => [
-                [$t('Surveillance des domaines', 'Domain monitoring'), $t('Surveillez les identités liées aux domaines de l’entreprise.', 'Watch identities linked to company domains.')],
-                [$t('Signaux de fuite', 'Leak signals'), $t('Détectez les identifiants présents dans des sources de fuite connues.', 'Find credentials present in known leak sources.')],
-                [$t('Action utilisateur', 'User action'), $t('Indiquez aux utilisateurs ce qu’ils doivent modifier.', 'Tell users what to change.')],
-                [$t('Revue des accès', 'Access review'), $t('Contrôlez les comptes sensibles après une fuite.', 'Review sensitive accounts after a leak.')],
-                [$t('Contrôles continus', 'Ongoing checks'), $t('Poursuivez la détection après le nettoyage.', 'Continue detection after cleanup.')],
+                [$t('Surveillance active', 'Domain monitoring'), $t('Scannez les fuites de données pour protéger vos domaines d’entreprise.', 'Watch identities linked to company domains.')],
+                [$t('Détection préventive', 'Leak signals'), $t('Repérez vos identifiants dans les bases de données de compromissions tierces.', 'Find credentials present in known leak sources.')],
+                [$t('Remédiation assistée', 'User action'), $t('Guidez vos collaborateurs vers les actions de sécurisation nécessaires.', 'Tell users what to change.')],
+                [$t('Revue de sécurité', 'Access review'), $t('Vérifiez l’intégrité de vos comptes sensibles après chaque alerte.', 'Review sensitive accounts after a leak.')],
+                [$t('Vigilance permanente', 'Ongoing checks'), $t('Maintenez un contrôle continu sur l’exposition de vos identifiants.', 'Continue detection after cleanup.')],
             ],
             'steps' => $monitoring,
         ],
         'prepare-audit' => [
             'accent' => 'ui:text-brand-500',
-            'title' => [$t('Transformez le travail de sécurité en', 'Turn security work into'), $t('preuves.', 'evidence.')],
-            'lede' => $t('Organisez les constats, politiques et progrès avant un audit ou une revue client.', 'Organize findings, policies and progress before an audit or customer review.'),
+            'title' => [$t('Transformez votre sécurité en', 'Turn security work into'), $t('preuves.', 'evidence.')],
+            'lede' => $t('Centralisez vos preuves, vos politiques et vos actions avant vos audits et revues de conformité.', 'Organize findings, policies and progress before an audit or customer review.'),
             'panel' => $t('Audit · Acme', 'Audit · Acme'),
             'font' => $sans,
             'rows' => [
@@ -101,18 +101,18 @@
                 ['low', $t('Actions de remédiation', 'Remediation actions'), '12', $t('Suivi', 'Tracked')],
             ],
             'features' => [
-                [$t('Visibilité des écarts', 'Gap visibility'), $t('Identifiez les contrôles manquants et les risques ouverts.', 'See missing controls and open risks.')],
-                [$t('Préparation des politiques', 'Policy readiness'), $t('Passez en revue les documents de sécurité.', 'Review security documents.')],
-                [$t('Preuves de remédiation', 'Remediation evidence'), $t('Présentez les actions et les progrès.', 'Show actions and progress.')],
-                [$t('Vue de pilotage', 'Management view'), $t('Synthétisez la posture actuelle.', 'Summarize current posture.')],
-                [$t('Suivi', 'Follow-up'), $t('Conservez une visibilité sur le travail après l’audit.', 'Keep work visible after the audit.')],
+                [$t('Diagnostic des écarts', 'Gap visibility'), $t('Identifiez vos contrôles manquants et vos risques non couverts.', 'See missing controls and open risks.')],
+                [$t('Conformité documentaire', 'Policy readiness'), $t('Préparez et validez vos documents de sécurité pour vos auditeurs.', 'Review security documents.')],
+                [$t('Justification des progrès', 'Remediation evidence'), $t('Démontrez vos actions correctives et l’évolution de votre posture.', 'Show actions and progress.')],
+                [$t('Pilotage stratégique', 'Management view'), $t('Synthétisez votre situation réelle pour vos instances de décision.', 'Summarize current posture.')],
+                [$t('Veille post-audit', 'Follow-up'), $t('Conservez une visibilité sur vos engagements après l’audit.', 'Keep work visible after the audit.')],
             ],
             'steps' => null,
         ],
         'run-pentest' => [
             'accent' => 'ui:text-brand-500',
-            'title' => [$t('Testez avant que les attaquants', 'Test before'), $t('ne le fassent.', 'attackers do.')],
-            'lede' => $t('Utilisez des tests experts pour éprouver les applications et infrastructures critiques.', 'Use expert testing to challenge critical applications and infrastructure.'),
+            'title' => [$t('Testez vos défenses avant que', 'Test before'), $t('l’attaque n’ait lieu.', 'attackers do.')],
+            'lede' => $t('Faites évaluer vos applications et infrastructures critiques par nos experts en sécurité offensive.', 'Use expert testing to challenge critical applications and infrastructure.'),
             'panel' => $t('Rapport de pentest · app.acme.fr', 'Pentest report · app.acme.fr'),
             'font' => $sans,
             'rows' => [
@@ -122,12 +122,12 @@
                 ['low', $t('Divulgation de version', 'Version disclosure'), $t('Ouvert', 'Open'), $levels['low']],
             ],
             'features' => [
-                [$t('Périmètre', 'Scope'), $t('Définissez les systèmes et les objectifs.', 'Define systems and goals.')],
-                [$t('Reconnaissance', 'Reconnaissance'), $t('Examinez la surface d’attaque.', 'Review the attack surface.')],
-                [$t('Tests manuels', 'Manual testing'), $t('Éprouvez les systèmes avec des techniques expertes.', 'Challenge systems with expert techniques.')],
-                [$t('Preuves', 'Evidence'), $t('Documentez chaque faiblesse confirmée.', 'Document each confirmed weakness.')],
-                [$t('Rapport priorisé', 'Prioritized report'), $t('Classez les constats par gravité.', 'Order findings by severity.')],
-                [$t('Contre-test', 'Retest'), $t('Vérifiez les corrections importantes.', 'Verify important remediation.')],
+                [$t('Définition du cadre', 'Scope'), $t('Ciblez précisément vos systèmes et vos objectifs de sécurité.', 'Define systems and goals.')],
+                [$t('Reconnaissance experte', 'Reconnaissance'), $t('Analysez votre surface d’attaque avec une approche offensive.', 'Review the attack surface.')],
+                [$t('Simulations d’attaque', 'Manual testing'), $t('Éprouvez vos systèmes grâce aux techniques de nos pentesters experts.', 'Challenge systems with expert techniques.')],
+                [$t('Documentation des failles', 'Evidence'), $t('Obtenez des preuves concrètes pour chaque vulnérabilité confirmée.', 'Document each confirmed weakness.')],
+                [$t('Rapport priorisé', 'Prioritized report'), $t('Recevez vos résultats classés par sévérité pour une action immédiate.', 'Order findings by severity.')],
+                [$t('Validation des correctifs', 'Retest'), $t('Confirmez la résolution de vos failles critiques après remédiation.', 'Verify important remediation.')],
             ],
             'steps' => null,
         ],
@@ -187,7 +187,7 @@
         <div class="ui:h-24" aria-hidden="true"></div>
     @endif
 
-    <x-site.cta :href="route('register')" :label="$t('Commencer →', 'Start protecting →')">
-        <x-slot:title>{!! $t('Rendez votre<br>sécurité visible.', 'Make your<br>security visible.') !!}</x-slot:title>
+    <x-site.cta :href="route('register')" :label="$t('Démarrer maintenant →', 'Start protecting →')">
+        <x-slot:title>{!! $t('Démystifiez votre<br>cybersécurité.', 'Make your<br>security visible.') !!}</x-slot:title>
     </x-site.cta>
 </main>
