@@ -1,0 +1,47 @@
+# ITEM-004 Activity
+
+- 2026-10-25T18:25Z | Junie | I004 | created | Harmonisation corporate et Copywriting des textes français
+- 2026-10-25T18:26Z | Junie | I004 | updated | backlog → specifying
+- 2026-10-25T18:27Z | Junie | I004-S01 | created | Page d'accueil; pending
+- 2026-10-25T18:27Z | Junie | I004-S02 | created | Page Solutions Index; pending
+- 2026-10-25T18:27Z | Junie | I004-S03 | created | Solution Pentest; pending
+- 2026-10-25T18:27Z | Junie | I004-S04 | created | Solution Surface d'attaque; pending
+- 2026-10-25T18:27Z | Junie | I004-S05 | created | Solution Gestion des vulnérabilités; pending
+- 2026-10-25T18:27Z | Junie | I004-S06 | created | Solution Surveillance des identifiants; pending
+- 2026-10-25T18:27Z | Junie | I004-S07 | created | Solution CyberBuddy; pending
+- 2026-10-25T18:27Z | Junie | I004-S08 | created | Page Cas d'usage Index; pending
+- 2026-10-25T18:27Z | Junie | I004-S09 | created | Cas d'usage Surveiller la surface d'attaque; pending
+- 2026-10-25T18:27Z | Junie | I004-S10 | created | Cas d'usage Trouver des vulnérabilités; pending
+- 2026-10-25T18:27Z | Junie | I004-S11 | created | Cas d'usage Vérifier les identifiants; pending
+- 2026-10-25T18:27Z | Junie | I004-S12 | created | Cas d'usage Préparer un audit; pending
+- 2026-10-25T18:27Z | Junie | I004-S13 | created | Cas d'usage Lancer un pentest; pending
+- 2026-10-25T18:27Z | Junie | I004-S14 | created | Page Pour qui Index; pending
+- 2026-10-25T18:27Z | Junie | I004-S15 | created | Audience PME; pending
+- 2026-10-25T18:27Z | Junie | I004-S16 | created | Audience Startups; pending
+- 2026-10-25T18:27Z | Junie | I004-S17 | created | Audience Équipes IT; pending
+- 2026-10-25T18:27Z | Junie | I004-S18 | created | Audience RSSI; pending
+- 2026-10-25T18:27Z | Junie | I004-S19 | created | Audience MSP; pending
+- 2026-10-25T18:27Z | Junie | I004-S20 | created | Partials du site; pending
+- 2026-10-25T18:28Z | Junie | question | asked | Approuvez-vous la liste des 20 spécifications basées sur les principes de Copywriting ?
+- 2026-10-25T18:30Z | User | decision | provided | oui
+- 2026-10-25T18:31Z | Junie | I004-S01 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S02 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S03 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S04 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S05 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S06 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S07 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S08 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S09 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S10 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S11 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S12 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S13 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S14 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S15 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S16 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S17 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S18 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S19 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S20 | updated | pending → approved
+- 2026-10-25T18:32Z | Junie | I004 | updated | specifying → ready
