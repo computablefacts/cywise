@@ -109,4 +109,7 @@
 - 2026-10-25T19:13Z | Junie | I004 | updated | in_progress → review
 - 2026-10-25T19:15Z | User | decision | provided | Je n'autorise pas le marge mais le commit
 - 2026-10-25T19:16Z | Junie | I004 | updated | review → ready_to_merge
-- 2026-10-25T19:56Z | Junie | question | asked | Le commit 6f9c234f contient maintenant la SPEC S21 et les dernières corrections. Est-ce correct ?
+- 2026-10-25T19:56Z | Junie | I004-S21 | updated | completed → completed (a1fd5fbf)
+- 2026-10-25T19:57Z | User | decision | provided | Je suis ok pour le merge
+- 2026-10-25T19:58Z | Junie | I004 | updated | ready_to_merge → done
+- 2026-10-25T19:59Z | Junie | git | merge | Merge branch item/ITEM-004 into main (99531412)
