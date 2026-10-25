@@ -25,3 +25,5 @@
 - 2028-10-25T20:28Z | Junie | I006 | updated | in_progress → review
 - 2026-10-25T20:30Z | User | decision | provided | oui (autorisation de fusion)
 - 2026-10-25T20:31Z | Junie | I006 | updated | review → ready_to_merge
+- 2026-10-25T20:35Z | Junie | git | merge | Merge branch item/ITEM-006 into main
+- 2026-10-25T20:36Z | Junie | I006 | updated | ready_to_merge → done
