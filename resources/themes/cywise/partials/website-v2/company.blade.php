@@ -6,20 +6,20 @@
     $cardTitle = 'ui:m-0 ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%';
 
     $pillars = [
-        [$t('Visibilité complète', 'Full visibility'), $t('Sur votre état de sécurité, en continu.', 'On your security posture, continuously.')],
-        [$t('Automatisation', 'Automation'), $t('Des tâches techniques, pour compenser le manque de ressources internes.', 'Of technical tasks, to make up for limited in-house resources.')],
-        [$t('Chatbot pédagogique', 'Teaching chatbot'), $t('Pour répondre à vos questions et vous former en même temps.', 'To answer your questions and train you at the same time.')],
-        [$t('Accompagnement humain', 'Human support'), $t('Quand c’est nécessaire : ticket, support, hotline.', 'When needed: ticket, support, hotline.')],
-        [$t('Tarification TPE/PME', 'SMB pricing'), $t('Claire, transparente, sans surprise.', 'Clear, transparent, no surprises.')],
-        [$t('Modulaire et évolutive', 'Modular and scalable'), $t('Vous commencez petit, vous adaptez au fur et à mesure.', 'Start small, adapt as you go.')],
+        [$t('Visibilité totale', 'Full visibility'), $t('Maîtrisez votre posture de sécurité en temps réel et en continu.', 'On your security posture, continuously.')],
+        [$t('Automatisation intelligente', 'Automation'), $t('Libérez vos ressources internes grâce à l’automatisation des tâches techniques complexes.', 'Of technical tasks, to make up for limited in-house resources.')],
+        [$t('Accompagnement pédagogique', 'Teaching chatbot'), $t('Progressez avec votre assistant CyberBuddy qui répond à vos questions et vous forme.', 'To answer your questions and train you at the same time.')],
+        [$t('Expertise humaine', 'Human support'), $t('Bénéficiez de notre support et de nos experts quand vous en avez besoin.', 'When needed: ticket, support, hotline.')],
+        [$t('Transparence tarifaire', 'SMB pricing'), $t('Profitez d’une offre claire et adaptée aux TPE/PME, sans frais cachés.', 'Clear, transparent, no surprises.')],
+        [$t('Évolutivité garantie', 'Modular and scalable'), $t('Adaptez vos capacités de défense à mesure que votre entreprise grandit.', 'Start small, adapt as you go.')],
     ];
 
     $values = [
-        [$t('Honnêteté & Intégrité', 'Honesty & Integrity'), $t('« On dit ce qu’on fait. On fait ce qu’on dit. » Et on ne vend pas des promesses vides. Ni à nos clients, ni entre nous.', '“We say what we do. We do what we say.” And we don’t sell empty promises. Not to our customers, not to each other.')],
-        [$t('Partage & Transmission', 'Sharing & Teaching'), $t('La cybersécurité, on ne la garde pas pour nous. On la simplifie, on la vulgarise, on la transmet. Avec pédagogie. Et quand on peut, avec humour.', 'We don’t keep cybersecurity to ourselves. We simplify it, explain it, pass it on. Patiently. And with humour when we can.')],
-        [$t('Curiosité & Persévérance', 'Curiosity & Perseverance'), $t('Notre IA est curieuse par nature. Et nous aussi. On gratte, on teste, on creuse, on ajuste. Jusqu’à ce que ça fonctionne !', 'Our AI is curious by nature. So are we. We scratch, test, dig and adjust. Until it works!')],
-        [$t('Fiabilité', 'Reliability'), $t('On déteste les bugs (et les tickets !). Alors on développe proprement, on vérifie, et on livre un produit sérieux.', 'We hate bugs (and tickets!). So we build cleanly, we check, and we ship a serious product.')],
-        [$t('Accessibilité & Inclusion', 'Accessibility & Inclusion'), $t('Pas besoin d’un doctorat en cybersécurité pour utiliser Cywise. Notre solution est pensée pour les TPE/PME. Elle est accessible techniquement et financièrement !', 'No PhD in cybersecurity needed to use Cywise. It is built for SMBs, and affordable both technically and financially!')],
+        [$t('Transparence & Intégrité', 'Honesty & Integrity'), $t('Nous agissons avec honnêteté : nous tenons nos engagements et délivrons une valeur réelle, sans promesses superflues.', '“We say what we do. We do what we say.” And we don’t sell empty promises. Not to our customers, not to each other.')],
+        [$t('Transmission & Partage', 'Sharing & Teaching'), $t('Nous simplifions la cybersécurité pour la rendre accessible à tous. Nous partageons notre savoir avec pédagogie et clarté.', 'We don’t keep cybersecurity to ourselves. We simplify it, explain it, pass it on. Patiently. And with humour when we can.')],
+        [$t('Innovation & Persévérance', 'Curiosity & Perseverance'), $t('Nous explorons sans cesse de nouvelles solutions techniques pour devancer les menaces et protéger efficacement votre activité.', 'Our AI is curious by nature. So are we. We scratch, test, dig and adjust. Until it works!')],
+        [$t('Fiabilité & Rigueur', 'Reliability'), $t('Nous concevons des outils robustes et performants sur lesquels vous pouvez compter au quotidien.', 'We hate bugs (and tickets!). So we build cleanly, we check, and we ship a serious product.')],
+        [$t('Accessibilité & Engagement', 'Accessibility & Inclusion'), $t('Nous rendons la haute sécurité accessible aux TPE et PME, tant sur le plan technique que financier.', 'No PhD in cybersecurity needed to use Cywise. It is built for SMBs, and affordable both technically and financially!')],
     ];
 
     // [photo, name, role, bio]
@@ -33,10 +33,10 @@
     ];
 
     $actions = [
-        $t('Lancer un audit express', 'Run an express audit'),
+        $t('Lancer votre audit express', 'Run an express audit'),
         $t('Générer votre charte informatique', 'Generate your IT charter'),
-        $t('Déployer un honeypot en deux temps trois mouvements', 'Deploy a honeypot in no time'),
-        $t('Être conforme à NIS2 sans complexité', 'Comply with NIS2 without the hassle'),
+        $t('Déployer un honeypot instantanément', 'Deploy a honeypot in no time'),
+        $t('Assurer votre conformité NIS2 simplement', 'Comply with NIS2 without the hassle'),
     ];
 @endphp
 
@@ -130,7 +130,7 @@
         </ul>
     </section>
 
-    <x-site.cta :href="route('tools.cybercheck.init')" :label="$t('Démarrer mon audit gratuit →', 'Start my free audit →')">
-        <x-slot:title>{!! $t('Prêt à sécuriser<br>votre activité ?', 'Ready to secure<br>your business?') !!}</x-slot:title>
+    <x-site.cta :href="route('tools.cybercheck.init')" :label="$t('Lancer mon audit gratuit →', 'Start my free audit →')">
+        <x-slot:title>{!! $t('Démystifiez votre<br>cybersécurité.', 'Ready to secure<br>your business?') !!}</x-slot:title>
     </x-site.cta>
 </main>
