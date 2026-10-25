@@ -32,7 +32,7 @@ Write a failing regression test, observe the failure, implement the fix, then ob
 
 ## Commits
 
-Use `<type>(ITEM-NNN)(SPEC-NN): <Imperative description>` on the assigned Item branch.
+Use `<type>(SPEC-NNN-MM): <Imperative description>` on the assigned Item branch.
 
 Types: `feat` (feature), `fix` (bug), `chore` (maintenance), `refactor` (behavior-preserving restructuring).
 
@@ -45,7 +45,7 @@ Types: `feat` (feature), `fix` (bug), `chore` (maintenance), `refactor` (behavio
 Example:
 
 ```text
-feat(ITEM-001)(SPEC-01): Validate credentials
+feat(SPEC-001-01): Validate credentials
 
 Validate credentials and reject invalid login attempts without exposing account existence.
 ```
