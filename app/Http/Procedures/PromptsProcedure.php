@@ -36,7 +36,18 @@ class PromptsProcedure extends Procedure
             ->first();
 
         if (!isset($prompt)) {
-            throw new \Exception("A prompt with the name '{$params['name']}' cannot be found.");
+            if ($params['name'] !== 'default_translate') {
+                throw new \Exception("A prompt with the name '{$params['name']}' cannot be found.");
+            }
+            $prompt = "
+You are a helpful assistant.
+
+Translate the following text located between [TEXT] and [/TEXT] in {LANG}.
+If the text is already in the desired language, just copy it as is. Do not include the [TEXT] and [/TEXT] tags in your answer. Just provide the translated text, do not prefix it with anything else even if it is already in the correct language.
+[TEXT]
+{TEXT}
+[/TEXT]
+            ";
         }
         return [
             'prompt' => $prompt,
