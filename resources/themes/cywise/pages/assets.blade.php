@@ -35,17 +35,30 @@ render(function (Request $request) {
     [$assetRows, $serverRows] = $rows->partition(fn($row) => isset($row['_asset']));
     $tab = request('tab') === 'agents' ? 'agents' : 'assets';
 
+    // Subdomain rank: monitored first, most vulnerable (high, then medium, then low) first.
+    // Ties (and unmonitored subdomains) are sorted by name:
+    //   api (2 high), www (1 high), mail (3 medium), blog (none), dev (unmonitored), test (unmonitored)
+    $rank = function ($row) {
+      if (!$row['_asset']->is_monitored) {
+        return [1, 0, 0, 0];
+      }
+      $alerts = $row['_alerts'];
+      return [0, -$alerts->filter->isHigh()->count(), -$alerts->filter->isMedium()->count(), -$alerts->filter->isLow()->count()];
+    };
+
     // Assets grouped by root domain, biggest groups first, then single rows by name (not by date):
     //   acme.example (5 subdomains), example.com (2 subdomains), 10.10.10.0, 203.0.113.10, solo.org
     $entries = $assetRows
       ->groupBy(fn($row) => $row['_asset']->tld() ?? "asset-{$row['_asset']->id}")
-      ->map(function ($group, $key) {
+      ->map(function ($group, $key) use ($rank) {
         [$roots, $children] = $group->partition(fn($row) => $row['_asset']->asset === $key);
         return [
           'name' => $group->count() > 1 ? $key : $group->first()['_asset']->asset,
           'size' => $group->count(),
           'root' => $roots->first(),
-          'children' => $children->values(),
+          'children' => $children
+            ->sort(fn($a, $b) => $rank($a) <=> $rank($b) ?: strnatcasecmp($a['_asset']->asset, $b['_asset']->asset))
+            ->values(),
           'row' => $group->first(),
         ];
       })

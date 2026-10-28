@@ -450,8 +450,9 @@ render(function (Request $request) {
   </div>
 
   {{-- Chain of thought (native dialog, opened from the bot avatar by chainOfThought; .cot-body filled by JS) --}}
+  {{-- m-auto: centers it, Tailwind preflight (app.css) resets the dialog's default "margin: auto" --}}
   <dialog id="cot-dialog" aria-labelledby="cot-dialog-title"
-          class="ui:w-[calc(100%-2rem)] ui:max-w-lg ui:overflow-hidden ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-0 ui:text-ink ui:shadow-xl ui:backdrop:bg-slate-900/40">
+          class="ui:m-auto ui:w-[calc(100%-2rem)] ui:max-w-lg ui:overflow-hidden ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-0 ui:text-ink ui:shadow-xl ui:backdrop:bg-slate-900/40">
     <header class="ui:flex ui:items-center ui:justify-between ui:gap-4 ui:border-0 ui:border-b ui:border-solid ui:border-line ui:px-5 ui:py-4">
       <h2 id="cot-dialog-title" class="ui:m-0 ui:text-base ui:font-semibold ui:text-ink">{{ __('Chain of Thought') }}</h2>
       <x-ui.icon-button icon="x" :title="__('Close')" onclick="this.closest('dialog').close()"/>
