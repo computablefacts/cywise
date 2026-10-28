@@ -366,7 +366,7 @@ name('a-propos');
             </p>
             <ul class="marker:text-indigo-600 list-inside list-disc" role="list">
               <li>Lancer un audit express</li>
-              <li>Générer votre PSSI ou charte informatique</li>
+              <li>Générer votre charte informatique</li>
               <li>Déployer un honeypot en deux temps trois mouvements</li>
               <li>Être conforme à NIS2 sans complexité</li>
             </ul>

@@ -11,6 +11,17 @@ jobs:
         php: [ '8.4' ]
         laravel: [ '12.63' ]
     name: PHP ${{ matrix.php }} Laravel ${{ matrix.laravel }}
+    services:
+      mariadb:
+        image: mariadb:10.6
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: 'tw_testdb'
+          MYSQL_USER: 'tw_testuser'
+          MYSQL_PASSWORD: 'z0rglub'
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout
         uses: actions/checkout@main
@@ -22,18 +33,6 @@ jobs:
           tools: composer:v2
         env:
           update: true # Update to the latest patch of PHP versions.
-      - name: Shutting down MySQL
-        run: sudo service mysql stop
-      - name: Installing MariaDb
-        uses: YakkaDev/mariadb-actions@v1.1.0
-        with:
-          character: 'utf8mb4'
-          version: '10.6.18'
-          database: 'tw_testdb'
-          user: 'tw_testuser'
-          password: 'z0rglub'
-        env:
-          DOCKER_API_VERSION: 1.48
       - name: Lock Laravel Version
         run: composer require "laravel/framework:${{ matrix.laravel }}.*" --no-update -v
       - name: Composer Install

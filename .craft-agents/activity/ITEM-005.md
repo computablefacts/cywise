@@ -1,0 +1,29 @@
+# ITEM-005 Activity
+
+- 2026-10-25T19:03Z | Junie | I005 | created | Réexécution et correction des tests automatiques
+- 2026-10-25T19:04Z | Junie | I005 | updated | backlog → specifying
+- 2026-10-25T19:05Z | Junie | I005-S01 | created | Exécution complète des tests; pending
+- 2026-10-25T19:05Z | Junie | I005-S02 | created | Correction des échecs; pending
+- 2026-10-25T19:05Z | Junie | I005-S03 | created | Analyse des tests ignorés; pending
+- 2026-10-25T19:07Z | User | decision | provided | oui
+- 2026-10-25T19:08Z | Junie | I005-S01 | updated | pending → approved
+- 2026-10-25T19:08Z | Junie | I005-S02 | updated | pending → approved
+- 2026-10-25T19:08Z | Junie | I005-S03 | updated | pending → approved
+- 2026-10-25T19:09Z | Junie | I005 | updated | specifying → ready
+- 2026-10-25T19:10Z | Junie | git | commit | 15848f57: record approved Specs on main
+- 2026-10-25T19:11Z | Junie | git | checkout | Create branch item/ITEM-005 from main
+- 2026-10-25T19:12Z | Junie | I005 | updated | ready → in_progress
+- 2026-10-25T19:13Z | Junie | I005-S01 | updated | approved → in_progress
+- 2026-10-25T19:18Z | Junie | I005-S01 | updated | in_progress → completed
+- 2026-10-25T19:19Z | Junie | git | commit | a4006c4b: record Spec S01 on item/ITEM-005
+- 2026-10-25T19:20Z | Junie | I005-S02 | updated | approved → completed
+- 2026-10-25T19:21Z | Junie | git | commit | a4006c4b: record Spec S02 on item/ITEM-005 (no failures found)
+- 2026-10-25T19:22Z | Junie | I005-S03 | updated | approved → in_progress
+- 2026-10-25T19:25Z | Junie | I005-S03 | updated | in_progress → completed
+- 2026-10-25T19:26Z | Junie | git | commit | 8d7c2a1b: improve RouteTestSkip and re-enable HomeTestSkip
+- 2026-10-25T19:27Z | Junie | I005 | updated | in_progress → review
+- 2026-10-25T19:30Z | Junie | I005 | updated | review → ready_to_merge
+- 2026-10-25T19:31Z | Junie | question | asked | Authorize merge of item/ITEM-005 into main?
+- 2026-10-25T19:32Z | User | decision | provided | Authorize merge into main
+- 2026-10-25T19:33Z | Junie | I005 | updated | ready_to_merge → done
+- 2026-10-25T19:34Z | Junie | git | merge | Merge branch item/ITEM-005 into main

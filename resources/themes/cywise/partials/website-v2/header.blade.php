@@ -14,7 +14,6 @@
                 ['medium', $isEnglish ? 'Vulnerability management' : 'Gestion des vulnérabilités', route($routePrefix . 'solutions.vulnerability-management')],
                 ['low', $isEnglish ? 'Credential monitoring' : 'Surveillance des identifiants', route($routePrefix . 'solutions.credential-monitoring')],
                 ['brand', 'CyberBuddy', route($routePrefix . 'solutions.cyberbuddy')],
-                ['info', $isEnglish ? 'Security policy' : 'PSSI', route($routePrefix . 'solutions.pssi')],
                 ['ink', 'Pentest', route($routePrefix . 'solutions.pentest')],
             ],
         ],
@@ -29,9 +28,20 @@
                 [null, 'MSP', route($routePrefix . 'audiences.msps')],
             ],
         ],
+        [
+            'label' => $isEnglish ? 'Use cases' : 'Cas d’usages',
+            'all' => [$isEnglish ? 'All use cases' : 'Tous les cas d’usages', route($routePrefix . 'use-cases.index')],
+            'items' => [
+                ['critical', $isEnglish ? 'Monitor your attack surface' : 'Surveiller votre surface d’attaque', route($routePrefix . 'use-cases.monitor-attack-surface')],
+                ['medium', $isEnglish ? 'Detect your vulnerabilities' : 'Détecter vos vulnérabilités', route($routePrefix . 'use-cases.find-vulnerabilities')],
+                ['low', $isEnglish ? 'Search for compromised credentials' : 'Rechercher vos identifiants compromis', route($routePrefix . 'use-cases.check-leaked-credentials')],
+                ['info', $isEnglish ? 'Prepare your audit' : 'Préparer votre audit', route($routePrefix . 'use-cases.prepare-audit')],
+                ['ink', $isEnglish ? 'Launch an expert pentest' : 'Lancer un Pentest expert', route($routePrefix . 'use-cases.run-pentest')],
+            ],
+        ],
     ];
     $links = [
-        [$isEnglish ? 'Use cases' : 'Cas d’usage', route($routePrefix . 'use-cases.index')],
+        [$isEnglish ? 'Company' : 'Société', route($routePrefix . 'company')],
         ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
         [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
     ];

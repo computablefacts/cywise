@@ -261,6 +261,15 @@ Route::post('/logalert/{secret}', function (string $secret, \Illuminate\Http\Req
 
             /** @var \App\Models\User $user */
             $user = $apiToken->user()->first();
+
+            if (!$user) {
+                return new JsonResponse([
+                    'status' => 'failure',
+                    'message' => 'user not found',
+                    'payload' => $payload,
+                ], 200, ['Access-Control-Allow-Origin' => '*']);
+            }
+
             $user->actAs();
 
             $server = \App\Models\YnhServer::where('name', $payload['hostname'])

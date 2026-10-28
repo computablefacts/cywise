@@ -16,14 +16,18 @@
             [$isEnglish ? 'CISOs' : 'RSSI', route($routePrefix . 'audiences.cisos')],
             ['MSP', route($routePrefix . 'audiences.msps')],
         ],
-        ($isEnglish ? 'Resources' : 'Ressources') => [
-            ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
-            [$isEnglish ? 'Use cases' : 'Cas d’usage', route($routePrefix . 'use-cases.index')],
-            [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
+        ($isEnglish ? 'Use cases' : 'Cas d’usages') => [
+            [$isEnglish ? 'Monitor your attack surface' : 'Surveiller votre surface d’attaque', route($routePrefix . 'use-cases.monitor-attack-surface')],
+            [$isEnglish ? 'Detect your vulnerabilities' : 'Détecter vos vulnérabilités', route($routePrefix . 'use-cases.find-vulnerabilities')],
+            [$isEnglish ? 'Search for compromised credentials' : 'Rechercher vos identifiants compromis', route($routePrefix . 'use-cases.check-leaked-credentials')],
+            [$isEnglish ? 'Prepare your audit' : 'Préparer votre audit', route($routePrefix . 'use-cases.prepare-audit')],
+            [$isEnglish ? 'Launch an expert pentest' : 'Lancer un pentest expert', route($routePrefix . 'use-cases.run-pentest')],
         ],
         'Cywise' => [
             [$isEnglish ? 'Home' : 'Accueil', route($homeRoute)],
-            [$isEnglish ? 'Company' : 'La société', route($routePrefix . 'company')],
+            [$isEnglish ? 'Company' : 'Société', route($routePrefix . 'company')],
+            ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
+            [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
             ['Contact', route($homeRoute) . '#cta'],
             [$isEnglish ? 'Privacy' : 'Confidentialité', route('privacy-policy')],
         ],

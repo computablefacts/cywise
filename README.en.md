@@ -110,15 +110,6 @@ Cywise integrates all essential features for SMEs.
 > [!WARNING]
 > To enable this feature in the self-hosted version, you will need to provide your own [DeepInfra](https://deepinfra.com/) API key.
 
-### CyberScribe
-
-:white_check_mark: self-hosted :white_check_mark: SaaS
-
-**Assisted drafting of your cyber documents.** Need to create an IT Charter or an Information Systems Security Policy (ISSP)? CyberScribe, our intelligent editor, accompanies you step-by-step to write clear, compliant, and adapted documents, thanks to artificial intelligence.
-
-> [!WARNING]
-> To enable this feature in the self-hosted version, you will need to provide your own [DeepInfra](https://deepinfra.com/) API key.
-
 ### Telegram & WhatsApp
 
 :white_check_mark: self-hosted :white_check_mark: SaaS
@@ -134,7 +125,7 @@ Cywise integrates all essential features for SMEs.
 
 :white_check_mark: self-hosted :white_check_mark: SaaS
 
-**Integrate your document base (IT Charter, ISSP, etc.) with CyberBuddy.** Provide your teams with instant and intuitive access to information. They just need to ask a question in natural language, like "CyberBuddy, what are the remote work rules in our ISSP?", to get a precise answer, extracted directly from your internal resources. A simple and effective way to disseminate your best practices and facilitate access to information on a daily basis.
+**Integrate your document base (IT Charter, etc.) with CyberBuddy.** Provide your teams with instant and intuitive access to information. They just need to ask a question in natural language, like "CyberBuddy, what are the remote work rules in our IT Charter?", to get a precise answer, extracted directly from your internal resources. A simple and effective way to disseminate your best practices and facilitate access to information on a daily basis.
 
 ### Single Sign-On (SSO)
 
@@ -189,7 +180,7 @@ The key components of this architecture are:
     - "What are my priorities this morning?"
 - **Structured data.** Uses ClickHouse to perform complex analyses and statistical calculations on large volumes of technical data (data leaks or imports of your tabular data). For example:
     - "What are my leaked credentials?"
-- **Knowledge base.** RAG (Retrieval Augmented Generation) system that searches through your documents (IT Charters, ISSP, PDF) and your personal notes (memos) by semantic search to return factual and sourced answers. For example:
+- **Knowledge base.** RAG (Retrieval Augmented Generation) system that searches through your documents (IT Charters, PDF) and your personal notes (memos) by semantic search to return factual and sourced answers. For example:
     - "How to isolate a compromised server according to our procedures?"
 - **Local actions.** Allow direct control of Cywise features via its JSON-RPC APIs. For example:
     - "Monitor www.example.com"
@@ -343,9 +334,9 @@ You can delete the entire stack including all associated data with the command:
 
 ## Activating certain features
 
-### CyberBuddy and CyberScribe
+### CyberBuddy
 
-To activate CyberBuddy and CyberScribe, you must have created an API key at [DeepInfra](https://deepinfra.com/).
+To activate CyberBuddy, you must have created an API key at [DeepInfra](https://deepinfra.com/).
 
 You must then set up this key in Cywise.
 

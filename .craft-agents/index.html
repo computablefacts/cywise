@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craft Agents Dashboard</title>
+    <!-- FastBootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fastbootstrap@2.2.0/dist/css/fastbootstrap.min.css" rel="stylesheet" integrity="sha256-V6lu+kGzsbghJHInOz6NYutYLzqnqwJueL43CcJONhc=" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f1110;
+            --sidebar-bg: #161817;
+            --card-bg: #1c1e1d;
+            --border-color: #2c2e2d;
+            --text-primary: #e1e3e1;
+            --text-secondary: #9ea09e;
+            --accent-color: #4ade80;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr 350px;
+            height: 100vh;
+        }
+
+        /* Sidebar Left */
+        .sidebar-left {
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .project-header {
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .item-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .item-row {
+            padding: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .item-row:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .item-row.active {
+            background-color: rgba(74, 222, 128, 0.1);
+            border-left-color: var(--accent-color);
+        }
+
+        .item-row .item-id {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .item-row .item-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        /* Center Content */
+        .main-view {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            height: 56px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 1.5rem;
+        }
+
+        .nav-item-tab {
+            padding: 1.2rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item-tab.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--accent-color);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Right Panel (Details/History) */
+        .details-panel {
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-title {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Card Styles */
+        .spec-card-dark {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .spec-card-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+        }
+
+        .spec-card-body {
+            padding: 1rem;
+            flex: 1;
+        }
+
+        .spec-card-footer {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid var(--border-color);
+            background-color: rgba(0,0,0,0.1);
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-pill {
+            font-size: 0.7rem;
+            padding: 0 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Timeline Styles */
+        .timeline-v2 {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-v2::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-v2-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-v2-item::after {
+            content: "";
+            position: absolute;
+            left: -1.5rem;
+            top: 6px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80; /* Light Blue */
+            margin-left: -3px;
+            border: 2px solid var(--bg-color);
+        }
+
+        .timeline-v2-item.git-history::after {
+            background: #4ade80 !important; /* Green */
+        }
+
+        .timeline-v2-item.question::after,
+        .timeline-v2-item.instruction::after,
+        .timeline-v2-item.decision::after {
+            background: #f97316 !important; /* Orange */
+        }
+
+        .timeline-v2-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
+        }
+
+        .timeline-v2-content {
+            font-size: 0.9rem;
+        }
+
+        /* Markdown Overrides */
+        .markdown-body {
+            color: var(--text-primary) !important;
+            line-height: 1.6;
+        }
+        .markdown-body h1, .markdown-body h2 { border-bottom-color: var(--border-color) !important; color: var(--text-primary) !important; }
+        .markdown-body code { background-color: rgba(255,255,255,0.1) !important; color: var(--accent-color) !important; }
+        .markdown-body pre { background-color: var(--card-bg) !important; border: 1px solid var(--border-color); }
+        .markdown-body blockquote { border-left-color: var(--border-color) !important; color: var(--text-secondary) !important; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar-left">
+            <div class="project-header">
+                <div class="fs-5 fw-bold text-white mb-0">Craft Agents</div>
+            </div>
+            <div class="item-list" id="items-list">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Main View -->
+        <div class="main-view">
+            <div class="top-nav">
+                <div class="nav-item-tab active" onclick="switchTab('item')" id="tab-item">Item</div>
+                <div class="nav-item-tab" onclick="switchTab('spec')" id="tab-spec">Specs</div>
+                <div class="nav-item-tab" onclick="switchTab('activity')" id="tab-activity">Activity</div>
+                <div class="nav-item-tab" onclick="switchTab('doctrine')" id="tab-doctrine">Doctrine</div>
+                
+                <div class="ms-auto d-flex align-items-center">
+                     <div id="loading-status" class="spinner-border spinner-border-sm text-success d-none" role="status"></div>
+                </div>
+            </div>
+
+            <div class="content-area" id="content-viewer">
+                <!-- Content here -->
+            </div>
+        </div>
+
+        <!-- Right Panel (History & Verdicts) -->
+        <div class="details-panel" id="right-panel">
+            <div id="item-summary-header">
+                <!-- Populated by JS -->
+            </div>
+            
+            <hr class="my-4" style="border-color: var(--border-color);">
+            
+            <div class="detail-section">
+                <div class="detail-title">Git History</div>
+                <div class="timeline-v2" id="mini-activity">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentItem = null;
+        let currentTab = 'item';
+        const filesCache = {};
+        
+        // Liste des items (sera peuplée dynamiquement)
+        let items = [];
+
+        async function fetchItems() {
+            const status = document.getElementById('loading-status');
+            status?.classList.remove('d-none');
+            
+            try {
+                // Tentative de lecture du répertoire (marche sur les serveurs de dev qui listent les fichiers)
+                const response = await fetch('items/');
+                let discoveredItems = [];
+
+                if (response.ok) {
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const links = Array.from(doc.querySelectorAll('a'));
+                    
+                    const itemFiles = links
+                        .map(a => a.getAttribute('href'))
+                        .filter(href => href && href.endsWith('.md') && href.startsWith('ITEM-'))
+                        .map(href => href.replace('.md', ''));
+                    
+                    for (const id of itemFiles) {
+                        const content = await loadFile(`items/${id}.md`);
+                        if (content) {
+                            const nameMatch = content.match(/^# ([^:\n]+): (.*)$/m) || content.match(/^# (.*)$/m);
+                            const name = nameMatch ? (nameMatch[2] || nameMatch[1]) : id;
+                            discoveredItems.push({ id, name, date: Date.now() / 1000 });
+                        }
+                    }
+                }
+
+                // Fallback / Complément : Recherche séquentielle si la liste est vide ou incomplète
+                // On essaie de charger les items de ITEM-001 à ITEM-020 (ou plus si nécessaire)
+                if (discoveredItems.length < 5) {
+                    for (let i = 1; i <= 20; i++) {
+                        const id = `ITEM-${String(i).padStart(3, '0')}`;
+                        if (discoveredItems.find(item => item.id === id)) continue;
+                        
+                        const content = await loadFile(`items/${id}.md`);
+                        if (content) {
+                            const nameMatch = content.match(/^# ([^:\n]+): (.*)$/m) || content.match(/^# (.*)$/m);
+                            const name = nameMatch ? (nameMatch[2] || nameMatch[1]) : id;
+                            discoveredItems.push({ id, name, date: Date.now() / 1000 });
+                        }
+                    }
+                }
+                
+                if (discoveredItems.length > 0) {
+                    // Tri par ID décroissant par défaut (ordre chronologique inverse supposé)
+                    items = discoveredItems.sort((a, b) => b.id.localeCompare(a.id));
+                    updateSidebar();
+                    
+                    if (items.length > 0 && !currentItem) {
+                        selectItem(items[0].id);
+                    }
+                }
+            } catch (e) {
+                console.warn('Listing failed', e);
+            } finally {
+                status?.classList.add('d-none');
+            }
+        }
+
+        async function loadFile(path) {
+            if (filesCache[path]) return filesCache[path];
+            try {
+                const response = await fetch(path);
+                if (!response.ok) throw new Error('File not found');
+                const text = await response.text();
+                filesCache[path] = text;
+                return text;
+            } catch (e) {
+                console.error('Error loading file:', path, e);
+                return null;
+            }
+        }
+
+        async function selectItem(id) {
+            currentItem = id;
+            updateSidebar();
+            renderContent();
+            renderRightPanel();
+        }
+
+        function updateSidebar() {
+            const list = document.getElementById('items-list');
+            list.innerHTML = '';
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `item-row ${currentItem === item.id ? 'active' : ''}`;
+                div.innerHTML = `
+                    <div class="item-id">${item.id}</div>
+                    <div class="item-name">${item.name}</div>
+                `;
+                div.onclick = () => selectItem(item.id);
+                list.appendChild(div);
+            });
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.nav-item-tab').forEach(btn => {
+                if (btn.id === `tab-${tab}`) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderContent();
+        }
+
+        async function renderContent() {
+            const viewer = document.getElementById('content-viewer');
+            const status = document.getElementById('loading-status');
+            
+            if (currentTab === 'doctrine') {
+                status.classList.remove('d-none');
+                const content = await loadFile('DOCTRINE.md');
+                status.classList.add('d-none');
+                viewer.innerHTML = `<div class="markdown-body">${marked.parse(content || '# Doctrine file not found')}</div>`;
+                return;
+            }
+
+            if (!currentItem) {
+                viewer.innerHTML = '<div class="text-center mt-5 text-secondary">Select an item to view details</div>';
+                return;
+            }
+            
+            status.classList.remove('d-none');
+
+            let path = '';
+            if (currentTab === 'item') path = `items/${currentItem}.md`;
+            else if (currentTab === 'spec') path = `specs/${currentItem}.md`;
+            else if (currentTab === 'activity') path = `activity/${currentItem}.md`;
+
+            const content = await loadFile(path);
+            status.classList.add('d-none');
+
+            if (!content) {
+                viewer.innerHTML = `<div class="alert alert-danger bg-dark border-danger text-danger">File not found: ${path}</div>`;
+                return;
+            }
+
+            if (currentTab === 'item') {
+                const item = items.find(i => i.id === currentItem);
+                const titleHtml = item ? `<h2 class="mb-4 text-white">${item.id}: ${item.name}</h2>` : '';
+                viewer.innerHTML = titleHtml + `<div class="markdown-body">${marked.parse(content)}</div>`;
+            } else if (currentTab === 'spec') {
+                renderSpecs(content);
+            } else if (currentTab === 'activity') {
+                renderActivity(content, viewer);
+            }
+        }
+
+        function renderSpecs(markdown) {
+            const viewer = document.getElementById('content-viewer');
+            const sections = markdown.split(/\n## /);
+            const title = sections.shift().replace(/^# /, '').trim();
+            
+            let html = `<h2 class="mb-4 text-white">${title}</h2>`;
+            
+            sections.forEach(section => {
+                const lines = section.split('\n');
+                const specIdName = lines[0].trim();
+                const statusLine = lines.find(l => l.toLowerCase().startsWith('status:')) || '';
+                const status = statusLine.split(':')[1]?.trim() || 'unknown';
+                
+                const requirementIdx = lines.findIndex(l => l.toLowerCase().startsWith('requirement:'));
+                const testIdx = lines.findIndex(l => l.toLowerCase().startsWith('test:'));
+                
+                const requirement = requirementIdx !== -1 ? lines[requirementIdx].split(':')[1].trim() : '';
+                const test = testIdx !== -1 ? lines[testIdx].split(':')[1].trim() : '';
+
+                let statusColor = '#9ea09e'; // secondary
+                if (status === 'completed') statusColor = '#4ade80'; // accent/success
+                if (status === 'approved') statusColor = '#3b82f6'; // primary
+                if (status === 'in_progress') statusColor = '#fbbf24'; // warning
+
+                html += `
+                    <div class="spec-card-dark">
+                        <div class="spec-card-header">${specIdName}</div>
+                        
+                        <div class="spec-card-body">
+                            <div style="padding-top: 10px; padding-bottom: 10px;">
+                                <div class="small text-secondary fw-bold mb-1" style="letter-spacing: 0.05em; padding-top: 10px; padding-bottom: 10px;">REQUIREMENT</div>
+                                <div class="text-white">${requirement}</div>
+                            </div>
+
+                            <div style="padding-top: 10px; padding-bottom: 10px;">
+                                <div class="small text-secondary fw-bold mb-1" style="letter-spacing: 0.05em; padding-top: 10px; padding-bottom: 10px;">TEST</div>
+                                <div class="text-white">${test}</div>
+                            </div>
+                        </div>
+
+                        <div class="spec-card-footer">
+                            <span class="status-pill" style="background: ${statusColor}22; color: ${statusColor}; border: 1px solid ${statusColor}44">${status}</span>
+                        </div>
+                    </div>`;
+            });
+            
+            viewer.innerHTML = html;
+        }
+
+        function renderActivity(markdown, container) {
+            const lines = markdown.split('\n').filter(l => l.startsWith('- '));
+            const activities = lines.map(line => {
+                const parts = line.substring(2).split(' | ');
+                return {
+                    date: parts[0],
+                    who: parts[1],
+                    what: parts[2],
+                    action: parts[3],
+                    details: parts[4]
+                };
+            }).filter(act => act.what !== 'git').reverse();
+
+            let html = `<h2 class="mb-4 text-white">Activity</h2><div class="timeline-v2">`;
+            
+            activities.forEach(act => {
+                let itemClass = ''; // Default blue via CSS
+                let actionStyle = 'color: var(--text-primary)';
+                let dotStyle = 'color: #4ade80';
+                
+                // Normalisation de l'affichage : On ne garde que ce qui suit le "-" si c'est une spécification (Sxx)
+                let displayWhat = act.what;
+                if (displayWhat.includes('-')) {
+                    const parts = displayWhat.split('-');
+                    const lastPart = parts[parts.length - 1];
+                    if (/^S\d+/.test(lastPart)) {
+                        displayWhat = lastPart;
+                    }
+                }
+
+                const isOrange = act.what.trim().toUpperCase() === 'INSTRUCTION' || 
+                                 act.what.trim().toUpperCase() === 'DECISION' || 
+                                 act.what.trim().toUpperCase() === 'QUESTION';
+
+                if (isOrange) {
+                    const normalizedWhat = act.what.trim().toUpperCase();
+                    if (normalizedWhat === 'INSTRUCTION') itemClass = 'instruction';
+                    else if (normalizedWhat === 'DECISION') itemClass = 'decision';
+                    else if (normalizedWhat === 'QUESTION') itemClass = 'question';
+
+                    dotStyle = 'color: #f97316';
+                }
+
+                html += `
+                    <div class="timeline-v2-item ${itemClass}">
+                        <div class="timeline-v2-date">
+                            <span style="${dotStyle}; margin-right: 5px; text-transform: uppercase;">${displayWhat}</span>
+                            ${new Date(act.date).toLocaleString()}
+                        </div>
+                        <div class="timeline-v2-content">
+                            <span class="fw-bold">${act.who}</span>
+                            <span class="mx-1">•</span>
+                            <span style="${actionStyle}">${act.action}</span>
+                            <div class="text-secondary small mt-1">${act.details}</div>
+                        </div>
+                    </div>`;
+            });
+            
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        async function renderRightPanel() {
+            if (!currentItem) return;
+            
+            const header = document.getElementById('item-summary-header');
+            const item = items.find(i => i.id === currentItem);
+            
+            // Get Item content for owner/status
+            const content = await loadFile(`items/${currentItem}.md`);
+            let owner = 'Unknown';
+            let status = 'Unknown';
+            if (content) {
+                owner = content.match(/Owner: (.*)/)?.[1] || 'Unknown';
+                status = content.match(/Status: (.*)/)?.[1] || 'Unknown';
+            }
+
+            header.innerHTML = ``;
+
+            // Git History
+            const activityContent = await loadFile(`activity/${currentItem}.md`);
+            const miniActivity = document.getElementById('mini-activity');
+            
+            if (activityContent) {
+                const gitActions = activityContent.split('\n')
+                    .filter(l => l.startsWith('- '))
+                    .map(line => {
+                        const parts = line.substring(2).split(' | ');
+                        return {
+                            date: parts[0],
+                            who: parts[1],
+                            what: parts[2],
+                            action: parts[3],
+                            details: parts[4]
+                        };
+                    })
+                    .filter(act => act.what === 'git')
+                    .reverse();
+
+                miniActivity.innerHTML = gitActions.map(act => {
+                    return `
+                        <div class="timeline-v2-item git-history">
+                            <div class="timeline-v2-content small text-white">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="fw-bold" style="color: var(--accent-color); font-size: 0.75rem; text-transform: uppercase;">${act.action}</span>
+                                    <span class="timeline-v2-date mb-0 d-flex align-items-center" style="height: 18px;">${new Date(act.date).toLocaleString()}</span>
+                                </div>
+                                <div class="text-secondary mt-1">${act.details}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Initialisation
+        fetchItems();
+    </script>
+</body>
+</html>

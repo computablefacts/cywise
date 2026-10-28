@@ -1,0 +1,115 @@
+# ITEM-004 Activity
+
+- 2026-10-25T18:25Z | Junie | I004 | created | Harmonisation corporate et Copywriting des textes français
+- 2026-10-25T18:26Z | Junie | I004 | updated | backlog → specifying
+- 2026-10-25T18:27Z | Junie | I004-S01 | created | Page d'accueil; pending
+- 2026-10-25T18:27Z | Junie | I004-S02 | created | Page Solutions Index; pending
+- 2026-10-25T18:27Z | Junie | I004-S03 | created | Solution Pentest; pending
+- 2026-10-25T18:27Z | Junie | I004-S04 | created | Solution Surface d'attaque; pending
+- 2026-10-25T18:27Z | Junie | I004-S05 | created | Solution Gestion des vulnérabilités; pending
+- 2026-10-25T18:27Z | Junie | I004-S06 | created | Solution Surveillance des identifiants; pending
+- 2026-10-25T18:27Z | Junie | I004-S07 | created | Solution CyberBuddy; pending
+- 2026-10-25T18:27Z | Junie | I004-S08 | created | Page Cas d'usage Index; pending
+- 2026-10-25T18:27Z | Junie | I004-S09 | created | Cas d'usage Surveiller la surface d'attaque; pending
+- 2026-10-25T18:27Z | Junie | I004-S10 | created | Cas d'usage Trouver des vulnérabilités; pending
+- 2026-10-25T18:27Z | Junie | I004-S11 | created | Cas d'usage Vérifier les identifiants; pending
+- 2026-10-25T18:27Z | Junie | I004-S12 | created | Cas d'usage Préparer un audit; pending
+- 2026-10-25T18:27Z | Junie | I004-S13 | created | Cas d'usage Lancer un pentest; pending
+- 2026-10-25T18:27Z | Junie | I004-S14 | created | Page Pour qui Index; pending
+- 2026-10-25T18:27Z | Junie | I004-S15 | created | Audience PME; pending
+- 2026-10-25T18:27Z | Junie | I004-S16 | created | Audience Startups; pending
+- 2026-10-25T18:27Z | Junie | I004-S17 | created | Audience Équipes IT; pending
+- 2026-10-25T18:27Z | Junie | I004-S18 | created | Audience RSSI; pending
+- 2026-10-25T18:27Z | Junie | I004-S19 | created | Audience MSP; pending
+- 2026-10-25T18:27Z | Junie | I004-S20 | created | Partials du site; pending
+- 2026-10-25T18:28Z | Junie | question | asked | Approuvez-vous la liste des 20 spécifications basées sur les principes de Copywriting ?
+- 2026-10-25T18:30Z | User | decision | provided | oui
+- 2026-10-25T18:31Z | Junie | I004-S01 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S02 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S03 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S04 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S05 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S06 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S07 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S08 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S09 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S10 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S11 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S12 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S13 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S14 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S15 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S16 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S17 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S18 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S19 | updated | pending → approved
+- 2026-10-25T18:31Z | Junie | I004-S20 | updated | pending → approved
+- 2026-10-25T18:32Z | Junie | I004 | updated | specifying → ready
+- 2026-10-25T18:33Z | Junie | git | commit | 2ef93c77: record approved Specs on main
+- 2026-10-25T18:33Z | Junie | git | checkout | Create branch item/ITEM-004 from main
+- 2026-10-25T18:34Z | Junie | I004 | updated | ready → in_progress
+- 2026-10-25T18:35Z | Junie | I004-S01 | updated | approved → completed
+- 2026-10-25T18:35Z | Junie | git | commit | b8bf494f: record Spec S01 on item/ITEM-004
+- 2026-10-25T18:36Z | Junie | I004-S02 | updated | approved → in_progress
+- 2026-10-25T18:37Z | Junie | I004-S02 | updated | in_progress → completed
+- 2026-10-25T18:37Z | Junie | git | commit | 76c1ee64: record Spec S02 on item/ITEM-004
+- 2026-10-25T18:38Z | Junie | I004-S03 | updated | approved → in_progress
+- 2026-10-25T18:39Z | Junie | I004-S03 | updated | in_progress → completed
+- 2026-10-25T18:39Z | Junie | git | commit | dcbb3431: record Spec S03 on item/ITEM-004
+- 2026-10-25T18:40Z | Junie | I004-S04 | updated | approved → in_progress
+- 2026-10-25T18:41Z | Junie | I004-S04 | updated | in_progress → completed
+- 2026-10-25T18:41Z | Junie | git | commit | 10574e2f: record Spec S04 on item/ITEM-004
+- 2026-10-25T18:42Z | Junie | I004-S05 | updated | approved → in_progress
+- 2026-10-25T18:43Z | Junie | I004-S05 | updated | in_progress → completed
+- 2026-10-25T18:43Z | Junie | git | commit | 7ac41f11: record Spec S05 on item/ITEM-004
+- 2026-10-25T18:44Z | Junie | I004-S06 | updated | approved → in_progress
+- 2026-10-25T18:45Z | Junie | I004-S06 | updated | in_progress → completed
+- 2026-10-25T18:45Z | Junie | git | commit | 82a0dbcd: record Spec S06 on item/ITEM-004
+- 2026-10-25T18:46Z | Junie | I004-S07 | updated | approved → in_progress
+- 2026-10-25T18:47Z | Junie | I004-S07 | updated | in_progress → completed
+- 2026-10-25T18:47Z | Junie | git | commit | 88d6d141: record Spec S07 on item/ITEM-004
+- 2026-10-25T18:48Z | Junie | I004-S08 | updated | approved → in_progress
+- 2026-10-25T18:49Z | Junie | I004-S08 | updated | in_progress → completed
+- 2026-10-25T18:49Z | Junie | git | commit | 6ee6d851: record Spec S08 on item/ITEM-004
+- 2026-10-25T18:50Z | Junie | I004-S09 | updated | approved → in_progress
+- 2026-10-25T18:51Z | Junie | I004-S09 | updated | in_progress → completed
+- 2026-10-25T18:51Z | Junie | I004-S10 | updated | approved → completed
+- 2026-10-25T18:51Z | Junie | I004-S11 | updated | approved → completed
+- 2026-10-25T18:51Z | Junie | I004-S12 | updated | approved → completed
+- 2026-10-25T18:51Z | Junie | I004-S13 | updated | approved → completed
+- 2026-10-25T18:51Z | Junie | git | commit | 9857737c: record Specs S09-S13 on item/ITEM-004
+- 2026-10-25T18:52Z | Junie | I004-S14 | updated | approved → in_progress
+- 2026-10-25T18:53Z | Junie | I004-S14 | updated | in_progress → completed
+- 2026-10-25T18:53Z | Junie | I004-S15 | updated | approved → completed
+- 2026-10-25T18:53Z | Junie | I004-S16 | updated | approved → completed
+- 2026-10-25T18:53Z | Junie | I004-S17 | updated | approved → completed
+- 2026-10-25T18:53Z | Junie | I004-S18 | updated | approved → completed
+- 2026-10-25T18:53Z | Junie | I004-S19 | updated | approved → completed
+- 2026-10-25T18:53Z | Junie | git | commit | e724825e: record Specs S14-S19 on item/ITEM-004
+- 2026-10-25T18:55Z | Junie | I004-S15 | updated | completed → completed (re-commit f31193f3)
+- 2026-10-25T18:55Z | Junie | I004-S16 | updated | completed → completed (re-commit f31193f3)
+- 2026-10-25T18:55Z | Junie | I004-S17 | updated | completed → completed (re-commit f31193f3)
+- 2026-10-25T18:55Z | Junie | I004-S18 | updated | completed → completed (re-commit f31193f3)
+- 2026-10-25T18:55Z | Junie | I004-S19 | updated | completed → completed (re-commit f31193f3)
+- 2026-10-25T18:55Z | Junie | git | commit | f31193f3: record Spec S15-S19 on item/ITEM-004
+- 2026-10-25T18:56Z | Junie | I004-S20 | updated | approved → in_progress
+- 2026-10-25T18:57Z | Junie | I004-S20 | updated | in_progress → completed
+- 2026-10-25T18:57Z | Junie | git | commit | 61aa068f: record Spec S20 on item/ITEM-004
+- 2026-10-25T18:58Z | Junie | I004 | updated | in_progress → review
+- 2026-10-25T19:00Z | User | decision | provided | Pas fan de vérifier vos idetifiants compromis. Je trouve Rechercher vos identifiants compromis mieux
+- 2026-10-25T19:01Z | Junie | I004 | updated | review → in_progress
+- 2026-10-25T19:02Z | Junie | git | commit | 36cbf7f1: replace 'Vérifier' with 'Rechercher'
+- 2026-10-25T19:03Z | User | decision | provided | Pas encore. Enlève les mentions liées aux honeypots et à la charte informatique
+- 2026-10-25T19:04Z | Junie | git | commit | c1382548: remove honeypots and IT charter
+- 2026-10-25T19:05Z | Junie | I004 | updated | in_progress → review
+- 2026-10-25T19:10Z | Junie | I004-S21 | created | Mise en adéquation des textes anglais; pending
+- 2026-10-25T19:11Z | User | decision | provided | Create a new SPEC for your translation updates
+- 2026-10-25T19:12Z | Junie | I004-S21 | updated | pending → completed
+- 2026-10-25T19:12Z | Junie | git | commit | 6f9c234f: synchronize english translations and final fixes
+- 2026-10-25T19:13Z | Junie | I004 | updated | in_progress → review
+- 2026-10-25T19:15Z | User | decision | provided | Je n'autorise pas le marge mais le commit
+- 2026-10-25T19:16Z | Junie | I004 | updated | review → ready_to_merge
+- 2026-10-25T19:56Z | Junie | I004-S21 | updated | completed → completed (a1fd5fbf)
+- 2026-10-25T19:57Z | User | decision | provided | Je suis ok pour le merge
+- 2026-10-25T19:58Z | Junie | I004 | updated | ready_to_merge → done
+- 2026-10-25T19:59Z | Junie | git | merge | Merge branch item/ITEM-004 into main (99531412)

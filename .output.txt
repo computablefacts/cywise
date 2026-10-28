@@ -1,0 +1,99 @@
+[Se connecter](https://www.cywise.io/login)   [Créer un compte](https://www.cywise.io/register)
+
+
+
+Short - 1 Février 2026
+
+### [Comment protéger mon site web ?](https://youtu.be/TdxKrUFlO-Y)
+
+Question du jour : Mon site résiste-t-il aux attaques courantes ?
+
+  
+
+Beaucoup n'en ont aucune certitude. Cywise cartographie votre surface exposée et identifie immédiatement les failles prioritaires.
+
+Webinaire - 12 Décembre 2025
+
+### [Les fuites de mots de passes dont vous n'avez jamais entendu parler](https://youtu.be/N9KSao79nTg)
+
+Vous pensez que vos mots de passe sont sécurisés ?
+
+  
+
+Détrompez-vous. Chaque jour, des milliers de combinaisons d’identifiants et de mots de passe fuitent sur le web, souvent sans que vous ne vous en rendiez compte. Ces données, récupérées lors de fuites massives ou de cyberattaques ciblées, deviennent des clefs universelles pour les pirates. Ils les utilisent pour s'infiltrer dans vos comptes professionnels, personnels, et même dans les systèmes de votre entreprise.
+
+Webinaire - 14 Novembre 2025
+
+### [Pourquoi les cybercriminels vous ciblent ?](https://youtu.be/l6NYLhtPKhE)
+
+La cybercriminalité n'est plus une menace réservée aux grandes entreprises.
+
+  
+
+Beaucoup de dirigeants se rassurent encore : « Nous sommes trop petits, personne ne nous piratera. » Pourtant, la réalité est tout autre : les PME sont aujourd'hui la cible privilégiée des attaques opportunistes et automatisées. Les pirates ne vous visent pas personnellement, mais ils scannent Internet à la recherche de failles courantes, de mots de passe réutilisés ou de systèmes non mis à jour. Dès qu'une vulnérabilité est détectée, vous entrez dans leur ligne de mire (sans même qu’ils sachent qui vous êtes).
+
+FAQ
+
+## Questions fréquentes
+
+Nos réponses aux questions les plus courantes sur Cywise.
+
+Cywise est disponible en version [SaaS](https://www.cywise.io/register) ou [auto-hébergée](https://github.com/computablefacts/cywise).
+
+Il n'est pas possible de scanner votre réseau interne avec la version [SaaS](https://www.cywise.io/register) de Cywise. Cependant, la version [auto-hébergée](https://github.com/computablefacts/cywise) de Cywise vous permet de le faire !
+
+Oui, Cywise vous permet d'intégrer vos propres documents (Charte Informatique, Charte IA, PSSI, etc.) à CyberBuddy. Vos équipes peuvent alors poser des questions en langage naturel et obtenir des réponses extraites directement de vos ressources internes.
+
+Nous utilisons [Osquery](https://osquery.io/) pour collecter les événements de sécurité de vos machines en temps réel. Des règles écrites par nos experts analysent ces comportements pour identifier toute menace dès son apparition.
+
+Le hardening (ou durcissement) consiste à optimiser la configuration de vos serveurs pour réduire leur surface d'attaque. Cywise utilise des règles [OSSEC](https://www.ossec.net/) écrites par nos experts pour auditer et renforcer vos machines.
+
+Un honeypot est un leurre conçu pour attirer les cyberattaquants et analyser leurs méthodes. Nos honeypots permettent d'identifier en temps réel les attaques en cours, de vérifier si votre entreprise est ciblée et d'évaluer les risques pour votre infrastructure, sans l'exposer directement.
+
+Les fuites révèlent si des identifiants professionnels de votre organisation circulent dans des bases piratées. Cela permet d'anticiper les risques (phishing, usurpation) et de sécuriser les comptes concernés.
+
+La plupart de nos fuites de données contiennent des triplets (identifiant, mot de passe, site web d'utilisation). En croisant les sites web concernés avec vos propres domaines, nous vous permettons d'identifier rapidement les connexions suspectes à votre infrastructure. Cette analyse proactive vous permet de bloquer les comptes compromis avant toute exploitation malveillante, d'imposer une réinitialisation des mots de passe aux utilisateurs exposés et de renforcer la surveillance des comptes les plus vulnérables.
+
+Témoignages
+
+## Ce qu'ils en disent
+
+Nos clients partagent leur expérience.
+
+"Cywise est le meilleur produit que j'ai vu en matière de détection de vulnérabilités de qualité, sans faux positifs."
+
+#### Julien B.
+
+CISO d'un groupe du CAC40
+
+"Avec Cywise, nous avons vu produire une PSSI claire et complète pour notre client en quelques jours au lieu de plusieurs semaines. Un vrai game changer aussi bien en terme de temps qu'en terme de qualité et de suivi."
+
+#### Augustin B.
+
+Co-fondateur d'Ackero
+
+"La solution a amélioré notre visibilité des périmètres exposés et internes. Nous avons été notifiés automatiquement des vulnérabilités à corriger. Rien de critique, heureusement. Depuis, nous sommes alertés dès qu'un changement important est détecté. En somme l'idéal pour une PME comme la nôtre."
+
+#### Sylvain M.
+
+RSSI d'Oppscience
+
+###### Utilisé et approuvé par
+
+Échangeons ensemble
+
+## N'hésitez pas à nous partager vos problématiques cyber !
+
+##### Notre adresse
+
+178 boulevard Haussmann  
+75008 Paris  
+France
+
+##### Besoin d'aide ?
+
+Utilisez le formulaire ci-contre pour nous contacter !
+
+### Envoyez-nous un message
+
+  

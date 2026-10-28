@@ -10,7 +10,7 @@ name('website.en.solutions.cyberbuddy');
     :language-url="route('website.solutions.cyberbuddy')"
     :seo="[
         'title' => 'CyberBuddy — Cywise',
-        'description' => 'Use a security assistant that answers from your company context.',
+        'description' => 'Benefit from an expert AI security assistant for your company.',
     ]"
 >
 <main>
@@ -18,9 +18,9 @@ name('website.en.solutions.cyberbuddy');
     <section class="ui:mx-auto ui:grid ui:max-w-[1240px] ui:grid-cols-1 ui:items-end ui:gap-12 ui:px-4 ui:pb-22 ui:pt-16 ui:sm:px-6 ui:lg:grid-cols-2">
         <div>
             <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Ask. Understand. <span class="ui:text-brand-500">Act.</span></x-site.display>
-            <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Use a security assistant that answers from your company context.</p>
+            <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Your dedicated AI assistant analyzes your risks and guides your security decisions.</p>
             <div class="ui:mt-8 ui:flex ui:flex-wrap ui:gap-3">
-                <x-site.button :href="route('register')">Start protecting →</x-site.button>
+                <x-site.button :href="route('register')">Discover CyberBuddy →</x-site.button>
                 <x-site.button variant="outline" :href="route('website.en.solutions.index')">Explore Cywise</x-site.button>
             </div>
         </div>
@@ -64,13 +64,13 @@ name('website.en.solutions.cyberbuddy');
     {{-- What you get --}}
     <section class="ui:border-0 ui:border-y ui:border-solid ui:border-line ui:bg-canvas">
         <div class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:py-22 ui:sm:px-6">
-            <x-site.display>Security that stays clear.</x-site.display>
+            <x-site.display>Demystify your cybersecurity.</x-site.display>
             <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:gap-3 ui:sm:grid-cols-2">
                 @foreach([
-                    ['Direct questions', 'Ask plain-language security questions.'],
-                    ['Company context', 'Use your policies and security data for relevant answers.'],
-                    ['Policy support', 'Get help with security documentation and PSSI work.'],
-                    ['Risk explanation', 'Explain technical findings to non-specialists.'],
+                    ['Natural language questions', 'Get precise answers without needing complex technical expertise.'],
+                    ['Contextual analysis', 'Benefit from personalized advice based on your own data and security policies.'],
+                    ['Document assistance', 'Generate and refine your security policies with the help of your AI assistant.'],
+                    ['Risk simplification', 'Instantly translate technical findings into business stakes for your decision-makers.'],
                 ] as [$title, $text])
                     <article class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6">
                         <h3 class="ui:m-0 ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</h3>
@@ -83,16 +83,16 @@ name('website.en.solutions.cyberbuddy');
 
     <x-site.steps
         :steps="[
-            ['title' => 'Connect your scope.', 'text' => 'Define what Cywise must monitor for your organization.'],
-            ['title' => 'Find the important risks.', 'text' => 'Cywise groups signals and highlights the findings that need action.'],
-            ['title' => 'Fix with clear guidance.', 'text' => 'Your team gets direct actions without unnecessary security complexity.'],
+            ['title' => 'Connect your sources.', 'text' => 'Integrate your policies and data feeds to nourish your CyberBuddy.'],
+            ['title' => 'Ask your questions.', 'text' => 'Query the AI about any aspect of your security posture.'],
+            ['title' => 'Apply solutions.', 'text' => 'Follow the generated recommendations to immediately strengthen your defenses.'],
         ]"
     >
-        <x-slot:title>See.<br>Prioritize.<br><span class="ui:text-brand-500">Act.</span></x-slot:title>
+        <x-slot:title>Query.<br>Understand.<br><span class="ui:text-brand-500">Optimize.</span></x-slot:title>
     </x-site.steps>
 
-    <x-site.cta :href="route('register')" label="Start protecting →">
-        <x-slot:title>Make your<br>security visible.</x-slot:title>
+    <x-site.cta :href="route('register')" label="Discover CyberBuddy →">
+        <x-slot:title>Give your team the security assistant<br>they deserve.</x-slot:title>
     </x-site.cta>
 </main>
 </x-layouts.website-v2>
