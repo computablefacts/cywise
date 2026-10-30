@@ -39,7 +39,10 @@ class PromptsProcedure extends Procedure
             if ($params['name'] !== 'default_translate') {
                 throw new \Exception("A prompt with the name '{$params['name']}' cannot be found.");
             }
-            $prompt = "
+            $prompt = new Prompt();
+            $prompt->created_by = $user->id;
+            $prompt->name = 'default_translate';
+            $prompt->template = "
 Translate the text located between [TEXT] and [/TEXT] in {LANG}.
 If the text is already in the desired language, just copy it as is. Do not include the [TEXT] and [/TEXT] tags in your answer. Just provide the translated text, do not prefix it with anything else even if it is already in the correct language.
 [TEXT]
