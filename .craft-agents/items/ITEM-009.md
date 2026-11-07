@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-009
-- Status: ready
+- Status: review
 
 ## Description
 
@@ -12,7 +12,7 @@ Define the process for handling specification changes that occur during the revi
 
 ## Acceptance
 
-- [ ] AGENTS.md requires passing unit tests for each spec.
-- [ ] AGENTS.md requires passing unit tests for each item acceptance criterion.
-- [ ] AGENTS.md defines the restart process when specs change during review.
-- [ ] DOCTRINE.md reflects the mandatory unit testing policy.
+- [x] AGENTS.md requires passing unit tests for each spec.
+- [x] AGENTS.md requires passing unit tests for each item acceptance criterion.
+- [x] AGENTS.md defines the restart process when specs change during review.
+- [x] DOCTRINE.md reflects the mandatory unit testing policy.

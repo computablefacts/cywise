@@ -25,4 +25,5 @@
 - 2026-11-07T07:59Z | Junie | git | commit | 824b4195: record Spec S03 on item/ITEM-009
 - 2026-11-07T08:00Z | Junie | I009-S04 | updated | approved → in_progress
 - 2026-11-07T08:01Z | Junie | I009-S04 | updated | in_progress → completed
-- 2026-11-07T08:02Z | Junie | git | commit | c1b9e2a: record Spec S04 on item/ITEM-009
+- 2026-11-07T08:02Z | Junie | git | commit | 54835573: record Spec S04 on item/ITEM-009
+- 2026-11-07T08:03Z | Junie | I009 | updated | in_progress → review
