@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         php: [ '8.4' ]
-        laravel: [ '12.63' ]
+        laravel: [ '12.69' ]
     name: PHP ${{ matrix.php }} Laravel ${{ matrix.laravel }}
     services:
       mariadb:
