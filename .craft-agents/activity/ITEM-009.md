@@ -27,3 +27,5 @@
 - 2026-11-07T08:01Z | Junie | I009-S04 | updated | in_progress → completed
 - 2026-11-07T08:02Z | Junie | git | commit | 54835573: record Spec S04 on item/ITEM-009
 - 2026-11-07T08:03Z | Junie | I009 | updated | in_progress → review
+- 2026-11-07T08:04Z | Junie | I009 | updated | review → ready_to_merge
+- 2026-11-07T08:05Z | User | decision | provided | Authorize merge into main
