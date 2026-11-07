@@ -16,3 +16,6 @@
 - 2026-11-07T09:22Z | Junie | I012-S01 | updated | approved → in_progress
 - 2026-11-07T09:24Z | Junie | I012-S01 | updated | in_progress → completed
 - 2026-11-07T09:24Z | Junie | git | commit | 81b1625: create translations migration
+- 2026-11-07T09:25Z | Junie | I012-S02 | updated | approved → in_progress
+- 2026-11-07T09:26Z | Junie | I012-S02 | updated | in_progress → completed
+- 2026-11-07T09:26Z | Junie | git | commit | c1b3a56: create Translation model

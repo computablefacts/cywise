@@ -9,10 +9,10 @@ Commit: 81b1625
 
 ## ITEM-012-S02: Translation Model
 
-Status: approved
+Status: completed
 Requirement: Create a `Translation` model to interact with the `translations` table.
 Test: Model can be instantiated and saved.
-Commit: -
+Commit: c1b3a56
 
 ## ITEM-012-S03: Update ChunkAssistant::translate
 
