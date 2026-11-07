@@ -26,6 +26,11 @@ For languages other than English, apply equivalent clarity rules.
 - Hide low-level I/O behind driver or abstraction layers. Expose domain-level APIs. A layer may call only its immediate lower layer.
 - Minimize changed lines. Do not modify unrelated code, comments, formatting, or behavior.
 
+## Testing
+
+Mandate passing unit tests for each specification and each item acceptance criterion.
+Observe every test passing before marking a requirement as completed.
+
 ## Bug Fixes
 
 Write a failing regression test, observe the failure, implement the fix, then observe the test passing.

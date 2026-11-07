@@ -28,9 +28,9 @@ User registration is outside this Item's scope.
 
 ## Acceptance
 
-- [x] Users can log in.
-- [x] Invalid credentials are rejected.
-- [x] Successful login creates a session.
+- [ ] Users can log in. Passing unit tests required.
+- [ ] Invalid credentials are rejected. Passing unit tests required.
+- [ ] Successful login creates a session. Passing unit tests required.
 ```
 
 Each Item has one active agent and one Git branch.
@@ -43,7 +43,7 @@ Each Item has one active agent and one Git branch.
 - in_progress: The Git branch has been created, and an agent is implementing approved Specs.
 - blocked: An unresolved question or dependency prevents further work.
 - review: Implementation is complete, and all Spec tests pass. Final verification is in progress.
-- ready_to_merge: All required Specs are completed, acceptance tests pass, and the review is approved. The Item awaits a human merge.
+- ready_to_merge: All required Specs are completed, acceptance tests pass, and the review is approved. All acceptance criteria must have passing unit tests. The Item awaits a human merge.
 - done: The merge into the base branch has been authorized.
 
 Record every status change in Activity.
@@ -95,21 +95,21 @@ The Spec file defines the testable requirements of an Item, their approval statu
 
 Status: completed
 Requirement: Validate credentials and reject invalid login attempts without exposing account existence.
-Test: Unit tests for valid and invalid credentials.
+Test: Passing unit tests for valid and invalid credentials.
 Commit: a31f2c1
 
 ## ITEM-001-S02: Create session
 
 Status: completed
 Requirement: Create a session after successful login.
-Test: Unit test for session creation.
+Test: Passing unit test for session creation.
 Commit: b85d912
 
 ## ITEM-001-S03: Handle errors
 
 Status: dropped
 Requirement: Handle authentication errors.
-Test: Unit test for error responses.
+Test: Passing unit test for error responses.
 Commit: -
 ```
 
@@ -182,12 +182,12 @@ Record actual actions only. Never invent approvals, results, or commits.
 
 ## Workflow
 
-1. `backlog` → `specifying`: Define the Specs and tests.
+1. `backlog` → `specifying`: Define the Specs and tests. Each Spec and Item acceptance criterion must have passing unit tests.
 2. `specifying` → `ready`: Obtain user approval for all required Specs.
 3. `ready` → `in_progress`: Commit approved requirements to the base branch. Create the Item branch.
 4. For each Spec, follow `pending` → `approved` → `in_progress` → `completed`. Require passing tests and a dedicated commit before completion.
 5. `in_progress` → `review`: Complete all required Specs and pass their tests.
-6. `review` → `ready_to_merge`: Pass acceptance tests and obtain review approval. Return to `in_progress` if changes are necessary.
+6. `review` → `ready_to_merge`: Pass acceptance tests and obtain review approval. Return to `in_progress` if changes are necessary. If the user modifies specs during this phase, create additional specs and restart implementation.
 7. `ready_to_merge` → `done`: Obtain explicit human authorization. Merge successfully before setting `done`.
 
 Use `blocked` when work cannot continue. Record the cause and resume the previous status after resolution.
