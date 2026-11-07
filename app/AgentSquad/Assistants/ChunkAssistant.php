@@ -4,6 +4,7 @@ namespace App\AgentSquad\Assistants;
 
 use App\AgentSquad\Vectors\Vector;
 use App\Enums\LanguageEnum;
+use App\Models\Translation;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -48,25 +49,41 @@ class ChunkAssistant
             return $this->chunk;
         }
 
-        $key = "translation:{$this->lang->value}:{$lang->value}:" . md5($this->chunk);
+        $hash = md5($this->chunk);
 
-        return \Cache::remember($key, now()->addDays(120), function () use ($lang) {
+        $translation = Translation::where('from_lang', $this->lang->value)
+            ->where('to_lang', $lang->value)
+            ->where('source_text_hash', $hash)
+            ->first();
 
-            $answer = TextAssistant::use()
-                ->withTimeout($this->timeoutInSeconds)
-                ->withPrompt('default_translate', [
-                    'TEXT' => $this->chunk,
-                    'LANG' => $lang->value,
-                ])
-                ->withDeepInfraModel($this->model)
-                ->text();
+        if ($translation) {
+            return $translation->translated_text;
+        }
 
-            if ($answer === '') {
-                Log::warning("Unable to translate {$this->chunk} from {$this->lang->value} to {$lang->value} language.");
-                return $this->chunk;
-            }
-            return $answer;
-        });
+        $answer = TextAssistant::use()
+            ->withTimeout($this->timeoutInSeconds)
+            ->withPrompt('default_translate', [
+                'TEXT' => $this->chunk,
+                'LANG' => $lang->value,
+            ])
+            ->withDeepInfraModel($this->model)
+            ->text();
+
+        if ($answer === '') {
+            Log::warning("Unable to translate {$this->chunk} from {$this->lang->value} to {$lang->value} language.");
+            return $this->chunk;
+        }
+
+        Translation::updateOrCreate([
+            'from_lang' => $this->lang->value,
+            'to_lang' => $lang->value,
+            'source_text_hash' => $hash,
+        ], [
+            'source_text' => $this->chunk,
+            'translated_text' => $answer,
+        ]);
+
+        return $answer;
     }
 
     public function hypotheticalQuestions(): array
