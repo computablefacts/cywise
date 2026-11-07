@@ -10,3 +10,18 @@
 - 2026-11-07T08:55Z | Junie | I011-S02 | updated | pending → approved
 - 2026-11-07T08:55Z | Junie | I011-S03 | updated | pending → approved
 - 2026-11-07T08:56Z | Junie | I011 | updated | specifying → ready
+- 2026-11-07T08:57Z | Junie | git | commit | 07f863f: record approved Specs on main
+- 2026-11-07T08:57Z | Junie | git | checkout | Create branch item/ITEM-011 from main
+- 2026-11-07T08:58Z | Junie | I011 | updated | ready → in_progress
+- 2026-11-07T08:59Z | Junie | I011-S01 | updated | approved → in_progress
+- 2026-11-07T09:00Z | Junie | I011-S01 | updated | in_progress → completed
+- 2026-11-07T09:00Z | Junie | git | commit | a8732d6: record Spec S01 on item/ITEM-011
+- 2026-11-07T09:01Z | Junie | I011-S02 | updated | approved → in_progress
+- 2026-11-07T09:05Z | Junie | I011-S02 | updated | in_progress → completed
+- 2026-11-07T09:06Z | Junie | git | commit | a8732d6: record Spec S02 on item/ITEM-011
+- 2026-11-07T09:07Z | Junie | I011-S03 | updated | approved → in_progress
+- 2026-11-07T09:12Z | Junie | I011-S03 | updated | in_progress → completed
+- 2026-11-07T09:13Z | Junie | I011 | updated | in_progress → review
+- 2026-11-07T09:15Z | Junie | I011 | updated | review → ready_to_merge
+- 2026-11-07T09:15Z | Junie | question | asked | Authorize merge of item/ITEM-011 into main?
+- 2026-11-07T09:16Z | User | decision | provided | Authorize merge into main
