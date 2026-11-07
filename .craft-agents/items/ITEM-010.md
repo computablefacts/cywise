@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-010
-- Status: in_progress
+- Status: ready_to_merge
 
 ## Description
 
@@ -13,7 +13,7 @@ The commit message must follow a specific format including the Spec ID and the r
 
 ## Acceptance
 
-- [ ] DOCTRINE.md defines the new commit message format.
-- [ ] The format includes the Spec ID in the header: `feat(ITEM-NNN-SMM): Title`.
-- [ ] The format includes the Spec requirement in the body.
-- [ ] The requirement for one commit per Spec is explicitly stated.
+- [x] DOCTRINE.md defines the new commit message format.
+- [x] The format includes the Spec ID in the header: `feat(ITEM-NNN-SMM): Title`.
+- [x] The format includes the Spec requirement in the body.
+- [x] The requirement for one commit per Spec is explicitly stated.

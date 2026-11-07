@@ -15,4 +15,6 @@
 - 2026-11-07T08:20Z | Junie | I010-S02 | updated | approved → in_progress
 - 2026-11-07T08:21Z | Junie | I010-S01 | updated | in_progress → completed
 - 2026-11-07T08:22Z | Junie | I010-S02 | updated | in_progress → completed
-- 2026-11-07T08:23Z | Junie | git | commit | c1197931: record Spec S01 and S02 on item/ITEM-010
+- 2026-11-07T08:23Z | Junie | git | commit | 0aa595b9: record Spec S01 and S02 on item/ITEM-010
+- 2026-11-07T08:24Z | Junie | I010 | updated | in_progress → review
+- 2026-11-07T08:25Z | Junie | I010 | updated | review → ready_to_merge
