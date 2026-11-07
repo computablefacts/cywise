@@ -187,7 +187,7 @@ Record actual actions only. Never invent approvals, results, or commits.
 3. `ready` → `in_progress`: Commit approved requirements to the base branch. Create the Item branch.
 4. For each Spec, follow `pending` → `approved` → `in_progress` → `completed`. Require passing tests and a dedicated commit before completion.
 5. `in_progress` → `review`: Complete all required Specs and pass their tests.
-6. `review` → `ready_to_merge`: Pass acceptance tests and obtain review approval. Return to `in_progress` if changes are necessary.
+6. `review` → `ready_to_merge`: Pass acceptance tests and obtain review approval. Return to `in_progress` if changes are necessary. If the user modifies specs during this phase, create additional specs and restart implementation.
 7. `ready_to_merge` → `done`: Obtain explicit human authorization. Merge successfully before setting `done`.
 
 Use `blocked` when work cannot continue. Record the cause and resume the previous status after resolution.
