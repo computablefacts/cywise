@@ -10,3 +10,18 @@
 - 2026-11-07T09:20Z | Junie | I012-S02 | updated | pending → approved
 - 2026-11-07T09:20Z | Junie | I012-S03 | updated | pending → approved
 - 2026-11-07T09:20Z | Junie | I012 | updated | specifying → ready
+- 2026-11-07T09:21Z | Junie | git | commit | dc03577a: record approved Specs on main
+- 2026-11-07T09:21Z | Junie | git | checkout | Create branch item/ITEM-012 from main
+- 2026-11-07T09:21Z | Junie | I012 | updated | ready → in_progress
+- 2026-11-07T09:22Z | Junie | I012-S01 | updated | approved → in_progress
+- 2026-11-07T09:24Z | Junie | I012-S01 | updated | in_progress → completed
+- 2026-11-07T09:24Z | Junie | git | commit | 81b1625: create translations migration
+- 2026-11-07T09:25Z | Junie | I012-S02 | updated | approved → in_progress
+- 2026-11-07T09:26Z | Junie | I012-S02 | updated | in_progress → completed
+- 2026-11-07T09:26Z | Junie | git | commit | c1b3a56: create Translation model
+- 2026-11-07T09:28Z | Junie | I012-S03 | updated | approved → in_progress
+- 2026-11-07T09:35Z | Junie | I012-S03 | updated | in_progress → completed
+- 2026-11-07T09:35Z | Junie | git | commit | 5f9e2d1: update ChunkAssistant::translate and add tests
+- 2026-11-07T09:36Z | Junie | I012 | updated | in_progress → review
+- 2026-11-07T09:37Z | User | decision | provided | Authorize merge into main
+- 2026-11-07T09:37Z | Junie | I012 | updated | review → ready_to_merge
