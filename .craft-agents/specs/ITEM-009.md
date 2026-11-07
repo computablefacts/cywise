@@ -2,17 +2,17 @@
 
 ## ITEM-009-S01: Mandate Spec unit tests
 
-Status: approved
+Status: completed
 Requirement: Update AGENTS.md to explicitly state that each Spec requires passing unit tests for completion.
 Test: Manual verification of AGENTS.md content.
-Commit: -
+Commit: c8e92f1
 
 ## ITEM-009-S02: Mandate Acceptance unit tests
 
-Status: approved
+Status: completed
 Requirement: Update AGENTS.md to explicitly state that each Item acceptance criterion requires passing unit tests.
 Test: Manual verification of AGENTS.md content.
-Commit: -
+Commit: c8e92f1
 
 ## ITEM-009-S03: Review phase modification process
 
