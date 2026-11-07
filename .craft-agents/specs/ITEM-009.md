@@ -19,11 +19,11 @@ Commit: 5a8afb86
 Status: completed
 Requirement: Update AGENTS.md to define that if the user modifies specs during the review phase, the agent must create additional specs and restart implementation.
 Test: Manual verification of AGENTS.md content.
-Commit: a7f8e3c
+Commit: 824b4195
 
 ## ITEM-009-S04: Update DOCTRINE.md testing policy
 
-Status: approved
+Status: completed
 Requirement: Ensure DOCTRINE.md reflects the requirement for passing unit tests for specs and acceptance criteria.
 Test: Manual verification of DOCTRINE.md content.
-Commit: -
+Commit: c1b9e2a
