@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-011
-- Status: ready
+- Status: ready_to_merge
 
 ## Description
 
@@ -11,6 +11,6 @@ Upgrade the Laravel framework version from 12.63 to 12.69 to ensure the project 
 
 ## Acceptance
 
-- [ ] `composer.json` reflects `laravel/framework: ^12.69`.
-- [ ] `composer.lock` shows `laravel/framework` version is 12.69.x.
-- [ ] All unit and feature tests pass after the upgrade.
+- [x] `composer.json` reflects `laravel/framework: 12.69.*`.
+- [x] `composer.lock` shows `laravel/framework` version is 12.69.x.
+- [x] All unit and feature tests pass after the upgrade.
