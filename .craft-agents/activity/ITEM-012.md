@@ -23,3 +23,5 @@
 - 2026-11-07T09:35Z | Junie | I012-S03 | updated | in_progress → completed
 - 2026-11-07T09:35Z | Junie | git | commit | 5f9e2d1: update ChunkAssistant::translate and add tests
 - 2026-11-07T09:36Z | Junie | I012 | updated | in_progress → review
+- 2026-11-07T09:37Z | User | decision | provided | Authorize merge into main
+- 2026-11-07T09:37Z | Junie | I012 | updated | review → ready_to_merge
