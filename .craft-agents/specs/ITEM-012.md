@@ -2,10 +2,10 @@
 
 ## ITEM-012-S01: Database Migration for Translations
 
-Status: approved
+Status: completed
 Requirement: Create a migration for the `translations` table.
 Test: `php artisan migrate` runs successfully.
-Commit: -
+Commit: 81b1625
 
 ## ITEM-012-S02: Translation Model
 
