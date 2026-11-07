@@ -25,3 +25,6 @@
 - 2026-11-07T09:36Z | Junie | I012 | updated | in_progress → review
 - 2026-11-07T09:37Z | User | decision | provided | Authorize merge into main
 - 2026-11-07T09:37Z | Junie | I012 | updated | review → ready_to_merge
+- 2026-11-07T09:38Z | Junie | I012 | updated | ready_to_merge → done
+- 2026-11-07T09:38Z | Junie | git | commit | 027ee252: record approved merge on item/ITEM-012
+- 2026-11-07T09:39Z | Junie | git | merge | Merge branch item/ITEM-012 into main
