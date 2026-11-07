@@ -26,17 +26,23 @@ For languages other than English, apply equivalent clarity rules.
 - Hide low-level I/O behind driver or abstraction layers. Expose domain-level APIs. A layer may call only its immediate lower layer.
 - Minimize changed lines. Do not modify unrelated code, comments, formatting, or behavior.
 
+## Testing
+
+Mandate passing unit tests for each specification and each item acceptance criterion.
+Observe every test passing before marking a requirement as completed.
+
 ## Bug Fixes
 
 Write a failing regression test, observe the failure, implement the fix, then observe the test passing.
 
 ## Commits
 
-Use `<type>(SPEC-NNN-MM): <Imperative description>` on the assigned Item branch.
+Use `<type>(ITEM-NNN-SMM): <Imperative description>` on the assigned Item branch.
 
 Types: `feat` (feature), `fix` (bug), `chore` (maintenance), `refactor` (behavior-preserving restructuring).
 
-- Reference an existing Item and approved Spec in the body. Each completed Spec needs at least one related commit.
+- Include the Spec requirement in the body.
+- Each completed Spec requires a dedicated commit.
 - Keep the whole subject within 50 characters when possible; never exceed 72.
 - Capitalize the description; use an imperative verb; omit the final period.
 - Separate subject and body with one blank line.
@@ -45,7 +51,7 @@ Types: `feat` (feature), `fix` (bug), `chore` (maintenance), `refactor` (behavio
 Example:
 
 ```text
-feat(SPEC-001-01): Validate credentials
+feat(ITEM-001-S01): Validate credentials
 
 Validate credentials and reject invalid login attempts without exposing account existence.
 ```

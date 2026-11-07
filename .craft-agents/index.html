@@ -225,6 +225,10 @@
             background: #f97316 !important; /* Orange */
         }
 
+        .timeline-v2-item.item-blue::after {
+            background: #38bdf8 !important; /* Blue Cyan */
+        }
+
         .timeline-v2-date {
             font-size: 0.8rem;
             color: var(--text-secondary);
@@ -390,6 +394,39 @@
             renderRightPanel();
         }
 
+        function scrollToElement(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        async function navigateToItemOrSpec(targetId) {
+            console.log('Navigating to:', targetId);
+            
+            // Priorité à la Spec si présente dans l'identifiant (ex: ITEM-001-S01 ou I001-S01)
+            if (targetId.includes('-S')) {
+                const specId = targetId.split('-').pop();
+                switchTab('spec');
+                setTimeout(() => scrollToElement(`spec-${specId}`), 100);
+            } else if (/^S\d+/.test(targetId)) {
+                switchTab('spec');
+                setTimeout(() => scrollToElement(`spec-${targetId}`), 100);
+            } 
+            // Ensuite les Items
+            else if (targetId.includes('ITEM-') || /^I\d+/.test(targetId)) {
+                let itemId = '';
+                if (targetId.includes('ITEM-')) {
+                    itemId = targetId.match(/ITEM-\d+/)[0];
+                } else {
+                    const num = targetId.match(/I(\d+)/)[1];
+                    itemId = `ITEM-${num.padStart(3, '0')}`;
+                }
+                switchTab('item');
+                setTimeout(() => scrollToElement(`item-${itemId}`), 100);
+            }
+        }
+
         function updateSidebar() {
             const list = document.getElementById('items-list');
             list.innerHTML = '';
@@ -451,7 +488,7 @@
 
             if (currentTab === 'item') {
                 const item = items.find(i => i.id === currentItem);
-                const titleHtml = item ? `<h2 class="mb-4 text-white">${item.id}: ${item.name}</h2>` : '';
+                const titleHtml = item ? `<h2 class="mb-4 text-white" id="item-${item.id}">${item.id}: ${item.name}</h2>` : '';
                 viewer.innerHTML = titleHtml + `<div class="markdown-body">${marked.parse(content)}</div>`;
             } else if (currentTab === 'spec') {
                 renderSpecs(content);
@@ -470,6 +507,7 @@
             sections.forEach(section => {
                 const lines = section.split('\n');
                 const specIdName = lines[0].trim();
+                const specId = specIdName.split(':')[0].trim();
                 const statusLine = lines.find(l => l.toLowerCase().startsWith('status:')) || '';
                 const status = statusLine.split(':')[1]?.trim() || 'unknown';
                 
@@ -485,7 +523,7 @@
                 if (status === 'in_progress') statusColor = '#fbbf24'; // warning
 
                 html += `
-                    <div class="spec-card-dark">
+                    <div class="spec-card-dark" id="spec-${specId}">
                         <div class="spec-card-header">${specIdName}</div>
                         
                         <div class="spec-card-body">
@@ -526,7 +564,6 @@
             
             activities.forEach(act => {
                 let itemClass = ''; // Default blue via CSS
-                let actionStyle = 'color: var(--text-primary)';
                 let dotStyle = 'color: #4ade80';
                 
                 // Normalisation de l'affichage : On ne garde que ce qui suit le "-" si c'est une spécification (Sxx)
@@ -543,6 +580,9 @@
                                  act.what.trim().toUpperCase() === 'DECISION' || 
                                  act.what.trim().toUpperCase() === 'QUESTION';
 
+                const isItem = act.what.includes('ITEM-') || /^I\d+/.test(act.what);
+                const isSpec = act.what.includes('-S') || /^S\d+/.test(act.what);
+
                 if (isOrange) {
                     const normalizedWhat = act.what.trim().toUpperCase();
                     if (normalizedWhat === 'INSTRUCTION') itemClass = 'instruction';
@@ -550,19 +590,34 @@
                     else if (normalizedWhat === 'QUESTION') itemClass = 'question';
 
                     dotStyle = 'color: #f97316';
+                } else if (isItem && !isSpec) {
+                    itemClass = 'item-blue'; // Use a specific class or handle in JS
+                    dotStyle = 'color: #38bdf8'; // Cyan pour les Items
+                } else {
+                    dotStyle = 'color: #4ade80'; // Vert pour les Specs (par défaut)
+                }
+
+                let isStatusUpdate = false;
+                let content = '';
+                if (act.action === 'updated' && act.details.includes('→')) {
+                    isStatusUpdate = true;
+                    content = `<span style="${dotStyle}">${act.who}:</span> ${act.details}`;
+                } else {
+                    content = `<span style="${dotStyle}">${act.who}:</span> ${act.details}`;
+                }
+
+                if (isStatusUpdate) {
+                    // No suffix needed as it's explicit
                 }
 
                 html += `
                     <div class="timeline-v2-item ${itemClass}">
                         <div class="timeline-v2-date">
-                            <span style="${dotStyle}; margin-right: 5px; text-transform: uppercase;">${displayWhat}</span>
+                            <span style="${dotStyle}; margin-right: 5px; text-transform: uppercase; cursor: pointer;" onclick="navigateToItemOrSpec('${act.what}')">${displayWhat}</span>
                             ${new Date(act.date).toLocaleString()}
                         </div>
                         <div class="timeline-v2-content">
-                            <span class="fw-bold">${act.who}</span>
-                            <span class="mx-1">•</span>
-                            <span style="${actionStyle}">${act.action}</span>
-                            <div class="text-secondary small mt-1">${act.details}</div>
+                            <div class="text-white mt-1">${content}</div>
                         </div>
                     </div>`;
             });
