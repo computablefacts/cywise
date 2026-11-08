@@ -90,7 +90,7 @@
             'steps' => $monitoring,
         ],
         'prepare-audit' => [
-            'accent' => 'ui:text-brand-500',
+            'accent' => 'ui:text-info',
             'title' => [$t('Transformez votre sécurité en', 'Turn your security into'), $t('preuves.', 'evidence.')],
             'lede' => $t('Centralisez vos preuves, vos politiques et vos actions avant vos audits et revues de conformité.', 'Centralize your evidence, policies and actions before your audits and compliance reviews.'),
             'panel' => $t('Audit · Acme', 'Audit · Acme'),
