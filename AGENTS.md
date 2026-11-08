@@ -161,10 +161,10 @@ The following example covers the full development of ITEM-001.
 - 2026-10-25T09:35Z | User | decision | provided | yes
 - 2026-10-25T09:36Z | Claude | I001 | updated | blocked → in_progress
 - 2026-10-25T09:46Z | Claude | I001-S01 | updated | in_progress → completed
-- 2026-10-25T09:47Z | Claude | git | commit | a31f2c1: record Spec S01 on item/ITEM-001
+- 2026-10-25T09:47Z | Claude | git | commit | a31f2c1: feat(ITEM-001-S01): Validate credentials
 - 2026-10-25T09:50Z | Claude | I001-S02 | updated | approved → in_progress
 - 2026-10-25T10:03Z | Claude | I001-S02 | updated | in_progress → completed
-- 2026-10-25T10:05Z | Claude | git | commit | b85d912: record Spec S02 on item/ITEM-001
+- 2026-10-25T10:05Z | Claude | git | commit | b85d912: feat(ITEM-001-S02): Create session
 - 2026-10-25T10:10Z | Claude | I001 | updated | in_progress → review
 - 2026-10-25T10:37Z | Claude | I001 | updated | review → ready_to_merge
 - 2026-10-25T10:38Z | Claude | question | asked | Authorize merge of item/ITEM-001 into main?

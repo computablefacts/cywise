@@ -37,7 +37,9 @@ Write a failing regression test, observe the failure, implement the fix, then ob
 
 ## Commits
 
-Use `<type>(ITEM-NNN-SMM): <Imperative description>` on the assigned Item branch.
+Use `feat(ITEM-NNN-SMM): <Imperative description>` for implementation commits on the assigned Item branch.
+
+Use `chore(ITEM-NNN): <Imperative description>` for administrative tasks (recording specs, branching, merging).
 
 Types: `feat` (feature), `fix` (bug), `chore` (maintenance), `refactor` (behavior-preserving restructuring).
 
