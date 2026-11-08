@@ -46,7 +46,6 @@ new class extends Component {
 ?>
 
 <x-dynamic-component component="layouts.app" :title="__('Remediation recipe')">
-  @volt('recipe')
   <div class="container-fluid">
     <div class="row">
       <div class="col">
@@ -78,6 +77,5 @@ new class extends Component {
       </div>
     </div>
   </div>
-  @endvolt
 </x-dynamic-component>
 
