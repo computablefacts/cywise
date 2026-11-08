@@ -2,7 +2,7 @@
 
 use function Laravel\Folio\{name};
 
-name('website.a-propos-redirect');
+name('a-propos');
 
 ?>
 

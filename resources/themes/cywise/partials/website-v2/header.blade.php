@@ -41,7 +41,7 @@
         ],
     ];
     $links = [
-        [$isEnglish ? 'The team' : 'L’équipe', route($routePrefix . 'company')],
+        [$isEnglish ? 'Company' : 'Société', route($routePrefix . 'company')],
         ['Blog', route($isEnglish ? 'blog.en' : 'blog')],
         [$isEnglish ? 'Pricing' : 'Tarifs', route($isEnglish ? 'website.en.pricing' : 'pricing')],
     ];
