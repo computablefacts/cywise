@@ -23,6 +23,20 @@ name('pricing');
         <div class="ui:grid ui:grid-cols-1 ui:gap-3 ui:md:grid-cols-2 ui:xl:grid-cols-4">
             @include('theme::partials.website-v2.plans', ['locale' => 'fr'])
         </div>
+
+        <div class="ui:mt-16 ui:rounded-2xl ui:bg-slate-50 ui:p-8 ui:lg:p-12">
+            <x-site.display size="sm" class="ui:mb-8">Comprendre nos modules.</x-site.display>
+            <div class="ui:grid ui:grid-cols-1 ui:gap-8 ui:md:grid-cols-2">
+                <div>
+                    <h3 class="ui:m-0 ui:text-lg ui:font-bold">CyberTodo & CyberScribe</h3>
+                    <p class="ui:m-0 ui:mt-2 ui:text-slate-600">Vos outils de pilotage : gérez votre plan d'action (CyberTodo) et générez vos documents de sécurité (CyberScribe) en quelques clics.</p>
+                </div>
+                <div>
+                    <h3 class="ui:m-0 ui:text-lg ui:font-bold">Agents & Hardening</h3>
+                    <p class="ui:m-0 ui:mt-2 ui:text-slate-600">Nos agents surveillent vos systèmes en continu et vous guident dans le durcissement (Hardening) de vos configurations.</p>
+                </div>
+            </div>
+        </div>
     </section>
 </main>
 </x-layouts.website-v2>
