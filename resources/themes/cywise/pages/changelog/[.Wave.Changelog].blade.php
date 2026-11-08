@@ -24,7 +24,7 @@
             <meta property="dateModified" content="{{ Carbon\Carbon::parse($changelog->updated_at)->toIso8601String() }}">
             <meta class="uk-margin-remove-adjacent" property="datePublished" content="{{ Carbon\Carbon::parse($changelog->created_at)->toIso8601String() }}">
 
-            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">{{ $changelog->title }}</x-site.display>
+            <x-site.display as="h1" size="xl">{{ $changelog->title }}</x-site.display>
 
             @if ($changelog->description)
                 <p class="ui:m-0 ui:mt-6 ui:max-w-[720px] ui:text-[22px] ui:leading-normal ui:text-slate-700">{{ $changelog->description }}</p>

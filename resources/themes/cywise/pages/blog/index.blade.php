@@ -24,7 +24,7 @@ render(function (View $view, BlogContent $content) {
 >
     <main>
         <section class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:pb-12 ui:pt-16 ui:sm:px-6">
-            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Depuis le lab Cywise.</x-site.display>
+            <x-site.display as="h1" size="xl">Depuis le lab Cywise.</x-site.display>
             <p class="ui:m-0 ui:mt-6 ui:max-w-[560px] ui:text-xl ui:leading-normal ui:text-slate-700">Des contenus cybersécurité pratiques pour les équipes qui veulent des réponses claires.</p>
         </section>
 
