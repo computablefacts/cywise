@@ -7,10 +7,10 @@
 
     // Edge = the matching solution's tone (see site/edge-card); an audit spans all solutions → neutral line
     $cases = [
-        ['ui:bg-medium', $t('Trouver vos vulnérabilités', 'Find your vulnerabilities'), $t('Détectez et priorisez vos failles de sécurité.', 'Detect and prioritize your security flaws.'), 'use-cases.find-vulnerabilities'],
         ['ui:bg-critical', $t('Surveiller votre surface d’attaque', 'Monitor your attack surface'), $t('Maîtrisez votre exposition externe en continu.', 'Master your external exposure continuously.'), 'use-cases.monitor-attack-surface'],
+        ['ui:bg-medium', $t('Trouver vos vulnérabilités', 'Find your vulnerabilities'), $t('Détectez et priorisez vos failles de sécurité.', 'Detect and prioritize your security flaws.'), 'use-cases.find-vulnerabilities'],
         ['ui:bg-low', $t('Rechercher vos identifiants compromis', 'Search for your compromised credentials'), $t('Identifiez vos données collaborateurs exposées.', 'Identify your exposed employee data.'), 'use-cases.check-leaked-credentials'],
-        ['ui:bg-line', $t('Préparer votre audit', 'Prepare your audit'), $t('Centralisez vos preuves de sécurité et corrigez vos écarts.', 'Centralize your security evidence and fix your gaps.'), 'use-cases.prepare-audit'],
+        ['ui:bg-info', $t('Préparer votre audit', 'Prepare your audit'), $t('Centralisez vos preuves de sécurité et corrigez vos écarts.', 'Centralize your security evidence and fix your gaps.'), 'use-cases.prepare-audit'],
         ['ui:bg-ink', $t('Lancer un pentest expert', 'Launch an expert pentest'), $t('Évaluez vos systèmes critiques avec nos experts.', 'Evaluate your critical systems with our experts.'), 'use-cases.run-pentest'],
     ];
 @endphp

@@ -13,7 +13,7 @@
                 ['critical', $isEnglish ? 'Attack surface' : 'Surface d’attaque', route($routePrefix . 'solutions.attack-surface')],
                 ['medium', $isEnglish ? 'Vulnerability management' : 'Gestion des vulnérabilités', route($routePrefix . 'solutions.vulnerability-management')],
                 ['low', $isEnglish ? 'Credential monitoring' : 'Surveillance des identifiants', route($routePrefix . 'solutions.credential-monitoring')],
-                ['brand', 'CyberBuddy', route($routePrefix . 'solutions.cyberbuddy')],
+                ['info', 'CyberBuddy', route($routePrefix . 'solutions.cyberbuddy')],
                 ['ink', 'Pentest', route($routePrefix . 'solutions.pentest')],
             ],
         ],
@@ -21,11 +21,11 @@
             'label' => $isEnglish ? 'For whom' : 'Pour qui',
             'all' => [$isEnglish ? 'All audiences' : 'Tous les profils', route($routePrefix . 'audiences.index')],
             'items' => [
-                [null, $isEnglish ? 'SMBs' : 'PME', route($routePrefix . 'audiences.smbs')],
-                [null, 'Startups', route($routePrefix . 'audiences.startups')],
-                [null, $isEnglish ? 'IT teams' : 'Équipes IT', route($routePrefix . 'audiences.it-teams')],
-                [null, $isEnglish ? 'CISOs' : 'RSSI', route($routePrefix . 'audiences.cisos')],
-                [null, 'MSP', route($routePrefix . 'audiences.msps')],
+                ['critical', $isEnglish ? 'SMBs' : 'PME', route($routePrefix . 'audiences.smbs')],
+                ['brand', 'Startups', route($routePrefix . 'audiences.startups')],
+                ['low', $isEnglish ? 'IT teams' : 'Équipes IT', route($routePrefix . 'audiences.it-teams')],
+                ['info', $isEnglish ? 'CISOs' : 'RSSI', route($routePrefix . 'audiences.cisos')],
+                ['ink', 'MSP', route($routePrefix . 'audiences.msps')],
             ],
         ],
         [
@@ -53,7 +53,7 @@
         'low' => 'ui:bg-low',
         'brand' => 'ui:bg-brand-500',
         'info' => 'ui:bg-info',
-        'ink' => 'ui:bg-slate-400',
+        'ink' => 'ui:bg-ink',
     ];
     $link = 'ui:text-slate-700! ui:no-underline! ui:hover:text-ink!';
 @endphp

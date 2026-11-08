@@ -17,7 +17,7 @@
 <main>
     {{-- Hero --}}
     <section class="{{ $wrap }} ui:pb-16 ui:pt-16">
-        <x-site.display as="h1" size="xl" class="ui:max-w-[1100px] ui:text-[clamp(26px,5.6vw,92px)]!">{!! $t('Conçu pour les équipes qui exigent de la <span class="ui:text-brand-500">clarté.</span>', 'Designed for teams that demand <span class="ui:text-brand-500">clarity.</span>') !!}</x-site.display>
+        <x-site.display as="h1" size="xl" class="ui:max-w-[1100px]">{!! $t('Conçu pour les équipes qui exigent de la <span class="ui:text-brand-500">clarté.</span>', 'Designed for teams that demand <span class="ui:text-brand-500">clarity.</span>') !!}</x-site.display>
         <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ $t('Sélectionnez le profil qui correspond à votre organisation pour découvrir votre expérience personnalisée.', 'Select the profile that matches your organization to discover your personalized experience.') }}</p>
     </section>
 

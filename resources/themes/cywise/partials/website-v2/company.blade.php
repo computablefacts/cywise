@@ -41,7 +41,7 @@
 <main>
     {{-- Hero --}}
     <section class="{{ $wrap }} ui:pb-20 ui:pt-14">
-        <x-site.display as="h1" size="xl" class="ui:text-[clamp(24px,8vw,100px)]!">{!! $t('La cybersécurité<br><span class="ui:text-brand-500">pour les mortels.</span>', 'Cybersecurity<br><span class="ui:text-brand-500">for mere mortals.</span>') !!}</x-site.display>
+        <x-site.display as="h1" size="xl">{!! $t('La cybersécurité<br><span class="ui:text-brand-500">pour les mortels.</span>', 'Cybersecurity<br><span class="ui:text-brand-500">for mere mortals.</span>') !!}</x-site.display>
         <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:gap-6 ui:text-[21px] ui:leading-normal ui:text-slate-700 ui:lg:grid-cols-2 ui:lg:gap-12">
             <p class="ui:m-0">{{ $t('Cywise est une plateforme SaaS française qui accompagne les entreprises de toutes tailles dans leur cyberprotection, leur cyberdéfense et leur cyberrésilience.', 'Cywise is a French SaaS platform helping companies of all sizes with their cyber protection, cyber defence and cyber resilience.') }}</p>
             <p class="ui:m-0">{{ $t('Notre ambition : rendre la cybersécurité simple, accessible et opérationnelle, même sans expertise technique.', 'Our ambition: make cybersecurity simple, accessible and actionable, even without technical expertise.') }}</p>

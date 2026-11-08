@@ -108,7 +108,7 @@
     <section class="ui:border-0 ui:border-b ui:border-solid ui:border-line ui:bg-canvas">
         <div class="{{ $wrap }} ui:py-24">
             <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
-            <x-site.display>{!! $t('Ce que disent<br><span class="ui:text-slate-400">nos clients.</span>', 'What<br><span class="ui:text-slate-400">our customers say.</span>') !!}</x-site.display>
+            <x-site.display>{!! $t('Ce que disent<br><span class="ui:text-brand-500">nos clients.</span>', 'What<br><span class="ui:text-brand-500">our customers say.</span>') !!}</x-site.display>
                 <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Découvrez comment Cywise transforme la cybersécurité de nos clients au quotidien.', 'Discover how Cywise transforms our customers\' cybersecurity every day.') }}</p>
             </div>
             <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
@@ -132,7 +132,7 @@
     {{-- Solutions --}}
     <section id="solutions" class="{{ $wrap }} ui:py-24">
         <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
-            <x-site.display>{!! $t('Une plateforme<br><span class="ui:text-slate-400">au service de votre défense.</span>', 'One platform<br><span class="ui:text-slate-400">at the service of your defense.</span>') !!}</x-site.display>
+            <x-site.display>{!! $t('Une plateforme<br><span class="ui:text-brand-500">au service de votre défense.</span>', 'One platform<br><span class="ui:text-brand-500">at the service of your defense.</span>') !!}</x-site.display>
             <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Des outils simples pour les tâches de sécurité que votre entreprise gère chaque jour.', 'Simple tools for the security tasks your company manages every day.') }}</p>
         </div>
         <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-2 ui:xl:grid-cols-3">
@@ -150,7 +150,7 @@
     {{-- CyberBuddy: title above, then the app's own chat window (Inter, same tokens as pages/cyberbuddy) --}}
     <section class="ui:bg-brand-500 ui:text-white">
         <div class="{{ $wrap }} ui:py-24">
-            <x-site.display class="ui:max-w-[1000px] ui:text-[clamp(24px,5vw,76px)]!">{{ $t('Votre équipe cybersécurité a un collègue IA.', 'Your cybersecurity team has an AI colleague.') }}</x-site.display>
+        <x-site.display class="ui:max-w-[1000px]">{{ $t('Votre équipe cybersécurité a un collègue IA.', 'Your cybersecurity team has an AI colleague.') }}</x-site.display>
             <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:items-start ui:gap-10 ui:lg:grid-cols-3">
                 <div class="ui:max-w-[360px]">
                     <p class="ui:m-0 ui:text-[19px] ui:leading-normal ui:text-brand-50">{{ $t('Posez des questions directes sur vos risques, vos politiques et vos actions de sécurité.', 'Ask direct questions about your risks, policies and security actions.') }}</p>
@@ -212,7 +212,7 @@
     <section class="ui:bg-ink ui:text-white">
         <div class="{{ $wrap }} ui:grid ui:grid-cols-1 ui:items-end ui:gap-12 ui:py-24 ui:lg:grid-cols-2">
             <div>
-                <x-site.display size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">{!! $t('Parfois, il faut une <span class="ui:text-brand-500">expertise humaine.</span>', 'Sometimes you need <span class="ui:text-brand-500">human expertise.</span>') !!}</x-site.display>
+                <x-site.display size="xl">{!! $t('Parfois, il faut une <span class="ui:text-brand-500">expertise humaine.</span>', 'Sometimes you need <span class="ui:text-brand-500">human expertise.</span>') !!}</x-site.display>
                 <p class="ui:m-0 ui:mt-5 ui:text-[19px] ui:leading-normal ui:text-slate-400">{{ $t('Des tests experts pour vos applications et infrastructures critiques.', 'Expert testing for your critical applications and infrastructure.') }}</p>
                 <x-site.button class="ui:mt-7" :href="route($routePrefix . 'solutions.pentest')">{{ $t('Réserver un Pentest →', 'Book a pentest →') }}</x-site.button>
             </div>
@@ -243,7 +243,7 @@
 
     {{-- Ready --}}
     <section id="cta" class="{{ $wrap }} ui:py-28">
-        <x-site.display size="xl" class="ui:text-[clamp(26px,5.6vw,92px)]!">{!! $t('Ne laissez plus la complexité freiner votre sécurité.<br><span class="ui:text-brand-500">Passez à Cywise.</span>', 'Don’t let complexity slow down your security.<br><span class="ui:text-brand-500">Switch to Cywise.</span>') !!}</x-site.display>
+        <x-site.display size="xl">{!! $t('Ne laissez plus la complexité freiner votre sécurité.<br><span class="ui:text-brand-500">Passez à Cywise.</span>', 'Don’t let complexity slow down your security.<br><span class="ui:text-brand-500">Switch to Cywise.</span>') !!}</x-site.display>
         <div class="ui:mt-10 ui:flex ui:flex-wrap ui:gap-3">
             <x-site.button :href="route('register')">{{ $t('Essayer gratuitement →', 'Try for free →') }}</x-site.button>
             <x-site.button variant="outline" :href="'mailto:sales@cywise.io'">{{ $t('Demander une démo', 'Book a demo') }}</x-site.button>

@@ -17,7 +17,7 @@ name('website.solutions.credential-monitoring');
     {{-- Hero: the accent is the solution's tone (credentials → low, marker for contrast) --}}
     <section class="ui:mx-auto ui:grid ui:max-w-[1240px] ui:grid-cols-1 ui:items-end ui:gap-12 ui:px-4 ui:pb-22 ui:pt-16 ui:sm:px-6 ui:lg:grid-cols-2">
         <div>
-            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Découvrez vos données <span class="ui:bg-low ui:px-[0.06em] ui:box-decoration-clone">exposées.</span></x-site.display>
+            <x-site.display as="h1" size="xl">Découvrez vos données <span class="ui:bg-low ui:text-white ui:px-[0.06em] ui:box-decoration-clone">exposées.</span></x-site.display>
             <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Détectez vos identifiants compromis sur le web avant qu'ils ne soient exploités par des cyberattaquants.</p>
             <div class="ui:mt-8 ui:flex ui:flex-wrap ui:gap-3">
                 <x-site.button :href="route('register')">Surveiller mes identifiants →</x-site.button>

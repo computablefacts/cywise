@@ -22,7 +22,7 @@
     ]"
 >
     <{{ $tag }} class="ui:mx-auto ui:w-full ui:max-w-[1240px] ui:px-4 ui:pb-24 ui:pt-16 ui:sm:px-6">
-        <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">{{ __('Changelog') }}</x-site.display>
+        <x-site.display as="h1" size="xl">{{ __('Changelog') }}</x-site.display>
         <p class="ui:m-0 ui:mt-6 ui:max-w-[560px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ __('Latest updates and enhancements') }}</p>
 
         {{-- Timeline: date column, then title and body --}}

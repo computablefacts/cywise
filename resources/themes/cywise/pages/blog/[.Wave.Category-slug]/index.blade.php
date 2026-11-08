@@ -25,7 +25,7 @@ render(function (View $view, BlogContent $content, Category $category) {
 >
     <main>
         <section class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:pb-12 ui:pt-16 ui:sm:px-6">
-            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">{{ $category->name }}</x-site.display>
+            <x-site.display as="h1" size="xl">{{ $category->name }}</x-site.display>
             <p class="ui:m-0 ui:mt-6 ui:max-w-[560px] ui:text-xl ui:leading-normal ui:text-slate-700">Les derniers contenus de cette catégorie.</p>
         </section>
 

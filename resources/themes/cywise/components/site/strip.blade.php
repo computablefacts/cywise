@@ -10,7 +10,8 @@
 
 <div aria-hidden="true" {{ $attributes->merge(['class' => 'ui:flex ui:h-1.5' . ($reverse ? ' ui:flex-row-reverse' : '')]) }}>
   <span class="ui:flex-1 ui:bg-critical"></span>
-  <span class="ui:flex-[2] ui:bg-medium"></span>
-  <span class="ui:flex-[3] ui:bg-low"></span>
-  <span class="ui:flex-[6] ui:bg-brand-500"></span>
+  <span class="ui:flex-1 ui:bg-medium"></span>
+  <span class="ui:flex-1 ui:bg-low"></span>
+  <span class="ui:flex-1 ui:bg-info"></span>
+  <span class="ui:flex-1 ui:bg-ink"></span>
 </div>

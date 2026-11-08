@@ -17,7 +17,7 @@ name('website.solutions.attack-surface');
     {{-- Hero: the accent is the solution's tone (attack surface → critical, see site/edge-card) --}}
     <section class="ui:mx-auto ui:grid ui:max-w-[1240px] ui:grid-cols-1 ui:items-end ui:gap-12 ui:px-4 ui:pb-22 ui:pt-16 ui:sm:px-6 ui:lg:grid-cols-2">
         <div>
-            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Visualisez votre entreprise du point de vue des <span class="ui:text-critical">attaquants.</span></x-site.display>
+            <x-site.display as="h1" size="xl">Visualisez votre entreprise du point de vue des <span class="ui:bg-critical ui:text-white ui:px-[0.06em] ui:box-decoration-clone">attaquants.</span></x-site.display>
             <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Découvrez et surveillez vos actifs exposés pour éliminer les risques avant qu'ils ne soient exploités.</p>
             <div class="ui:mt-8 ui:flex ui:flex-wrap ui:gap-3">
                 <x-site.button :href="route('register')">Surveiller ma surface d'attaque →</x-site.button>
