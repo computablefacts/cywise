@@ -487,9 +487,7 @@
             }
 
             if (currentTab === 'item') {
-                const item = items.find(i => i.id === currentItem);
-                const titleHtml = item ? `<h2 class="mb-4 text-white" id="item-${item.id}">${item.id}: ${item.name}</h2>` : '';
-                viewer.innerHTML = titleHtml + `<div class="markdown-body">${marked.parse(content)}</div>`;
+                viewer.innerHTML = `<div class="markdown-body">${marked.parse(content)}</div>`;
             } else if (currentTab === 'spec') {
                 renderSpecs(content);
             } else if (currentTab === 'activity') {
