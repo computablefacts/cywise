@@ -342,9 +342,9 @@
                 }
 
                 // Fallback / Complément : Recherche séquentielle si la liste est vide ou incomplète
-                // On essaie de charger les items de ITEM-001 à ITEM-020 (ou plus si nécessaire)
+                // On essaie de charger les items de ITEM-001 à ITEM-099 (ou plus si nécessaire)
                 if (discoveredItems.length < 5) {
-                    for (let i = 1; i <= 20; i++) {
+                    for (let i = 1; i <= 99; i++) {
                         const id = `ITEM-${String(i).padStart(3, '0')}`;
                         if (discoveredItems.find(item => item.id === id)) continue;
                         
