@@ -22,3 +22,8 @@
 - 2026-11-08T10:30Z | Junie | git | commit | 67edd885: record Spec S02 on item/ITEM-013
 - 2026-11-08T10:35Z | Junie | I013-S03 | updated | in_progress → completed
 - 2026-11-08T10:35Z | Junie | git | commit | b8a7d3f: record Spec S03 on item/ITEM-013
+- 2026-11-08T10:40Z | Junie | I013 | updated | in_progress → review
+- 2026-11-08T10:42Z | Junie | I013 | updated | review → ready_to_merge
+- 2026-11-08T10:43Z | Junie | question | asked | Authorize merge of item/ITEM-013 into main?
+- 2026-11-08T10:45Z | User | decision | provided | ok (authorize merge)
+- 2026-11-08T10:46Z | Junie | I013 | updated | ready_to_merge → done

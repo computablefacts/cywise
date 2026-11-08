@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-013
-- Status: in_progress
+- Status: done
 
 ## Description
 
@@ -12,6 +12,6 @@ Update all references to `.craft-agents` in the codebase and within the workflow
 
 ## Acceptance
 
-- [ ] Directory `.craft-agents` is renamed to `.ia-factory`.
-- [ ] All references to `.craft-agents` in the codebase are updated to `.ia-factory`.
-- [ ] The agent workflow remains functional with the new directory name.
+- [x] Directory `.craft-agents` is renamed to `.ia-factory`.
+- [x] All references to `.craft-agents` in the codebase are updated to `.ia-factory`.
+- [x] The agent workflow remains functional with the new directory name.
