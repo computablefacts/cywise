@@ -22,3 +22,29 @@
 - 2026-11-08T16:16Z | Junie | I017-S05 | updated | pending → approved
 - 2026-11-08T16:16Z | Junie | I017-S06 | updated | pending → approved
 - 2026-11-08T16:17Z | Junie | I017 | updated | specifying → ready
+- 2026-11-08T16:25Z | Junie | git | commit | ce36570: record approved specs for UI updates on main
+- 2026-11-08T16:26Z | Junie | git | checkout | Create branch item/ITEM-017 from main
+- 2026-11-08T16:27Z | Junie | I017 | updated | ready → in_progress
+- 2026-11-08T16:28Z | Junie | I017-S01 | updated | approved → in_progress
+- 2026-11-08T16:40Z | Junie | I017-S01 | updated | in_progress → completed
+- 2026-11-08T16:41Z | Junie | git | commit | 2f68e56: feat(ITEM-017-S01): Clarify positioning and remove AI patterns on home
+- 2026-11-08T16:42Z | Junie | I017-S02 | updated | approved → in_progress
+- 2026-11-08T16:55Z | Junie | I017-S02 | updated | in_progress → completed
+- 2026-11-08T16:56Z | Junie | git | commit | 65f663e: feat(ITEM-017-S02): Merge Solutions and Use Cases into a single page
+- 2026-11-08T16:57Z | Junie | I017-S03 | updated | approved → in_progress
+- 2026-11-08T17:10Z | Junie | I017-S03 | updated | in_progress → completed
+- 2026-11-08T17:11Z | Junie | git | commit | 601bf69: feat(ITEM-017-S03): Improve team visibility and clarify roles
+- 2026-11-08T17:12Z | Junie | I017-S04 | updated | approved → in_progress
+- 2026-11-08T17:25Z | Junie | I017-S04 | updated | in_progress → completed
+- 2026-11-08T17:26Z | Junie | git | commit | a13c354: feat(ITEM-017-S04): Clarify pricing and product bricks
+- 2026-11-08T17:27Z | Junie | I017-S05 | updated | approved → in_progress
+- 2026-11-08T17:40Z | Junie | I017-S05 | updated | in_progress → completed
+- 2026-11-08T17:41Z | Junie | git | commit | 04c1e8d: feat(ITEM-017-S05): Global Anti-IA copy cleanup
+- 2026-11-08T17:42Z | Junie | I017-S06 | updated | approved → in_progress
+- 2026-11-08T17:55Z | Junie | I017-S06 | updated | in_progress → completed
+- 2026-11-08T17:56Z | Junie | git | commit | 82ff64c: feat(ITEM-017-S06): Resolve technical inconsistencies and update legal notices
+- 2026-11-08T18:00Z | Junie | I017 | updated | in_progress → review
+- 2026-11-08T18:05Z | Junie | I017 | updated | review → ready_to_merge
+- 2026-11-08T18:10Z | User | decision | provided | Authorize merge into main
+- 2026-11-08T18:15Z | Junie | I017 | updated | ready_to_merge → done
+- 2026-11-08T18:16Z | Junie | git | merge | Merge branch item/ITEM-017 into main
