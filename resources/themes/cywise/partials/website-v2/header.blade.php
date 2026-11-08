@@ -53,7 +53,7 @@
         'low' => 'ui:bg-low',
         'brand' => 'ui:bg-brand-500',
         'info' => 'ui:bg-info',
-        'ink' => 'ui:bg-slate-400',
+        'ink' => 'ui:bg-ink',
     ];
     $link = 'ui:text-slate-700! ui:no-underline! ui:hover:text-ink!';
 @endphp
