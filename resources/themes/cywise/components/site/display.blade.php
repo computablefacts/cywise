@@ -11,7 +11,7 @@
 @php
   $sizes = match ($size) {
     'xl' => 'ui:text-[clamp(34px,7vw,90px)] ui:leading-none ui:font-stretch-125%',
-    'md' => 'ui:text-[clamp(28px,3.8vw,56px)] ui:leading-[1.02] ui:font-stretch-118%',
+    'md' => 'ui:text-[clamp(24px,3.5vw,48px)] ui:leading-[1.02] ui:font-stretch-118%',
     default => 'ui:text-[clamp(28px,4.5vw,64px)] ui:leading-[1.02] ui:font-stretch-112%',
   };
 @endphp
