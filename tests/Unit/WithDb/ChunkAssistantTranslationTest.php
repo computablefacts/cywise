@@ -6,6 +6,7 @@ use App\AgentSquad\Assistants\ChunkAssistant;
 use App\AgentSquad\Assistants\TextAssistant;
 use App\Enums\LanguageEnum;
 use App\Models\Translation;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCaseWithDb;
 use Mockery;
 
@@ -18,13 +19,16 @@ class ChunkAssistantTranslationTest extends TestCaseWithDb
         $translatedText = 'Bonjour le monde';
         $targetLang = LanguageEnum::FRENCH;
 
-        // Mock TextAssistant to avoid real API calls
-        $textAssistantMock = Mockery::mock('overload:' . TextAssistant::class);
-        $textAssistantMock->shouldReceive('use')->andReturnSelf();
-        $textAssistantMock->shouldReceive('withTimeout')->andReturnSelf();
-        $textAssistantMock->shouldReceive('withPrompt')->andReturnSelf();
-        $textAssistantMock->shouldReceive('withDeepInfraModel')->andReturnSelf();
-        $textAssistantMock->shouldReceive('text')->once()->andReturn($translatedText);
+        // Mock Http to avoid real API calls for TextAssistant
+        Http::fake([
+            '*' => Http::response([
+                'choices' => [[
+                    'message' => [
+                        'content' => $translatedText,
+                    ],
+                ]],
+            ], 200),
+        ]);
 
         $assistant = ChunkAssistant::use()
             ->withChunk($sourceText)
