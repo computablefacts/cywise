@@ -5,14 +5,14 @@
 Status: completed
 Requirement: Rename the `.craft-agents` directory to `.ia-factory`.
 Test: Directory `.ia-factory` exists and `.craft-agents` does not.
-Commit: 8e5f29c
+Commit: 9999d0c4
 
 ## ITEM-013-S02: Update references in AGENTS.md
 
-Status: in_progress
+Status: completed
 Requirement: Update all references to `.craft-agents` in `AGENTS.md` to `.ia-factory`.
 Test: `grep -r ".craft-agents" AGENTS.md` returns no results.
-Commit: -
+Commit: c81a992
 
 ## ITEM-013-S03: Update references in workflow files
 
