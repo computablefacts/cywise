@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-015
-- Status: ready
+- Status: done
 
 ## Description
 
@@ -12,6 +12,6 @@ L'erreur semble liée à une mauvaise utilisation de `@volt` à l'intérieur d'u
 
 ## Acceptance
 
-- [ ] La page `/recipe/{id}` s'affiche sans erreur 500.
-- [ ] Le bouton "Télécharger le script de remédiation" fonctionne correctement.
-- [ ] L'affichage de la recette fonctionne correctement.
+- [x] La page `/recipe/{id}` s'affiche sans erreur 500.
+- [x] Le bouton "Télécharger le script de remédiation" fonctionne correctement.
+- [x] L'affichage de la recette fonctionne correctement.
