@@ -10,9 +10,9 @@
 
 @php
   $sizes = match ($size) {
-    'xl' => 'ui:text-[clamp(30px,5.4vw,54px)] ui:leading-none ui:font-stretch-125%',
-    'md' => 'ui:text-[clamp(24px,3.5vw,42px)] ui:leading-[1.02] ui:font-stretch-118%',
-    default => 'ui:text-[clamp(28px,3.8vw,48px)] ui:leading-[1.02] ui:font-stretch-112%',
+    'xl' => 'ui:text-[clamp(32px,6.5vw,72px)] ui:leading-none ui:font-stretch-125%',
+    'md' => 'ui:text-[clamp(24px,4vw,50px)] ui:leading-[1.02] ui:font-stretch-118%',
+    default => 'ui:text-[clamp(28px,5vw,60px)] ui:leading-[1.02] ui:font-stretch-112%',
   };
 @endphp
 
