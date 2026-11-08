@@ -15,10 +15,11 @@
         'pentest' => ['ink', 'Pentest', $t('Faites tester vos systèmes par nos experts.', 'Get tested by our experts.'), $t('Faites tester vos applications critiques par nos experts en sécurité offensive.', 'Have your critical applications tested by our offensive security experts.'), 'solutions.pentest'],
     ];
 
-    // Per audience: title [lead, accent], intro, hero rows [level, text, tag, badge] (example data), features, solutions
+    // Per audience: title [lead, accent], accent class, intro, hero rows [level, text, tag, badge] (example data), features, solutions
     $pages = [
         'smbs' => [
             'title' => [$t('La sécurité simplifiée pour votre', 'Security without a large'), $t('entreprise.', 'security team.')],
+            'accent' => 'ui:bg-critical ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'intro' => $t('Bénéficiez d’une visibilité claire et d’actions concrètes pour sécuriser votre activité sans équipe dédiée.', 'Give small and medium businesses clear visibility and practical actions.'),
             'panel' => 'acme.fr',
             'rows' => [
@@ -36,6 +37,7 @@
         ],
         'startups' => [
             'title' => [$t('Accélérez votre croissance en toute', 'Move fast without ignoring'), $t('sécurité.', 'security.')],
+            'accent' => 'ui:bg-brand-500 ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'intro' => $t('Bâtissez vos fondations de sécurité dès le premier jour, sans ralentir votre équipe produit.', 'Build security foundations while your product and team grow.'),
             'panel' => $t('Nouveaux actifs', 'New assets'),
             'rows' => [
@@ -53,6 +55,7 @@
         ],
         'it-teams' => [
             'title' => [$t('Maîtrisez vos priorités de', 'Know what to fix'), $t('sécurité.', 'first.')],
+            'accent' => 'ui:bg-low ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'intro' => $t('Fournissez à vos équipes IT une liste d’actions précise et priorisée pour réduire les risques.', 'Give IT teams a direct security worklist.'),
             'panel' => $t('À corriger', 'To fix'),
             'rows' => [
@@ -70,6 +73,7 @@
         ],
         'cisos' => [
             'title' => [$t('Prenez des décisions basées sur des', 'Turn security signals into'), $t('données claires.', 'decisions.')],
+            'accent' => 'ui:bg-info ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'intro' => $t('Bénéficiez d’une vision stratégique sur votre exposition, vos priorités et vos progrès réels.', 'Give security leaders a clear view of exposure, priority and progress.'),
             'panel' => $t('Programme', 'Program'),
             'rows' => [
@@ -85,6 +89,7 @@
         ],
         'msps' => [
             'title' => [$t('Protégez vos clients plus', 'Protect more customers with less'), $t('efficacement.', 'friction.')],
+            'accent' => 'ui:bg-ink ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'intro' => $t('Standardisez votre offre de visibilité sécurité et guidez vos clients avec des conseils experts.', 'Standardize visibility and security guidance across customer environments.'),
             'panel' => $t('Clients', 'Customers'),
             'rows' => [
@@ -109,7 +114,7 @@
     {{-- Hero: title with accent word, next to an app-like panel (example data) --}}
     <section class="{{ $wrap }} ui:grid ui:grid-cols-1 ui:items-end ui:gap-12 ui:pb-22 ui:pt-16 ui:lg:grid-cols-2">
         <div>
-            <x-site.display as="h1" size="xl">{{ $page['title'][0] }} <span class="ui:text-brand-500">{{ $page['title'][1] }}</span></x-site.display>
+            <x-site.display as="h1" size="xl">{{ $page['title'][0] }} <span class="{{ $page['accent'] }}">{{ $page['title'][1] }}</span></x-site.display>
             <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ $page['intro'] }}</p>
             <div class="ui:mt-8 ui:flex ui:flex-wrap ui:gap-3">
                 <x-site.button :href="route('register')">{{ $t('Commencer →', 'Start protecting →') }}</x-site.button>
@@ -150,7 +155,7 @@
 
     {{-- Relevant solutions, each in its own tone --}}
     <section class="{{ $wrap }} ui:pt-24">
-        <x-site.display>{!! $t('Une plateforme unique<br><span class="ui:text-slate-400">pour votre défense.</span>', 'One platform<br><span class="ui:text-slate-400">for your defense.</span>') !!}</x-site.display>
+        <x-site.display>{!! $t('Une plateforme unique<br><span class="ui:text-brand-500">pour votre défense.</span>', 'One platform<br><span class="ui:text-brand-500">for your defense.</span>') !!}</x-site.display>
         <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:gap-3 ui:md:grid-cols-3">
             @foreach($related as [$slug, $tone, $name, $title, $text])
                 <x-site.edge-card :tone="$tone" :href="route($routePrefix . 'solutions.' . $slug)">

@@ -16,7 +16,7 @@ name('website.solutions.index');
 <main>
     {{-- Hero --}}
     <section class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:pb-12 ui:pt-16 ui:sm:px-6">
-        <x-site.display as="h1" size="xl">Une plateforme unique<br><span class="ui:text-slate-400">au service de votre cyberdéfense.</span></x-site.display>
+        <x-site.display as="h1" size="xl">Une plateforme unique<br><span class="ui:text-brand-500">au service de votre cyberdéfense.</span></x-site.display>
         <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Activez les capacités de sécurité adaptées à vos enjeux et protégez vos actifs critiques.</p>
     </section>
 
@@ -27,7 +27,7 @@ name('website.solutions.index');
                 ['critical', 'Surface d’attaque', 'Maîtrisez votre exposition externe et visualisez vos actifs comme un attaquant.', 'website.solutions.attack-surface'],
                 ['medium', 'Gestion des vulnérabilités', 'Détectez, priorisez et corrigez vos failles de sécurité avant qu’elles ne soient exploitées.', 'website.solutions.vulnerability-management'],
                 ['low', 'Identifiants compromis', 'Surveillez le web pour identifier vos données collaborateurs exposées.', 'website.solutions.credential-monitoring'],
-                ['brand', 'CyberBuddy', 'Interrogez votre assistant IA pour obtenir des conseils clairs et des plans d’action.', 'website.solutions.cyberbuddy'],
+                ['info', 'CyberBuddy', 'Interrogez votre assistant IA pour obtenir des conseils clairs et des plans d’action.', 'website.solutions.cyberbuddy'],
                 ['ink', 'Pentest expert', 'Faites évaluer vos systèmes critiques par nos experts en sécurité offensive.', 'website.solutions.pentest'],
             ] as [$tone, $title, $text, $route])
                 <x-site.edge-card :tone="$tone" :href="route($route)">

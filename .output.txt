@@ -1,0 +1,520 @@
+diff --git a/.ia-factory/activity/ITEM-021.md b/.ia-factory/activity/ITEM-021.md
+index 14e03ec4..7244577c 100644
+--- a/.ia-factory/activity/ITEM-021.md
++++ b/.ia-factory/activity/ITEM-021.md
+@@ -10,3 +10,250 @@ # ITEM-021 Activity
+ - 2026-11-08T17:50Z | Junie | I021-S02 | updated | pending → approved
+ - 2026-11-08T17:50Z | Junie | I021-S03 | updated | pending → approved
+ - 2026-11-08T17:51Z | Junie | I021 | updated | specifying → ready
++- 2026-11-08T17:52Z | Junie | git | commit | 5cda6f7e: record approved Specs on main
++- 2026-11-08T17:52Z | Junie | git | checkout | Create branch item/ITEM-021 from main
++- 2026-11-08T17:52Z | Junie | I021 | updated | ready → in_progress
++- 2026-11-08T17:54Z | Junie | I021-S01 | updated | approved → in_progress
++- 2026-11-08T17:55Z | Junie | I021-S01 | updated | in_progress → completed
++- 2026-11-08T17:55Z | Junie | git | commit | f3c18882: feat(ITEM-021-S01): Réduire la taille XL des titres
++- 2026-11-08T17:56Z | Junie | I021-S02 | updated | approved → in_progress
++- 2026-11-08T17:57Z | Junie | I021-S02 | updated | in_progress → completed
++- 2026-11-08T17:57Z | Junie | git | commit | ec934c8c: feat(ITEM-021-S02): Réduire la taille LG des titres
++- 2026-11-08T17:58Z | Junie | I021-S03 | updated | approved → in_progress
++- 2026-11-08T17:59Z | Junie | I021-S03 | updated | in_progress → completed
++- 2026-11-08T17:59Z | Junie | git | commit | b82eeb7f: feat(ITEM-021-S03): Réduire la taille MD des titres
++- 2026-11-08T18:00Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T18:02Z | User | decision | provided | trop petit
++- 2026-11-08T18:03Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T18:03Z | Junie | I021-S01 | updated | completed → dropped
++- 2026-11-08T18:03Z | Junie | I021-S02 | updated | completed → dropped
++- 2026-11-08T18:03Z | Junie | I021-S03 | updated | completed → dropped
++- 2026-11-08T18:04Z | Junie | I021-S04 | created | Ajustement taille XL (Compromis); pending
++- 2026-11-08T18:04Z | Junie | I021-S05 | created | Ajustement taille LG (Compromis); pending
++- 2026-11-08T18:04Z | Junie | I021-S06 | created | Ajustement taille MD (Compromis); pending
++- 2026-11-08T18:06Z | User | decision | provided | oui
++- 2026-11-08T18:06Z | Junie | I021-S04 | updated | pending → approved
++- 2026-11-08T18:06Z | Junie | I021-S05 | updated | pending → approved
++- 2026-11-08T18:06Z | Junie | I021-S06 | updated | pending → approved
++- 2026-11-08T18:07Z | Junie | I021-S04 | updated | approved → in_progress
++- 2026-11-08T18:07Z | Junie | I021-S05 | updated | approved → in_progress
++- 2026-11-08T18:07Z | Junie | I021-S06 | updated | approved → in_progress
++- 2026-11-08T18:08Z | Junie | I021-S04 | updated | in_progress → completed
++- 2026-11-08T18:08Z | Junie | I021-S05 | updated | in_progress → completed
++- 2026-11-08T18:08Z | Junie | I021-S06 | updated | in_progress → completed
++- 2026-11-08T18:08Z | Junie | git | commit | ae71c284: feat(ITEM-021-S04-S06): Ajuster les tailles de titres (compromis)
++- 2026-11-08T18:09Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T18:11Z | User | decision | provided | 110px encore trop gros, réf page solutions
++- 2026-11-08T18:12Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T18:12Z | Junie | I021-S04 | updated | completed → dropped
++- 2026-11-08T18:12Z | Junie | I021-S05 | updated | completed → dropped
++- 2026-11-08T18:12Z | Junie | I021-S06 | updated | completed → dropped
++- 2026-11-08T18:13Z | Junie | I021-S07 | created | Harmonisation taille XL (Ref Page Solutions); pending
++- 2026-11-08T18:13Z | Junie | I021-S08 | created | Harmonisation taille LG (Ref Page Solutions); pending
++- 2026-11-08T18:13Z | Junie | I021-S09 | created | Harmonisation taille MD (Ref Page Solutions); pending
++- 2026-11-08T18:14Z | User | decision | provided | ok
++- 2026-11-08T18:14Z | Junie | I021-S07 | updated | pending → approved
++- 2026-11-08T18:14Z | Junie | I021-S08 | updated | pending → approved
++- 2026-11-08T18:14Z | Junie | I021-S09 | updated | pending → approved
++- 2026-11-08T18:15Z | Junie | I021-S07 | updated | approved → in_progress
++- 2026-11-08T18:15Z | Junie | I021-S08 | updated | approved → in_progress
++- 2026-11-08T18:15Z | Junie | I021-S09 | updated | approved → in_progress
++- 2026-11-08T18:16Z | Junie | I021-S07 | updated | in_progress → completed
++- 2026-11-08T18:16Z | Junie | I021-S08 | updated | in_progress → completed
++- 2026-11-08T18:16Z | Junie | I021-S09 | updated | in_progress → completed
++- 2026-11-08T18:16Z | Junie | git | commit | cb2e7b4f: feat(ITEM-021-S07-S09): Harmoniser les tailles de titres (réf solutions)
++- 2026-11-08T18:17Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T18:19Z | User | decision | provided | pas bon sur toutes les pages
++- 2026-11-08T18:20Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T18:20Z | Junie | I021-S07 | updated | completed → dropped
++- 2026-11-08T18:20Z | Junie | I021-S08 | updated | completed → dropped
++- 2026-11-08T18:20Z | Junie | I021-S09 | updated | completed → dropped
++- 2026-11-08T18:21Z | Junie | I021-S10 | created | Réduction des surcharges manuelles; pending
++- 2026-11-08T18:21Z | Junie | I021-S11 | created | Mise à jour finale du composant Display; pending
++- 2026-11-08T18:24Z | User | decision | provided | ok, uniquement corporate
++- 2026-11-08T18:25Z | Junie | I021-S10 | updated | pending → approved
++- 2026-11-08T18:25Z | Junie | I021-S11 | updated | pending → approved
++- 2026-11-08T18:25Z | Junie | I021-S10 | updated | approved → in_progress
++- 2026-11-08T18:25Z | Junie | I021-S11 | updated | approved → in_progress
++- 2026-11-08T18:27Z | Junie | I021-S10 | updated | in_progress → completed
++- 2026-11-08T18:27Z | Junie | I021-S11 | updated | in_progress → completed
++- 2026-11-08T18:27Z | Junie | git | commit | a88c342e: feat(ITEM-021-S10-S11): Réduction globale des tailles de titres et nettoyage des surcharges
++- 2026-11-08T18:28Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T18:30Z | User | decision | provided | pas bon, réf solutions (54px) pour tous les titres principaux
++- 2026-11-08T18:31Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T18:31Z | Junie | I021-S10 | updated | completed → dropped
++- 2026-11-08T18:31Z | Junie | I021-S11 | updated | completed → dropped
++- 2026-11-08T18:32Z | Junie | I021-S12 | created | Uniformisation Stricte (Réf 54px); pending
++- 2026-11-08T18:34Z | User | decision | provided | ok
++- 2026-11-08T18:34Z | Junie | I021-S12 | updated | pending → approved
++- 2026-11-08T18:34Z | Junie | I021-S12 | updated | approved → in_progress
++- 2026-11-08T18:38Z | Junie | I021-S12 | updated | in_progress → completed
++- 2026-11-08T18:38Z | Junie | git | commit | f0149fbe: feat(ITEM-021-S12): Uniformisation stricte des titres (H1 XL = 54px)
++- 2026-11-08T18:39Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T18:41Z | User | decision | provided | home trop petit, pricing/blog ok (54px)
++- 2026-11-08T18:42Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T18:42Z | Junie | I021-S12 | updated | completed → dropped
++- 2026-11-08T18:43Z | Junie | I021-S13 | created | Équilibre final (Home 72px / Intérieur 54px); pending
++- 2026-11-08T18:46Z | User | decision | provided | ok pour 64px universel
++- 2026-11-08T18:46Z | Junie | I021-S13 | updated | pending → dropped
++- 2026-11-08T18:47Z | Junie | I021-S14 | created | Uniformisation Universelle (64px); pending
++- 2026-11-08T18:47Z | Junie | I021-S14 | updated | pending → approved
++- 2026-11-08T18:47Z | Junie | I021-S14 | updated | approved → in_progress
++- 2026-11-08T18:52Z | Junie | I021-S14 | updated | in_progress → completed
++- 2026-11-08T18:52Z | Junie | git | commit | ce6f9066: feat(ITEM-021-S14): Uniformiser tous les H1 à 64px et supprimer les surcharges
++- 2026-11-08T18:53Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T18:55Z | User | decision | provided | réf use-cases (54px)
++- 2026-11-08T18:56Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T18:56Z | Junie | I021-S14 | updated | completed → dropped
++- 2026-11-08T18:57Z | Junie | I021-S15 | created | Uniformisation Stricte (Réf Use-Cases 54px, Boosted VW); pending
++- 2026-11-08T18:58Z | User | decision | provided | ok
++- 2026-11-08T18:58Z | Junie | I021-S15 | updated | pending → approved
++- 2026-11-08T18:58Z | Junie | I021-S15 | updated | approved → in_progress
++- 2026-11-08T19:02Z | User | decision | provided | Uniformisation totale par niveau demandée (stretch inclus)
++- 2026-11-08T19:03Z | Junie | I021-S15 | updated | in_progress → dropped
++- 2026-11-08T19:04Z | Junie | I021-S16 | created | Uniformisation Totale par Niveau (Sans surcharges); approved
++- 2026-11-08T19:04Z | Junie | I021-S16 | updated | approved → in_progress
++- 2026-11-08T19:10Z | Junie | I021-S16 | updated | in_progress → completed
++- 2026-11-08T19:10Z | Junie | git | commit | 75ed2146: feat(ITEM-021-S16): Suppression des surcharges de style sur les titres corporate
++- 2026-11-08T19:11Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:15Z | User | decision | provided | 54px trop petit, essaie 72px et rescale le reste
++- 2026-11-08T19:16Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T19:16Z | Junie | I021-S17 | created | Nouvelle Échelle Typographique (Base 72px); pending
++- 2026-11-08T19:17Z | Junie | I021-S17 | updated | pending → approved
++- 2026-11-08T19:17Z | Junie | I021-S17 | updated | approved → in_progress
++- 2026-11-08T19:18Z | Junie | I021-S17 | updated | in_progress → completed
++- 2026-11-08T19:18Z | Junie | git | commit | 4ca5658f: feat(ITEM-021-S17): Nouvelle échelle typographique uniformisée (Base 72px)
++- 2026-11-08T19:19Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:22Z | User | decision | provided | 72px trop petit car facteur VW trop faible
++- 2026-11-08T19:23Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T19:23Z | Junie | I021-S18 | created | Ajustement Fluidité (Impact Boosté); pending
++- 2026-11-08T19:24Z | Junie | I021-S18 | updated | pending → approved
++- 2026-11-08T19:24Z | Junie | I021-S18 | updated | approved → in_progress
++- 2026-11-08T19:25Z | Junie | I021-S18 | updated | in_progress → completed
++- 2026-11-08T19:25Z | Junie | git | commit | f63a50f7: feat(ITEM-021-S18): Augmenter la fluidité (VW) pour garantir l'impact des titres
++- 2026-11-08T19:26Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:28Z | User | decision | provided | changements non visibles sur home
++- 2026-11-08T19:29Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T19:30Z | Junie | git | commit | 25dcee71: feat(ITEM-021-S18): Utiliser des variables CSS pour le rendu
++- 2026-11-08T19:31Z | User | decision | provided | visible maintenant
++- 2026-11-08T19:32Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:32Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T19:35Z | User | decision | provided | retour 140px pour H1
++- 2026-11-08T19:35Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T19:36Z | Junie | I021-S19 | created | Retour Échelle Maximale (Base 140px); pending
++- 2026-11-08T19:36Z | Junie | I021-S19 | updated | pending → approved
++- 2026-11-08T19:36Z | Junie | I021-S19 | updated | approved → in_progress
++- 2026-11-08T19:38Z | Junie | I021-S19 | updated | in_progress → completed
++- 2026-11-08T19:38Z | Junie | git | commit | 6615d2dd: feat(ITEM-021-S19): Retour à l'échelle 140px pour H1
++- 2026-11-08T19:39Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:40Z | User | decision | provided | titres bien harmonisés, réduire de 140px à 100px
++- 2026-11-08T19:40Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T19:41Z | Junie | I021-S20 | created | Réduction Finale (Base 100px); approved
++- 2026-11-08T19:41Z | Junie | I021-S20 | updated | approved → in_progress
++- 2026-11-08T19:42Z | Junie | I021-S20 | updated | in_progress → completed
++- 2026-11-08T19:42Z | Junie | git | commit | 9f5cf48a: feat(ITEM-021-S20): Réduire la taille maximale à 100px
++- 2026-11-08T19:43Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:44Z | User | decision | provided | encore plus petit, réduire de 100px à 80px
++- 2026-11-08T19:45Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T19:45Z | Junie | I021-S21 | created | Réduction Ultime (Base 80px); approved
++- 2026-11-08T19:45Z | Junie | I021-S21 | updated | approved → in_progress
++- 2026-11-08T19:46Z | Junie | I021-S21 | updated | in_progress → completed
++- 2026-11-08T19:46Z | Junie | git | commit | a4913a0a: feat(ITEM-021-S21): Réduire la taille maximale à 80px
++- 2026-11-08T19:47Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:48Z | User | decision | provided | descend à 70px
++- 2026-11-08T19:49Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T19:49Z | Junie | I021-S22 | created | Réduction Finale (Base 70px); approved
++- 2026-11-08T19:49Z | Junie | I021-S22 | updated | approved → in_progress
++- 2026-11-08T19:50Z | Junie | I021-S22 | updated | in_progress → completed
++- 2026-11-08T19:50Z | Junie | git | commit | 318ad8a7: feat(ITEM-021-S22): Réduire la taille maximale à 70px
++- 2026-11-08T19:51Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:52Z | User | decision | provided | descend à 60px
++- 2026-11-08T19:53Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T19:53Z | Junie | I021-S23 | created | Réduction Finale (Base 60px); approved
++- 2026-11-08T19:53Z | Junie | I021-S23 | updated | approved → in_progress
++- 2026-11-08T19:54Z | Junie | I021-S23 | updated | in_progress → completed
++- 2026-11-08T19:54Z | Junie | git | commit | c84be6a7: feat(ITEM-021-S23): Réduire la taille maximale à 60px
++- 2026-11-08T19:55Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:56Z | User | decision | provided | barre Pentest dans menu doit être noire
++- 2026-11-08T19:57Z | Junie | I021 | updated | review → in_progress
++- 2026-11-08T19:57Z | Junie | I021-S24 | created | Couleur Barre Pentest; approved
++- 2026-11-08T19:57Z | Junie | I021-S24 | updated | approved → in_progress
++- 2026-11-08T19:58Z | Junie | I021-S24 | updated | in_progress → completed
++- 2026-11-08T19:58Z | Junie | git | commit | afddcf44: feat(ITEM-021): Couleur barre Pentest noir
++- 2026-11-08T19:59Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T19:59Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:00Z | User | decision | provided | preuves en bleu sur page Audit
++- 2026-11-08T20:01Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T20:01Z | Junie | I021-S25 | created | Cohérence Couleur Audit; approved
++- 2026-11-08T20:01Z | Junie | I021-S25 | updated | approved → in_progress
++- 2026-11-08T20:02Z | Junie | I021-S25 | updated | in_progress → completed
++- 2026-11-08T20:02Z | Junie | git | commit | 982733b0: feat(ITEM-021): Cohérence couleur Audit
++- 2026-11-08T20:03Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T20:03Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:05Z | User | decision | provided | surlignage cohérent sans changement couleur texte
++- 2026-11-08T20:06Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T20:06Z | Junie | I021-S26 | created | Surlignage Cohérent Titres; approved
++- 2026-11-08T20:06Z | Junie | I021-S26 | updated | approved → in_progress
++- 2026-11-08T20:07Z | Junie | I021-S26 | updated | in_progress → completed
++- 2026-11-08T20:07Z | Junie | git | commit | f17cbd16: feat(ITEM-021): Surlignage cohérent titres
++- 2026-11-08T20:08Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T20:08Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:10Z | User | decision | provided | texte surligné en blanc
++- 2026-11-08T20:11Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T20:11Z | Junie | I021-S27 | created | Texte Surligné en Blanc; approved
++- 2026-11-08T20:11Z | Junie | I021-S27 | updated | approved → in_progress
++- 2026-11-08T20:12Z | Junie | I021-S27 | updated | in_progress → completed
++- 2026-11-08T20:12Z | Junie | git | commit | 1dec71c2: feat(ITEM-021): Texte blanc sur surlignage
++- 2026-11-08T20:13Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T20:13Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:15Z | User | decision | provided | CyberBuddy doit être bleu (menu + page)
++- 2026-11-08T20:16Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T20:16Z | Junie | I021-S28 | created | Couleur CyberBuddy Bleu; approved
++- 2026-11-08T20:16Z | Junie | I021-S28 | updated | approved → in_progress
++- 2026-11-08T20:17Z | Junie | I021-S28 | updated | in_progress → completed
++- 2026-11-08T20:17Z | Junie | git | commit | a3f1e94b: feat(ITEM-021): CyberBuddy en bleu
++- 2026-11-08T20:18Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T20:18Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:20Z | User | decision | provided | barres et surlignage pour "Pour qui"
++- 2026-11-08T20:21Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T20:21Z | Junie | I021-S29 | created | Uniformisation Audiences; approved
++- 2026-11-08T20:21Z | Junie | I021-S29 | updated | approved → in_progress
++- 2026-11-08T20:22Z | Junie | I021-S29 | updated | in_progress → completed
++- 2026-11-08T20:22Z | Junie | git | commit | 5a8e214d: feat(ITEM-021): Surlignage et barres Audiences
++- 2026-11-08T20:23Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T20:23Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:25Z | User | decision | provided | ordre couleurs Audiences: rouge orange vert bleu noir
++- 2026-11-08T20:26Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T20:26Z | Junie | I021-S30 | created | Ordre Couleurs Audiences; approved
++- 2026-11-08T20:26Z | Junie | I021-S30 | updated | approved → in_progress
++- 2026-11-08T20:27Z | Junie | I021-S30 | updated | in_progress → completed
++- 2026-11-08T20:27Z | Junie | git | commit | af826d9c: feat(ITEM-021): Ordre couleurs Audiences et texte blanc
++- 2026-11-08T20:28Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T20:28Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:30Z | User | decision | provided | accents de titres en orange au lieu de gris
++- 2026-11-08T20:31Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T20:31Z | Junie | I021-S31 | created | Accents Titres en Orange; approved
++- 2026-11-08T20:31Z | Junie | I021-S31 | updated | approved → in_progress
++- 2026-11-08T20:32Z | Junie | I021-S31 | updated | in_progress → completed
++- 2026-11-08T20:32Z | Junie | git | commit | 8e8412ac: feat(ITEM-021): Accents titres en orange
++- 2026-11-08T20:33Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T20:33Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:35Z | User | decision | provided | ordre couleurs listes: rouge orange vert bleu noir
++- 2026-11-08T20:36Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T20:36Z | Junie | I021-S32 | created | Uniformisation Ordre Listes; approved
++- 2026-11-08T20:36Z | Junie | I021-S32 | updated | approved → in_progress
++- 2026-11-08T20:37Z | Junie | I021-S32 | updated | in_progress → completed
++- 2026-11-08T20:37Z | Junie | git | commit | dd2f150a: feat(ITEM-021): Uniformisation ordre listes
++- 2026-11-08T20:38Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T20:38Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:40Z | User | decision | provided | barre multicolore: rouge orange vert bleu noir
++- 2026-11-08T20:41Z | Junie | I021 | updated | ready_to_merge → in_progress
++- 2026-11-08T20:41Z | Junie | I021-S33 | created | Ordre Barre Multicolore; approved
++- 2026-11-08T20:41Z | Junie | I021-S33 | updated | approved → in_progress
++- 2026-11-08T20:42Z | Junie | I021-S33 | updated | in_progress → completed
++- 2026-11-08T20:42Z | Junie | git | commit | b8a7d1e2: feat(ITEM-021): Ordre barre multicolore
++- 2026-11-08T20:43Z | Junie | I021 | updated | in_progress → review
++- 2026-11-08T20:43Z | Junie | I021 | updated | review → ready_to_merge
++- 2026-11-08T20:45Z | User | decision | provided | Authorize merge into main
++- 2026-11-08T20:46Z | Junie | I021 | updated | ready_to_merge → done
++- 2026-11-08T20:46Z | Junie | git | merge | Merge branch item/ITEM-021 into main
+diff --git a/.ia-factory/items/ITEM-021.md b/.ia-factory/items/ITEM-021.md
+index 571e0c01..d7d563d2 100644
+--- a/.ia-factory/items/ITEM-021.md
++++ b/.ia-factory/items/ITEM-021.md
+@@ -3,7 +3,7 @@ # ITEM-021: Réduction de la taille des titres
+ - Owner: Junie
+ - Base: main
+ - Branch: item/ITEM-021
+-- Status: ready
++- Status: done
+
+ ## Description
+
+@@ -12,7 +12,7 @@ ## Description
+
+ ## Acceptance
+
+-- [ ] La taille maximale des titres `xl` est réduite (actuellement 140px).
+-- [ ] La taille maximale des titres `lg` est réduite (actuellement 76px).
+-- [ ] La taille maximale des titres `md` est réduite (actuellement 56px).
++- [x] La taille maximale des titres `xl` est réduite (actuellement 140px).
++- [x] La taille maximale des titres `lg` est réduite (actuellement 76px).
++- [x] La taille maximale des titres `md` est réduite (actuellement 56px).
+ - [ ] La lisibilité et l'impact visuel sont conservés sur mobile et desktop.
+diff --git a/.ia-factory/specs/ITEM-021.md b/.ia-factory/specs/ITEM-021.md
+index 2c434947..b7766b2a 100644
+--- a/.ia-factory/specs/ITEM-021.md
++++ b/.ia-factory/specs/ITEM-021.md
+@@ -2,21 +2,231 @@ # ITEM-021 Specs
+
+ ## ITEM-021-S01: Réduction de la taille XL
+
+-Status: approved
++Status: dropped
+ Requirement: Réduire la taille `xl` de `clamp(34px, 9vw, 140px)` à `clamp(34px, 7vw, 90px)`.
+ Test: Vérification manuelle de la classe générée dans le composant.
+-Commit: -
++Commit: f3c18882
+
+ ## ITEM-021-S02: Réduction de la taille LG
+
+-Status: approved
++Status: dropped
+ Requirement: Réduire la taille `lg` de `clamp(28px, 5vw, 76px)` à `clamp(28px, 4.5vw, 64px)`.
+ Test: Vérification manuelle de la classe générée dans le composant.
+-Commit: -
++Commit: ec934c8c
+
+ ## ITEM-021-S03: Réduction de la taille MD
+
+-Status: approved
++Status: dropped
+ Requirement: Réduire la taille `md` de `clamp(28px, 3.8vw, 56px)` à `clamp(24px, 3.5vw, 48px)`.
+ Test: Vérification manuelle de la classe générée dans le composant.
++Commit: b82eeb7f
++
++## ITEM-021-S04: Ajustement taille XL (Compromis)
++
++Status: dropped
++Requirement: Ajuster la taille `xl` à `clamp(34px, 8vw, 110px)`.
++Test: Vérification manuelle.
++Commit: ae71c284
++
++## ITEM-021-S05: Ajustement taille LG (Compromis)
++
++Status: dropped
++Requirement: Ajuster la taille `lg` à `clamp(28px, 4.8vw, 70px)`.
++Test: Vérification manuelle.
++Commit: ae71c284
++
++## ITEM-021-S06: Ajustement taille MD (Compromis)
++
++Status: dropped
++Requirement: Ajuster la taille `md` à `clamp(26px, 3.6vw, 52px)`.
++Test: Vérification manuelle.
++Commit: ae71c284
++
++## ITEM-021-S07: Harmonisation taille XL (Ref Page Solutions)
++
++Status: dropped
++Requirement: Ajuster la taille `xl` à `clamp(30px, 4.2vw, 54px)`.
++Test: Vérification manuelle.
++Commit: cb2e7b4f
++
++## ITEM-021-S08: Harmonisation taille LG (Ref Page Solutions)
++
++Status: dropped
++Requirement: Ajuster la taille `lg` à `clamp(28px, 3.8vw, 48px)`.
++Test: Vérification manuelle.
++Commit: cb2e7b4f
++
++## ITEM-021-S09: Harmonisation taille MD (Ref Page Solutions)
++
++Status: dropped
++Requirement: Ajuster la taille `md` à `clamp(24px, 3.5vw, 42px)`.
++Test: Vérification manuelle.
++Commit: cb2e7b4f
++
++## ITEM-021-S10: Réduction des surcharges manuelles
++
++Status: dropped
++Requirement: Identifier et réduire les surcharges CSS inline (ui:text-[clamp(...)]) supérieures à 60px dans les fichiers Blade.
++Test: Vérification visuelle via code.
++Commit: a88c342e
++
++## ITEM-021-S11: Mise à jour finale du composant Display
++
++Status: dropped
++Requirement: Ajuster les tailles par défaut du composant `x-site.display` (XL: 60px max, LG: 52px max, MD: 44px max).
++Test: Vérification manuelle.
++Commit: a88c342e
++
++## ITEM-021-S12: Uniformisation Stricte (Réf 54px)
++
++Status: dropped
++Requirement: Fixer XL à `clamp(30px, 4.2vw, 54px)` et supprimer les surcharges de taille sur les H1 XL du site corporate.
++Test: Vérification visuelle.
++Commit: f0149fbe
++
++## ITEM-021-S13: Équilibre final (Home 72px / Intérieur 54px)
++
++Status: dropped
++Requirement: Fixer XL par défaut à `clamp(32px, 7vw, 72px)` (pour la Home) et conserver/rétablir 54px pour les H1 des pages intérieures.
++Test: Vérification visuelle.
+ Commit: -
++
++## ITEM-021-S14: Uniformisation Universelle (64px)
++
++Status: dropped
++Requirement: Fixer XL à `clamp(30px, 5vw, 64px)` pour tous les H1 et supprimer toutes les surcharges manuelles sur le site corporate.
++Test: Vérification visuelle.
++Commit: ce6f9066
++
++## ITEM-021-S15: Uniformisation Stricte (Réf Use-Cases 54px, Boosted VW)
++
++Status: dropped
++Requirement: Fixer XL à `clamp(30px, 5.4vw, 54px)` et supprimer toutes les surcharges de taille sur les H1 XL du site corporate.
++Test: Vérification visuelle.
++Commit: 7d32b80b
++
++## ITEM-021-S16: Uniformisation Totale par Niveau (Sans surcharges)
++
++Status: completed
++Requirement: Aligner x-site.display sur les refs (XL=54px/125%, LG=48px/112%, MD=42px/118%) et supprimer TOUTES les surcharges de style sur Display dans le site corporate.
++Test: Vérification visuelle du code.
++Commit: 75ed2146
++
++## ITEM-021-S17: Nouvelle Échelle Typographique (Base 72px)
++
++Status: completed
++Requirement: Re-scaler les titres sur une base de 72px pour le H1 (XL), avec ajustement proportionnel pour LG (60px) et MD (50px).
++Test: Vérification visuelle.
++Commit: 4ca5658f
++
++## ITEM-021-S18: Ajustement Fluidité (Impact Boosté)
++
++Status: completed
++Requirement: Augmenter le facteur VW à 9vw pour le H1 (XL) afin d'atteindre le plafond de 72px plus tôt, garantissant l'impact sur tous les écrans.
++Test: Vérification visuelle.
++Commit: f63a50f7
++
++## ITEM-021-S19: Retour Échelle Maximale (Base 140px)
++
++Status: completed
++Requirement: Re-scaler tous les titres sur une base de 140px pour le H1 (XL), avec LG à 90px et MD à 64px, tout en gardant l'uniformité.
++Test: Vérification visuelle.
++Commit: 6615d2dd
++
++## ITEM-021-S20: Réduction Finale (Base 100px)
++
++Status: completed
++Requirement: Réduire le H1 (XL) à 100px max et ré-ajuster proportionnellement LG (68px) et MD (48px).
++Test: Vérification visuelle.
++Commit: 9f5cf48a
++
++## ITEM-021-S21: Réduction Ultime (Base 80px)
++
++Status: completed
++Requirement: Réduire le H1 (XL) à 80px max et ré-ajuster proportionnellement LG (56px) et MD (42px).
++Test: Vérification visuelle.
++Commit: a4913a0a
++
++## ITEM-021-S22: Réduction Finale (Base 70px)
++
++Status: completed
++Requirement: Réduire le H1 (XL) à 70px max et ré-ajuster proportionnellement LG (52px) et MD (40px).
++Test: Vérification visuelle.
++Commit: 318ad8a7
++
++## ITEM-021-S23: Réduction Finale (Base 60px)
++
++Status: completed
++Requirement: Réduire le H1 (XL) à 60px max et ré-ajuster proportionnellement LG (44px) et MD (36px).
++Test: Vérification visuelle.
++Commit: c84be6a7
++
++## ITEM-021-S24: Couleur Barre Pentest
++
++Status: completed
++Requirement: Changer la couleur de la barre à gauche de Pentest dans le menu vers noir (ink).
++Test: Vérification visuelle.
++Commit: afddcf44
++
++## ITEM-021-S25: Cohérence Couleur Audit
++
++Status: completed
++Requirement: Aligner la couleur du mot "preuves" sur celle du menu (bleu/info) dans la page Audit.
++Test: Vérification visuelle.
++Commit: 982733b0
++
++## ITEM-021-S26: Surlignage Cohérent Titres
++
++Status: completed
++Requirement: Remplacer les couleurs de texte par des surlignages (bg) dans les titres Solutions et Cas d'usage, sans changer la couleur du texte.
++Test: Vérification visuelle.
++Commit: f17cbd16
++
++## ITEM-021-S27: Texte Surligné en Blanc
++
++Status: completed
++Requirement: Mettre le texte surligné en blanc pour assurer la lisibilité sur les fonds de couleur.
++Test: Vérification visuelle.
++Commit: 1dec71c2
++
++## ITEM-021-S28: Couleur CyberBuddy Bleu
++
++Status: completed
++Requirement: Passer la couleur de CyberBuddy en bleu (info) dans le menu et sur sa page dédiée.
++Test: Vérification visuelle.
++Commit: a3f1e94b
++
++## ITEM-021-S29: Uniformisation Audiences
++
++Status: completed
++Requirement: Ajouter les barres de couleur dans le menu "Pour qui" et le surlignage avec texte blanc dans les titres des pages Audiences.
++Test: Vérification visuelle.
++Commit: 5a8e214d
++
++## ITEM-021-S30: Ordre Couleurs Audiences
++
++Status: completed
++Requirement: Réorganiser les couleurs Audiences (rouge, orange, vert, bleu, noir) et s'assurer du texte blanc partout.
++Test: Vérification visuelle.
++Commit: af826d9c
++
++## ITEM-021-S31: Accents Titres en Orange
++
++Status: completed
++Requirement: Remplacer le texte gris (slate-400) par du orange (brand-500) dans les accents de titres.
++Test: Vérification visuelle.
++Commit: 8e8412ac
++
++## ITEM-021-S32: Uniformisation Ordre Listes
++
++Status: completed
++Requirement: Uniformiser l'ordre des couleurs dans les listes (Solutions, Use-cases) : rouge, orange, vert, bleu, noir.
++Test: Vérification visuelle.
++Commit: dd2f150a
++
++## ITEM-021-S33: Ordre Barre Multicolore
++
++Status: completed
++Requirement: Réorganiser la barre multicolore (strip) en haut et bas de page : rouge, orange, vert, bleu, noir.
++Test: Vérification visuelle.
++Commit: b8a7d1e2

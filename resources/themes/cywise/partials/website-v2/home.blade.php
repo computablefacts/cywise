@@ -108,7 +108,7 @@
     <section class="ui:border-0 ui:border-b ui:border-solid ui:border-line ui:bg-canvas">
         <div class="{{ $wrap }} ui:py-24">
             <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
-            <x-site.display>{!! $t('Ce que disent<br><span class="ui:text-slate-400">nos clients.</span>', 'What<br><span class="ui:text-slate-400">our customers say.</span>') !!}</x-site.display>
+            <x-site.display>{!! $t('Ce que disent<br><span class="ui:text-brand-500">nos clients.</span>', 'What<br><span class="ui:text-brand-500">our customers say.</span>') !!}</x-site.display>
                 <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Découvrez comment Cywise transforme la cybersécurité de nos clients au quotidien.', 'Discover how Cywise transforms our customers\' cybersecurity every day.') }}</p>
             </div>
             <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
@@ -132,7 +132,7 @@
     {{-- Solutions --}}
     <section id="solutions" class="{{ $wrap }} ui:py-24">
         <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
-            <x-site.display>{!! $t('Une plateforme<br><span class="ui:text-slate-400">au service de votre défense.</span>', 'One platform<br><span class="ui:text-slate-400">at the service of your defense.</span>') !!}</x-site.display>
+            <x-site.display>{!! $t('Une plateforme<br><span class="ui:text-brand-500">au service de votre défense.</span>', 'One platform<br><span class="ui:text-brand-500">at the service of your defense.</span>') !!}</x-site.display>
             <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Des outils simples pour les tâches de sécurité que votre entreprise gère chaque jour.', 'Simple tools for the security tasks your company manages every day.') }}</p>
         </div>
         <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-2 ui:xl:grid-cols-3">
