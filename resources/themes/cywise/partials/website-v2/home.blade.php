@@ -15,7 +15,7 @@
         ['critical', $t('Surface d’attaque', 'Attack surface'), $t('Visualisez ce que les attaquants voient.', 'Visualize what attackers see.'), $t('Surveillez vos domaines, serveurs et services exposés en temps réel.', 'Monitor your domains, servers and services in real-time.'), 'solutions.attack-surface'],
         ['medium', $t('Vulnérabilités', 'Vulnerabilities'), $t('Détectez vos points faibles.', 'Detect your weak points.'), $t('Identifiez vos vulnérabilités et concentrez-vous sur les risques les plus critiques.', 'Identify your vulnerabilities and focus on the most critical risks.'), 'solutions.vulnerability-management'],
         ['low', $t('Identifiants', 'Credentials'), $t('Découvrez vos données exposées.', 'Discover your exposed data.'), $t('Détectez les identifiants compromis liés à votre entreprise sur le web.', 'Detect compromised credentials linked to your company on the web.'), 'solutions.credential-monitoring'],
-        ['brand', 'CyberBuddy', $t('Interrogez. Comprenez. Agissez.', 'Ask. Understand. Act.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance adapted to your company context.'), 'solutions.cyberbuddy'],
+        ['brand', 'CyberBuddy', $t('Posez vos questions.', 'Ask your questions.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance adapted to your company context.'), 'solutions.cyberbuddy'],
         ['ink', 'Pentest', $t('Faites tester vos systèmes par nos experts.', 'Get tested by our experts.'), $t('Faites tester vos applications critiques par nos experts en sécurité offensive.', 'Have your critical applications tested by our offensive security experts.'), 'solutions.pentest'],
     ];
 
@@ -63,7 +63,7 @@
 <main>
     {{-- Hero --}}
     <section class="{{ $wrap }} ui:pb-20 ui:pt-14">
-        <x-site.display as="h1" size="xl">{!! $t('Votre<br>entreprise<br>est déjà<br><span class="ui:text-brand-500">une cible.</span>', 'Your<br>company<br>is already<br><span class="ui:text-brand-500">a target.</span>') !!}</x-site.display>
+        <x-site.display as="h1" size="xl">{!! $t('Comprenez<br>enfin votre<br>sécurité<br><span class="ui:text-brand-500">en ligne.</span>', 'Finally<br>understand<br>your online<br><span class="ui:text-brand-500">security.</span>') !!}</x-site.display>
 
         {{-- Lead and actions on one row, key figures full width below --}}
         <div class="ui:mt-12 ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-8">
@@ -85,13 +85,20 @@
         </div>
     </section>
 
-    {{-- Problem: visibility → priority → action --}}
+    {{-- Problem: Diagnostiquer → Identifier → Accompagner --}}
     <section class="ui:border-0 ui:border-y ui:border-solid ui:border-line ui:bg-canvas">
         <div class="{{ $wrap }} ui:py-22">
-            <x-site.display class="ui:max-w-[980px]">{{ $t('La cybersécurité ne devrait pas exiger une équipe de 50 personnes.', 'Cybersecurity should not require a 50-person team.') }}</x-site.display>
+            <x-site.display class="ui:max-w-[980px]">{{ $t('Prenez le contrôle de votre sécurité en trois étapes simples.', 'Take control of your security in three simple steps.') }}</x-site.display>
             <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
-                @foreach([$t('Découvrez ce qui est exposé.', 'Discover what is exposed.'), $t('Priorisez ce qui compte.', 'Prioritize what matters.'), $t('Maîtrisez quoi corriger.', 'Master what to fix.')] as $line)
-                    <div class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6 ui:text-[26px] ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $line }}</div>
+                @foreach([
+                    [$t('Diagnostiquer', 'Diagnose'), $t('Listez vos actifs exposés en quelques secondes.', 'List your exposed assets in seconds.')],
+                    [$t('Identifier', 'Identify'), $t('Détectez les vulnérabilités et identifiants compromis.', 'Detect vulnerabilities and leaked credentials.')],
+                    [$t('Accompagner', 'Support'), $t('Suivez un plan d’action clair avec CyberBuddy.', 'Follow a clear action plan with CyberBuddy.')]
+                ] as [$title, $desc])
+                    <div class="ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-white ui:p-6">
+                        <div class="ui:text-[26px] ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</div>
+                        <p class="ui:m-0 ui:mt-3 ui:text-base ui:leading-normal ui:text-slate-600">{{ $desc }}</p>
+                    </div>
                 @endforeach
             </div>
         </div>
@@ -101,7 +108,7 @@
     <section class="ui:border-0 ui:border-b ui:border-solid ui:border-line ui:bg-canvas">
         <div class="{{ $wrap }} ui:py-24">
             <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
-                <x-site.display>{!! $t('Ce qu’ils en disent.<br><span class="ui:text-slate-400">Leurs retours d’expérience.</span>', 'What they say.<br><span class="ui:text-slate-400">Their feedback.</span>') !!}</x-site.display>
+            <x-site.display>{!! $t('Ce que disent<br><span class="ui:text-slate-400">nos clients.</span>', 'What<br><span class="ui:text-slate-400">our customers say.</span>') !!}</x-site.display>
                 <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Découvrez comment Cywise transforme la cybersécurité de nos clients au quotidien.', 'Discover how Cywise transforms our customers\' cybersecurity every day.') }}</p>
             </div>
             <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
@@ -125,8 +132,8 @@
     {{-- Solutions --}}
     <section id="solutions" class="{{ $wrap }} ui:py-24">
         <div class="ui:flex ui:flex-wrap ui:items-end ui:justify-between ui:gap-6">
-            <x-site.display>{!! $t('Une plateforme.<br><span class="ui:text-slate-400">Une défense complète.</span>', 'One platform.<br><span class="ui:text-slate-400">Complete defense.</span>') !!}</x-site.display>
-            <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Des outils simples pour les tâches de sécurité que votre entreprise doit gérer chaque jour.', 'Simple tools for the security tasks your company must manage every day.') }}</p>
+            <x-site.display>{!! $t('Une plateforme<br><span class="ui:text-slate-400">au service de votre défense.</span>', 'One platform<br><span class="ui:text-slate-400">at the service of your defense.</span>') !!}</x-site.display>
+            <p class="ui:m-0 ui:max-w-[380px] ui:text-lg ui:leading-normal ui:text-slate-600">{{ $t('Des outils simples pour les tâches de sécurité que votre entreprise gère chaque jour.', 'Simple tools for the security tasks your company manages every day.') }}</p>
         </div>
         <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-2 ui:xl:grid-cols-3">
             @foreach($solutions as [$tone, $name, $title, $text, $route])
