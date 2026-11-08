@@ -16,7 +16,7 @@
     - [Article 10 : Archivage - Preuve - Sécurité](#article-10)
     - [Article 11 : Disposition diverses](#article-11)
 
-Dernière mise à jour le 16/07/2025.
+Dernière mise à jour le 08/11/2026.
 
 # <a name="ml">Mentions légales</a>
 
@@ -32,24 +32,21 @@ Dernière mise à jour le 16/07/2025.
 
 Le site vitrine https://cywise.io est hébergé par :
 
-- La société **Scaleway SAS** par le biais de son interface [scaleway.com](https://www.scaleway.com)
-  (adresse : 8 rue de la Ville l'Evêque, 75008 Paris, France)
+- La société **Scaleway SAS** (adresse : 8 rue de la Ville l'Evêque, 75008 Paris, France)
 
 Les applications métiers, services web et données personnelles des Utilisateurs sont hébergés par :
 
-- La société **Scaleway SAS** par le biais de son interface [scaleway.com](https://www.scaleway.com)
-  (adresse : 8 rue de la Ville l'Evêque, 75008 Paris, France)
+- La société **Scaleway SAS** (adresse : 8 rue de la Ville l'Evêque, 75008 Paris, France)
 
 Les sauvegardes sont hébergées par :
 
-- La société **Amazon Web Services LLC** par le biais de son interface [aws.amazon.com](https://aws.amazon.com/)
-  (adresse : P.O. Box 81226 - Seattle, WA 98108-1226 - USA)
+- La société **Amazon Web Services LLC** (adresse : P.O. Box 81226 - Seattle, WA 98108-1226 - USA)
 
 # <a name="cgvu">Conditions générales de vente et d'utilisation</a>
 
 Les présentes Condition Générales de Vente et d'Utilisation (les « Conditions Générales ») ont pour objet de définir les
 relations contractuelles entre tout utilisateur ou client ci-après désigné (« Utilisateur » ou « Client ») du service
-Cywise édité par la société ComputableFacts SAS, dont le siège est situé 78 boulevard Haussmann 75008 Paris
+Cywise édité par la société ComputableFacts SAS, dont le siège est situé 178 boulevard Haussmann 75008 Paris
 (France) et immatriculée au registre du commerce et des sociétés de Paris sous le numéro 844 389 882 (ci-après «
 ComputableFacts » ou « La Société ») via son site internet (ci-après le « Site »).
 
@@ -72,7 +69,7 @@ avoir lues et acceptées sans réserve les Conditions Générales de Vente et d'
 
 ## <a name="article-1">Article 1 : Définitions</a>
 
-**Client :** personne physique majeure qui souscrit un abonnement par le biais du Site. Un Client est nécessairement un
+**Client :** personne morale ou personne physique majeure agissant pour ses besoins professionnels, qui souscrit un abonnement par le biais du Site. Un Client est nécessairement un
 Utilisateur.
 
 **Conditions de divulgation :** critères définis par l'Utilisateur qui autorisent La Société à divulguer les
@@ -102,7 +99,7 @@ biais d'une souscription.
 ## <a name="article-2">Article 2 : Objet des services proposés</a>
 
 Par l'intermédiaire d'une application en ligne accessible au travers de son Site
-Internet, [cywise.io](https://app.cywise.io), La Société met à disposition des personnes physiques en faisant la
+Internet, [cywise.io](https://app.cywise.io), La Société met à disposition des personnes morales ou physiques en faisant la
 demande un service de surveillance d'un ensemble d'Actifs.
 
 Notamment, suivant l'offre commerciale retenue, l'application permet de :
@@ -111,8 +108,6 @@ Notamment, suivant l'offre commerciale retenue, l'application permet de :
   risque ;
 - Rechercher les informations sensibles accessibles sur internet et d'identifier les vulnérabilités qui ont un impact
   direct sur les Actifs de l'utilisateur ;
-- Déployer des honeypots permettant à l'Utilisateur de mieux appréhender les menaces qui le ciblent ;
-- Instrumenter des serveurs pour permettre à l'Utilisateur de collecter évènements de sécurité et métriques ;
 - Notifier l'Utilisateur si une information sensible ou une vulnérabilité est découverte par La Société.
 
 Cette liste est non limitative, de nouveaux services pouvant être ajoutés gracieusement ou non par La Société à

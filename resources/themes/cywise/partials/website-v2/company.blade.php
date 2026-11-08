@@ -34,7 +34,7 @@
 
     $actions = [
         $t('Lancer votre audit express', 'Run an express audit'),
-        $t('Assurer votre conformité NIS2 simplement', 'Comply with NIS2 without the hassle'),
+        $t('Renforcer votre cybersécurité simplement', 'Strengthen your cybersecurity simply'),
     ];
 @endphp
 

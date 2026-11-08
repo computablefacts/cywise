@@ -245,8 +245,8 @@
     <section id="cta" class="{{ $wrap }} ui:py-28">
         <x-site.display size="xl" class="ui:text-[clamp(26px,5.6vw,92px)]!">{!! $t('Ne laissez plus la complexité freiner votre sécurité.<br><span class="ui:text-brand-500">Passez à Cywise.</span>', 'Don’t let complexity slow down your security.<br><span class="ui:text-brand-500">Switch to Cywise.</span>') !!}</x-site.display>
         <div class="ui:mt-10 ui:flex ui:flex-wrap ui:gap-3">
-            <x-site.button :href="route('register')">{{ $t('Démarrer gratuitement →', 'Start for free →') }}</x-site.button>
-            <x-site.button variant="outline" :href="'mailto:' . config('towerify.freshdesk.from_email')">{{ $t('Demander une démo', 'Book a demo') }}</x-site.button>
+            <x-site.button :href="route('register')">{{ $t('Essayer gratuitement →', 'Try for free →') }}</x-site.button>
+            <x-site.button variant="outline" :href="'mailto:sales@cywise.io'">{{ $t('Demander une démo', 'Book a demo') }}</x-site.button>
         </div>
     </section>
 </main>

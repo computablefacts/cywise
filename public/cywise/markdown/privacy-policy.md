@@ -14,7 +14,7 @@
   - [Modalités d'exercice](#modalites-d-exercice)
   - [Modification de la politique de confidentialité](#modification-de-la-politique-de-confidentialite)
 
-Dernière mise à jour le 14/01/2026.
+Dernière mise à jour le 08/11/2026.
 
 # <a name="ml">Mentions légales</a>
 
@@ -30,18 +30,15 @@ Dernière mise à jour le 14/01/2026.
 
 Le site vitrine https://cywise.io est hébergé par :
 
-- La société **Scaleway SAS** par le biais de son interface [scaleway.com](https://www.scaleway.com)
-  (adresse : 8 rue de la Ville l'Evêque, 75008 Paris, France)
+- La société **Scaleway SAS** (adresse : 8 rue de la Ville l'Evêque, 75008 Paris, France)
 
 Les applications métiers, services web et données personnelles des Utilisateurs sont hébergés par :
 
-- La société **Scaleway SAS** par le biais de son interface [scaleway.com](https://www.scaleway.com)
-  (adresse : 8 rue de la Ville l'Evêque, 75008 Paris, France)
+- La société **Scaleway SAS** (adresse : 8 rue de la Ville l'Evêque, 75008 Paris, France)
 
 Les sauvegardes sont hébergées par :
 
-- La société **Amazon Web Services LLC** par le biais de son interface [aws.amazon.com](https://aws.amazon.com/)
-  (adresse : P.O. Box 81226 - Seattle, WA 98108-1226 - USA)
+- La société **Amazon Web Services LLC** (adresse : P.O. Box 81226 - Seattle, WA 98108-1226 - USA)
 
 # <a name="pc">Charte d'utilisation des données personnelles et politique de confidentialité</a>
 
@@ -101,7 +98,7 @@ reçoit une demande judiciaire ou une notification de plainte.
 
 Les données saisies par les Utilisateurs dans leur espace personnel sont conservées pendant 1 mois à partir du moment où
 l'utilisateur demande la suppression de son compte, via son Espace Sécurisé ou en envoyant une demande par email à
-privacy@cywise.com, avant effacement définitif.
+privacy@cywise.io, avant effacement définitif.
 
 Les données de navigation sont conservées durant 24 mois. Ces données sont anonymes.
 
