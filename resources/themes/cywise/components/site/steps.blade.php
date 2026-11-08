@@ -12,7 +12,7 @@
 
 <section class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:py-24 ui:sm:px-6">
   <div class="ui:grid ui:grid-cols-1 ui:gap-12 ui:lg:grid-cols-2">
-    <x-site.display size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">{!! $title !!}</x-site.display>
+    <x-site.display size="xl">{!! $title !!}</x-site.display>
     <ol class="ui:m-0 ui:list-none ui:self-end ui:p-0">
       @foreach($steps as $step)
         <li class="ui:flex ui:gap-5 ui:border-0 ui:border-t ui:border-solid ui:border-line ui:py-6">
