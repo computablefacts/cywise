@@ -1,7 +1,9 @@
 <?php
 
-use function Laravel\Folio\{name, redirect};
+use function Laravel\Folio\{name};
 
 name('website.a-propos-redirect');
 
-redirect('/la-societe');
+?>
+
+<script>window.location.href = '/la-societe';</script>
