@@ -11,7 +11,7 @@
         'attack-surface' => ['critical', $t('Surface d’attaque', 'Attack surface'), $t('Visualisez ce que les attaquants voient.', 'Visualize what attackers see.'), $t('Surveillez vos domaines, serveurs et services exposés en temps réel.', 'Monitor your domains, servers and services in real-time.'), 'solutions.attack-surface'],
         'vulnerability-management' => ['medium', $t('Vulnérabilités', 'Vulnerabilities'), $t('Détectez vos points faibles.', 'Detect your weak points.'), $t('Identifiez vos vulnérabilités et concentrez-vous sur les risques les plus critiques.', 'Identify your vulnerabilities and focus on the most critical risks.'), 'solutions.vulnerability-management'],
         'credential-monitoring' => ['low', $t('Identifiants', 'Credentials'), $t('Découvrez vos données exposées.', 'Discover your exposed data.'), $t('Détectez les identifiants compromis liés à votre entreprise sur le web.', 'Detect compromised credentials linked to your company on the web.'), 'solutions.credential-monitoring'],
-        'cyberbuddy' => ['brand', 'CyberBuddy', $t('Interrogez. Comprenez. Agissez.', 'Ask. Understand. Act.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance adapted to your company context.'), 'solutions.cyberbuddy'],
+        'cyberbuddy' => ['brand', 'CyberBuddy', $t('Posez vos questions.', 'Ask your questions.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance adapted to your company context.'), 'solutions.cyberbuddy'],
         'pentest' => ['ink', 'Pentest', $t('Faites tester vos systèmes par nos experts.', 'Get tested by our experts.'), $t('Faites tester vos applications critiques par nos experts en sécurité offensive.', 'Have your critical applications tested by our offensive security experts.'), 'solutions.pentest'],
     ];
 
@@ -29,8 +29,8 @@
             'features' => [
                 [$t('Visibilité immédiate', 'Immediate visibility'), $t('Identifiez vos expositions critiques sans outils complexes.', 'Identify your critical exposures without complex tools.')],
                 [$t('Remédiation guidée', 'Guided remediation'), $t('Appliquez directement nos conseils pour corriger vos vulnérabilités.', 'Directly apply our advice to fix your vulnerabilities.')],
-                [$t('Pilotage simplifié', 'Simplified steering'), $t('Suivez et partagez votre niveau de sécurité en toute simplicité.', 'Track and share your security level with ease.')],
-                [$t('Sérénité continue', 'Continuous serenity'), $t('Maintenez votre surveillance active 24/7 après votre première évaluation.', 'Maintain your active 24/7 monitoring after your first assessment.')],
+                [$t('Pilotage centralisé', 'Centralized steering'), $t('Suivez et partagez votre niveau de sécurité en toute simplicité.', 'Track and share your security level with ease.')],
+                [$t('Surveillance 24/7', '24/7 Monitoring'), $t('Maintenez votre surveillance active en continu après votre première évaluation.', 'Maintain your continuous active monitoring after your first assessment.')],
             ],
             'solutions' => ['attack-surface', 'credential-monitoring', 'cyberbuddy'],
         ],
@@ -44,7 +44,7 @@
                 ['low', 'app.acme.io', '443', 'OK'],
             ],
             'features' => [
-                [$t('Déploiement instantané', 'Instant deployment'), $t('Activez votre surveillance en quelques minutes sans projet lourd.', 'Activate your monitoring in a few minutes without a heavy project.')],
+                [$t('Déploiement rapide', 'Rapid deployment'), $t('Activez votre surveillance en quelques minutes sans projet lourd.', 'Activate your monitoring in a few minutes without a heavy project.')],
                 [$t('Contrôle de l’exposition', 'Exposure control'), $t('Suivez l’évolution de votre surface d’attaque à chaque mise en production.', 'Track the evolution of your attack surface with each production release.')],
                 [$t('Protection des accès', 'Access protection'), $t('Sécurisez les comptes de votre équipe contre les fuites de données.', 'Secure your team’s accounts against data leaks.')],
                 [$t('Preuves de conformité', 'Compliance evidence'), $t('Préparez vos preuves de sécurité pour rassurer vos clients et investisseurs.', 'Prepare your security evidence to reassure your customers and investors.')],
@@ -64,7 +64,7 @@
                 [$t('Vue centralisée', 'Centralized view'), $t('Regroupez tous vos signaux de risque externe dans une interface unique.', 'Group all your external risk signals in a single interface.')],
                 [$t('Actions priorisées', 'Prioritized actions'), $t('Concentrez-vous sur les correctifs qui ont le plus d’impact sur votre sécurité.', 'Focus on the fixes that have the most impact on your security.')],
                 [$t('Suivi de résolution', 'Resolution tracking'), $t('Mesurez l’efficacité de vos remédiations au fil du temps.', 'Measure the effectiveness of your remediations over time.')],
-                [$t('Collaboration fluide', 'Seamless collaboration'), $t('Assignez clairement les responsabilités pour chaque action corrective.', 'Clearly assign responsibilities for each corrective action.')],
+                [$t('Collaboration d’équipe', 'Team collaboration'), $t('Assignez clairement les responsabilités pour chaque action corrective.', 'Clearly assign responsibilities for each corrective action.')],
             ],
             'solutions' => ['attack-surface', 'vulnerability-management', 'cyberbuddy'],
         ],
@@ -150,7 +150,7 @@
 
     {{-- Relevant solutions, each in its own tone --}}
     <section class="{{ $wrap }} ui:pt-24">
-        <x-site.display>{!! $t('Une plateforme.<br><span class="ui:text-slate-400">Plusieurs défenses.</span>', 'One platform.<br><span class="ui:text-slate-400">Multiple defenses.</span>') !!}</x-site.display>
+        <x-site.display>{!! $t('Une plateforme unique<br><span class="ui:text-slate-400">pour votre défense.</span>', 'One platform<br><span class="ui:text-slate-400">for your defense.</span>') !!}</x-site.display>
         <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:gap-3 ui:md:grid-cols-3">
             @foreach($related as [$slug, $tone, $name, $title, $text])
                 <x-site.edge-card :tone="$tone" :href="route($routePrefix . 'solutions.' . $slug)">
@@ -167,10 +167,10 @@
         :steps="[
             ['title' => $t('Analysez votre périmètre.', 'Analyze your scope.'), 'text' => $t('Identifiez les actifs que Cywise doit surveiller pour votre organisation.', 'Identify the assets Cywise should monitor for your organization.')],
             ['title' => $t('Ciblez les priorités.', 'Target priorities.'), 'text' => $t('Cywise isole les risques critiques qui nécessitent votre attention immédiate.', 'Cywise isolates critical risks that require your immediate attention.')],
-            ['title' => $t('Sécurisez vos systèmes.', 'Secure your systems.'), 'text' => $t('Votre équipe applique nos recommandations concrètes pour éliminer les risques.', 'Your team applies our concrete recommendations to eliminate risks.')],
+            ['title' => $t('Sécurisez vos systèmes.', 'Secure your systems.'), 'text' => $t('Votre équipe applique nos recommandations concrètes pour renforcer votre protection.', 'Your team applies our concrete recommendations to strengthen your protection.')],
         ]"
     >
-        <x-slot:title>{!! $t('Découvrez.<br>Priorisez.<br><span class="ui:text-brand-500">Sécurisez.</span>', 'Discover.<br>Prioritize.<br><span class="ui:text-brand-500">Secure.</span>') !!}</x-slot:title>
+        <x-slot:title>{!! $t('Identifiez vos risques.<br>Appliquez vos<br><span class="ui:text-brand-500">solutions.</span>', 'Identify your risks.<br>Apply your<br><span class="ui:text-brand-500">solutions.</span>') !!}</x-slot:title>
     </x-site.steps>
 
     <x-site.cta :href="route('register')" :label="$t('Démarrer maintenant →', 'Start now →')">

@@ -17,8 +17,8 @@ name('website.solutions.cyberbuddy');
     {{-- Hero: the accent is the solution's tone (CyberBuddy → brand) --}}
     <section class="ui:mx-auto ui:grid ui:max-w-[1240px] ui:grid-cols-1 ui:items-end ui:gap-12 ui:px-4 ui:pb-22 ui:pt-16 ui:sm:px-6 ui:lg:grid-cols-2">
         <div>
-            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Interrogez. Comprenez. <span class="ui:text-brand-500">Agissez.</span></x-site.display>
-            <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Votre assistant IA dédié analyse vos risques et vous guide dans vos décisions de sécurité.</p>
+            <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Obtenez des réponses claires <span class="ui:text-brand-500">sur vos risques.</span></x-site.display>
+            <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Votre assistant IA dédié analyse vos vulnérabilités et vous guide pas à pas dans vos actions de sécurité.</p>
             <div class="ui:mt-8 ui:flex ui:flex-wrap ui:gap-3">
                 <x-site.button :href="route('register')">Découvrir CyberBuddy →</x-site.button>
                 <x-site.button variant="outline" :href="route('website.solutions.index')">Découvrir Cywise</x-site.button>
@@ -83,12 +83,12 @@ name('website.solutions.cyberbuddy');
 
     <x-site.steps
         :steps="[
-            ['title' => 'Connectez vos sources.', 'text' => 'Intégrez vos politiques et vos flux de données pour nourrir votre CyberBuddy.'],
+            ['title' => 'Connectez vos sources.', 'text' => 'Intégrez vos politiques et vos flux de données pour configurer votre CyberBuddy.'],
             ['title' => 'Posez vos questions.', 'text' => 'Interrogez l’IA sur n’importe quel aspect de votre posture de sécurité.'],
-            ['title' => 'Appliquez les solutions.', 'text' => 'Suivez les recommandations générées pour renforcer immédiatement vos défenses.'],
+            ['title' => 'Appliquez les solutions.', 'text' => 'Suivez les recommandations prioritaires pour renforcer vos défenses.'],
         ]"
     >
-        <x-slot:title>Interrogez.<br>Comprenez.<br><span class="ui:text-brand-500">Optimisez.</span></x-slot:title>
+        <x-slot:title>Posez vos questions.<br>Recevez vos<br><span class="ui:text-brand-500">solutions.</span></x-slot:title>
     </x-site.steps>
 
     <x-site.cta :href="route('register')" label="Découvrir CyberBuddy →">
