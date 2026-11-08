@@ -10,9 +10,9 @@
 
 @php
   $config = match ($size) {
-    'xl' => ['font-size' => 'clamp(34px, 9vw, 72px)', 'stretch' => '125%'],
-    'md' => ['font-size' => 'clamp(26px, 5.5vw, 50px)', 'stretch' => '118%'],
-    default => ['font-size' => 'clamp(28px, 7vw, 60px)', 'stretch' => '112%'],
+    'xl' => ['font-size' => 'clamp(34px, 9vw, 140px)', 'stretch' => '125%'],
+    'md' => ['font-size' => 'clamp(28px, 3.8vw, 64px)', 'stretch' => '118%'],
+    default => ['font-size' => 'clamp(28px, 5vw, 90px)', 'stretch' => '112%'],
   };
 @endphp
 
