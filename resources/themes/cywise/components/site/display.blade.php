@@ -9,11 +9,11 @@
 ])
 
 @php
-  $sizes = match ($size) {
-    'xl' => 'ui:text-[clamp(34px,9vw,72px)] ui:leading-none ui:font-stretch-125%',
-    'md' => 'ui:text-[clamp(26px,5.5vw,50px)] ui:leading-[1.02] ui:font-stretch-118%',
-    default => 'ui:text-[clamp(28px,7vw,60px)] ui:leading-[1.02] ui:font-stretch-112%',
+  $config = match ($size) {
+    'xl' => ['font-size' => 'clamp(34px, 9vw, 72px)', 'stretch' => '125%'],
+    'md' => ['font-size' => 'clamp(26px, 5.5vw, 50px)', 'stretch' => '118%'],
+    default => ['font-size' => 'clamp(28px, 7vw, 60px)', 'stretch' => '112%'],
   };
 @endphp
 
-<{{ $as }} {{ $attributes->merge(['class' => "ui:m-0 ui:font-display ui:font-black ui:uppercase ui:tracking-[-0.035em] ui:text-balance ui:break-words $sizes"]) }}>{{ $slot }}</{{ $as }}>
+<{{ $as }} {{ $attributes->merge(['style' => "--ui-font-size: {$config['font-size']}; --ui-font-stretch: {$config['stretch']};", 'class' => "ui:m-0 ui:font-display ui:font-black ui:uppercase ui:tracking-[-0.035em] ui:text-balance ui:break-words ui:text-[length:var(--ui-font-size)] ui:font-stretch-[var(--ui-font-stretch)] ui:leading-none"]) }}>{{ $slot }}</{{ $as }}>
