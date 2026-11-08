@@ -1,14 +1,14 @@
 # Agent Workflow
 
-All agents must follow `.craft-agents/DOCTRINE.md`.
+All agents must follow `.ia-factory/DOCTRINE.md`.
 
 ## Files
 
-### Doctrine — `.craft-agents/DOCTRINE.md`
+### Doctrine — `.ia-factory/DOCTRINE.md`
 
 One shared set of project rules for all agents.
 
-### Item — `.craft-agents/items/ITEM-001.md`
+### Item — `.ia-factory/items/ITEM-001.md`
 
 The Item file defines a development task, its scope, acceptance criteria, ownership, and Git branch. It tracks the task's status from creation to merge.
 
@@ -57,9 +57,9 @@ After the user approves all required Specs, commit the Item and Spec files to th
 ```
 git switch <base-branch>
 
-git add .craft-agents/items/ITEM-NNN.md \
-        .craft-agents/specs/ITEM-NNN.md \
-        .craft-agents/activity/ITEM-NNN.md
+git add .ia-factory/items/ITEM-NNN.md \
+        .ia-factory/specs/ITEM-NNN.md \
+        .ia-factory/activity/ITEM-NNN.md
 
 git commit -m "chore(ITEM-NNN): Record approved specs for user login"
 
@@ -84,7 +84,7 @@ Set done only after the merge succeeds. Record the merge and final status in Act
 
 Commit post-merge record updates to the base branch when needed.
 
-### Spec — `.craft-agents/specs/ITEM-001.md`
+### Spec — `.ia-factory/specs/ITEM-001.md`
 
 The Spec file defines the testable requirements of an Item, their approval status, and expected tests. It tracks each requirement from approval to implementation, with a linked Git commit.
 
@@ -127,7 +127,7 @@ Agents must implement only approved Specs. Each completed Spec requires passing 
 
 Record every status change in Activity.
 
-### Activity — `.craft-agents/activity/ITEM-001.md`
+### Activity — `.ia-factory/activity/ITEM-001.md`
 
 The Activity file records all actions and interactions between agents and the user in chronological order. It tracks progress, questions, decisions, approvals, tests, commits, and merges.
 

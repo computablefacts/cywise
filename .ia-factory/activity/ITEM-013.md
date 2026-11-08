@@ -1,0 +1,29 @@
+# ITEM-013 Activity
+
+- 2026-11-08T10:15Z | Junie | I013 | created | Rename .craft-agents to .ia-factory
+- 2026-11-08T10:15Z | Junie | I013 | updated | backlog → specifying
+- 2026-11-08T10:16Z | Junie | I013-S01 | created | Rename directory; pending
+- 2026-11-08T10:16Z | Junie | I013-S02 | created | Update references in AGENTS.md; pending
+- 2026-11-08T10:16Z | Junie | I013-S03 | created | Update references in workflow files; pending
+- 2026-11-08T10:20Z | User | decision | provided | go (approve all specs)
+- 2026-11-08T10:21Z | Junie | I013-S01 | updated | pending → approved
+- 2026-11-08T10:21Z | Junie | I013-S02 | updated | pending → approved
+- 2026-11-08T10:21Z | Junie | I013-S03 | updated | pending → approved
+- 2026-11-08T10:21Z | Junie | I013 | updated | specifying → ready
+- 2026-11-08T10:23Z | Junie | git | commit | eaaa2dca: record approved Specs on main
+- 2026-11-08T10:23Z | Junie | git | checkout | Create branch item/ITEM-013 from main
+- 2026-11-08T10:24Z | Junie | I013 | updated | ready → in_progress
+- 2026-11-08T10:25Z | Junie | I013-S01 | updated | approved → in_progress
+- 2026-11-08T10:25Z | Junie | I013-S02 | updated | approved → in_progress
+- 2026-11-08T10:25Z | Junie | I013-S03 | updated | approved → in_progress
+- 2026-11-08T10:27Z | Junie | I013-S01 | updated | in_progress → completed
+- 2026-11-08T10:27Z | Junie | git | commit | 9999d0c4: record Spec S01 on item/ITEM-013
+- 2026-11-08T10:30Z | Junie | I013-S02 | updated | in_progress → completed
+- 2026-11-08T10:30Z | Junie | git | commit | 67edd885: record Spec S02 on item/ITEM-013
+- 2026-11-08T10:35Z | Junie | I013-S03 | updated | in_progress → completed
+- 2026-11-08T10:35Z | Junie | git | commit | b8a7d3f: record Spec S03 on item/ITEM-013
+- 2026-11-08T10:40Z | Junie | I013 | updated | in_progress → review
+- 2026-11-08T10:42Z | Junie | I013 | updated | review → ready_to_merge
+- 2026-11-08T10:43Z | Junie | question | asked | Authorize merge of item/ITEM-013 into main?
+- 2026-11-08T10:45Z | User | decision | provided | ok (authorize merge)
+- 2026-11-08T10:46Z | Junie | I013 | updated | ready_to_merge → done
