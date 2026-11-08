@@ -31,7 +31,7 @@ render(function (View $view, BlogContent $content, Category $category, Post $pos
                     <a class="ui:text-brand-700! ui:no-underline! ui:hover:text-ink!" href="{{ route('blog.category', ['category' => $category]) }}">{{ $category->name }}</a>
                 </div>
 
-                <x-site.display as="h1" class="ui:mt-8 ui:text-[clamp(28px,4.4vw,60px)]!">{{ $post->title }}</x-site.display>
+                <x-site.display as="h1" size="xl" class="ui:mt-8 ui:text-[clamp(30px,4.2vw,54px)]!">{{ $post->title }}</x-site.display>
 
                 @if ($post->excerpt)
                     <p class="ui:m-0 ui:mt-6 ui:max-w-[720px] ui:text-[22px] ui:leading-normal ui:text-slate-700">{{ $post->excerpt }}</p>

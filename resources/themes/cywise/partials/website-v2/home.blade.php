@@ -150,7 +150,7 @@
     {{-- CyberBuddy: title above, then the app's own chat window (Inter, same tokens as pages/cyberbuddy) --}}
     <section class="ui:bg-brand-500 ui:text-white">
         <div class="{{ $wrap }} ui:py-24">
-            <x-site.display class="ui:max-w-[1000px] ui:text-[clamp(24px,5vw,60px)]!">{{ $t('Votre équipe cybersécurité a un collègue IA.', 'Your cybersecurity team has an AI colleague.') }}</x-site.display>
+        <x-site.display class="ui:max-w-[1000px]">{{ $t('Votre équipe cybersécurité a un collègue IA.', 'Your cybersecurity team has an AI colleague.') }}</x-site.display>
             <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:items-start ui:gap-10 ui:lg:grid-cols-3">
                 <div class="ui:max-w-[360px]">
                     <p class="ui:m-0 ui:text-[19px] ui:leading-normal ui:text-brand-50">{{ $t('Posez des questions directes sur vos risques, vos politiques et vos actions de sécurité.', 'Ask direct questions about your risks, policies and security actions.') }}</p>
@@ -243,7 +243,7 @@
 
     {{-- Ready --}}
     <section id="cta" class="{{ $wrap }} ui:py-28">
-        <x-site.display size="xl" class="ui:text-[clamp(26px,4.5vw,64px)]!">{!! $t('Ne laissez plus la complexité freiner votre sécurité.<br><span class="ui:text-brand-500">Passez à Cywise.</span>', 'Don’t let complexity slow down your security.<br><span class="ui:text-brand-500">Switch to Cywise.</span>') !!}</x-site.display>
+        <x-site.display size="xl">{!! $t('Ne laissez plus la complexité freiner votre sécurité.<br><span class="ui:text-brand-500">Passez à Cywise.</span>', 'Don’t let complexity slow down your security.<br><span class="ui:text-brand-500">Switch to Cywise.</span>') !!}</x-site.display>
         <div class="ui:mt-10 ui:flex ui:flex-wrap ui:gap-3">
             <x-site.button :href="route('register')">{{ $t('Essayer gratuitement →', 'Try for free →') }}</x-site.button>
             <x-site.button variant="outline" :href="'mailto:sales@cywise.io'">{{ $t('Demander une démo', 'Book a demo') }}</x-site.button>

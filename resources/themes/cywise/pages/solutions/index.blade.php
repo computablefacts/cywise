@@ -16,7 +16,7 @@ name('website.solutions.index');
 <main>
     {{-- Hero --}}
     <section class="ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:pb-12 ui:pt-16 ui:sm:px-6">
-        <x-site.display as="h1" size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">Une plateforme unique<br><span class="ui:text-slate-400">au service de votre cyberdéfense.</span></x-site.display>
+        <x-site.display as="h1" size="xl">Une plateforme unique<br><span class="ui:text-slate-400">au service de votre cyberdéfense.</span></x-site.display>
         <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">Activez les capacités de sécurité adaptées à vos enjeux et protégez vos actifs critiques.</p>
     </section>
 
