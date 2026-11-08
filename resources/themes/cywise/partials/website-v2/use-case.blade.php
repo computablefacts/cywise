@@ -26,7 +26,7 @@
     // Hero accent = the matching solution's tone (see site/edge-card); rows = example data (acme.fr)
     $cases = [
         'find-vulnerabilities' => [
-            'accent' => 'ui:bg-medium ui:px-[0.06em] ui:box-decoration-clone',
+            'accent' => 'ui:bg-medium ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Trouvez vos failles avant', 'Find your flaws before'), $t('les attaquants.', 'attackers do.')],
             'lede' => $t('Détectez vos vulnérabilités et transformez-les en un plan d’action priorisé pour vos équipes.', 'Detect your vulnerabilities and turn them into a prioritized action plan for your teams.'),
             'panel' => $t('Vulnérabilités · acme.fr', 'Vulnerabilities · acme.fr'),
@@ -48,7 +48,7 @@
             'steps' => $monitoring,
         ],
         'monitor-attack-surface' => [
-            'accent' => 'ui:bg-critical ui:px-[0.06em] ui:box-decoration-clone',
+            'accent' => 'ui:bg-critical ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Maîtrisez votre', 'Master your'), $t('empreinte externe.', 'external footprint.')],
             'lede' => $t('Gardez le contrôle sur vos actifs publics et vos services exposés en temps réel.', 'Maintain control over your public assets and exposed services in real-time.'),
             'panel' => $t('Changements · acme.fr', 'Changes · acme.fr'),
@@ -69,7 +69,7 @@
             'steps' => $monitoring,
         ],
         'check-leaked-credentials' => [
-            'accent' => 'ui:bg-low ui:px-[0.06em] ui:box-decoration-clone',
+            'accent' => 'ui:bg-low ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Protégez vos', 'Protect your'), $t('comptes compromis.', 'compromised accounts.')],
             'lede' => $t('Identifiez vos identifiants exposés et prévenez les risques de prise de contrôle de compte.', 'Identify your exposed credentials and prevent account takeover risks.'),
             'panel' => $t('Identifiants · acme.fr', 'Credentials · acme.fr'),
@@ -90,7 +90,7 @@
             'steps' => $monitoring,
         ],
         'prepare-audit' => [
-            'accent' => 'ui:bg-info ui:px-[0.06em] ui:box-decoration-clone',
+            'accent' => 'ui:bg-info ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Transformez votre sécurité en', 'Turn your security into'), $t('preuves.', 'evidence.')],
             'lede' => $t('Centralisez vos preuves, vos politiques et vos actions avant vos audits et revues de conformité.', 'Centralize your evidence, policies and actions before your audits and compliance reviews.'),
             'panel' => $t('Audit · Acme', 'Audit · Acme'),
@@ -110,7 +110,7 @@
             'steps' => null,
         ],
         'run-pentest' => [
-            'accent' => 'ui:bg-ink ui:px-[0.06em] ui:text-white ui:box-decoration-clone',
+            'accent' => 'ui:bg-ink ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Testez vos défenses avant que', 'Test your defenses before'), $t('l’attaque n’ait lieu.', 'the attack occurs.')],
             'lede' => $t('Faites évaluer vos applications et infrastructures critiques par nos experts en sécurité offensive.', 'Have your critical applications and infrastructures evaluated by our offensive security experts.'),
             'panel' => $t('Rapport de pentest · app.acme.fr', 'Pentest report · app.acme.fr'),
