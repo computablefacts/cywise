@@ -61,10 +61,10 @@ name('website.solutions.attack-surface');
         :steps="[
             ['title' => 'Cartographiez vos actifs.', 'text' => 'Cywise identifie automatiquement tout ce que votre entreprise expose sur le web.'],
             ['title' => 'Évaluez les risques.', 'text' => 'Nous mettons en lumière les services critiques qui nécessitent une attention immédiate.'],
-            ['title' => 'Réduisez votre exposition.', 'text' => 'Fermez les accès inutiles et sécurisez vos services grâce à nos guides pas à pas.'],
+            ['title' => 'Réduisez votre exposition.', 'text' => 'Fermez les accès inutiles et renforcez votre sécurité grâce à nos guides pas à pas.'],
         ]"
     >
-        <x-slot:title>Découvrez.<br>Analysez.<br><span class="ui:text-brand-500">Sécurisez.</span></x-slot:title>
+        <x-slot:title>Listez vos actifs.<br>Analysez vos risques.<br><span class="ui:text-brand-500">Agissez.</span></x-slot:title>
     </x-site.steps>
 
     <x-site.cta :href="route('register')" label="Surveiller ma surface d'attaque →">

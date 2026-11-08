@@ -60,10 +60,10 @@ name('website.solutions.credential-monitoring');
         :steps="[
             ['title' => 'Ciblez vos domaines.', 'text' => 'Indiquez les domaines et les comptes clés que Cywise doit surveiller.'],
             ['title' => 'Identifiez les fuites.', 'text' => 'Nous parcourons les bases de données de compromissions pour trouver vos accès exposés.'],
-            ['title' => 'Sécurisez vos accès.', 'text' => 'Appliquez nos recommandations pour réinitialiser les comptes à risque et renforcer votre sécurité.'],
+            ['title' => 'Sécurisez vos accès.', 'text' => 'Appliquez nos recommandations pour réinitialiser les comptes à risque et renforcer votre protection.'],
         ]"
     >
-        <x-slot:title>Surveillez.<br>Détectez.<br><span class="ui:text-brand-500">Sécurisez.</span></x-slot:title>
+        <x-slot:title>Identifiez vos comptes.<br>Détectez les fuites.<br><span class="ui:text-brand-500">Agissez.</span></x-slot:title>
     </x-site.steps>
 
     <x-site.cta :href="route('register')" label="Surveiller mes identifiants →">

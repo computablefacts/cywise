@@ -19,12 +19,13 @@
 
         <p class="ui:m-0 ui:mt-3 ui:flex ui:flex-wrap ui:items-baseline ui:gap-x-2">
             <span class="ui:text-[44px] ui:font-black ui:leading-none ui:tracking-tight ui:font-stretch-125%">{{ $plan->currency }}{{ $plan->monthly_price }}</span>
-            <span class="ui:font-mono ui:text-xs ui:uppercase ui:text-slate-500">/ {{ $isEnglish ? 'month' : 'mois' }}</span>
+            <span class="ui:font-mono ui:text-xs ui:uppercase ui:text-slate-500">/ {{ $isEnglish ? 'month' : 'mois' }} HT</span>
         </p>
 
         @if ($plan->yearly_price)
-            <p class="ui:m-0 ui:font-mono ui:text-[13px] ui:uppercase ui:text-slate-500">
-                {{ $plan->currency }}{{ $plan->yearly_price }} / {{ $isEnglish ? 'year' : 'an' }}
+            <p class="ui:m-0 ui:font-mono ui:text-[13px] ui:uppercase ui:text-brand-600 ui:font-bold">
+                {{ $plan->currency }}{{ $plan->yearly_price }} / {{ $isEnglish ? 'year' : 'an' }} HT
+                <span class="ui:ml-1 ui:text-slate-500 ui:font-normal">({{ $isEnglish ? '2 months free' : '2 mois offerts' }})</span>
             </p>
         @endif
 
@@ -53,7 +54,7 @@
 <article class="ui:flex ui:flex-col ui:gap-2 ui:rounded-2xl ui:bg-ink ui:p-6 ui:pl-8 ui:text-white">
     <h2 class="ui:m-0 ui:text-[28px] ui:font-black ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-118%">Pentest</h2>
 
-    <p class="ui:m-0 ui:mt-3 ui:text-[44px] ui:font-black ui:leading-none ui:tracking-tight ui:font-stretch-125%">{{ $isEnglish ? '€3,000+' : '3 000 €+' }}</p>
+    <p class="ui:m-0 ui:mt-3 ui:text-[44px] ui:font-black ui:leading-none ui:tracking-tight ui:font-stretch-125%">{{ $isEnglish ? '€3,000+' : '3 000 €+' }} <span class="ui:text-xs ui:font-mono ui:uppercase ui:text-slate-500">HT</span></p>
 
     <p class="ui:m-0 ui:mt-2 ui:text-base ui:leading-normal ui:text-slate-400">{{ $isEnglish ? 'Human testing for critical applications and infrastructure.' : 'Des tests humains pour les applications et infrastructures critiques.' }}</p>
 
