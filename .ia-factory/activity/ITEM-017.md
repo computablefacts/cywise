@@ -1,0 +1,24 @@
+# ITEM-017 Activity
+
+- 2026-11-08T15:45Z | Junie | I017 | created | Mise à jour de l'UI Suite aux Retours Corporate
+- 2026-11-08T15:45Z | Junie | I017 | updated | backlog → specifying
+- 2026-11-08T15:46Z | Junie | I017-S01 | created | Clarification du positionnement (Accueil); pending
+- 2026-11-08T15:46Z | Junie | I017-S02 | created | Fusion des pages Solutions et Cas d'usage; pending
+- 2026-11-08T15:46Z | Junie | I017-S03 | created | Amélioration de la page Société et Visibilité Équipe; pending
+- 2026-11-08T15:46Z | Junie | I017-S04 | created | Clarification des tarifs; pending
+- 2026-11-08T15:46Z | Junie | I017-S05 | created | Révision rédactionnelle (Anti-IA); pending
+- 2026-11-08T15:46Z | Junie | I017-S06 | created | Corrections techniques et incohérences; pending
+- 2026-11-08T16:05Z | Junie | I017-S01 | updated | Détails de spécification ajoutés
+- 2026-11-08T16:05Z | Junie | I017-S02 | updated | Détails de spécification ajoutés
+- 2026-11-08T16:05Z | Junie | I017-S03 | updated | Détails de spécification ajoutés
+- 2026-11-08T16:05Z | Junie | I017-S04 | updated | Détails de spécification ajoutés
+- 2026-11-08T16:05Z | Junie | I017-S05 | updated | Détails de spécification ajoutés
+- 2026-11-08T16:05Z | Junie | I017-S06 | updated | Détails de spécification ajoutés
+- 2026-11-08T16:15Z | User | decision | provided | yes
+- 2026-11-08T16:16Z | Junie | I017-S01 | updated | pending → approved
+- 2026-11-08T16:16Z | Junie | I017-S02 | updated | pending → approved
+- 2026-11-08T16:16Z | Junie | I017-S03 | updated | pending → approved
+- 2026-11-08T16:16Z | Junie | I017-S04 | updated | pending → approved
+- 2026-11-08T16:16Z | Junie | I017-S05 | updated | pending → approved
+- 2026-11-08T16:16Z | Junie | I017-S06 | updated | pending → approved
+- 2026-11-08T16:17Z | Junie | I017 | updated | specifying → ready
