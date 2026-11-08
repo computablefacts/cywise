@@ -6,3 +6,29 @@
 - 2026-11-08T16:55Z | User | decision | provided | approuvé
 - 2026-11-08T16:55Z | Junie | I019-S01 | updated | pending → approved
 - 2026-11-08T16:56Z | Junie | I019 | updated | specifying → ready
+- 2026-11-08T16:57Z | Junie | git | commit | 4c2298b: record approved Specs on main
+- 2026-11-08T16:57Z | Junie | git | checkout | Create branch item/ITEM-019 from main
+- 2026-11-08T16:57Z | Junie | I019 | updated | ready → in_progress
+- 2026-11-08T16:58Z | Junie | I019-S01 | updated | approved → in_progress
+- 2026-11-08T16:59Z | Junie | I019-S01 | updated | in_progress → completed
+- 2026-11-08T16:59Z | Junie | git | commit | 0252040: feat(ITEM-019-S01): Update Patrick Brisacier role
+- 2026-11-08T17:00Z | Junie | I019 | updated | in_progress → review
+- 2026-11-08T17:01Z | Junie | I019 | updated | review → ready_to_merge
+- 2026-11-08T17:05Z | User | decision | provided | Non, tu n'as pas enlevé Freelance
+- 2026-11-08T17:05Z | Junie | I019 | updated | ready_to_merge → in_progress
+- 2026-11-08T17:06Z | Junie | I019-S01 | updated | completed → in_progress
+- 2026-11-08T17:07Z | Junie | I019-S01 | updated | in_progress → completed
+- 2026-11-08T17:07Z | Junie | git | commit | f2c5f85: feat(ITEM-019-S01): Remove Freelance mention for all
+- 2026-11-08T17:08Z | Junie | I019 | updated | in_progress → review
+- 2026-11-08T17:08Z | Junie | I019 | updated | review → ready_to_merge
+- 2026-11-08T17:10Z | User | decision | provided | ENlève aussi Associé dans company
+- 2026-11-08T17:10Z | Junie | I019 | updated | ready_to_merge → in_progress
+- 2026-11-08T17:11Z | Junie | I019-S01 | updated | completed → in_progress
+- 2026-11-08T17:12Z | Junie | I019-S01 | updated | in_progress → completed
+- 2026-11-08T17:12Z | Junie | git | commit | 806de8b: feat(ITEM-019-S01): Remove Associé mention
+- 2026-11-08T17:13Z | Junie | I019 | updated | in_progress → review
+- 2026-11-08T17:13Z | Junie | I019 | updated | review → ready_to_merge
+- 2026-11-08T17:15Z | User | decision | provided | Autorise la fusion
+- 2026-11-08T17:16Z | Junie | I019 | updated | ready_to_merge → done
+- 2026-11-08T17:16Z | Junie | git | commit | f273e91: record approved merge on item/ITEM-019
+- 2026-11-08T17:16Z | Junie | git | merge | Merge branch item/ITEM-019 into main

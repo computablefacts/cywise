@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-019
-- Status: ready
+- Status: done
 
 ## Description
 
@@ -12,6 +12,7 @@ Supprimer la mention "(FREELANCE)" et remplacer par "R&D Infrastructure et Donn�
 
 ## Acceptance
 
-- [ ] Le rôle de Patrick Brisacier est mis à jour en français : "R&D Infrastructure et Données".
-- [ ] Le rôle de Patrick Brisacier est mis à jour en anglais : "R&D Infrastructure and Data".
-- [ ] La mention "(Freelance)" est supprimée.
+- [x] Le rôle de Patrick Brisacier est mis à jour en français : "R&D Infrastructure et Données".
+- [x] Le rôle de Patrick Brisacier est mis à jour en anglais : "R&D Infrastructure and Data".
+- [x] La mention "(Freelance)" est supprimée pour toute l'équipe.
+- [x] La mention "(Associé)" est supprimée pour Eric Esmérian.
