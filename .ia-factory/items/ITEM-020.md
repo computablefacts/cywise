@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-020
-- Status: specifying
+- Status: done
 
 ## Description
 
@@ -15,6 +15,6 @@ Both fail with 500 errors due to a missing `pentest` route name in Blade templat
 
 ## Acceptance
 
-- [ ] `it serves the former changelog` test passes.
-- [ ] `it renders localized website copy` test passes.
-- [ ] All `route('pentest')` calls are resolved correctly.
+- [✓] `it serves the former changelog` test passes.
+- [✓] `it renders localized website copy` test passes.
+- [✓] All `route('pentest')` calls are resolved correctly.
