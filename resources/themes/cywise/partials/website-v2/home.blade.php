@@ -212,7 +212,7 @@
     <section class="ui:bg-ink ui:text-white">
         <div class="{{ $wrap }} ui:grid ui:grid-cols-1 ui:items-end ui:gap-12 ui:py-24 ui:lg:grid-cols-2">
             <div>
-                <x-site.display size="xl" class="ui:text-[clamp(30px,4.2vw,54px)]!">{!! $t('Parfois, il faut une <span class="ui:text-brand-500">expertise humaine.</span>', 'Sometimes you need <span class="ui:text-brand-500">human expertise.</span>') !!}</x-site.display>
+                <x-site.display size="xl">{!! $t('Parfois, il faut une <span class="ui:text-brand-500">expertise humaine.</span>', 'Sometimes you need <span class="ui:text-brand-500">human expertise.</span>') !!}</x-site.display>
                 <p class="ui:m-0 ui:mt-5 ui:text-[19px] ui:leading-normal ui:text-slate-400">{{ $t('Des tests experts pour vos applications et infrastructures critiques.', 'Expert testing for your critical applications and infrastructure.') }}</p>
                 <x-site.button class="ui:mt-7" :href="route($routePrefix . 'solutions.pentest')">{{ $t('Réserver un Pentest →', 'Book a pentest →') }}</x-site.button>
             </div>
