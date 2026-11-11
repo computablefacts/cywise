@@ -306,7 +306,7 @@ Five days later, the report comes out. Two critical vulnerabilities — fixed im
                             </p>
                             <div class="ui:mt-6 ui:pt-6 ui:border-0 ui:border-t ui:border-solid ui:border-line">
                                 <p class="ui:m-0 ui:text-[15px] ui:leading-normal ui:text-slate-700">
-                                    <span class="ui:block ui:font-mono ui:text-[10px] ui:uppercase ui:tracking-wider ui:text-brand-500 ui:mb-2">{{ $t('Apport Cywise', 'Cywise Value') }}</span>
+                                    <span class="ui:block ui:font-mono ui:text-[10px] ui:uppercase ui:tracking-wider ui:text-brand-500 ui:mb-2">{{ $t('Notre apport', 'Our value') }}</span>
                                     {{ $benefit }}
                                 </p>
                             </div>
