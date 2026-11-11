@@ -137,11 +137,23 @@
         </div>
         <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-2 ui:xl:grid-cols-3">
             @foreach($solutions as [$tone, $name, $title, $text, $route])
-                <x-site.edge-card :tone="$tone" :href="route($routePrefix . $route)">
+                @php
+                    $textColor = match ($tone) {
+                        'critical' => 'ui:text-critical',
+                        'medium' => 'ui:text-medium',
+                        'low' => 'ui:text-low',
+                        'info' => 'ui:text-info',
+                        'ink' => 'ui:text-ink',
+                        default => 'ui:text-brand-500',
+                    };
+                @endphp
+                <x-site.edge-card :tone="$tone" :href="route($routePrefix . $route)" variant="flat">
                     <span class="ui:font-mono ui:text-[13px] ui:uppercase ui:text-slate-500">{{ $name }}</span>
                     <span class="ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</span>
-                    <span class="ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
-                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase ui:group-hover:text-brand-700">{{ $t('Découvrir →', 'Explore →') }}</span>
+                    <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
+                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase {{ $textColor }} ui:transition-transform ui:group-hover:translate-x-1">
+                        {{ $t('Découvrir →', 'Explore →') }}
+                    </span>
                 </x-site.edge-card>
             @endforeach
         </div>
@@ -199,11 +211,11 @@
         <p class="ui:m-0 ui:mt-5 ui:text-lg ui:text-slate-600">{{ $t('Choisissez le profil qui correspond à votre organisation pour découvrir votre expérience personnalisée.', 'Choose the profile that matches your organization to discover your personalized experience.') }}</p>
         <div class="ui:mt-10 ui:grid ui:gap-3 ui:sm:grid-cols-2 ui:xl:grid-cols-4">
             @foreach($audiences as [$name, $text, $route])
-                <a href="{{ route($routePrefix . $route) }}" class="ui:group ui:flex ui:min-h-52 ui:flex-col ui:gap-2.5 ui:rounded-2xl ui:bg-slate-100 ui:p-6 ui:text-ink! ui:no-underline! ui:hover:bg-slate-200">
+                <x-site.edge-card tone="brand" :href="route($routePrefix . $route)" variant="flat">
                     <span class="ui:text-[32px] ui:font-black ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-125%">{{ $name }}</span>
                     <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
                     <span class="ui:text-[22px] ui:font-bold ui:text-brand-500 ui:transition-transform ui:group-hover:translate-x-1">→</span>
-                </a>
+                </x-site.edge-card>
             @endforeach
         </div>
     </section>
