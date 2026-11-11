@@ -253,7 +253,7 @@ Five days later, the report comes out. Two critical vulnerabilities — fixed im
     {{-- Story --}}
     @if(isset($useCase['story']))
         <section class="ui:border-0 ui:border-t ui:border-solid ui:border-line ui:bg-white">
-            <div class="{{ $wrap }} ui:py-24">
+            <div class="{{ $wrap }} ui:py-16">
                 <div class="ui:grid ui:grid-cols-1 ui:gap-12 ui:lg:grid-cols-2 ui:items-center">
                     <div>
                         <span class="ui:font-mono ui:text-sm ui:uppercase ui:tracking-widest ui:text-brand-500">{{ $t('L\'histoire', 'The story') }}</span>
@@ -263,7 +263,7 @@ Five days later, the report comes out. Two critical vulnerabilities — fixed im
                         </div>
                     </div>
                     <div class="ui:relative">
-                        <div class="ui:aspect-square ui:rounded-2xl ui:bg-slate-100 ui:overflow-hidden ui:flex ui:items-center ui:justify-center">
+                        <div class="ui:aspect-video ui:rounded-2xl ui:bg-slate-100 ui:overflow-hidden ui:flex ui:items-center ui:justify-center ui:shadow-lg">
                             @if(isset($useCase['story']['image']))
                                 <img src="{{ $useCase['story']['image'] }}" alt="{{ $useCase['story']['title'] }}" class="ui:w-full ui:h-full ui:object-cover">
                             @else
