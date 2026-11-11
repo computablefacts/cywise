@@ -297,25 +297,21 @@ Five days later, the report comes out. Two critical vulnerabilities — fixed im
             <div class="{{ $wrap }} ui:py-24">
                 <span class="ui:font-mono ui:text-sm ui:uppercase ui:tracking-widest ui:text-brand-500">{{ $t('Pour qui ?', 'For whom?') }}</span>
                 <x-site.display class="ui:mt-4">{{ $t('Vous vous reconnaissez ?', 'Do you recognize yourself?') }}</x-site.display>
-                <div class="ui:mt-12 ui:overflow-x-auto">
-                    <table class="ui:w-full ui:border-collapse ui:text-left">
-                        <thead>
-                            <tr class="ui:border-0 ui:border-b ui:border-solid ui:border-line">
-                                <th class="ui:pb-4 ui:pr-6 ui:font-mono ui:text-xs ui:uppercase ui:tracking-wider ui:text-slate-500">{{ $t('Profil', 'Profile') }}</th>
-                                <th class="ui:pb-4 ui:pr-6 ui:font-mono ui:text-xs ui:uppercase ui:tracking-wider ui:text-slate-500">{{ $t('Son problème', 'Their problem') }}</th>
-                                <th class="ui:pb-4 ui:font-mono ui:text-xs ui:uppercase ui:tracking-wider ui:text-slate-500">{{ $t('Ce que Cywise apporte', 'What Cywise brings') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="ui:divide-y ui:divide-line">
-                            @foreach($useCase['for-whom'] as [$profile, $problem, $benefit])
-                                <tr>
-                                    <td class="ui:py-6 ui:pr-6 ui:align-top ui:font-bold ui:text-slate-900">{{ $profile }}</td>
-                                    <td class="ui:py-6 ui:pr-6 ui:align-top ui:italic ui:text-slate-600">{{ $problem }}</td>
-                                    <td class="ui:py-6 ui:align-top ui:text-slate-700">{{ $benefit }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <div class="ui:mt-12 ui:grid ui:grid-cols-1 ui:gap-4 ui:sm:grid-cols-2 ui:lg:grid-cols-4">
+                    @foreach($useCase['for-whom'] as [$profile, $problem, $benefit])
+                        <div class="ui:flex ui:flex-col ui:rounded-2xl ui:border ui:border-solid ui:border-line ui:bg-slate-50 ui:p-6 ui:transition-colors ui:hover:bg-slate-100">
+                            <h4 class="ui:m-0 ui:text-lg ui:font-bold ui:leading-tight ui:text-slate-900">{{ $profile }}</h4>
+                            <p class="ui:m-0 ui:mt-4 ui:flex-1 ui:text-sm ui:italic ui:leading-relaxed ui:text-slate-500">
+                                {{ $problem }}
+                            </p>
+                            <div class="ui:mt-6 ui:pt-6 ui:border-0 ui:border-t ui:border-solid ui:border-line">
+                                <p class="ui:m-0 ui:text-[15px] ui:leading-normal ui:text-slate-700">
+                                    <span class="ui:block ui:font-mono ui:text-[10px] ui:uppercase ui:tracking-wider ui:text-brand-500 ui:mb-2">{{ $t('Apport Cywise', 'Cywise Value') }}</span>
+                                    {{ $benefit }}
+                                </p>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </section>
