@@ -25,11 +25,13 @@
     <section class="{{ $wrap }} ui:pb-24">
         <div class="ui:grid ui:grid-cols-1 ui:gap-3 ui:sm:grid-cols-2 ui:lg:grid-cols-3">
             @foreach($audiences as [$name, $text, $route])
-                <a href="{{ route($routePrefix . $route) }}" class="ui:group ui:flex ui:min-h-52 ui:flex-col ui:gap-2.5 ui:rounded-2xl ui:bg-slate-100 ui:p-6 ui:text-ink! ui:no-underline! ui:hover:bg-slate-200">
+                <x-site.edge-card tone="brand" :href="route($routePrefix . $route)" variant="flat">
                     <span class="ui:text-[32px] ui:font-black ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-125%">{{ $name }}</span>
                     <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
-                    <span class="ui:text-[22px] ui:font-bold ui:text-brand-500 ui:transition-transform ui:group-hover:translate-x-1">→</span>
-                </a>
+                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase ui:text-brand-500 ui:transition-transform ui:group-hover:translate-x-1">
+                        {{ $t('Découvrir →', 'Explore →') }}
+                    </span>
+                </x-site.edge-card>
             @endforeach
         </div>
     </section>

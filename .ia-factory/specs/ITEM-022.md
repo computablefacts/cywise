@@ -20,3 +20,10 @@ Status: completed
 Requirement: Appliquer le même redesign (variante `flat` et liens colorés) aux cartouches de la page /solutions (FR et EN).
 Test: Les pages /solutions et /en/solutions utilisent le composant x-site.edge-card avec variant="flat" et les liens colorés selon le tone.
 Commit: 11c74b3
+
+## ITEM-022-S04: Redesign de la page Audiences
+
+Status: completed
+Requirement: Utiliser le composant x-site.edge-card et ajouter le lien coloré "Découvrir →" sur la page /for-whom.
+Test: La page /for-whom utilise x-site.edge-card avec variant="flat" et affiche "Découvrir →" en couleur brand.
+Commit: 33cb058
