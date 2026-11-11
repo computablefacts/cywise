@@ -39,3 +39,6 @@
 - 2026-11-11T12:40Z | User | decision | provided | Harmoniser la taille des titres des cartouches sur /for-whom
 - 2026-11-11T12:41Z | Junie | git | commit | 1c3c75b: feat(ITEM-022): Harmonize card title sizes across all redesigned pages
 - 2026-11-11T12:42Z | Junie | I022 | updated | review → ready_to_merge
+- 2026-11-11T12:45Z | User | decision | provided | Modifier le titre de la page /use-cases
+- 2026-11-11T12:46Z | Junie | git | commit | 9631bef: style(ITEM-022): Update use-cases page title to orange Priority objective
+- 2026-11-11T12:47Z | Junie | I022 | updated | ready_to_merge → review
