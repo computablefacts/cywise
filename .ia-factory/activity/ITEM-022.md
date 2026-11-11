@@ -28,3 +28,7 @@
 - 2026-11-11T12:17Z | Junie | I022-S04 | updated | approved → completed
 - 2026-11-11T12:17Z | Junie | git | commit | 33cb058: feat(ITEM-022): Apply redesign to audiences index page
 - 2026-11-11T12:18Z | Junie | I022 | updated | in_progress → review
+- 2026-11-11T12:22Z | User | decision | provided | Les couleurs des liens ne correspondent pas au menu
+- 2026-11-11T12:22Z | Junie | I022 | updated | review → in_progress
+- 2026-11-11T12:25Z | Junie | git | commit | 082dc4f: fix(ITEM-022): Align all card link colors with navigation menu tones
+- 2026-11-11T12:26Z | Junie | I022 | updated | in_progress → review

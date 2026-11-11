@@ -15,15 +15,15 @@
         ['critical', $t('Surface d’attaque', 'Attack surface'), $t('Visualisez ce que les attaquants voient.', 'Visualize what attackers see.'), $t('Surveillez vos domaines, serveurs et services exposés en temps réel.', 'Monitor your domains, servers and services in real-time.'), 'solutions.attack-surface'],
         ['medium', $t('Vulnérabilités', 'Vulnerabilities'), $t('Détectez vos points faibles.', 'Detect your weak points.'), $t('Identifiez vos vulnérabilités et concentrez-vous sur les risques les plus critiques.', 'Identify your vulnerabilities and focus on the most critical risks.'), 'solutions.vulnerability-management'],
         ['low', $t('Identifiants', 'Credentials'), $t('Découvrez vos données exposées.', 'Discover your exposed data.'), $t('Détectez les identifiants compromis liés à votre entreprise sur le web.', 'Detect compromised credentials linked to your company on the web.'), 'solutions.credential-monitoring'],
-        ['brand', 'CyberBuddy', $t('Posez vos questions.', 'Ask your questions.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance adapted to your company context.'), 'solutions.cyberbuddy'],
+        ['info', 'CyberBuddy', $t('Posez vos questions.', 'Ask your questions.'), $t('Obtenez des conseils clairs adaptés au contexte de votre entreprise.', 'Get clear cybersecurity guidance adapted to your company context.'), 'solutions.cyberbuddy'],
         ['ink', 'Pentest', $t('Faites tester vos systèmes par nos experts.', 'Get tested by our experts.'), $t('Faites tester vos applications critiques par nos experts en sécurité offensive.', 'Have your critical applications tested by our offensive security experts.'), 'solutions.pentest'],
     ];
 
     $audiences = [
-        [$t('PME', 'SMBs'), $t('Sécurisez votre entreprise sans infrastructure complexe.', 'Secure your business without complex infrastructure.'), 'audiences.smbs'],
-        [$t('Équipes IT', 'IT teams'), $t('Visualisez vos risques et sachez exactement quoi corriger en priorité.', 'Visualize your risks and know exactly what to fix first.'), 'audiences.it-teams'],
-        [$t('RSSI', 'CISOs'), $t('Centralisez votre visibilité pour des décisions de sécurité éclairées.', 'Centralize your visibility for informed security decisions.'), 'audiences.cisos'],
-        ['MSP', $t('Gérez la sécurité de vos clients depuis une interface unique.', 'Manage your customers’ security from a single interface.'), 'audiences.msps'],
+        [$t('PME', 'SMBs'), $t('Sécurisez votre entreprise sans infrastructure complexe.', 'Secure your business without complex infrastructure.'), 'audiences.smbs', 'critical'],
+        [$t('Équipes IT', 'IT teams'), $t('Visualisez vos risques et sachez exactement quoi corriger en priorité.', 'Visualize your risks and know exactly what to fix first.'), 'audiences.it-teams', 'low'],
+        [$t('RSSI', 'CISOs'), $t('Centralisez votre visibilité pour des décisions de sécurité éclairées.', 'Centralize your visibility for informed security decisions.'), 'audiences.cisos', 'info'],
+        ['MSP', $t('Gérez la sécurité de vos clients depuis une interface unique.', 'Manage your customers’ security from a single interface.'), 'audiences.msps', 'ink'],
     ];
 
     $pentest = [
@@ -210,11 +210,21 @@
         <x-site.display class="ui:max-w-[900px]">{{ $t('Conçu pour les équipes qui exigent de la clarté.', 'Built for teams that demand clarity.') }}</x-site.display>
         <p class="ui:m-0 ui:mt-5 ui:text-lg ui:text-slate-600">{{ $t('Choisissez le profil qui correspond à votre organisation pour découvrir votre expérience personnalisée.', 'Choose the profile that matches your organization to discover your personalized experience.') }}</p>
         <div class="ui:mt-10 ui:grid ui:gap-3 ui:sm:grid-cols-2 ui:xl:grid-cols-4">
-            @foreach($audiences as [$name, $text, $route])
-                <x-site.edge-card tone="brand" :href="route($routePrefix . $route)" variant="flat">
+            @foreach($audiences as [$name, $text, $route, $tone])
+                @php
+                    $textColor = match ($tone) {
+                        'critical' => 'ui:text-critical',
+                        'medium' => 'ui:text-medium',
+                        'low' => 'ui:text-low',
+                        'info' => 'ui:text-info',
+                        'ink' => 'ui:text-ink',
+                        default => 'ui:text-brand-500',
+                    };
+                @endphp
+                <x-site.edge-card :tone="$tone" :href="route($routePrefix . $route)" variant="flat">
                     <span class="ui:text-[32px] ui:font-black ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-125%">{{ $name }}</span>
                     <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
-                    <span class="ui:text-[22px] ui:font-bold ui:text-brand-500 ui:transition-transform ui:group-hover:translate-x-1">→</span>
+                    <span class="ui:text-[22px] ui:font-bold {{ $textColor }} ui:transition-transform ui:group-hover:translate-x-1">→</span>
                 </x-site.edge-card>
             @endforeach
         </div>

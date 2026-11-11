@@ -6,11 +6,11 @@
     $wrap = 'ui:mx-auto ui:max-w-[1240px] ui:px-4 ui:sm:px-6';
 
     $audiences = [
-        [$t('PME', 'SMBs'), $t('Sécurisez votre activité avec une solution simple et efficace sans infrastructure complexe.', 'Secure your activity with a simple and effective solution without complex infrastructure.'), 'audiences.smbs'],
-        ['Startups', $t('Bâtissez des fondations de sécurité solides pour accompagner votre forte croissance.', 'Build solid security foundations to support your strong growth.'), 'audiences.startups'],
-        [$t('Équipes IT', 'IT teams'), $t('Automatisez votre surveillance et visualisez exactement les actions à mener.', 'Automate your monitoring and visualize exactly the actions to be taken.'), 'audiences.it-teams'],
-        [$t('RSSI', 'CISOs'), $t('Centralisez votre visibilité et facilitez vos prises de décisions stratégiques.', 'Centralize your visibility and facilitate your strategic decision-making.'), 'audiences.cisos'],
-        [$t('MSP', 'MSPs'), $t('Gérez la posture de sécurité de tous vos clients depuis une plateforme unique.', 'Manage the security posture of all your customers from a single platform.'), 'audiences.msps'],
+        [$t('PME', 'SMBs'), $t('Sécurisez votre activité avec une solution simple et efficace sans infrastructure complexe.', 'Secure your activity with a simple and effective solution without complex infrastructure.'), 'audiences.smbs', 'critical'],
+        ['Startups', $t('Bâtissez des fondations de sécurité solides pour accompagner votre forte croissance.', 'Build solid security foundations to support your strong growth.'), 'audiences.startups', 'brand'],
+        [$t('Équipes IT', 'IT teams'), $t('Automatisez votre surveillance et visualisez exactement les actions à mener.', 'Automate your monitoring and visualize exactly the actions to be taken.'), 'audiences.it-teams', 'low'],
+        [$t('RSSI', 'CISOs'), $t('Centralisez votre visibilité et facilitez vos prises de décisions stratégiques.', 'Centralize your visibility and facilitate your strategic decision-making.'), 'audiences.cisos', 'info'],
+        [$t('MSP', 'MSPs'), $t('Gérez la posture de sécurité de tous vos clients depuis une plateforme unique.', 'Manage the security posture of all your customers from a single platform.'), 'audiences.msps', 'ink'],
     ];
 @endphp
 
@@ -24,11 +24,21 @@
     {{-- Audience cards, same style as the home page's "for whom" section --}}
     <section class="{{ $wrap }} ui:pb-24">
         <div class="ui:grid ui:grid-cols-1 ui:gap-3 ui:sm:grid-cols-2 ui:lg:grid-cols-3">
-            @foreach($audiences as [$name, $text, $route])
-                <x-site.edge-card tone="brand" :href="route($routePrefix . $route)" variant="flat">
+            @foreach($audiences as [$name, $text, $route, $tone])
+                @php
+                    $textColor = match ($tone) {
+                        'critical' => 'ui:text-critical',
+                        'medium' => 'ui:text-medium',
+                        'low' => 'ui:text-low',
+                        'info' => 'ui:text-info',
+                        'ink' => 'ui:text-ink',
+                        default => 'ui:text-brand-500',
+                    };
+                @endphp
+                <x-site.edge-card :tone="$tone" :href="route($routePrefix . $route)" variant="flat">
                     <span class="ui:text-[32px] ui:font-black ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-125%">{{ $name }}</span>
                     <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
-                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase ui:text-brand-500 ui:transition-transform ui:group-hover:translate-x-1">
+                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase {{ $textColor }} ui:transition-transform ui:group-hover:translate-x-1">
                         {{ $t('Découvrir →', 'Explore →') }}
                     </span>
                 </x-site.edge-card>
