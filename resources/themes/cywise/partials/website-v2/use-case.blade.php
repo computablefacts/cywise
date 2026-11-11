@@ -153,7 +153,7 @@ Le jour de l'audit, au lieu de fouiller dans ses mails, il ouvre un tableau de b
 He opens Cywise: three missing controls, twelve actions in progress. He assigns, he tracks.
 
 On the day of the audit, instead of rummaging through his emails, he opens a single dashboard. The auditor is satisfied, the contract is signed. And Karim doesn't close the file: Cywise keeps track of his commitments for the next audit."),
-                'image' => 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800',
+                'image' => 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=800',
             ],
             'for-whom' => [
                 [$t('DSI avant une certification', 'CIO before certification'), $t('« L\'auditeur arrive dans deux mois. Mes preuves sont éparpillées. »', '"The auditor arrives in two months. My evidence is scattered."'), $t('Une centralisation des écarts, des actions et des documents de conformité.', 'Centralization of gaps, actions and compliance documents.')],
