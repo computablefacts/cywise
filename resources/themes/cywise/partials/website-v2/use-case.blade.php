@@ -295,7 +295,8 @@ Five days later, the report comes out. Two critical vulnerabilities — fixed im
     @if(isset($useCase['for-whom']))
         <section class="ui:bg-white">
             <div class="{{ $wrap }} ui:py-24">
-                <x-site.display>{{ $t('Pour qui ?', 'For whom?') }}</x-site.display>
+                <span class="ui:font-mono ui:text-sm ui:uppercase ui:tracking-widest ui:text-brand-500">{{ $t('Pour qui ?', 'For whom?') }}</span>
+                <x-site.display class="ui:mt-4">{{ $t('Vous vous reconnaissez ?', 'Do you recognize yourself?') }}</x-site.display>
                 <div class="ui:mt-12 ui:overflow-x-auto">
                     <table class="ui:w-full ui:border-collapse ui:text-left">
                         <thead>
