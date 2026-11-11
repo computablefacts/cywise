@@ -45,3 +45,6 @@
 - 2026-11-11T12:51Z | User | decision | provided | Mettre le ? en orange et remplacer flux de travail par processus
 - 2026-11-11T12:52Z | Junie | git | commit | ca72a0e: style(ITEM-022): Color question mark in orange and update description text
 - 2026-11-11T12:53Z | Junie | I022 | updated | review → ready_to_merge
+- 2026-11-11T12:56Z | User | decision | provided | Enlever "cas d'usage" en haut des cartouches
+- 2026-11-11T12:57Z | Junie | git | commit | 559ac65: style(ITEM-022): Remove Use Case label from use-cases cards
+- 2026-11-11T12:58Z | Junie | I022 | updated | ready_to_merge → review

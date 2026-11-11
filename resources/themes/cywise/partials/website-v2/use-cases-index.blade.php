@@ -38,7 +38,6 @@
                     };
                 @endphp
                 <x-site.edge-card :tone="$tone" :href="route($routePrefix . $route)" variant="flat">
-                    <span class="ui:font-mono ui:text-[13px] ui:uppercase ui:text-slate-500">{{ $t('Cas d’usage', 'Use case') }}</span>
                     <span class="ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</span>
                     <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
                     <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase {{ $textColor }} ui:transition-transform ui:group-hover:translate-x-1">
