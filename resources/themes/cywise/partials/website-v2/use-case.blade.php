@@ -192,7 +192,7 @@ Cinq jours plus tard, le rapport tombe. Deux vulnérabilités critiques — corr
 Her team does code reviews, but a bank wants a human test with evidence. She scopes the perimeter in Cywise: the API, the customer portal, the administration interface.
 
 Five days later, the report comes out. Two critical vulnerabilities — fixed immediately. She sends the report. The contract is signed. The bank even demands an annual pentest. Amandine already knows who she will call."),
-                'image' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800',
+                'image' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800',
             ],
             'for-whom' => [
                 [$t('CTO startup / scale-up', 'Startup / Scale-up CTO'), $t('« Mon prospect banque/assurance exige un pentest indépendant. »', '"My bank/insurance prospect demands an independent pentest."'), $t('Un rapport reconnu, avec preuves, méthodologie et recommandations.', 'A recognized report, with evidence, methodology and recommendations.')],
