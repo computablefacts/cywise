@@ -48,3 +48,6 @@
 - 2026-11-11T12:56Z | User | decision | provided | Enlever "cas d'usage" en haut des cartouches
 - 2026-11-11T12:57Z | Junie | git | commit | 559ac65: style(ITEM-022): Remove Use Case label from use-cases cards
 - 2026-11-11T12:58Z | Junie | I022 | updated | ready_to_merge → review
+- 2026-11-11T13:01Z | User | decision | provided | Ajouter "Découvrir" sur les cartouches Audiences de la home
+- 2026-11-11T13:02Z | Junie | git | commit | 3b95e21: style(ITEM-022): Add Discover text to audience cards on homepage
+- 2026-11-11T13:03Z | Junie | I022 | updated | review → ready_to_merge
