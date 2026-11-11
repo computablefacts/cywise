@@ -32,7 +32,7 @@
             'story' => [
                 'title' => $t("L'histoire de Thomas", "Thomas's story"),
                 'text' => $t("Le patron de Thomas reçoit un email : un client exige un rapport de sécurité sous 15 jours. Thomas est seul. Il n'a pas d'outil de scan. Il renseigne son nom de domaine dans Cywise.\n\nTrente secondes plus tard, il a une liste : un framework obsolète (critique), un certificat TLS expiré (élevé), des en-têtes de sécurité absents (moyen). Il sait par où commencer. Il corrige, il suit, il exporte.\n\nQuinze jours plus tard, il envoie son rapport au client. Le contrat est maintenu. Et Thomas a un outil qu'il peut utiliser chaque mois.", "Thomas's boss receives an email: a client demands a security report within 15 days. Thomas is alone. He has no scanning tool. He enters his domain name into Cywise.\n\nThirty seconds later, he has a list: an obsolete framework (critical), an expired TLS certificate (high), missing security headers (medium). He knows where to start. He fixes, he tracks, he exports.\n\nFifteen days later, he sends his report to the client. The contract is maintained. And Thomas has a tool he can use every month."),
-                'image' => 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800',
+                'image' => 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=800',
             ],
             'for-whom' => [
                 [$t('Responsable IT seul', 'IT Manager alone'), $t('« Mon patron me demande un rapport de sécurité. Je n\'ai pas d\'outil de scan. »', '"My boss asks me for a security report. I don\'t have a scanning tool."'), $t('Un scan en 30 secondes et une liste priorisée par criticité.', 'A scan in 30 seconds and a list prioritized by criticality.')],
@@ -73,7 +73,7 @@ Avec Cywise, elle voit son périmètre en temps réel. Elle peut enfin répondre
 It exposes customer data, without authentication, visible to anyone. Without Cywise, Marie would never have known this service existed.
 
 With Cywise, she sees her perimeter in real-time. She can finally answer the question her CISO asks her every month: \"What exactly are we exposing?\""),
-                'image' => 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800',
+                'image' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800',
             ],
             'for-whom' => [
                 [$t('DSI d\'une PME en croissance', 'CIO of a growing SMB'), $t('« Chaque semaine, un nouveau service apparaît. Je n\'ai pas de cartographie à jour. »', '"Every week, a new service appears. I don\'t have an up-to-date mapping."'), $t('Un inventaire automatique et continu de tous les actifs exposés.', 'An automatic and continuous inventory of all exposed assets.')],
@@ -144,16 +144,8 @@ She forces a reset, activates two-factor authentication, schedules a monthly che
             'lede' => $t('Centralisez vos preuves, vos politiques et vos actions avant vos audits et revues de conformité.', 'Centralize your evidence, policies and actions before your audits and compliance reviews.'),
             'story' => [
                 'title' => $t('L\'histoire de Karim', 'Karim\'s story'),
-                'text' => $t("Dans deux mois, un auditeur vient vérifier la conformité de Karim. Un contrat de deux millions d'euros en dépend. Karim a des documents éparpillés dans SharePoint, des tableurs Excel dans ses emails, des captures d'écran « au cas où ». Rien n'est centralisé.
-
-Il ouvre Cywise : trois contrôles manquants, douze actions en cours. Il assigne, il suit.
-
-Le jour de l'audit, au lieu de fouiller dans ses mails, il ouvre un tableau de bord unique. L'auditeur est satisfait, le contrat est signé. Et Karim ne referme pas le dossier : Cywise garde la trace de ses engagements pour le prochain audit.", "In two months, an auditor is coming to check Karim's compliance. A two-million-euro contract depends on it. Karim has documents scattered in SharePoint, Excel spreadsheets in his emails, screenshots \"just in case\". Nothing is centralized.
-
-He opens Cywise: three missing controls, twelve actions in progress. He assigns, he tracks.
-
-On the day of the audit, instead of rummaging through his emails, he opens a single dashboard. The auditor is satisfied, the contract is signed. And Karim doesn't close the file: Cywise keeps track of his commitments for the next audit."),
-                'image' => 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800',
+                'text' => $t("Dans deux mois, un auditeur vient vérifier la conformité de Karim. Un contrat de deux millions d'euros en dépend. Karim a des documents éparpillés dans SharePoint, des tableurs Excel dans ses emails, des captures d'écran « au cas où ». Rien n'est centralisé.\n\nIl ouvre Cywise : trois contrôles manquants, douze actions en cours. Il assigne, il suit.\n\nLe jour de l'audit, au lieu de fouiller dans ses mails, il ouvre un tableau de bord unique. L'auditeur est satisfait, le contrat est signé. Et Karim ne referme pas le dossier : Cywise garde la trace de ses engagements pour le prochain audit.", "In two months, an auditor is coming to check Karim's compliance. A two-million-euro contract depends on it. Karim has documents scattered in SharePoint, Excel spreadsheets in his emails, screenshots \"just in case\". Nothing is centralized.\n\nHe opens Cywise: three missing controls, twelve actions in progress. He assigns, he tracks.\n\nOn the day of the audit, instead of rummaging through his emails, he opens a single dashboard. The auditor is satisfied, the contract is signed. And Karim doesn't close the file: Cywise keeps track of his commitments for the next audit."),
+                'image' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800',
             ],
             'for-whom' => [
                 [$t('DSI avant une certification', 'CIO before certification'), $t('« L\'auditeur arrive dans deux mois. Mes preuves sont éparpillées. »', '"The auditor arrives in two months. My evidence is scattered."'), $t('Une centralisation des écarts, des actions et des documents de conformité.', 'Centralization of gaps, actions and compliance documents.')],
