@@ -31,7 +31,15 @@
             'lede' => $t('Détectez vos vulnérabilités et transformez-les en un plan d’action priorisé pour vos équipes.', 'Detect your vulnerabilities and turn them into a prioritized action plan for your teams.'),
             'story' => [
                 'title' => $t("L'histoire de Thomas", "Thomas's story"),
-                'text' => $t("Le patron de Thomas reçoit un email : un client exige un rapport de sécurité sous 15 jours. Thomas est seul. Il n'a pas d'outil de scan. Il renseigne son nom de domaine dans Cywise. Trente secondes plus tard, il a une liste : un framework obsolète (critique), un certificat TLS expiré (élevé), des en-têtes de sécurité absents (moyen). Il sait par où commencer. Il corrige, il suit, il exporte. Quinze jours plus tard, il envoie son rapport au client. Le contrat est maintenu. Et Thomas a un outil qu'il peut utiliser chaque mois.", "Thomas's boss receives an email: a client demands a security report within 15 days. Thomas is alone. He has no scanning tool. He enters his domain name into Cywise. Thirty seconds later, he has a list: an obsolete framework (critical), an expired TLS certificate (high), missing security headers (medium). He knows where to start. He fixes, he tracks, he exports. Fifteen days later, he sends his report to the client. The contract is maintained. And Thomas has a tool he can use every month."),
+                'text' => $t("Le patron de Thomas reçoit un email : un client exige un rapport de sécurité sous 15 jours. Thomas est seul. Il n'a pas d'outil de scan. Il renseigne son nom de domaine dans Cywise.
+
+Trente secondes plus tard, il a une liste : un framework obsolète (critique), un certificat TLS expiré (élevé), des en-têtes de sécurité absents (moyen). Il sait par où commencer. Il corrige, il suit, il exporte.
+
+Quinze jours plus tard, il envoie son rapport au client. Le contrat est maintenu. Et Thomas a un outil qu'il peut utiliser chaque mois.", "Thomas's boss receives an email: a client demands a security report within 15 days. Thomas is alone. He has no scanning tool. He enters his domain name into Cywise.
+
+Thirty seconds later, he has a list: an obsolete framework (critical), an expired TLS certificate (high), missing security headers (medium). He knows where to start. He fixes, he tracks, he exports.
+
+Fifteen days later, he sends his report to the client. The contract is maintained. And Thomas has a tool he can use every month."),
             ],
             'for-whom' => [
                 [$t('Responsable IT seul', 'IT Manager alone'), $t('« Mon patron me demande un rapport de sécurité. Je n\'ai pas d\'outil de scan. »', '"My boss asks me for a security report. I don\'t have a scanning tool."'), $t('Un scan en 30 secondes et une liste priorisée par criticité.', 'A scan in 30 seconds and a list prioritized by criticality.')],
@@ -63,7 +71,15 @@
             'lede' => $t('Gardez le contrôle sur vos actifs publics et vos services exposés en temps réel.', 'Maintain control over your public assets and exposed services in real-time.'),
             'story' => [
                 'title' => $t("L'histoire de Marie", "Marie's story"),
-                'text' => $t("Lundi matin, Marie ouvre Cywise. Une alerte rouge : staging.acme.fr:8080 vient d'apparaître. C'est un environnement de test que son développeur a oublié de fermer dimanche soir. Il expose des données clients, sans authentification, visible par n'importe qui. Sans Cywise, Marie n'aurait jamais su que ce service existait. Avec Cywise, elle voit son périmètre en temps réel. Elle peut enfin répondre à la question que son DSI lui pose chaque mois : « On expose quoi, exactement ? »", "Monday morning, Marie opens Cywise. A red alert: staging.acme.fr:8080 has just appeared. It's a test environment that her developer forgot to close on Sunday evening. It exposes customer data, without authentication, visible to anyone. Without Cywise, Marie would never have known this service existed. With Cywise, she sees her perimeter in real-time. She can finally answer the question her CISO asks her every month: \"What exactly are we exposing?\""),
+                'text' => $t("Lundi matin, Marie ouvre Cywise. Une alerte rouge : staging.acme.fr:8080 vient d'apparaître. C'est un environnement de test que son développeur a oublié de fermer dimanche soir.
+
+Il expose des données clients, sans authentification, visible par n'importe qui. Sans Cywise, Marie n'aurait jamais su que ce service existait.
+
+Avec Cywise, elle voit son périmètre en temps réel. Elle peut enfin répondre à la question que son DSI lui pose chaque mois : « On expose quoi, exactement ? »", "Monday morning, Marie opens Cywise. A red alert: staging.acme.fr:8080 has just appeared. It's a test environment that her developer forgot to close on Sunday evening.
+
+It exposes customer data, without authentication, visible to anyone. Without Cywise, Marie would never have known this service existed.
+
+With Cywise, she sees her perimeter in real-time. She can finally answer the question her CISO asks her every month: \"What exactly are we exposing?\""),
             ],
             'for-whom' => [
                 [$t('DSI d\'une PME en croissance', 'CIO of a growing SMB'), $t('« Chaque semaine, un nouveau service apparaît. Je n\'ai pas de cartographie à jour. »', '"Every week, a new service appears. I don\'t have an up-to-date mapping."'), $t('Un inventaire automatique et continu de tous les actifs exposés.', 'An automatic and continuous inventory of all exposed assets.')],
@@ -94,7 +110,15 @@
             'lede' => $t('Identifiez vos identifiants exposés et prévenez les risques de prise de contrôle de compte.', 'Identify your exposed credentials and prevent account takeover risks.'),
             'story' => [
                 'title' => $t("L'histoire de Sophie", "Sophie's story"),
-                'text' => $t("Le compte Instagram du plus gros client de Sophie publie des messages injurieux. Il a été piraté. Son community manager utilisait le même mot de passe partout — un mot de passe qui a fuité dans une base de données compromise six mois plus tôt. Sophie renseigne @agence-sophie.com dans Cywise. Résultat : quatre collaborateurs compromis, dont le comptable. Elle force la réinitialisation, active l'authentification à deux facteurs, programme une vérification mensuelle. La prochaine fois qu'une base de données fuit quelque part dans le monde, elle le saura avant les attaquants.", "Sophie's biggest client's Instagram account is publishing abusive messages. It has been hacked. Her community manager was using the same password everywhere — a password that leaked in a compromised database six months earlier. Sophie enters @agence-sophie.com in Cywise. Result: four employees compromised, including the accountant. She forces a reset, activates two-factor authentication, schedules a monthly check. The next time a database leaks somewhere in the world, she will know before the attackers."),
+                'text' => $t("Le compte Instagram du plus gros client de Sophie publie des messages injurieux. Il a été piraté. Son community manager utilisait le même mot de passe partout — un mot de passe qui a fuité dans une base de données compromise six mois plus tôt.
+
+Sophie renseigne @agence-sophie.com dans Cywise. Résultat : quatre collaborateurs compromis, dont le comptable.
+
+Elle force la réinitialisation, active l'authentification à deux facteurs, programme une vérification mensuelle. La prochaine fois qu'une base de données fuit quelque part dans le monde, elle le saura avant les attaquants.", "Sophie's biggest client's Instagram account is publishing abusive messages. It has been hacked. Her community manager was using the same password everywhere — a password that leaked in a compromised database six months earlier.
+
+Sophie enters @agence-sophie.com in Cywise. Result: four employees compromised, including the accountant.
+
+She forces a reset, activates two-factor authentication, schedules a monthly check. The next time a database leaks somewhere in the world, she will know before the attackers."),
             ],
             'for-whom' => [
                 [$t('Dirigeant de PME', 'SMB Leader'), $t('« Un compte piraté peut détruire la réputation de mon entreprise. »', '"A hacked account can destroy my company\'s reputation."'), $t('Une surveillance proactive des fuites de données pour son domaine.', 'Proactive monitoring of data leaks for their domain.')],
@@ -125,7 +149,15 @@
             'lede' => $t('Centralisez vos preuves, vos politiques et vos actions avant vos audits et revues de conformité.', 'Centralize your evidence, policies and actions before your audits and compliance reviews.'),
             'story' => [
                 'title' => $t('L\'histoire de Karim', 'Karim\'s story'),
-                'text' => $t("Dans deux mois, un auditeur vient vérifier la conformité de Karim. Un contrat de deux millions d'euros en dépend. Karim a des documents éparpillés dans SharePoint, des tableurs Excel dans ses emails, des captures d'écran « au cas où ». Rien n'est centralisé. Il ouvre Cywise : trois contrôles manquants, douze actions en cours. Il assigne, il suit. Le jour de l'audit, au lieu de fouiller dans ses mails, il ouvre un tableau de bord unique. L'auditeur est satisfait, le contrat est signé. Et Karim ne referme pas le dossier : Cywise garde la trace de ses engagements pour le prochain audit.", "In two months, an auditor is coming to check Karim's compliance. A two-million-euro contract depends on it. Karim has documents scattered in SharePoint, Excel spreadsheets in his emails, screenshots \"just in case\". Nothing is centralized. He opens Cywise: three missing controls, twelve actions in progress. He assigns, he tracks. On the day of the audit, instead of rummaging through his emails, he opens a single dashboard. The auditor is satisfied, the contract is signed. And Karim doesn't close the file: Cywise keeps track of his commitments for the next audit."),
+                'text' => $t("Dans deux mois, un auditeur vient vérifier la conformité de Karim. Un contrat de deux millions d'euros en dépend. Karim a des documents éparpillés dans SharePoint, des tableurs Excel dans ses emails, des captures d'écran « au cas où ». Rien n'est centralisé.
+
+Il ouvre Cywise : trois contrôles manquants, douze actions en cours. Il assigne, il suit.
+
+Le jour de l'audit, au lieu de fouiller dans ses mails, il ouvre un tableau de bord unique. L'auditeur est satisfait, le contrat est signé. Et Karim ne referme pas le dossier : Cywise garde la trace de ses engagements pour le prochain audit.", "In two months, an auditor is coming to check Karim's compliance. A two-million-euro contract depends on it. Karim has documents scattered in SharePoint, Excel spreadsheets in his emails, screenshots \"just in case\". Nothing is centralized.
+
+He opens Cywise: three missing controls, twelve actions in progress. He assigns, he tracks.
+
+On the day of the audit, instead of rummaging through his emails, he opens a single dashboard. The auditor is satisfied, the contract is signed. And Karim doesn't close the file: Cywise keeps track of his commitments for the next audit."),
             ],
             'for-whom' => [
                 [$t('DSI avant une certification', 'CIO before certification'), $t('« L\'auditeur arrive dans deux mois. Mes preuves sont éparpillées. »', '"The auditor arrives in two months. My evidence is scattered."'), $t('Une centralisation des écarts, des actions et des documents de conformité.', 'Centralization of gaps, actions and compliance documents.')],
@@ -155,7 +187,15 @@
             'lede' => $t('Faites évaluer vos applications et infrastructures critiques par nos experts en sécurité offensive.', 'Have your critical applications and infrastructures evaluated by our offensive security experts.'),
             'story' => [
                 'title' => $t("L'histoire d'Amandine", "Amandine's story"),
-                'text' => $t("Amandine vient de lever cinq millions d'euros. Son plus gros prospect, une banque, exige un rapport de pentest indépendant avant de signer. Elle a trois semaines. Son équipe fait des revues de code, mais une banque veut un test humain avec des preuves. Elle cadre le périmètre dans Cywise : l'API, le portail client, l'interface d'administration. Cinq jours plus tard, le rapport tombe. Deux vulnérabilités critiques — corrigées immédiatement. Elle transmet le rapport. Le contrat est signé. La banque exige même un pentest annuel. Amandine sait déjà à qui elle fera appel.", "Amandine has just raised five million euros. Her biggest prospect, a bank, demands an independent pentest report before signing. She has three weeks. Her team does code reviews, but a bank wants a human test with evidence. She scopes the perimeter in Cywise: the API, the customer portal, the administration interface. Five days later, the report comes out. Two critical vulnerabilities — fixed immediately. She sends the report. The contract is signed. The bank even demands an annual pentest. Amandine already knows who she will call."),
+                'text' => $t("Amandine vient de lever cinq millions d'euros. Son plus gros prospect, une banque, exige un rapport de pentest indépendant avant de signer. Elle a trois semaines.
+
+Son équipe fait des revues de code, mais une banque veut un test humain avec des preuves. Elle cadre le périmètre dans Cywise : l'API, le portail client, l'interface d'administration.
+
+Cinq jours plus tard, le rapport tombe. Deux vulnérabilités critiques — corrigées immédiatement. Elle transmet le rapport. Le contrat est signé. La banque exige même un pentest annuel. Amandine sait déjà à qui elle fera appel.", "Amandine has just raised five million euros. Her biggest prospect, a bank, demands an independent pentest report before signing. She has three weeks.
+
+Her team does code reviews, but a bank wants a human test with evidence. She scopes the perimeter in Cywise: the API, the customer portal, the administration interface.
+
+Five days later, the report comes out. Two critical vulnerabilities — fixed immediately. She sends the report. The contract is signed. The bank even demands an annual pentest. Amandine already knows who she will call."),
             ],
             'for-whom' => [
                 [$t('CTO startup / scale-up', 'Startup / Scale-up CTO'), $t('« Mon prospect banque/assurance exige un pentest indépendant. »', '"My bank/insurance prospect demands an independent pentest."'), $t('Un rapport reconnu, avec preuves, méthodologie et recommandations.', 'A recognized report, with evidence, methodology and recommendations.')],
@@ -221,9 +261,9 @@
                     <div>
                         <span class="ui:font-mono ui:text-sm ui:uppercase ui:tracking-widest ui:text-brand-500">{{ $t('L\'histoire', 'The story') }}</span>
                         <x-site.display class="ui:mt-4">{{ $useCase['story']['title'] }}</x-site.display>
-                        <p class="ui:mt-6 ui:text-lg ui:leading-relaxed ui:text-slate-600">
-                            {{ $useCase['story']['text'] }}
-                        </p>
+                        <div class="ui:mt-6 ui:text-lg ui:leading-relaxed ui:text-slate-600 ui:space-y-4">
+                            {!! nl2br(e($useCase['story']['text'])) !!}
+                        </div>
                     </div>
                     <div class="ui:relative">
                         <div class="ui:aspect-square ui:rounded-2xl ui:bg-slate-100 ui:flex ui:items-center ui:center ui:justify-center">
