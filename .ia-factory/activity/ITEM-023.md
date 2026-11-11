@@ -6,3 +6,17 @@
 - 2026-11-11T12:08Z | User | decision | provided | oui
 - 2026-11-11T12:09Z | Junie | I023-S01 | updated | pending → approved
 - 2026-11-11T12:09Z | Junie | I023 | updated | specifying → ready
+- 2026-11-11T12:09Z | Junie | git | commit | 3e59701: record approved specs on main
+- 2026-11-11T12:09Z | Junie | git | checkout | Create branch item/ITEM-023 from main
+- 2026-11-11T12:09Z | Junie | I023 | updated | ready → in_progress
+- 2026-11-11T12:09Z | Junie | I023-S01 | updated | approved → in_progress
+- 2026-11-11T12:11Z | Junie | I023-S01 | updated | in_progress → completed
+- 2026-11-11T12:11Z | Junie | git | commit | 1d48174: feat(ITEM-023-S01): Update server count to 2K+ on homepage
+- 2026-11-11T12:12Z | Junie | I023 | updated | in_progress → review
+- 2026-11-11T12:13Z | User | decision | provided | oui
+- 2026-11-11T12:14Z | Junie | I023 | updated | review → ready_to_merge
+- 2026-11-11T12:14Z | Junie | question | asked | Authorize merge of item/ITEM-023 into main?
+- 2026-11-11T12:14Z | User | decision | provided | Authorize merge into main
+- 2026-11-11T12:15Z | Junie | I023 | updated | ready_to_merge → done
+- 2026-11-11T12:15Z | Junie | git | commit | 48643aa: record approved merge on item/ITEM-023
+- 2026-11-11T12:15Z | Junie | git | merge | Merge branch item/ITEM-023 into main
