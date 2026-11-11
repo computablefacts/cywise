@@ -7,3 +7,16 @@
 - 2026-11-11T13:06Z | User | decision | provided | yes
 - 2026-11-11T13:06Z | Junie | I025-S01 | updated | pending → approved
 - 2026-11-11T13:06Z | Junie | I025 | updated | specifying → ready
+- 2026-11-11T13:07Z | Junie | git | commit | c0b9252: record approved Specs on main
+- 2026-11-11T13:07Z | Junie | git | checkout | Create branch item/ITEM-025 from main
+- 2026-11-11T13:07Z | Junie | I025 | updated | ready → in_progress
+- 2026-11-11T13:07Z | Junie | I025-S01 | updated | approved → in_progress
+- 2026-11-11T13:09Z | Junie | I025-S01 | updated | in_progress → completed
+- 2026-11-11T13:10Z | Junie | git | commit | eaa7668: feat(ITEM-025-S01): colorize 'trois étapes simples' in orange
+- 2026-11-11T13:10Z | Junie | I025 | updated | in_progress → review
+- 2026-11-11T13:11Z | Junie | I025 | updated | review → ready_to_merge
+- 2026-11-11T13:11Z | Junie | question | asked | Autorisez-vous la fusion de item/ITEM-025 dans main ?
+- 2026-11-11T13:13Z | User | decision | provided | Authorize merge into main
+- 2026-11-11T13:14Z | Junie | I025 | updated | ready_to_merge → done
+- 2026-11-11T13:14Z | Junie | git | commit | d26a3f1: record approved merge on item/ITEM-025
+- 2026-11-11T13:14Z | Junie | git | merge | Merge branch item/ITEM-025 into main
