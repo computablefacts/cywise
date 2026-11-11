@@ -21,6 +21,7 @@
 
     $audiences = [
         [$t('PME', 'SMBs'), $t('Sécurisez votre entreprise sans infrastructure complexe.', 'Secure your business without complex infrastructure.'), 'audiences.smbs', 'critical'],
+        ['Startups', $t('Bâtissez des fondations de sécurité solides pour accompagner votre forte croissance.', 'Build solid security foundations to support your strong growth.'), 'audiences.startups', 'brand'],
         [$t('Équipes IT', 'IT teams'), $t('Visualisez vos risques et sachez exactement quoi corriger en priorité.', 'Visualize your risks and know exactly what to fix first.'), 'audiences.it-teams', 'low'],
         [$t('RSSI', 'CISOs'), $t('Centralisez votre visibilité pour des décisions de sécurité éclairées.', 'Centralize your visibility for informed security decisions.'), 'audiences.cisos', 'info'],
         ['MSP', $t('Gérez la sécurité de vos clients depuis une interface unique.', 'Manage your customers’ security from a single interface.'), 'audiences.msps', 'ink'],

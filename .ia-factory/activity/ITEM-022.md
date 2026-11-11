@@ -51,3 +51,6 @@
 - 2026-11-11T13:01Z | User | decision | provided | Ajouter "Découvrir" sur les cartouches Audiences de la home
 - 2026-11-11T13:02Z | Junie | git | commit | 3b95e21: style(ITEM-022): Add Discover text to audience cards on homepage
 - 2026-11-11T13:03Z | Junie | I022 | updated | review → ready_to_merge
+- 2026-11-11T13:06Z | User | decision | provided | Manque Startup et couleurs incohérentes
+- 2026-11-11T13:07Z | Junie | git | commit | a5b6a43: fix(ITEM-022): Add missing Startup card on home and fix tones
+- 2026-11-11T13:08Z | Junie | I022 | updated | ready_to_merge → review
