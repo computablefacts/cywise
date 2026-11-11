@@ -73,7 +73,7 @@ Avec Cywise, elle voit son périmètre en temps réel. Elle peut enfin répondre
 It exposes customer data, without authentication, visible to anyone. Without Cywise, Marie would never have known this service existed.
 
 With Cywise, she sees her perimeter in real-time. She can finally answer the question her CISO asks her every month: \"What exactly are we exposing?\""),
-                'image' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
+                'image' => 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=800',
             ],
             'for-whom' => [
                 [$t('DSI d\'une PME en croissance', 'CIO of a growing SMB'), $t('« Chaque semaine, un nouveau service apparaît. Je n\'ai pas de cartographie à jour. »', '"Every week, a new service appears. I don\'t have an up-to-date mapping."'), $t('Un inventaire automatique et continu de tous les actifs exposés.', 'An automatic and continuous inventory of all exposed assets.')],
@@ -113,7 +113,7 @@ Elle force la réinitialisation, active l'authentification à deux facteurs, pro
 Sophie enters @agence-sophie.com in Cywise. Result: four employees compromised, including the accountant.
 
 She forces a reset, activates two-factor authentication, schedules a monthly check. The next time a database leaks somewhere in the world, she will know before the attackers."),
-                'image' => 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
+                'image' => 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=800',
             ],
             'for-whom' => [
                 [$t('Dirigeant de PME', 'SMB Leader'), $t('« Un compte piraté peut détruire la réputation de mon entreprise. »', '"A hacked account can destroy my company\'s reputation."'), $t('Une surveillance proactive des fuites de données pour son domaine.', 'Proactive monitoring of data leaks for their domain.')],
@@ -192,7 +192,7 @@ Cinq jours plus tard, le rapport tombe. Deux vulnérabilités critiques — corr
 Her team does code reviews, but a bank wants a human test with evidence. She scopes the perimeter in Cywise: the API, the customer portal, the administration interface.
 
 Five days later, the report comes out. Two critical vulnerabilities — fixed immediately. She sends the report. The contract is signed. The bank even demands an annual pentest. Amandine already knows who she will call."),
-                'image' => 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=800',
+                'image' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800',
             ],
             'for-whom' => [
                 [$t('CTO startup / scale-up', 'Startup / Scale-up CTO'), $t('« Mon prospect banque/assurance exige un pentest indépendant. »', '"My bank/insurance prospect demands an independent pentest."'), $t('Un rapport reconnu, avec preuves, méthodologie et recommandations.', 'A recognized report, with evidence, methodology and recommendations.')],
