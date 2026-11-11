@@ -222,7 +222,7 @@
                     };
                 @endphp
                 <x-site.edge-card :tone="$tone" :href="route($routePrefix . $route)" variant="flat">
-                    <span class="ui:text-[32px] ui:font-black ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-125%">{{ $name }}</span>
+                    <span class="ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $name }}</span>
                     <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
                     <span class="ui:text-[22px] ui:font-bold {{ $textColor }} ui:transition-transform ui:group-hover:translate-x-1">→</span>
                 </x-site.edge-card>

@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-022
-- Status: review
+- Status: ready_to_merge
 
 ## Description
 

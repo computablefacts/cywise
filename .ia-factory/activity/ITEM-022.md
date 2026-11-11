@@ -36,3 +36,6 @@
 - 2026-11-11T12:35Z | Junie | I022-S05 | updated | approved → completed
 - 2026-11-11T12:35Z | Junie | git | commit | def092b: feat(ITEM-022): Align use-cases cards structure with homepage solutions
 - 2026-11-11T12:36Z | Junie | I022 | updated | in_progress → review
+- 2026-11-11T12:40Z | User | decision | provided | Harmoniser la taille des titres des cartouches sur /for-whom
+- 2026-11-11T12:41Z | Junie | git | commit | 1c3c75b: feat(ITEM-022): Harmonize card title sizes across all redesigned pages
+- 2026-11-11T12:42Z | Junie | I022 | updated | review → ready_to_merge
