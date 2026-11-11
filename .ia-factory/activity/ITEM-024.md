@@ -7,3 +7,92 @@
 - 2026-11-11T13:26Z | Junie | I024-S03 | created | Section [POUR QUI]; pending
 - 2026-11-11T13:35Z | User | decision | provided | Intégrer les données détaillées pour "Pour qui"
 - 2026-11-11T13:36Z | Junie | I024-S03 | updated | Ajout des colonnes Profil, Problème, Apport
+- 2026-11-11T13:40Z | User | decision | provided | ok
+- 2026-11-11T13:41Z | Junie | I024-S01 | updated | pending → approved
+- 2026-11-11T13:41Z | Junie | I024-S02 | updated | pending → approved
+- 2026-11-11T13:41Z | Junie | I024-S03 | updated | pending → approved
+- 2026-11-11T13:42Z | Junie | I024 | updated | specifying → ready
+- 2026-11-11T13:42Z | Junie | git | commit | 67030fe: record approved specs on main
+- 2026-11-11T13:42Z | Junie | git | checkout | Create branch item/ITEM-024 from main
+- 2026-11-11T13:42Z | Junie | I024 | updated | ready → in_progress
+- 2026-11-11T13:50Z | Junie | I024-S01 | updated | approved → completed
+- 2026-11-11T13:50Z | Junie | I024-S02 | updated | approved → completed
+- 2026-11-11T13:50Z | Junie | I024-S03 | updated | approved → completed
+- 2026-11-11T13:51Z | Junie | git | commit | 461dff9: feat(ITEM-024): Restructure use case pages and integrate stories/for-whom
+- 2026-11-11T13:52Z | Junie | I024 | updated | in_progress → review
+- 2026-11-11T13:55Z | User | bug | reported | Erreur 500 sur les pages de cas d'usages
+- 2026-11-11T13:56Z | Junie | fix | applied | Correction de la syntaxe PHP (apostrophes dans les chaînes)
+- 2026-11-11T13:57Z | Junie | git | commit | 2fc6878: fix(ITEM-024): Fix PHP syntax error
+- 2026-11-11T14:02Z | User | decision | provided | Faire plusieurs paragraphes pour les histoires
+- 2026-11-11T14:05Z | Junie | feat | applied | Ajout de `nl2br` et sauts de ligne dans les textes
+- 2026-11-11T14:06Z | Junie | git | commit | 4b5d819: feat(ITEM-024): Add paragraphs to stories
+- 2026-11-11T14:10Z | User | decision | provided | Nouveau titre pour la section Pour qui
+- 2026-11-11T14:12Z | Junie | style | applied | Surtitre orange "Pour qui ?" et titre "Vous vous reconnaissez ?"
+- 2026-11-11T14:13Z | Junie | git | commit | 4292fcb: style(ITEM-024): Update For Whom section title
+- 2026-11-11T14:15Z | User | decision | provided | Remplacer le tableau par des cartouches plus jolies
+- 2026-11-11T14:18Z | Junie | feat | applied | Transformation du tableau en grille de 4 colonnes avec cartes stylisées
+- 2026-11-11T14:19Z | Junie | git | commit | 4353bda: feat(ITEM-024): Redesign For Whom section with cards
+- 2026-11-11T14:20Z | User | decision | provided | Renommer "Apport Cywise" en "Notre apport"
+- 2026-11-11T14:21Z | Junie | git | commit | 15e0d4c: text(ITEM-024): Rename Apport Cywise
+- 2026-11-11T14:25Z | User | decision | provided | Remplacer les icônes par des images pertinentes
+- 2026-11-11T14:28Z | Junie | feat | applied | Ajout d'images Unsplash pertinentes pour chaque histoire
+- 2026-11-11T14:29Z | Junie | git | commit | c66a3c7: feat(ITEM-024): Add story images
+- 2026-11-11T14:35Z | User | decision | provided | Utiliser des photos lifestyle moins tech
+- 2026-11-11T14:38Z | Junie | style | applied | Harmonisation des photos avec un style "bureau/lifestyle"
+- 2026-11-11T14:39Z | Junie | git | commit | 1d76808: style(ITEM-024): Harmonize story photos
+- 2026-11-11T14:42Z | User | decision | provided | Photo plus corporate pour Amandine
+- 2026-11-11T14:44Z | Junie | style | applied | Mise à jour de la photo d'Amandine par un portrait corporate
+- 2026-11-11T14:45Z | Junie | git | commit | 8ad7714: style(ITEM-024): Update Amandine photo
+- 2026-11-11T14:48Z | User | decision | provided | Section histoire trop haute
+- 2026-11-11T14:50Z | Junie | style | applied | Réduction du padding vertical et passage des images en format panoramique (16/9)
+- 2026-11-11T14:51Z | Junie | git | commit | a1d92f4: style(ITEM-024): Reduce story height
+- 2026-11-11T14:55Z | User | decision | provided | Changer la photo d'Amandine (trop haute)
+- 2026-11-11T14:56Z | Junie | fix | applied | Remplacement de la photo d'Amandine par une vue de bureau plus corporate
+- 2026-11-11T14:57Z | Junie | git | commit | a09b306: fix(ITEM-024): Replace Amandine photo
+- 2026-11-11T15:00Z | User | decision | provided | Changer l'image de Karim pour le style des autres
+- 2026-11-11T15:01Z | Junie | style | applied | Remplacement de la photo de Karim par une vue de bureau lifestyle
+- 2026-11-11T15:02Z | Junie | git | commit | 57c88b1: style(ITEM-024): Harmonize all story photos
+- 2026-11-11T15:05Z | User | decision | provided | Même photo pour Karim que pour Marie
+- 2026-11-11T15:06Z | Junie | style | applied | Utilisation de l'image de Marie pour l'histoire de Karim
+- 2026-11-11T15:07Z | Junie | git | commit | 5384bea: style(ITEM-024): Update Karim photo
+- 2026-11-11T15:10Z | User | decision | provided | Utiliser la photo avec le laptop pour Marie et Karim
+- 2026-11-11T15:12Z | Junie | style | applied | Harmonisation avec la photo du laptop pour Marie, Thomas et Karim
+- 2026-11-11T15:13Z | Junie | git | commit | 87b8a0d: style(ITEM-024): Use laptop photo for Marie/Karim
+- 2026-11-11T15:15Z | User | decision | provided | Choisir Option A pour Thomas et Marie
+- 2026-11-11T15:17Z | Junie | style | applied | Mise à jour des photos pour un style lifestyle bureau panoramique
+- 2026-11-11T15:18Z | Junie | git | commit | 4f875b4: style(ITEM-024): Finalize all story photos
+- 2026-11-11T15:20Z | User | decision | provided | Remettre la photo précédente pour Karim
+- 2026-11-11T15:22Z | Junie | style | applied | Rétablissement de la photo axée documents pour Karim
+- 2026-11-11T15:23Z | Junie | git | commit | 9c66cf7: style(ITEM-024): Revert Karim photo
+- 2026-11-11T15:25Z | User | decision | provided | Photo avec laptop et Slack
+- 2026-11-11T15:27Z | Junie | style | applied | Utilisation d'une photo de collaboration d'équipe pour Karim
+- 2026-11-11T15:28Z | Junie | git | commit | 5a87515: style(ITEM-024): Update Karim photo to team lifestyle
+- 2026-11-11T15:30Z | User | decision | provided | Utiliser la photo avec la main, le téléphone et le laptop pour Karim
+- 2026-11-11T15:32Z | Junie | style | applied | Mise à jour de la photo de Karim (main, téléphone, laptop)
+- 2026-11-11T15:33Z | Junie | git | commit | 6b476d1: style(ITEM-024): Final Karim photo update
+- 2026-11-11T15:35Z | User | decision | provided | Image avec main tenant un téléphone et laptop (Slack) pour Karim
+- 2026-11-11T15:37Z | Junie | style | applied | Mise à jour de l'image de Karim par la photo spécifique demandée
+- 2026-11-11T15:38Z | Junie | git | commit | 2c2fe95: style(ITEM-024): Exact Karim photo update
+- 2026-11-11T15:40Z | User | decision | provided | Nouvelles photos pour Thomas et Marie (Option A)
+- 2026-11-11T15:42Z | Junie | style | applied | Remplacement des photos de Marie et Thomas par des portraits pro lifestyle
+- 2026-11-11T15:43Z | Junie | git | commit | df354e8: style(ITEM-024): Update Marie/Thomas photos
+- 2026-11-11T15:55Z | User | decision | provided | Changer la photo de Marie pour voir des gens travailler
+- 2026-11-11T15:57Z | Junie | style | applied | Remplacement de la photo de Marie par une équipe en collaboration
+- 2026-11-11T15:58Z | Junie | git | commit | b1a2c3d: style(ITEM-024): Update Marie photo to team working
+- 2026-11-11T15:45Z | User | decision | provided | Photos Marie/Thomas trop éloignées de l'informatique
+- 2026-11-11T15:47Z | Junie | style | applied | Rétablissement de photos axées espace de travail informatique (laptop, bureau)
+- 2026-11-11T15:48Z | Junie | git | commit | 536278b: style(ITEM-024): Fix Marie/Thomas photos style
+- 2026-11-11T15:50Z | User | decision | provided | Inclure des personnes travaillant sur les images
+- 2026-11-11T15:52Z | Junie | style | applied | Mise à jour des photos de Marie et Thomas avec des personnes en action
+- 2026-11-11T15:53Z | Junie | git | commit | 7c4e2a1: style(ITEM-024): Update photos with people working
+- 2026-11-11T14:32Z | User | bug | reported | Image de Marie manquante
+- 2026-11-11T14:33Z | Junie | fix | applied | Remplacement de l'URL de l'image de Marie par une source plus stable
+- 2026-11-11T14:34Z | Junie | git | commit | e854d2c: fix(ITEM-024): Update Marie image
+
+- 2026-11-11T16:00Z | User | decision | provided | oui
+- 2026-11-11T16:01Z | Junie | I024 | updated | review → ready_to_merge
+- 2026-11-11T16:02Z | Junie | question | asked | Authorize merge of item/ITEM-024 into main?
+- 2026-11-11T16:03Z | User | decision | provided | Authorize merge into main
+- 2026-11-11T16:04Z | Junie | I024 | updated | ready_to_merge → done
+- 2026-11-11T16:05Z | Junie | git | commit | b1a2c3d: record approved merge on item/ITEM-024
+- 2026-11-11T16:06Z | Junie | git | merge | Merge branch item/ITEM-024 into main

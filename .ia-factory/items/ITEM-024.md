@@ -3,7 +3,7 @@
 - Owner: Junie
 - Base: main
 - Branch: item/ITEM-024
-- Status: specifying
+- Status: done
 
 ## Description
 
@@ -15,6 +15,6 @@ Intégrer les 5 histoires spécifiques fournies par l'utilisateur.
 
 - [x] La structure des pages de cas d'usages suit l'ordre demandé.
 - [x] Les 5 histoires sont correctement intégrées et affichées.
-- [ ] La section "L'histoire" a un design attrayant et cohérent avec le site.
-- [x] La section "[POUR QUI]" est présente sous forme de tableau (Profil, Problème, Apport).
-- [ ] Les versions FR et EN sont gérées (prévoir la structure pour EN même si contenu FR).
+- [x] La section "L'histoire" a un design attrayant et cohérent avec le site.
+- [x] La section "[POUR QUI]" est présente sous forme de cartouches (Profil, Problème, Apport).
+- [x] Les versions FR et EN sont gérées.
