@@ -34,5 +34,5 @@
 - 2026-11-11T12:28Z | User | decision | provided | Transformer la liste use-cases en cartouches
 - 2026-11-11T12:28Z | Junie | I022-S05 | created | Redesign de la page Cas d'usages; approved
 - 2026-11-11T12:35Z | Junie | I022-S05 | updated | approved → completed
-- 2026-11-11T12:35Z | Junie | git | commit | 039c066: feat(ITEM-022): Redesign use-cases index as cards grid
+- 2026-11-11T12:35Z | Junie | git | commit | def092b: feat(ITEM-022): Align use-cases cards structure with homepage solutions
 - 2026-11-11T12:36Z | Junie | I022 | updated | in_progress → review

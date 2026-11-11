@@ -33,4 +33,4 @@ Commit: 33cb058
 Status: completed
 Requirement: Transformer la liste des cas d'usages en grille de cartouches (variant="flat") sur la page /use-cases.
 Test: La page /use-cases utilise x-site.edge-card avec variant="flat" dans une grille 2 ou 3 colonnes, avec liens colorés.
-Commit: 039c066
+Commit: def092b

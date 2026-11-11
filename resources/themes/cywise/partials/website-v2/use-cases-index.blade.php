@@ -21,7 +21,7 @@
         <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ $t('Sélectionnez votre enjeu sécurité. Cywise vous guide avec un flux de travail clair et des actions concrètes.', 'Select your security challenge. Cywise guides you with a clear workflow and concrete actions.') }}</p>
     </section>
 
-    {{-- Grid of use case cards --}}
+    {{-- Grid of use case cards, same as home's solutions --}}
     <section class="{{ $wrap }} ui:pb-28">
         <div class="ui:grid ui:grid-cols-1 ui:gap-3 ui:md:grid-cols-2 ui:xl:grid-cols-3">
             @foreach($cases as [$tone, $title, $text, $route])
@@ -36,7 +36,8 @@
                     };
                 @endphp
                 <x-site.edge-card :tone="$tone" :href="route($routePrefix . $route)" variant="flat">
-                    <x-site.display as="span" size="sm" class="ui:text-2xl! ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</x-site.display>
+                    <span class="ui:font-mono ui:text-[13px] ui:uppercase ui:text-slate-500">{{ $t('Cas d’usage', 'Use case') }}</span>
+                    <span class="ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</span>
                     <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
                     <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase {{ $textColor }} ui:transition-transform ui:group-hover:translate-x-1">
                         {{ $t('Découvrir →', 'Explore →') }}
