@@ -57,3 +57,6 @@
 - 2026-11-11T13:11Z | User | decision | provided | Grille 3 colonnes sur la home (3 + 2)
 - 2026-11-11T13:12Z | Junie | git | commit | faa7d63: style(ITEM-022): Change Audiences grid to 3 columns on home
 - 2026-11-11T13:13Z | Junie | I022 | updated | review → ready_to_merge
+- 2026-11-11T13:15Z | User | decision | provided | Autorise le merge dans main
+- 2026-11-11T13:16Z | Junie | I022 | updated | ready_to_merge → done
+- 2026-11-11T13:16Z | Junie | git | merge | Merge branch item/ITEM-022 into main
