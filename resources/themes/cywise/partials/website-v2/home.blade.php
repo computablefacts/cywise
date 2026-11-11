@@ -89,7 +89,7 @@
     {{-- Problem: Diagnostiquer → Identifier → Accompagner --}}
     <section class="ui:border-0 ui:border-y ui:border-solid ui:border-line ui:bg-canvas">
         <div class="{{ $wrap }} ui:py-22">
-            <x-site.display class="ui:max-w-[980px]">{{ $t('Prenez le contrôle de votre sécurité en trois étapes simples.', 'Take control of your security in three simple steps.') }}</x-site.display>
+            <x-site.display class="ui:max-w-[980px]">{!! $t('Prenez le contrôle de votre sécurité en <span class="ui:text-brand-500">trois étapes simples.</span>', 'Take control of your security in <span class="ui:text-brand-500">three simple steps.</span>') !!}</x-site.display>
             <div class="ui:mt-12 ui:grid ui:gap-3 ui:md:grid-cols-3">
                 @foreach([
                     [$t('Diagnostiquer', 'Diagnose'), $t('Listez vos actifs exposés en quelques secondes.', 'List your exposed assets in seconds.')],
