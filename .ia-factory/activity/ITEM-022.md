@@ -1,0 +1,11 @@
+# ITEM-022 Activity
+
+- 2026-11-11T11:45Z | Junie | I022 | created | Redesign des cartouches de la homepage
+- 2026-11-11T11:45Z | Junie | I022 | updated | backlog → specifying
+- 2026-11-11T11:46Z | Junie | I022-S01 | created | Style des cartouches Solutions; pending
+- 2026-11-11T11:46Z | Junie | I022-S02 | created | Coloration du lien "Découvrir →"; pending
+- 2026-11-11T11:47Z | Junie | question | asked | Est-ce que les spécifications S01 et S02 vous conviennent pour le redesign des cartouches ?
+- 2026-11-11T11:51Z | User | decision | provided | go
+- 2026-11-11T11:51Z | Junie | I022-S01 | updated | pending → approved
+- 2026-11-11T11:51Z | Junie | I022-S02 | updated | pending → approved
+- 2026-11-11T11:52Z | Junie | I022 | updated | specifying → ready
