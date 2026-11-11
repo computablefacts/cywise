@@ -9,3 +9,54 @@
 - 2026-11-11T11:51Z | Junie | I022-S01 | updated | pending → approved
 - 2026-11-11T11:51Z | Junie | I022-S02 | updated | pending → approved
 - 2026-11-11T11:52Z | Junie | I022 | updated | specifying → ready
+- 2026-11-11T11:53Z | Junie | git | commit | 1fd47d38: Record approved specs for homepage cards redesign
+- 2026-11-11T11:53Z | Junie | git | checkout | Create branch item/ITEM-022 from main
+- 2026-11-11T11:53Z | Junie | I022 | updated | ready → in_progress
+- 2026-11-11T11:58Z | Junie | I022-S01 | updated | approved → completed
+- 2026-11-11T11:58Z | Junie | I022-S02 | updated | approved → completed
+- 2026-11-11T11:59Z | Junie | git | commit | b8854cb: feat(ITEM-022): Redesign homepage cards and unify styles
+- 2026-11-11T12:00Z | Junie | I022 | updated | in_progress → review
+- 2026-11-11T12:02Z | User | decision | provided | Etendre le redesign à la page /solutions
+- 2026-11-11T12:02Z | Junie | I022 | updated | review → in_progress
+- 2026-11-11T12:03Z | Junie | I022-S03 | created | Redesign de la page Solutions; approved
+- 2026-11-11T12:07Z | Junie | I022-S03 | updated | approved → completed
+- 2026-11-11T12:08Z | Junie | git | commit | 11c74b3: feat(ITEM-022): Apply redesign to solutions pages
+- 2026-11-11T12:09Z | Junie | I022 | updated | in_progress → review
+- 2026-11-11T12:12Z | User | decision | provided | Ajouter les liens colorés sur la page /for-whom
+- 2026-11-11T12:12Z | Junie | I022 | updated | review → in_progress
+- 2026-11-11T12:13Z | Junie | I022-S04 | created | Redesign de la page Audiences; approved
+- 2026-11-11T12:17Z | Junie | I022-S04 | updated | approved → completed
+- 2026-11-11T12:17Z | Junie | git | commit | 33cb058: feat(ITEM-022): Apply redesign to audiences index page
+- 2026-11-11T12:18Z | Junie | I022 | updated | in_progress → review
+- 2026-11-11T12:22Z | User | decision | provided | Les couleurs des liens ne correspondent pas au menu
+- 2026-11-11T12:22Z | Junie | I022 | updated | review → in_progress
+- 2026-11-11T12:25Z | Junie | git | commit | 082dc4f: fix(ITEM-022): Align all card link colors with navigation menu tones
+- 2026-11-11T12:28Z | User | decision | provided | Transformer la liste use-cases en cartouches
+- 2026-11-11T12:28Z | Junie | I022-S05 | created | Redesign de la page Cas d'usages; approved
+- 2026-11-11T12:35Z | Junie | I022-S05 | updated | approved → completed
+- 2026-11-11T12:35Z | Junie | git | commit | def092b: feat(ITEM-022): Align use-cases cards structure with homepage solutions
+- 2026-11-11T12:36Z | Junie | I022 | updated | in_progress → review
+- 2026-11-11T12:40Z | User | decision | provided | Harmoniser la taille des titres des cartouches sur /for-whom
+- 2026-11-11T12:41Z | Junie | git | commit | 1c3c75b: feat(ITEM-022): Harmonize card title sizes across all redesigned pages
+- 2026-11-11T12:42Z | Junie | I022 | updated | review → ready_to_merge
+- 2026-11-11T12:45Z | User | decision | provided | Modifier le titre de la page /use-cases
+- 2026-11-11T12:46Z | Junie | git | commit | 9631bef: style(ITEM-022): Update use-cases page title to orange Priority objective
+- 2026-11-11T12:47Z | Junie | I022 | updated | ready_to_merge → review
+- 2026-11-11T12:51Z | User | decision | provided | Mettre le ? en orange et remplacer flux de travail par processus
+- 2026-11-11T12:52Z | Junie | git | commit | ca72a0e: style(ITEM-022): Color question mark in orange and update description text
+- 2026-11-11T12:53Z | Junie | I022 | updated | review → ready_to_merge
+- 2026-11-11T12:56Z | User | decision | provided | Enlever "cas d'usage" en haut des cartouches
+- 2026-11-11T12:57Z | Junie | git | commit | 559ac65: style(ITEM-022): Remove Use Case label from use-cases cards
+- 2026-11-11T12:58Z | Junie | I022 | updated | ready_to_merge → review
+- 2026-11-11T13:01Z | User | decision | provided | Ajouter "Découvrir" sur les cartouches Audiences de la home
+- 2026-11-11T13:02Z | Junie | git | commit | 3b95e21: style(ITEM-022): Add Discover text to audience cards on homepage
+- 2026-11-11T13:03Z | Junie | I022 | updated | review → ready_to_merge
+- 2026-11-11T13:06Z | User | decision | provided | Manque Startup et couleurs incohérentes
+- 2026-11-11T13:07Z | Junie | git | commit | a5b6a43: fix(ITEM-022): Add missing Startup card on home and fix tones
+- 2026-11-11T13:08Z | Junie | I022 | updated | ready_to_merge → review
+- 2026-11-11T13:11Z | User | decision | provided | Grille 3 colonnes sur la home (3 + 2)
+- 2026-11-11T13:12Z | Junie | git | commit | faa7d63: style(ITEM-022): Change Audiences grid to 3 columns on home
+- 2026-11-11T13:13Z | Junie | I022 | updated | review → ready_to_merge
+- 2026-11-11T13:15Z | User | decision | provided | Autorise le merge dans main
+- 2026-11-11T13:16Z | Junie | I022 | updated | ready_to_merge → done
+- 2026-11-11T13:16Z | Junie | git | merge | Merge branch item/ITEM-022 into main

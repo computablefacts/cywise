@@ -27,13 +27,23 @@ name('website.en.solutions.index');
                 ['critical', 'Attack surface', 'Visualize your exposed domains, services and assets.', 'website.en.solutions.attack-surface'],
                 ['medium', 'Vulnerability management', 'Detect and prioritize your critical vulnerabilities.', 'website.en.solutions.vulnerability-management'],
                 ['low', 'Credential monitoring', 'Identify your compromised data on the web.', 'website.en.solutions.credential-monitoring'],
-                ['brand', 'CyberBuddy', 'Ask your AI assistant about your company’s security.', 'website.en.solutions.cyberbuddy'],
+                ['info', 'CyberBuddy', 'Ask your AI assistant about your company’s security.', 'website.en.solutions.cyberbuddy'],
                 ['ink', 'Pentest', 'Have your systems tested by our offensive security experts.', 'website.en.solutions.pentest'],
             ] as [$tone, $title, $text, $route])
-                <x-site.edge-card :tone="$tone" :href="route($route)">
+                @php
+                    $textColor = match ($tone) {
+                        'critical' => 'ui:text-critical',
+                        'medium' => 'ui:text-medium',
+                        'low' => 'ui:text-low',
+                        'info' => 'ui:text-info', // consistent with tone mapping
+                        'ink' => 'ui:text-ink',
+                        default => 'ui:text-brand-500',
+                    };
+                @endphp
+                <x-site.edge-card :tone="$tone" :href="route($route)" variant="flat">
                     <span class="ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</span>
                     <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
-                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase ui:group-hover:text-brand-700">Explore →</span>
+                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase {{ $textColor }} ui:transition-transform ui:group-hover:translate-x-1">Explore →</span>
                 </x-site.edge-card>
             @endforeach
         </div>
