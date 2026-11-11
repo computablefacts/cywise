@@ -42,3 +42,6 @@
 - 2026-11-11T12:45Z | User | decision | provided | Modifier le titre de la page /use-cases
 - 2026-11-11T12:46Z | Junie | git | commit | 9631bef: style(ITEM-022): Update use-cases page title to orange Priority objective
 - 2026-11-11T12:47Z | Junie | I022 | updated | ready_to_merge → review
+- 2026-11-11T12:51Z | User | decision | provided | Mettre le ? en orange et remplacer flux de travail par processus
+- 2026-11-11T12:52Z | Junie | git | commit | ca72a0e: style(ITEM-022): Color question mark in orange and update description text
+- 2026-11-11T12:53Z | Junie | I022 | updated | review → ready_to_merge

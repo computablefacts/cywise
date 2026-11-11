@@ -17,8 +17,10 @@
 
 <main>
     <section class="{{ $wrap }} ui:pb-16 ui:pt-16">
-        <x-site.display as="h1" size="xl"><span class="ui:text-brand-500">{{ $t('Objectif prioritaire', 'Priority objective') }}</span></x-site.display>
-        <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ $t('Sélectionnez votre enjeu sécurité. Cywise vous guide avec un flux de travail clair et des actions concrètes.', 'Select your security challenge. Cywise guides you with a clear workflow and concrete actions.') }}</p>
+        <x-site.display as="h1" size="xl">
+            {!! $t('Quel est votre <span class="ui:text-brand-500">objectif prioritaire ?</span>', 'What is your <span class="ui:text-brand-500">priority objective?</span>') !!}
+        </x-site.display>
+        <p class="ui:m-0 ui:mt-6 ui:max-w-[520px] ui:text-xl ui:leading-normal ui:text-slate-700">{{ $t('Sélectionnez votre enjeu sécurité. Cywise vous guide avec un processus clair et des actions concrètes.', 'Select your security challenge. Cywise guides you with a clear process and concrete actions.') }}</p>
     </section>
 
     {{-- Grid of use case cards, same as home's solutions --}}
