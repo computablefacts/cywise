@@ -54,3 +54,6 @@
 - 2026-11-11T13:06Z | User | decision | provided | Manque Startup et couleurs incohérentes
 - 2026-11-11T13:07Z | Junie | git | commit | a5b6a43: fix(ITEM-022): Add missing Startup card on home and fix tones
 - 2026-11-11T13:08Z | Junie | I022 | updated | ready_to_merge → review
+- 2026-11-11T13:11Z | User | decision | provided | Grille 3 colonnes sur la home (3 + 2)
+- 2026-11-11T13:12Z | Junie | git | commit | faa7d63: style(ITEM-022): Change Audiences grid to 3 columns on home
+- 2026-11-11T13:13Z | Junie | I022 | updated | review → ready_to_merge

@@ -210,7 +210,7 @@
     <section class="{{ $wrap }} ui:py-24">
         <x-site.display class="ui:max-w-[900px]">{{ $t('Conçu pour les équipes qui exigent de la clarté.', 'Built for teams that demand clarity.') }}</x-site.display>
         <p class="ui:m-0 ui:mt-5 ui:text-lg ui:text-slate-600">{{ $t('Choisissez le profil qui correspond à votre organisation pour découvrir votre expérience personnalisée.', 'Choose the profile that matches your organization to discover your personalized experience.') }}</p>
-        <div class="ui:mt-10 ui:grid ui:gap-3 ui:sm:grid-cols-2 ui:xl:grid-cols-4">
+        <div class="ui:mt-10 ui:grid ui:gap-3 ui:sm:grid-cols-2 ui:lg:grid-cols-3">
             @foreach($audiences as [$name, $text, $route, $tone])
                 @php
                     $textColor = match ($tone) {
