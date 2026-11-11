@@ -29,6 +29,16 @@
             'accent' => 'ui:bg-medium ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Trouvez vos failles avant', 'Find your flaws before'), $t('les attaquants.', 'attackers do.')],
             'lede' => $t('Détectez vos vulnérabilités et transformez-les en un plan d’action priorisé pour vos équipes.', 'Detect your vulnerabilities and turn them into a prioritized action plan for your teams.'),
+            'story' => [
+                'title' => $t('L\'histoire de Thomas', 'Thomas\'s story'),
+                'text' => $t('Le patron de Thomas reçoit un email : un client exige un rapport de sécurité sous 15 jours. Thomas est seul. Il n\'a pas d\'outil de scan. Il renseigne son nom de domaine dans Cywise. Trente secondes plus tard, il a une liste : un framework obsolète (critique), un certificat TLS expiré (élevé), des en-têtes de sécurité absents (moyen). Il sait par où commencer. Il corrige, il suit, il exporte. Quinze jours plus tard, il envoie son rapport au client. Le contrat est maintenu. Et Thomas a un outil qu\'il peut utiliser chaque mois.', 'Thomas\'s boss receives an email: a client demands a security report within 15 days. Thomas is alone. He has no scanning tool. He enters his domain name into Cywise. Thirty seconds later, he has a list: an obsolete framework (critical), an expired TLS certificate (high), missing security headers (medium). He knows where to start. He fixes, he tracks, he exports. Fifteen days later, he sends his report to the client. The contract is maintained. And Thomas has a tool he can use every month.'),
+            ],
+            'for-whom' => [
+                [$t('Responsable IT seul', 'IT Manager alone'), $t('« Mon patron me demande un rapport de sécurité. Je n\'ai pas d\'outil de scan. »', '"My boss asks me for a security report. I don\'t have a scanning tool."'), $t('Un scan en 30 secondes et une liste priorisée par criticité.', 'A scan in 30 seconds and a list prioritized by criticality.')],
+                [$t('RSSI en PME', 'CISO in SMB'), $t('« J’ai 200 serveurs. Je ne sais pas lesquels sont vraiment fragiles. »', '"I have 200 servers. I don\'t know which ones are really fragile."'), $t('Une détection continue avec attribution des corrections par responsable.', 'Continuous detection with assignment of fixes by owner.')],
+                [$t('CTO startup', 'Startup CTO'), $t('« Mon prospect exige un audit de sécurité avant de signer. »', '"My prospect demands a security audit before signing."'), $t('Un export propre, des preuves de correction, un suivi des progrès.', 'A clean export, proof of fixes, progress tracking.')],
+                [$t('Équipe DevOps', 'DevOps Team'), $t('« On déploie vite. Les failles de config passent inaperçues. »', '"We deploy fast. Configuration flaws go unnoticed."'), $t('Un scan automatique à chaque nouveau déploiement.', 'An automatic scan at each new deployment.')],
+            ],
             'panel' => $t('Vulnérabilités · acme.fr', 'Vulnerabilities · acme.fr'),
             'font' => $sans,
             'rows' => [
@@ -51,6 +61,16 @@
             'accent' => 'ui:bg-critical ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Maîtrisez votre', 'Master your'), $t('empreinte externe.', 'external footprint.')],
             'lede' => $t('Gardez le contrôle sur vos actifs publics et vos services exposés en temps réel.', 'Maintain control over your public assets and exposed services in real-time.'),
+            'story' => [
+                'title' => $t('L\'histoire de Marie', 'Marie\'s story'),
+                'text' => $t('Lundi matin, Marie ouvre Cywise. Une alerte rouge : staging.acme.fr:8080 vient d\'apparaître. C\'est un environnement de test que son développeur a oublié de fermer dimanche soir. Il expose des données clients, sans authentification, visible par n\'importe qui. Sans Cywise, Marie n\'aurait jamais su que ce service existait. Avec Cywise, elle voit son périmètre en temps réel. Elle peut enfin répondre à la question que son DSI lui pose chaque mois : « On expose quoi, exactement ? »', 'Monday morning, Marie opens Cywise. A red alert: staging.acme.fr:8080 has just appeared. It\'s a test environment that her developer forgot to close on Sunday evening. It exposes customer data, without authentication, visible to anyone. Without Cywise, Marie would never have known this service existed. With Cywise, she sees her perimeter in real-time. She can finally answer the question her CISO asks her every month: "What exactly are we exposing?"'),
+            ],
+            'for-whom' => [
+                [$t('DSI d\'une PME en croissance', 'CIO of a growing SMB'), $t('« Chaque semaine, un nouveau service apparaît. Je n\'ai pas de cartographie à jour. »', '"Every week, a new service appears. I don\'t have an up-to-date mapping."'), $t('Un inventaire automatique et continu de tous les actifs exposés.', 'An automatic and continuous inventory of all exposed assets.')],
+                [$t('RSSI solo', 'Solo CISO'), $t('« Je suis seul. Je ne peux pas surveiller 200 sous-domaines manuellement. »', '"I\'m alone. I can\'t monitor 200 subdomains manually."'), $t('Des alertes automatiques dès qu\'un nouveau service apparaît ou disparaît.', 'Automatic alerts as soon as a new service appears or disappears.')],
+                [$t('Responsable IT en ETI', 'IT Manager in a mid-sized company'), $t('« Après une fusion, j\'hérite d\'un SI que je ne connais pas. »', '"After a merger, I inherit an IT system I don\'t know."'), $t('Une découverte complète des actifs oubliés, obsolètes ou non gérés.', 'A complete discovery of forgotten, obsolete or unmanaged assets.')],
+                [$t('Consultant / MSP', 'Consultant / MSP'), $t('« Mes clients me demandent un état des lieux de leur exposition. »', '"My clients ask me for an inventory of their exposure."'), $t('Un rapport clair, visuel, compréhensible par un non-technicien.', 'A clear, visual report, understandable by a non-technical person.')],
+            ],
             'panel' => $t('Changements · acme.fr', 'Changes · acme.fr'),
             'font' => $mono,
             'rows' => [
@@ -72,6 +92,16 @@
             'accent' => 'ui:bg-low ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Protégez vos', 'Protect your'), $t('comptes compromis.', 'compromised accounts.')],
             'lede' => $t('Identifiez vos identifiants exposés et prévenez les risques de prise de contrôle de compte.', 'Identify your exposed credentials and prevent account takeover risks.'),
+            'story' => [
+                'title' => $t('L\'histoire de Sophie', 'Sophie\'s story'),
+                'text' => $t('Le compte Instagram du plus gros client de Sophie publie des messages injurieux. Il a été piraté. Son community manager utilisait le même mot de passe partout — un mot de passe qui a fuité dans une base de données compromise six mois plus tôt. Sophie renseigne @agence-sophie.com dans Cywise. Résultat : quatre collaborateurs compromis, dont le comptable. Elle force la réinitialisation, active l\'authentification à deux facteurs, programme une vérification mensuelle. La prochaine fois qu\'une base de données fuit quelque part dans le monde, elle le saura avant les attaquants.', 'Sophie\'s biggest client\'s Instagram account is publishing abusive messages. It has been hacked. Her community manager was using the same password everywhere — a password that leaked in a compromised database six months earlier. Sophie enters @agence-sophie.com in Cywise. Result: four employees compromised, including the accountant. She forces a reset, activates two-factor authentication, schedules a monthly check. The next time a database leaks somewhere in the world, she will know before the attackers.'),
+            ],
+            'for-whom' => [
+                [$t('Dirigeant de PME', 'SMB Leader'), $t('« Un compte piraté peut détruire la réputation de mon entreprise. »', '"A hacked account can destroy my company\'s reputation."'), $t('Une surveillance proactive des fuites de données pour son domaine.', 'Proactive monitoring of data leaks for their domain.')],
+                [$t('RSSI', 'CISO'), $t('« Mes collaborateurs réutilisent leurs mots de passe, je le sais. »', '"My employees reuse their passwords, I know it."'), $t('La détection des comptes compromis avec leur niveau d\'accès.', 'Detection of compromised accounts with their access level.')],
+                [$t('DRH / Direction', 'HR / Management'), $t('« Je suis responsable de la protection des données de mes équipes. »', '"I am responsible for protecting my teams\' data."'), $t('Un accompagnement des collaborateurs vers les actions de sécurisation.', 'Guidance for employees towards necessary security actions.')],
+                [$t('MSP', 'MSP'), $t('« Mes clients ne comprennent pas le risque des mots de passe faibles. »', '"My clients don\'t understand the risk of weak passwords."'), $t('Un rapport simple qui montre qui est exposé et quoi faire.', 'A simple report showing who is exposed and what to do.')],
+            ],
             'panel' => $t('Identifiants · acme.fr', 'Credentials · acme.fr'),
             'font' => $mono,
             'rows' => [
@@ -93,6 +123,16 @@
             'accent' => 'ui:bg-info ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Transformez votre sécurité en', 'Turn your security into'), $t('preuves.', 'evidence.')],
             'lede' => $t('Centralisez vos preuves, vos politiques et vos actions avant vos audits et revues de conformité.', 'Centralize your evidence, policies and actions before your audits and compliance reviews.'),
+            'story' => [
+                'title' => $t('L\'histoire de Karim', 'Karim\'s story'),
+                'text' => $t('Dans deux mois, un auditeur vient vérifier la conformité de Karim. Un contrat de deux millions d'euros en dépend. Karim a des documents éparpillés dans SharePoint, des tableurs Excel dans ses emails, des captures d'écran « au cas où ». Rien n'est centralisé. Il ouvre Cywise : trois contrôles manquants, douze actions en cours. Il assigne, il suit. Le jour de l'audit, au lieu de fouiller dans ses mails, il ouvre un tableau de bord unique. L'auditeur est satisfait, le contrat est signé. Et Karim ne referme pas le dossier : Cywise garde la trace de ses engagements pour le prochain audit.', 'In two months, an auditor is coming to check Karim\'s compliance. A two-million-euro contract depends on it. Karim has documents scattered in SharePoint, Excel spreadsheets in his emails, screenshots "just in case". Nothing is centralized. He opens Cywise: three missing controls, twelve actions in progress. He assigns, he tracks. On the day of the audit, instead of rummaging through his emails, he opens a single dashboard. The auditor is satisfied, the contract is signed. And Karim doesn\'t close the file: Cywise keeps track of his commitments for the next audit.'),
+            ],
+            'for-whom' => [
+                [$t('DSI avant une certification', 'CIO before certification'), $t('« L\'auditeur arrive dans deux mois. Mes preuves sont éparpillées. »', '"The auditor arrives in two months. My evidence is scattered."'), $t('Une centralisation des écarts, des actions et des documents de conformité.', 'Centralization of gaps, actions and compliance documents.')],
+                [$t('Responsable conformité', 'Compliance Manager'), $t('« Je passe mon temps à collecter des preuves dans les emails. »', '"I spend my time collecting evidence in emails."'), $t('Un tableau de bord unique avec l\'évolution de la posture dans le temps.', 'A single dashboard with the evolution of the posture over time.')],
+                [$t('RSSI en secteur régulé', 'CISO in regulated sector'), $t('« Chaque année, le régulateur demande plus de justificatifs. »', '"Each year, the regulator asks for more justifications."'), $t('Une traçabilité continue, pas juste une course avant l\'audit.', 'Continuous traceability, not just a rush before the audit.')],
+                [$t('MSP / Cabinet de conseil', 'MSP / Consulting firm'), $t('« Mes clients veulent un accompagnement jusqu’à la certification. »', '"My clients want support until certification."'), $t('Un pilotage stratégique que le client peut montrer à son COMEX.', 'Strategic steering that the client can show to their executive committee.')],
+            ],
             'panel' => $t('Audit · Acme', 'Audit · Acme'),
             'font' => $sans,
             'rows' => [
@@ -113,6 +153,16 @@
             'accent' => 'ui:bg-ink ui:text-white ui:px-[0.06em] ui:box-decoration-clone',
             'title' => [$t('Testez vos défenses avant que', 'Test your defenses before'), $t('l’attaque n’ait lieu.', 'the attack occurs.')],
             'lede' => $t('Faites évaluer vos applications et infrastructures critiques par nos experts en sécurité offensive.', 'Have your critical applications and infrastructures evaluated by our offensive security experts.'),
+            'story' => [
+                'title' => $t('L\'histoire d'Amandine', 'Amandine\'s story'),
+                'text' => $t('Amandine vient de lever cinq millions d'euros. Son plus gros prospect, une banque, exige un rapport de pentest indépendant avant de signer. Elle a trois semaines. Son équipe fait des revues de code, mais une banque veut un test humain avec des preuves. Elle cadre le périmètre dans Cywise : l'API, le portail client, l'interface d'administration. Cinq jours plus tard, le rapport tombe. Deux vulnérabilités critiques — corrigées immédiatement. Elle transmet le rapport. Le contrat est signé. La banque exige même un pentest annuel. Amandine sait déjà à qui elle fera appel.', 'Amandine has just raised five million euros. Her biggest prospect, a bank, demands an independent pentest report before signing. She has three weeks. Her team does code reviews, but a bank wants a human test with evidence. She scopes the perimeter in Cywise: the API, the customer portal, the administration interface. Five days later, the report comes out. Two critical vulnerabilities — fixed immediately. She sends the report. The contract is signed. The bank even demands an annual pentest. Amandine already knows who she will call.'),
+            ],
+            'for-whom' => [
+                [$t('CTO startup / scale-up', 'Startup / Scale-up CTO'), $t('« Mon prospect banque/assurance exige un pentest indépendant. »', '"My bank/insurance prospect demands an independent pentest."'), $t('Un rapport reconnu, avec preuves, méthodologie et recommandations.', 'A recognized report, with evidence, methodology and recommendations.')],
+                [$t('DSI grande entreprise', 'Large enterprise CIO'), $t('« Je fais des scans automatiques, mais j\'ai besoin d\'un regard humain. »', '"I do automatic scans, but I need a human eye."'), $t('Des simulations d’attaque par des experts offensifs sur les systèmes critiques.', 'Attack simulations by offensive experts on critical systems.')],
+                [$t('Responsable sécurité applicative', 'Application Security Manager'), $t('« Mon équipe développe vite. Je veux valider que nos correctifs tiennent. »', '"My team develops fast. I want to validate that our fixes hold."'), $t('Un test ciblé sur l’application avec validation post-correction.', 'A targeted test on the application with post-correction validation.')],
+                [$t('Porteur de projet sensible', 'Sensitive project owner'), $t('« Je lance un nouveau service. Je veux être sûr avant la mise en prod. »', '"I am launching a new service. I want to be sure before going live."'), $t('Un cadrage précis du périmètre et des objectifs de sécurité.', 'Precise scoping of the perimeter and security objectives.')],
+            ],
             'panel' => $t('Rapport de pentest · app.acme.fr', 'Pentest report · app.acme.fr'),
             'font' => $sans,
             'rows' => [
@@ -162,7 +212,30 @@
             </ul>
         </div>
     </section>
-
+ 
+    {{-- Story --}}
+    @if(isset($useCase['story']))
+        <section class="ui:border-0 ui:border-t ui:border-solid ui:border-line ui:bg-white">
+            <div class="{{ $wrap }} ui:py-24">
+                <div class="ui:grid ui:grid-cols-1 ui:gap-12 ui:lg:grid-cols-2 ui:items-center">
+                    <div>
+                        <span class="ui:font-mono ui:text-sm ui:uppercase ui:tracking-widest ui:text-brand-500">{{ $t('L\'histoire', 'The story') }}</span>
+                        <x-site.display class="ui:mt-4">{{ $useCase['story']['title'] }}</x-site.display>
+                        <p class="ui:mt-6 ui:text-lg ui:leading-relaxed ui:text-slate-600">
+                            {{ $useCase['story']['text'] }}
+                        </p>
+                    </div>
+                    <div class="ui:relative">
+                        <div class="ui:aspect-square ui:rounded-2xl ui:bg-slate-100 ui:flex ui:items-center ui:center ui:justify-center">
+                            {{-- Placeholder for a visual or illustration --}}
+                            <div class="ui:text-6xl">✍️</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    @endif
+ 
     {{-- What you get --}}
     <section class="ui:border-0 ui:border-y ui:border-solid ui:border-line ui:bg-canvas">
         <div class="{{ $wrap }} ui:py-22">
@@ -177,7 +250,36 @@
             </div>
         </div>
     </section>
-
+ 
+    {{-- For Whom --}}
+    @if(isset($useCase['for-whom']))
+        <section class="ui:bg-white">
+            <div class="{{ $wrap }} ui:py-24">
+                <x-site.display>{{ $t('Pour qui ?', 'For whom?') }}</x-site.display>
+                <div class="ui:mt-12 ui:overflow-x-auto">
+                    <table class="ui:w-full ui:border-collapse ui:text-left">
+                        <thead>
+                            <tr class="ui:border-0 ui:border-b ui:border-solid ui:border-line">
+                                <th class="ui:pb-4 ui:pr-6 ui:font-mono ui:text-xs ui:uppercase ui:tracking-wider ui:text-slate-500">{{ $t('Profil', 'Profile') }}</th>
+                                <th class="ui:pb-4 ui:pr-6 ui:font-mono ui:text-xs ui:uppercase ui:tracking-wider ui:text-slate-500">{{ $t('Son problème', 'Their problem') }}</th>
+                                <th class="ui:pb-4 ui:font-mono ui:text-xs ui:uppercase ui:tracking-wider ui:text-slate-500">{{ $t('Ce que Cywise apporte', 'What Cywise brings') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="ui:divide-y ui:divide-line">
+                            @foreach($useCase['for-whom'] as [$profile, $problem, $benefit])
+                                <tr>
+                                    <td class="ui:py-6 ui:pr-6 ui:align-top ui:font-bold ui:text-slate-900">{{ $profile }}</td>
+                                    <td class="ui:py-6 ui:pr-6 ui:align-top ui:italic ui:text-slate-600">{{ $problem }}</td>
+                                    <td class="ui:py-6 ui:align-top ui:text-slate-700">{{ $benefit }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    @endif
+ 
     @if($useCase['steps'])
         <x-site.steps :steps="$useCase['steps']">
             <x-slot:title>{!! $t('Voyez.<br>Priorisez.<br><span class="ui:text-brand-500">Agissez.</span>', 'See.<br>Prioritize.<br><span class="ui:text-brand-500">Act.</span>') !!}</x-slot:title>
