@@ -31,4 +31,8 @@
 - 2026-11-11T12:22Z | User | decision | provided | Les couleurs des liens ne correspondent pas au menu
 - 2026-11-11T12:22Z | Junie | I022 | updated | review → in_progress
 - 2026-11-11T12:25Z | Junie | git | commit | 082dc4f: fix(ITEM-022): Align all card link colors with navigation menu tones
-- 2026-11-11T12:26Z | Junie | I022 | updated | in_progress → review
+- 2026-11-11T12:28Z | User | decision | provided | Transformer la liste use-cases en cartouches
+- 2026-11-11T12:28Z | Junie | I022-S05 | created | Redesign de la page Cas d'usages; approved
+- 2026-11-11T12:35Z | Junie | I022-S05 | updated | approved → completed
+- 2026-11-11T12:35Z | Junie | git | commit | 039c066: feat(ITEM-022): Redesign use-cases index as cards grid
+- 2026-11-11T12:36Z | Junie | I022 | updated | in_progress → review

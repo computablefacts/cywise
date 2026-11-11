@@ -27,3 +27,10 @@ Status: completed
 Requirement: Utiliser le composant x-site.edge-card et ajouter le lien coloré "Découvrir →" sur la page /for-whom.
 Test: La page /for-whom utilise x-site.edge-card avec variant="flat" et affiche "Découvrir →" en couleur brand.
 Commit: 33cb058
+
+## ITEM-022-S05: Redesign de la page Cas d'usages
+
+Status: completed
+Requirement: Transformer la liste des cas d'usages en grille de cartouches (variant="flat") sur la page /use-cases.
+Test: La page /use-cases utilise x-site.edge-card avec variant="flat" dans une grille 2 ou 3 colonnes, avec liens colorés.
+Commit: 039c066
