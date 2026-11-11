@@ -30,10 +30,20 @@ name('website.solutions.index');
                 ['info', 'CyberBuddy', 'Interrogez votre assistant IA pour obtenir des conseils clairs et des plans d’action.', 'website.solutions.cyberbuddy'],
                 ['ink', 'Pentest expert', 'Faites évaluer vos systèmes critiques par nos experts en sécurité offensive.', 'website.solutions.pentest'],
             ] as [$tone, $title, $text, $route])
-                <x-site.edge-card :tone="$tone" :href="route($route)">
+                @php
+                    $textColor = match ($tone) {
+                        'critical' => 'ui:text-critical',
+                        'medium' => 'ui:text-medium',
+                        'low' => 'ui:text-low',
+                        'info' => 'ui:text-info',
+                        'ink' => 'ui:text-ink',
+                        default => 'ui:text-brand-500',
+                    };
+                @endphp
+                <x-site.edge-card :tone="$tone" :href="route($route)" variant="flat">
                     <span class="ui:text-2xl ui:font-extrabold ui:uppercase ui:leading-[1.05] ui:tracking-tight ui:font-stretch-112%">{{ $title }}</span>
                     <span class="ui:flex-1 ui:text-base ui:leading-normal ui:text-slate-600">{{ $text }}</span>
-                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase ui:group-hover:text-brand-700">Découvrir →</span>
+                    <span class="ui:mt-2 ui:text-sm ui:font-bold ui:uppercase {{ $textColor }} ui:transition-transform ui:group-hover:translate-x-1">Découvrir →</span>
                 </x-site.edge-card>
             @endforeach
         </div>
