@@ -7,7 +7,7 @@
 
     $stats = [
         ['24/7', $t('Surveillance', 'Monitoring'), 'ui:bg-ink ui:text-white', 'ui:text-slate-400'],
-        ['1K+', $t('Serveurs', 'Servers'), 'ui:bg-brand-500 ui:text-white', 'ui:text-brand-50'],
+        ['2K+', $t('Serveurs', 'Servers'), 'ui:bg-brand-500 ui:text-white', 'ui:text-brand-50'],
         ['170B+', $t('Identifiants', 'Credentials'), 'ui:bg-slate-100', 'ui:text-slate-600'],
     ];
 
