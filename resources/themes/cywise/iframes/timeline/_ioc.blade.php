@@ -43,11 +43,7 @@
       <x-phosphor-caret-down class="ui:size-4 ui:shrink-0 ui:text-slate-400 ui:transition-transform"
                              ::class="open && 'ui:rotate-180'"/>
     </button>
-    @if($first->dismissed)
-      <x-ui.icon-button icon="eye" :title="__('Unmask this event for this server.')" onclick="undismissEvent('{{ $first->id }}')"/>
-    @else
-      <x-ui.icon-button icon="eye-slash" :title="__('Hide events like this for this server in the timeline.')" onclick="dismissEvent('{{ $first->id }}')"/>
-    @endif
+    <x-ui.icon-button icon="eye-slash" :title="__('Hide events like this for this server in the timeline.')" onclick="dismissEvent('{{ $first->id }}')"/>
   </div>
 
   <div x-show="open" x-collapse x-cloak>

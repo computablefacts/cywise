@@ -22,7 +22,7 @@ render(function (Request $request) {
 
     $level = request('level');
     $filters = request()->only(['server_id', 'rule_name']);
-    $isFiltered = !empty(array_filter($filters)) || !empty($level) || request('show_dismissed');
+    $isFiltered = !empty(array_filter($filters)) || !empty($level);
 
     // KPI tiles double as level filters; clicking the active one clears it.
     $kpis = [
@@ -49,7 +49,7 @@ render(function (Request $request) {
 
     {{-- Filters --}}
     <form method="get" action="{{ route('events') }}"
-          class="ui:m-0 ui:grid ui:items-end ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-4 ui:shadow-xs ui:sm:grid-cols-2 ui:lg:grid-cols-[1fr_1fr_1fr_auto]">
+          class="ui:m-0 ui:grid ui:items-end ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-4 ui:shadow-xs ui:sm:grid-cols-2 ui:lg:grid-cols-[1fr_2fr_auto]">
       <x-ui.field :label="__('Server')" for="server_id">
         <x-ui.select id="server_id" name="server_id">
           <option value="">{{ __('All servers') }}</option>
@@ -68,11 +68,6 @@ render(function (Request $request) {
           @endforeach
         </x-ui.select>
       </x-ui.field>
-      <div class="ui:flex ui:items-center ui:h-full">
-        <x-ui.checkbox id="show_dismissed" name="show_dismissed" value="1" @checked(request('show_dismissed'))>
-          {{ __('Show hidden events') }}
-        </x-ui.checkbox>
-      </div>
       <div class="ui:flex ui:gap-2">
         <x-ui.button type="submit" icon="funnel">{{ __('Filter') }}</x-ui.button>
         @if($isFiltered)

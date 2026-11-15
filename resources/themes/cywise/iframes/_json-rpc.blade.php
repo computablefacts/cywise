@@ -115,10 +115,6 @@
     executeJsonRpcApiCall('events@dismiss', {event_id: eventId}, onSuccess);
   }
 
-  function undismissEventApiCall(eventId, onSuccess = onSuccessDefault) {
-    executeJsonRpcApiCall('events@undismiss', {event_id: eventId}, onSuccess);
-  }
-
   function createAssetApiCall(asset, monitor, onSuccess = onSuccessDefault) {
     executeJsonRpcApiCall('assets@create', {asset: asset, watch: monitor}, onSuccess);
   }

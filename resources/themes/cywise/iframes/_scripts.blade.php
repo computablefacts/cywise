@@ -240,8 +240,6 @@
 
   const dismissEvent = (eventId) => dismissEventApiCall(eventId, () => window.toaster.toastSuccess("{{ __('Hide events like this for this server in the timeline.') }}"));
 
-  const undismissEvent = (eventId) => undismissEventApiCall(eventId, () => window.toaster.toastSuccess("{{ __('The event has been unmasked!') }}"));
-
   /* VULNERABILITIES */
 
   const hideByUid = (uid) => toggleVulnerabilityVisibilityApiCall(uid, null, null);
@@ -424,7 +422,7 @@
 
   /* RULES DYNAMIC DISPLAY */
 
-  const rulesDetails = {!! json_encode($rules_details ?? []) !!};
+  const rulesDetails = @json($rules_details);
 
   const updateRuleDisplay = (ruleName) => {
 
