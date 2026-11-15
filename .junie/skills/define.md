@@ -1,3 +1,8 @@
+---
+title: Define
+description: Define requirements and acceptance criteria for a task.
+---
+
 # Skill: Define
 
 Define requirements and acceptance criteria for a task.

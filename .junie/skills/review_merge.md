@@ -1,3 +1,8 @@
+---
+title: Review and Merge
+description: Review completed tasks and merge branches after approval.
+---
+
 # Skill: Review and Merge
 
 Review completed tasks and merge branches after approval.

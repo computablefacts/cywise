@@ -1,3 +1,8 @@
+---
+title: Decompose
+description: Decompose complex tasks into sub-items.
+---
+
 # Skill: Decompose
 
 Decompose complex tasks into sub-items.

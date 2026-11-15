@@ -1,3 +1,8 @@
+---
+title: Develop
+description: Develop features and fix bugs.
+---
+
 # Skill: Develop
 
 Develop features and fix bugs.
