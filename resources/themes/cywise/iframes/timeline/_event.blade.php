@@ -6,5 +6,9 @@
     <span class="ui:truncate ui:text-xs ui:text-slate-500">{{ $event->server_name }} ({{ $event->server_ip_address }})</span>
   </span>
   <span class="ui:hidden ui:w-28 ui:shrink-0 ui:text-right ui:text-xs ui:text-slate-400 ui:md:block">{{ $date }} {{ $time }}</span>
-  <x-ui.icon-button icon="eye-slash" :title="__('Hide events like this for this server in the timeline.')" onclick="dismissEvent('{{ $event->id }}')"/>
+  @if($event->dismissed)
+    <x-ui.icon-button icon="eye" :title="__('Unmask this event for this server.')" onclick="undismissEvent('{{ $event->id }}')"/>
+  @else
+    <x-ui.icon-button icon="eye-slash" :title="__('Hide events like this for this server in the timeline.')" onclick="dismissEvent('{{ $event->id }}')"/>
+  @endif
 </li>

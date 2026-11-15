@@ -67,6 +67,7 @@ abstract class AbstractTimelineController extends Controller
             'tags' => ['nullable', 'string'], // comma-separated list
             'port_tags' => ['nullable', 'string'], // comma-separated list
             'rule_name' => ['nullable', 'string'],
+            'show_dismissed' => ['nullable', 'boolean'],
         ]);
 
         // Keep in sync with the default value of the window parameter expected by EventsProcedure::list
@@ -90,7 +91,7 @@ abstract class AbstractTimelineController extends Controller
                 $params['monitoring_type'] ?? null
             ),
             'conversations' => $this->conversations(),
-            'events' => $this->eventsAndIoCs($params['server_id'] ?? null, $params['level'] ?? null, $params['rule_name'] ?? null),
+            'events' => $this->eventsAndIoCs($params['server_id'] ?? null, $params['level'] ?? null, $params['rule_name'] ?? null, $params['show_dismissed'] ?? false),
             'leaks' => $this->leaks(
                 $params['asset_id'] ?? null,
                 $params['tld'] ?? null,
@@ -345,10 +346,10 @@ abstract class AbstractTimelineController extends Controller
         ];
     }
 
-    private function eventsAndIoCs(?int $serverId = null, ?string $level = null, ?string $ruleName = null): array
+    private function eventsAndIoCs(?int $serverId = null, ?string $level = null, ?string $ruleName = null, bool $showDismissed = false): array
     {
-        $events = $this->events($serverId, $ruleName);
-        $iocs = $this->iocs(1, $serverId, $level, $ruleName);
+        $events = $this->events($serverId, $ruleName, $showDismissed);
+        $iocs = $this->iocs(1, $serverId, $level, $ruleName, $showDismissed);
 
         if ($level === 'suspect' || $level === 'low' || $level === 'medium' || $level === 'high') {
             $items = $iocs['items'];
@@ -367,13 +368,14 @@ abstract class AbstractTimelineController extends Controller
         ];
     }
 
-    private function events(?int $serverId = null, ?string $ruleName = null): array
+    private function events(?int $serverId = null, ?string $ruleName = null, bool $showDismissed = false): array
     {
         $request = new JsonRpcRequest([
             'server_id' => $serverId,
             'min_score' => 0,
             'max_score' => 0,
             'rule_name' => $ruleName,
+            'show_dismissed' => $showDismissed,
         ]);
         $request->setUserResolver(fn() => Auth::user());
         $events = (new EventsProcedure())->list($request)['events'];
@@ -400,12 +402,13 @@ abstract class AbstractTimelineController extends Controller
         ];
     }
 
-    private function iocs(int $minScore = 1, ?int $serverId = null, ?string $level = null, ?string $ruleName = null): array
+    private function iocs(int $minScore = 1, ?int $serverId = null, ?string $level = null, ?string $ruleName = null, bool $showDismissed = false): array
     {
         $request = new JsonRpcRequest([
             'server_id' => $serverId,
             'min_score' => $minScore,
             'rule_name' => $ruleName,
+            'show_dismissed' => $showDismissed,
         ]);
         $request->setUserResolver(fn() => Auth::user());
         $events = (new EventsProcedure())->list($request)['events'];
