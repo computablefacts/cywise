@@ -9,28 +9,29 @@ Develop features and fix bugs.
 
 ## Process
 
-1. List all Items in `ready` status.
+1. List all Items in `ready` status: `gh issue list --label "ready"`.
 2. Exclude sub-items from this list.
 3. Ask the developer which `ready` Item to start.
-4. Set the status of the Item to `in-progress`.
+4. Set the status of the Item to `in-progress`: `gh issue edit <ID> --remove-label "ready" --add-label "in-progress"`.
 5. Create a branch: `git switch -c issue/<ID>`.
-6. Synchronize with GitHub: `gh issue view <ID>`.
+6. Synchronize with GitHub: `gh issue view <main-ID>`.
 7. Check all sub-items.
 8. Do not start implementation if any sub-item is `blocked`.
 9. For each sub-item:
-    a. Synchronize with GitHub: `gh issue view <ID>`.
+    a. Synchronize with GitHub: `gh issue view <sub-ID>`.
     b. Implement changes. If implementation requires clarification:
        i. Stop implementation.
-       ii. Set the sub-item status to `blocked`.
+       ii. Set the sub-item status to `blocked`: `gh issue edit <sub-ID> --remove-label "ready" --add-label "blocked"`.
        iii. Ask the user for clarification.
-       iv. Comment on the sub-item with an explanation of the issue and the user's decisions.
-       v. Set the sub-item status to `ready` again and resume implementation.
+       iv. Comment on the sub-item with an explanation of the issue and the user's decisions: `gh issue comment <sub-ID> --body "<explanation>"`.
+       v. Set the sub-item status to `ready` again: `gh issue edit <sub-ID> --remove-label "blocked" --add-label "ready"`.
+       vi. Resume implementation.
     c. Ensure the sub-item has passing unit tests.
     d. Commit changes for the sub-item.
-    e. Set the sub-item status to `review`.
+    e. Set the sub-item status to `review`: `gh issue edit <sub-ID> --remove-label "ready" --add-label "review"`.
 10. Implement and run parent item acceptance criteria when all sub-items are in `review`.
 11. Commit changes for the parent item once all tests pass.
-12. Move the parent item to `review`.
+12. Move the parent item to `review`: `gh issue edit <main-ID> --remove-label "in-progress" --add-label "review"`.
 
 ## Coding Rules
 
