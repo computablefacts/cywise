@@ -205,14 +205,12 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             'window.*' => 'date|required',
             'categories' => 'array|nullable',
             'categories.*' => 'string|required',
-            'show_dismissed' => 'boolean|nullable',
         ]);
 
         $minScore = $params['min_score'] ?? 0;
         $maxScore = $params['max_score'] ?? 100;
         $ruleName = $params['rule_name'] ?? null;
         $categories = $params['categories'] ?? null;
-        $showDismissed = $params['show_dismissed'] ?? false;
 
         if (isset($params['window'])) {
             $minDate = Carbon::parse($params['window'][0])->startOfDay();
@@ -242,8 +240,8 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
         // Load events
         $events = YnhOsquery::select([
-            'ynh_servers.name AS server_name',
-            'ynh_servers.ip_address AS server_ip_address',
+            DB::raw('ynh_servers.name AS server_name'),
+            DB::raw('ynh_servers.ip_address AS server_ip_address'),
             'ynh_osquery_rules.score',
             'ynh_osquery_rules.comments',
             'ynh_osquery_rules.category AS rule_category',
@@ -264,7 +262,7 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         if (isset($categories)) {
             $events = $events->whereIn('ynh_osquery_rules.category', $categories);
         }
-        if (!$showDismissed && $dismissed->filter(fn(object $item) => !is_null($item->ynh_server_id) && !is_null($item->ynh_osquery_rule_id))->isNotEmpty()) {
+        if ($dismissed->filter(fn(object $item) => !is_null($item->ynh_server_id) && !is_null($item->ynh_osquery_rule_id))->isNotEmpty()) {
             $tuples = $dismissed->map(fn(object $item) => "({$item->ynh_server_id}, {$item->ynh_osquery_rule_id})")->implode(',');
             $events = $events->whereRaw("(ynh_server_id, ynh_osquery_rule_id) NOT IN ({$tuples})");
         }
@@ -295,31 +293,6 @@ Below is a list of security events sorted from the most recent to the oldest. Th
 
         return [
             "msg" => "The event has been dismissed!",
-        ];
-    }
-
-    #[RpcMethod(
-        description: "Unmask an event.",
-        params: [
-            'event_id' => 'The event identifier.',
-        ],
-        result: [
-            "msg" => "A success message.",
-        ]
-    )]
-    public function undismiss(JsonRpcRequest $request): array
-    {
-        $params = $request->validate([
-            'event_id' => 'required|integer|exists:ynh_osquery,id',
-        ]);
-
-        /** @var YnhOsquery $event */
-        $event = YnhOsquery::findOrFail($params['event_id']);
-        $event->dismissed = false;
-        $event->save();
-
-        return [
-            "msg" => "The event has been unmasked!",
         ];
     }
 
