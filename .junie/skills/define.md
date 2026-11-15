@@ -1,0 +1,61 @@
+# Skill: Define
+
+Define requirements and acceptance criteria for a task.
+
+## Process
+
+1. Review the user's request.
+2. Create a main GitHub Issue (Item).
+3. Set the status to `specifying`.
+4. Follow the required structure for the Item:
+    - **Description**: Explain the goal and scope in detail.
+    - **Acceptance Criteria**: Use Gherkin scenarios to define testable conditions.
+5. Seek user validation.
+6. Update the Item based on user feedback.
+7. Set the status to `todo` once the user validates the Item.
+
+## Rules
+
+GitHub Issues are the sole source of truth.
+
+Apply ASD-STE100 Simplified Technical English writing principles to **all languages** and all human-facing text, including comments, reviews, replies, and commits:
+
+- Use the active voice.
+- Use 20 words or fewer per sentence.
+- Express one idea per sentence.
+- Prefer simple present, past, and future tenses.
+- Use simple, consistent terms. Avoid idioms, slang, and unnecessary jargon.
+- Keep paragraphs to six sentences or fewer.
+- Use as few words as possible without losing necessary information.
+- Avoid superlatives, praise, and unnecessary agreement.
+- State facts directly.
+
+For languages other than English, apply equivalent clarity rules.
+
+## Example
+
+```markdown
+## Description
+
+Implement email and password authentication to allow existing users to log in securely.
+
+## Acceptance Criteria
+
+Scenario: Successful login
+  Given a registered user with email "user@example.com" and password "password123"
+  When the user attempts to log in with these credentials
+  Then a session is created
+  And the user is redirected to the dashboard
+
+Scenario: Failed login
+  Given a registered user with email "user@example.com"
+  When the user attempts to log in with an incorrect password
+  Then the system displays an error message
+  And the user remains on the login page
+
+Scenario: Unregistered user
+  Given an unregistered user with email "stranger@example.com"
+  When the user attempts to log in
+  Then the system displays an error message
+  And the user remains on the login page
+```
