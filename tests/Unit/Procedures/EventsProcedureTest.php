@@ -9,11 +9,10 @@ uses(\Sajya\Server\Testing\ProceduralRequests::class);
 describe('events@list', function () {
 
     test('list can show dismissed events', function () {
-        $user = tenant1User();
         asTenant1User();
-        $server = YnhServer::factory()->create(['created_by' => $user->id]);
+        $server = YnhServer::factory()->create(['created_by' => tenant1User()->id]);
         $rule = YnhOsqueryRule::factory()->create([
-            'created_by' => $user->id, 
+            'created_by' => tenant1User()->id, 
             'enabled' => true, 
             'score' => 50,
             'name' => 'test_rule'
