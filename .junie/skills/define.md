@@ -19,24 +19,6 @@ Define requirements and acceptance criteria for a task.
 6. Update the Item based on user feedback: `gh issue edit <ID> --body-file <file>`.
 7. Set the status to `todo` once the user validates the Item: `gh issue edit <ID> --remove-label "specifying" --add-label "todo"`.
 
-## Rules
-
-GitHub Issues are the sole source of truth.
-
-Apply ASD-STE100 Simplified Technical English writing principles to **all languages** and all human-facing text, including comments, reviews, replies, and commits:
-
-- Use the active voice.
-- Use 20 words or fewer per sentence.
-- Express one idea per sentence.
-- Prefer simple present, past, and future tenses.
-- Use simple, consistent terms. Avoid idioms, slang, and unnecessary jargon.
-- Keep paragraphs to six sentences or fewer.
-- Use as few words as possible without losing necessary information.
-- Avoid superlatives, praise, and unnecessary agreement.
-- State facts directly.
-
-For languages other than English, apply equivalent clarity rules.
-
 ## Example
 
 ```markdown
