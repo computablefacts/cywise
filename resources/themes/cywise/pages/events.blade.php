@@ -21,8 +21,9 @@ render(function (Request $request) {
       ->values();
 
     $level = request('level');
-    $filters = request()->only(['server_id', 'rule_name']);
+    $filters = request()->only(['server_id', 'rule_name', 'include_dismissed']);
     $isFiltered = !empty(array_filter($filters)) || !empty($level);
+    $includeDismissed = (bool)request('include_dismissed');
 
     // KPI tiles double as level filters; clicking the active one clears it.
     $kpis = [
@@ -68,6 +69,10 @@ render(function (Request $request) {
           @endforeach
         </x-ui.select>
       </x-ui.field>
+      <div class="ui:flex ui:items-center ui:gap-2 ui:pb-1">
+        <x-ui.checkbox id="include_dismissed" name="include_dismissed" value="1" @checked($include_dismissed) onchange="this.form.submit()"/>
+        <x-ui.label for="include_dismissed" class="ui:text-sm ui:cursor-pointer">{{ __('Show hidden events') }}</x-ui.label>
+      </div>
       <div class="ui:flex ui:gap-2">
         <x-ui.button type="submit" icon="funnel">{{ __('Filter') }}</x-ui.button>
         @if($isFiltered)

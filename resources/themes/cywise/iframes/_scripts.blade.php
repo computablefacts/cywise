@@ -238,7 +238,18 @@
 
   /* EVENTS */
 
-  const dismissEvent = (eventId) => dismissEventApiCall(eventId, () => window.toaster.toastSuccess("{{ __('Hide events like this for this server in the timeline.') }}"));
+  const dismissEvent = (eventId) => dismissEventApiCall(eventId, () => {
+    const elEvent = document.querySelector(`#eid-${eventId}`);
+    if (elEvent && !document.getElementById('include_dismissed')?.checked) {
+      elEvent.remove();
+    }
+    window.toaster.toastSuccess("{{ __('The event has been hidden.') }}");
+  });
+
+  const undismissEvent = (eventId) => undismissEventApiCall(eventId, () => {
+    window.toaster.toastSuccess("{{ __('The event has been restored.') }}");
+    location.reload();
+  });
 
   /* VULNERABILITIES */
 
