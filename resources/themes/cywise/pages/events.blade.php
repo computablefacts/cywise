@@ -50,34 +50,40 @@ render(function (Request $request) {
 
     {{-- Filters --}}
     <form method="get" action="{{ route('events') }}"
-          class="ui:m-0 ui:grid ui:items-end ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-4 ui:shadow-xs ui:sm:grid-cols-2 ui:lg:grid-cols-[1fr_2fr_auto]">
-      <x-ui.field :label="__('Server')" for="server_id">
-        <x-ui.select id="server_id" name="server_id">
-          <option value="">{{ __('All servers') }}</option>
-          @foreach($servers_with_active_events as $server)
-            <option value="{{ $server->id }}" @selected((int)request('server_id') === $server->id)>{{ $server->name }} ({{ $server->nb_events ?? 0 }})</option>
-          @endforeach
-        </x-ui.select>
-      </x-ui.field>
-      <x-ui.field :label="__('Rule')" for="rule_name">
-        <x-ui.select id="rule_name" name="rule_name">
-          <option value="">{{ __('All rules') }}</option>
-          @foreach($rules as $rule)
-            @if(($rules_details[$rule->name]['nb_events'] ?? 0) > 0)
-              <option value="{{ $rule->name }}" @selected(request('rule_name') === $rule->name)>{{ $rule->displayName() }} ({{ $rules_details[$rule->name]['nb_events'] ?? 0 }})</option>
-            @endif
-          @endforeach
-        </x-ui.select>
-      </x-ui.field>
-      <div class="ui:flex ui:items-center ui:gap-2 ui:pb-1">
-        <x-ui.checkbox id="include_dismissed" name="include_dismissed" value="1" @checked($include_dismissed) onchange="this.form.submit()"/>
-        <x-ui.label for="include_dismissed" class="ui:text-sm ui:cursor-pointer">{{ __('Show hidden events') }}</x-ui.label>
+          class="ui:m-0 ui:flex ui:flex-col ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-4 ui:shadow-xs">
+      <div class="ui:grid ui:items-end ui:gap-3 ui:lg:grid-cols-[1fr_2fr_auto]">
+        <x-ui.field :label="__('Server')" for="server_id">
+          <x-ui.select id="server_id" name="server_id">
+            <option value="">{{ __('All servers') }}</option>
+            @foreach($servers_with_active_events as $server)
+              <option value="{{ $server->id }}" @selected((int)request('server_id') === $server->id)>{{ $server->name }} ({{ $server->nb_events ?? 0 }})</option>
+            @endforeach
+          </x-ui.select>
+        </x-ui.field>
+        <x-ui.field :label="__('Rule')" for="rule_name">
+          <x-ui.select id="rule_name" name="rule_name">
+            <option value="">{{ __('All rules') }}</option>
+            @foreach($rules as $rule)
+              @if(($rules_details[$rule->name]['nb_events'] ?? 0) > 0)
+                <option value="{{ $rule->name }}" @selected(request('rule_name') === $rule->name)>{{ $rule->displayName() }} ({{ $rules_details[$rule->name]['nb_events'] ?? 0 }})</option>
+              @endif
+            @endforeach
+          </x-ui.select>
+        </x-ui.field>
+        <div class="ui:flex ui:gap-2">
+          <x-ui.button type="submit" icon="funnel">{{ __('Filter') }}</x-ui.button>
+          @if($isFiltered)
+            <x-ui.button variant="ghost" :href="route('events')">{{ __('Reset') }}</x-ui.button>
+          @endif
+        </div>
       </div>
-      <div class="ui:flex ui:gap-2">
-        <x-ui.button type="submit" icon="funnel">{{ __('Filter') }}</x-ui.button>
-        @if($isFiltered)
-          <x-ui.button variant="ghost" :href="route('events')">{{ __('Reset') }}</x-ui.button>
-        @endif
+      <div class="ui:grid ui:lg:grid-cols-[1fr_2fr_auto] ui:gap-3">
+        <div class="ui:hidden ui:lg:block"></div>
+        <div class="ui:flex ui:items-center ui:gap-2">
+          <x-elements.checkbox id="include_dismissed" name="include_dismissed" value="1" @checked($include_dismissed) onchange="this.form.submit()">
+            {{ __('Show hidden events') }}
+          </x-elements.checkbox>
+        </div>
       </div>
       @if($level)
         <input type="hidden" name="level" value="{{ $level }}">
