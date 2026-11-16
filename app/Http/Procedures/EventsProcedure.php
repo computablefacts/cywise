@@ -80,13 +80,16 @@ class EventsProcedure extends Procedure
             "server_name" => "An optional server name to filter events by. (string|nullable|min:0|max:191|exists:ynh_servers,name)",
             "ip_address" => "An optional server IP address to filter events by. (string|nullable|min:4|max:15|exists:ynh_servers,ip_address)",
             "window" => "An optional window of time [min_date, max_date] to filter events by.",
-            "categories" => "An optional list of categories to filter events by."
+            "categories" => "An optional list of categories to filter events by.",
+            "include_dismissed" => "An optional flag to include dismissed events in the list. (boolean|nullable)",
+            "only_dismissed" => "An optional flag to return only dismissed events. (boolean|nullable)"
         ],
         result: [
             "events" => "The list of events over the last 3 days.",
         ],
         ai_examples: [
             "if the request is 'List recent security events', the input should be {\"min_score\":0}",
+            "if the request is 'Show dismissed events', the input should be {\"min_score\":0,\"only_dismissed\":true}",
             "if the request is 'What is the available disk space on 192.168.0.40?', the input should be {\"min_score\":0,\"ip_address\":\"192.168.0.40\"}",
             "If the request is 'List recent security events excluding indicators of compromise (IoCs)', the input should be {\"max_score\":0}",
             "if the request is 'Show IoCs for server 192.168.0.38', the input should be {\"min_score\":1,\"ip_address\":\"192.168.0.38\"}",
@@ -205,12 +208,16 @@ Below is a list of security events sorted from the most recent to the oldest. Th
             'window.*' => 'date|required',
             'categories' => 'array|nullable',
             'categories.*' => 'string|required',
+            'include_dismissed' => 'boolean|nullable',
+            'only_dismissed' => 'boolean|nullable',
         ]);
 
         $minScore = $params['min_score'] ?? 0;
         $maxScore = $params['max_score'] ?? 100;
         $ruleName = $params['rule_name'] ?? null;
         $categories = $params['categories'] ?? null;
+        $includeDismissed = $params['include_dismissed'] ?? false;
+        $onlyDismissed = $params['only_dismissed'] ?? false;
 
         if (isset($params['window'])) {
             $minDate = Carbon::parse($params['window'][0])->startOfDay();
@@ -262,12 +269,52 @@ Below is a list of security events sorted from the most recent to the oldest. Th
         if (isset($categories)) {
             $events = $events->whereIn('ynh_osquery_rules.category', $categories);
         }
-        if ($dismissed->filter(fn(object $item) => !is_null($item->ynh_server_id) && !is_null($item->ynh_osquery_rule_id))->isNotEmpty()) {
-            $tuples = $dismissed->map(fn(object $item) => "({$item->ynh_server_id}, {$item->ynh_osquery_rule_id})")->implode(',');
-            $events = $events->whereRaw("(ynh_server_id, ynh_osquery_rule_id) NOT IN ({$tuples})");
+        if ($onlyDismissed) {
+            $events = $events->where('ynh_osquery.dismissed', true);
+        } else if (!$includeDismissed) {
+
+            // Load dismissed markers (server_id, rule_id)
+            $dismissed = YnhOsquery::select(['ynh_server_id', 'ynh_osquery_rule_id'])
+                ->where('dismissed', true)
+                ->whereIn('ynh_server_id', $servers->pluck('id'))
+                ->distinct()
+                ->get();
+
+            if ($dismissed->filter(fn(object $item) => !is_null($item->ynh_server_id) && !is_null($item->ynh_osquery_rule_id))->isNotEmpty()) {
+                $tuples = $dismissed->map(fn(object $item) => "({$item->ynh_server_id}, {$item->ynh_osquery_rule_id})")->implode(',');
+                $events = $events->whereRaw("(ynh_osquery.ynh_server_id, ynh_osquery.ynh_osquery_rule_id) NOT IN ({$tuples})");
+            }
+
+            // Also exclude individually dismissed events that might not be part of the (server, rule) tuple list 
+            $events = $events->where('ynh_osquery.dismissed', false);
         }
         return [
             'events' => $events->orderBy('calendar_time', 'desc')->get(),
+        ];
+    }
+
+    #[RpcMethod(
+        description: "Undismiss an event (re-enable).",
+        params: [
+            'event_id' => 'The event identifier.',
+        ],
+        result: [
+            "msg" => "A success message.",
+        ]
+    )]
+    public function undismiss(JsonRpcRequest $request): array
+    {
+        $params = $request->validate([
+            'event_id' => 'required|integer|exists:ynh_osquery,id',
+        ]);
+
+        /** @var YnhOsquery $event */
+        $event = YnhOsquery::findOrFail($params['event_id']);
+        $event->dismissed = false;
+        $event->save();
+
+        return [
+            "msg" => "The event has been undismissed!",
         ];
     }
 
