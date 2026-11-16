@@ -50,7 +50,7 @@ render(function (Request $request) {
 
     {{-- Filters --}}
     <form method="get" action="{{ route('events') }}"
-          class="ui:m-0 ui:grid ui:items-start ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-4 ui:shadow-xs ui:sm:grid-cols-2 ui:lg:grid-cols-[1fr_2fr_auto]">
+          class="ui:m-0 ui:grid ui:items-end ui:gap-3 ui:rounded-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:p-4 ui:shadow-xs ui:sm:grid-cols-2 ui:lg:grid-cols-[1fr_2fr_auto]">
       <x-ui.field :label="__('Server')" for="server_id">
         <x-ui.select id="server_id" name="server_id">
           <option value="">{{ __('All servers') }}</option>
@@ -68,17 +68,19 @@ render(function (Request $request) {
             @endif
           @endforeach
         </x-ui.select>
-        <div class="ui:flex ui:items-center ui:gap-2 ui:mt-1.5">
-          <input type="checkbox" id="include_dismissed" name="include_dismissed" value="1" @checked($includeDismissed) onchange="this.form.submit()" class="ui:rounded ui:border-slate-300 ui:text-brand-600 ui:focus:ring-brand-500">
-          <label for="include_dismissed" class="ui:text-sm ui:cursor-pointer ui:text-slate-600">{{ __('Show hidden events') }}</label>
-        </div>
       </x-ui.field>
-      <div class="ui:flex ui:gap-2 ui:pt-5.5">
+      <div class="ui:flex ui:gap-2">
         <x-ui.button type="submit" icon="funnel">{{ __('Filter') }}</x-ui.button>
         @if($isFiltered)
           <x-ui.button variant="ghost" :href="route('events')">{{ __('Reset') }}</x-ui.button>
         @endif
       </div>
+      <div></div>
+      <div class="ui:flex ui:items-center ui:gap-2">
+        <input type="checkbox" id="include_dismissed" name="include_dismissed" value="1" @checked($includeDismissed) onchange="this.form.submit()" class="ui:rounded ui:border-slate-300 ui:text-brand-600 ui:focus:ring-brand-500">
+        <label for="include_dismissed" class="ui:text-sm ui:cursor-pointer ui:text-slate-600">{{ __('Show hidden events') }}</label>
+      </div>
+      <div></div>
       @if($level)
         <input type="hidden" name="level" value="{{ $level }}">
       @endif
