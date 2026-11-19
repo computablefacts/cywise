@@ -25,6 +25,9 @@ export default {
 
     theme: {
         extend: {
+            transitionDuration: {
+                '5000': '5000ms',
+            },
             animation: {
                 'marquee': 'marquee 25s linear infinite',
             },
