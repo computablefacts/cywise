@@ -56,6 +56,8 @@
   --color-canvas: #f8fafc;
   --color-surface: #ffffff;
   --color-line: #e2e8f0;
+
+  --transition-duration-5000: 5000ms;
 }
 
 /* Alpine: hide until initialized */

@@ -97,7 +97,14 @@ render(function (Request $request) {
         │                      │              │  < lg: bottom sheet
         └──────────────────────┴──────────────┘
     --}}
-    <div x-data="{ selected: null, tab: '{{ $tab }}' }" @keydown.escape.window="selected = null"
+    <div x-data="{ selected: null, tab: '{{ $tab }}', highlight: false }" 
+         x-init="$watch('selected', value => { 
+           if (value) { 
+             highlight = true; 
+             setTimeout(() => highlight = false, 50);
+           } 
+         })"
+         @keydown.escape.window="selected = null"
          class="ui:grid ui:items-start ui:gap-6 ui:lg:grid-cols-[minmax(0,1fr)_22rem]">
       <x-ui.card id="inventory-list" flush>
 
@@ -153,8 +160,12 @@ render(function (Request $request) {
         </div>
       </x-ui.card>
 
-      <aside :class="selected ? 'ui:flex' : 'ui:hidden ui:lg:flex'"
-             class="ui:fixed ui:inset-x-0 ui:bottom-0 ui:z-40 ui:max-h-[70vh] ui:flex-col ui:overflow-y-auto ui:rounded-t-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:shadow-lg ui:lg:sticky ui:lg:top-20 ui:lg:inset-auto ui:lg:z-auto ui:lg:max-h-[calc(100vh-6rem)] ui:lg:rounded-xl ui:lg:shadow-xs">
+      <aside :class="{
+               'ui:flex ui:border-brand-500! ui:shadow-[0_0_25px_rgba(249,115,22,0.6)]!': selected && highlight,
+               'ui:flex ui:duration-5000': selected && !highlight,
+               'ui:hidden ui:lg:flex': !selected
+             }"
+             class="ui:fixed ui:inset-x-0 ui:bottom-0 ui:z-40 ui:max-h-[70vh] ui:flex-col ui:overflow-y-auto ui:rounded-t-xl ui:border ui:border-solid ui:border-line ui:bg-surface ui:shadow-lg ui:transition-all ui:lg:sticky ui:lg:top-20 ui:lg:inset-auto ui:lg:z-auto ui:lg:max-h-[calc(100vh-6rem)] ui:lg:rounded-xl ui:lg:shadow-xs">
         <div id="asset-panel" class="ui:contents"></div>
         <p x-show="!selected" class="ui:m-0 ui:p-5 ui:text-sm ui:text-slate-500">
           {{ __('Select an asset to see its details.') }}
