@@ -238,13 +238,29 @@ class Asset extends Model
         }
         return Cache::remember($key, now()->addDays(7), function () use ($dateKey) {
             Cache::put($dateKey, now()->timestamp, now()->addDays(7));
-            $records = @dns_get_record($this->asset, DNS_A + DNS_AAAA);
-            return !$records ? [] : collect($records)
-                ->map(fn(array $record) => $record['ip'] ?? $record['ipv6'] ?? null)
-                ->filter()
-                ->unique()
-                ->values()
-                ->toArray();
+            return $this->resolveIpAddresses($this->asset);
         });
+    }
+
+    private function resolveIpAddresses(string $domain, int $depth = 0): array
+    {
+        if ($depth > 10) {
+            return [];
+        }
+        $records = collect(@dns_get_record($domain, DNS_A + DNS_AAAA + DNS_CNAME));
+        $ips = $records->map(fn(array $record) => $record['ip'] ?? $record['ipv6'] ?? null)
+            ->filter()
+            ->toArray();
+        $cnames = $records->where('type', 'CNAME')
+            ->map(fn(array $record) => $record['target'] ?? null)
+            ->filter()
+            ->toArray();
+        foreach ($cnames as $cname) {
+            $ips = array_merge($ips, $this->resolveIpAddresses($cname, $depth + 1));
+        }
+        return collect($ips)
+            ->unique()
+            ->values()
+            ->toArray();
     }
 }
