@@ -21,3 +21,11 @@ test('isIpAddressMissing follows CNAME records', function () {
     ]);
     expect($asset->isIpAddressMissing(true))->toBeFalse();
 });
+
+test('isIpAddressMissing handles DNS resolution errors gracefully', function () {
+    $asset = new Asset();
+    $asset->type = AssetTypesEnum::DNS;
+    $asset->asset = 'invalid-domain-that-should-fail-dns.test';
+
+    expect($asset->isIpAddressMissing(true))->toBeTrue();
+});
