@@ -247,7 +247,12 @@ class Asset extends Model
         if ($depth > 10) {
             return [];
         }
-        $records = dns_get_record($domain, DNS_A + DNS_AAAA + DNS_CNAME);
+        try {
+            $records = dns_get_record($domain, DNS_A + DNS_AAAA + DNS_CNAME);
+        } catch (\Throwable $e) {
+            \Log::warning("DNS resolution failed for {$domain}: {$e->getMessage()}");
+            return [];
+        }
         if ($records === false) {
             return [];
         }
