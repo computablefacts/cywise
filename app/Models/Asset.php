@@ -247,7 +247,11 @@ class Asset extends Model
         if ($depth > 10) {
             return [];
         }
-        $records = collect(@dns_get_record($domain, DNS_A + DNS_AAAA + DNS_CNAME));
+        $records = dns_get_record($domain, DNS_A + DNS_AAAA + DNS_CNAME);
+        if ($records === false) {
+            return [];
+        }
+        $records = collect($records);
         $ips = $records->map(fn(array $record) => $record['ip'] ?? $record['ipv6'] ?? null)
             ->filter()
             ->toArray();
