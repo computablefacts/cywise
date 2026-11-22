@@ -226,6 +226,19 @@ class Asset extends Model
             return [$this->asset];
         }
 
+        if ($this->isDns()) {
+            $scanIp = DB::table('am_ports')
+                ->join('am_scans', 'am_scans.id', '=', 'am_ports.scan_id')
+                ->where('am_scans.asset_id', $this->id)
+                ->whereNotNull('am_scans.ports_scan_ends_at')
+                ->orderByDesc('am_scans.ports_scan_ends_at')
+                ->value('am_ports.ip');
+
+            if ($scanIp) {
+                return [$scanIp];
+            }
+        }
+
         $key = "ip_address:{$this->id}";
         $dateKey = "ip_address_date:{$this->id}";
 
