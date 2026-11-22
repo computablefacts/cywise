@@ -29,3 +29,50 @@ test('isIpAddressMissing handles DNS resolution errors gracefully', function () 
 
     expect($asset->isIpAddressMissing(true))->toBeTrue();
 });
+
+test('resolveIpAddresses handles dns failure', function () {
+    $asset = Asset::factory()->make([
+        'asset' => 'non-existent-domain-123456789.com',
+        'type' => AssetTypesEnum::DNS,
+    ]);
+
+    $method = new ReflectionMethod(Asset::class, 'resolveIpAddresses');
+    $method->setAccessible(true);
+
+    $result = $method->invoke($asset, 'non-existent-domain-123456789.com');
+
+    expect($result)->toBeArray()->toBeEmpty();
+});
+
+test('resolveIpAddresses returns ips if present', function () {
+    $asset = Asset::factory()->make([
+        'asset' => 'google.com',
+        'type' => AssetTypesEnum::DNS,
+    ]);
+
+    $method = new ReflectionMethod(Asset::class, 'resolveIpAddresses');
+    $method->setAccessible(true);
+
+    $result = $method->invoke($asset, 'google.com');
+
+    expect($result)->toBeArray()->not->toBeEmpty();
+    foreach ($result as $ip) {
+        expect(filter_var($ip, FILTER_VALIDATE_IP))->not->toBeFalse();
+    }
+});
+
+test('resolveIpAddresses follows cname if no ips', function () {
+    $domain = 'www.github.com';
+
+    $asset = Asset::factory()->make([
+        'asset' => $domain,
+        'type' => AssetTypesEnum::DNS,
+    ]);
+
+    $method = new ReflectionMethod(Asset::class, 'resolveIpAddresses');
+    $method->setAccessible(true);
+
+    $result = $method->invoke($asset, $domain);
+
+    expect($result)->toBeArray()->not->toBeEmpty();
+});
