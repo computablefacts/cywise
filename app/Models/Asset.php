@@ -247,14 +247,12 @@ class Asset extends Model
         if ($depth > 10) {
             return [];
         }
-
         try {
             $records = dns_get_record($domain, DNS_A + DNS_AAAA);
         } catch (\Throwable $e) {
             \Log::warning("DNS IP resolution failed for {$domain}: {$e->getMessage()}");
             return [];
         }
-
         if ($records !== false && !empty($records)) {
             $ips = collect($records)
                 ->map(fn(array $record) => $record['ip'] ?? $record['ipv6'] ?? null)
@@ -262,34 +260,28 @@ class Asset extends Model
                 ->unique()
                 ->values()
                 ->toArray();
-
             if (!empty($ips)) {
                 return $ips;
             }
         }
-
         try {
             $records = dns_get_record($domain, DNS_CNAME);
         } catch (\Throwable $e) {
             \Log::warning("DNS CNAME resolution failed for {$domain}: {$e->getMessage()}");
             return [];
         }
-
         if ($records === false || empty($records)) {
             return [];
         }
-
         $ips = [];
         $cnames = collect($records)
             ->where('type', 'CNAME')
             ->map(fn(array $record) => $record['target'] ?? null)
             ->filter()
             ->toArray();
-
         foreach ($cnames as $cname) {
             $ips = array_merge($ips, $this->resolveIpAddresses($cname, $depth + 1));
         }
-
         return collect($ips)
             ->unique()
             ->values()
